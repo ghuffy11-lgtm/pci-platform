@@ -1,0 +1,18 @@
+{
+  "@context": {
+    "pci": "https://pci.example/ontology/",
+    "id": "@id",
+    "type": "@type",
+    "name": "pci:name",
+    "dependsOn": "pci:dependsOn",
+    "ownedBy": "pci:ownedBy"
+  },
+  "id": "pci:object/example-platform",
+  "type": "pci:Platform",
+  "name": "PCI Platform",
+  "dependsOn": {
+    "id": "pci:object/example-knowledge-service",
+    "type": "pci:Service",
+    "name": "Knowledge Service"
+  }
+}
