@@ -1,6 +1,6 @@
 # MSG-0011 — Execution Supervisor: Decision and Scope
 
-**Status:** OPEN — built and tested; **not installed, not enabled**. Awaiting the operator decision.
+**Status:** **SUPERSEDED** by MSG-0024, which authorized enablement. Current state is in MSG-0025: installed, dry-run verified, not enabled.
 **Raised:** 2026-08-19
 **Raised by:** Claude Code (implementation agent)
 **Type:** Record — infrastructure

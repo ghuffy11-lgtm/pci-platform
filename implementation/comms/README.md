@@ -10,6 +10,8 @@ a defect in the record, not a missing message.
 
 | ID | Subject | Status | File |
 |---|---|---|---|
+| **MSG-0025** | **Execution Supervisor installed and dry-run verified — NOT enabled** | **OPEN** — runner invocation + permission posture required | [MSG-0025-supervisor-enablement-status.md](MSG-0025-supervisor-enablement-status.md) |
+| MSG-0024 | Execution Supervisor enable decision | DECIDED — enablement authorized | [MSG-0024-execution-supervisor-enable-decision.md](MSG-0024-execution-supervisor-enable-decision.md) |
 | **MSG-0023** | **Correct TASK-0009 boundary — no TASK-0012 in WP-0001 path** | **DECIDED** | [MSG-0023-correct-task-0009-boundary.md](MSG-0023-correct-task-0009-boundary.md) |
 | MSG-0022 | Resolve MSG-0020 conflict — WP-0001 COMPLETE | **DECIDED — superseded/clarified by MSG-0023** | [MSG-0022-resolve-msg-0020-conflict.md](MSG-0022-resolve-msg-0020-conflict.md) |
 | MSG-0021 | Which MSG-0020 stands? Two contradictory completion decisions | **CLOSED — resolved by MSG-0022 and clarified by MSG-0023** | [MSG-0021-msg-0020-conflict.md](MSG-0021-msg-0020-conflict.md) |
