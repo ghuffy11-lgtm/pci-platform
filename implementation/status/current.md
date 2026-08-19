@@ -77,6 +77,7 @@ All architecture communications are now closed. None are blocking.
 | MSG-0004 | Prepared repository corrections | CLOSED — approved and applied |
 | MSG-0005 | Architecture lead decisions | DECIDED — acted on 2026-08-19 |
 | MSG-0006 | Absolute host file boundary (override) | DECIDED — correction applied, awaiting review |
+| MSG-0007 | Permanent operating rule hardening | DECIDED — applied to CLAUDE.md and AGENTS.md |
 
 ## Repository / GitHub State
 
