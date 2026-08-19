@@ -156,3 +156,74 @@ nothing has been placed inside `/data` either.
 
 Granting scoped passwordless sudo (Option B above) remains the alternative if Claude Code is to
 perform the bootstrap itself rather than the operator running it.
+
+---
+
+## GO attempted 2026-08-19 — stopped, no workaround taken
+
+Instruction: proceed with WP-0001, establish `/data/pci-platform` with the required privilege,
+run the authorized bootstrap, continue verification.
+
+Preconditions verified directly on the host before acting. Both fail:
+
+```text
+$ sudo -n true
+sudo: a password is required
+
+$ ls -ld /data
+drwxr-xr-x 16 root root 4096 Aug 18 11:54 /data
+
+$ ls -ld /data/pci-platform
+ls: cannot access '/data/pci-platform': No such file or directory
+
+$ mkdir /data/pci-platform
+mkdir: cannot create directory ‘/data/pci-platform’: Permission denied
+
+$ command -v docker
+(absent)
+
+$ id -nG
+claude sudo users
+```
+
+The workspace cannot be created by `claude`: `/data` is `root:root` `0755`, and every `sudo`
+invocation requires a password this environment must not supply. Docker therefore cannot be
+installed either, so the bootstrap could not begin.
+
+**Nothing was worked around.** No alternative workspace was created, no temporary directory was
+used, no script was piped into a shell, and nothing was written to `/home/claude` or anywhere else
+outside `/data`. Nothing was written inside `/data` either — the single `mkdir` attempt failed and
+created nothing. The host is byte-for-byte as it was before this session.
+
+Per `CLAUDE.md` Non-Negotiable Rule 2 (server change control) and Rule 6 (stop conditions), work
+stopped at this boundary and this blocker is the record.
+
+### Exactly what is needed
+
+One privileged action unblocks everything. Either:
+
+**A — provision the workspace, then Claude Code proceeds unattended:**
+
+```bash
+sudo install -d -m 0755 -o claude -g claude /data/pci-platform
+```
+
+Claude Code then clones into it, and BLK-0004 still blocks the bootstrap itself unless option C is
+also granted.
+
+**B — run the bootstrap once (provisions the workspace as its step 2, installs Docker, verifies
+data-root):**
+
+```bash
+sudo bash pci-server-bootstrap.sh      # from the operator's own copy of the repository
+```
+
+After this, `/data/pci-platform` exists and `claude` is in the `docker` group, so Claude Code can
+clone into the workspace and run the remaining WP-0001 verification without further privilege.
+**This is the shortest path to unblocking WP-0001 completely.**
+
+**C — scoped passwordless sudo** in `/etc/sudoers.d/`, if Claude Code is to bootstrap and maintain
+the host itself as the contract's Host Responsibilities envisage.
+
+Option B is recommended: one command, no standing privilege, and it produces the evidence block
+WP-0001 needs for AC-01.

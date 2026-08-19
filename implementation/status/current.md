@@ -176,7 +176,12 @@ precedence has changed.
 
 ## Next Action
 
-**Stopped by instruction (MSG-0006), and blocked on BLK-0004 — host privilege.** Implementation
+**Blocked on BLK-0004 — host privilege.** GO was issued 2026-08-19 and stopped at the privilege
+boundary: `/data/pci-platform` does not exist, `/data` is `root:root` and not writable by
+`claude`, and `sudo` requires a password. Docker remains absent. No workaround was taken and the
+host is unchanged. One privileged command unblocks it — see BLK-0004.
+
+**Previously stopped by instruction (MSG-0006).** Implementation
 is held pending architecture-lead review of the contract v0.2 correction. Docker was not
 installed, the host was not bootstrapped, `/data/pci-platform` was not created, and the host has
 not been modified since the out-of-boundary clone was removed.
