@@ -1,0 +1,16 @@
+# Dependencies
+node_modules/
+
+# Environment files carry credentials and must never be committed (ADR-0009).
+.env
+.env.*
+!.env.example
+
+# Editor / OS
+.DS_Store
+Thumbs.db
+*.swp
+
+# Logs
+*.log
+npm-debug.log*

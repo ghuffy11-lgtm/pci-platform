@@ -1,0 +1,7 @@
+node_modules/
+*.log
+
+# Never commit environment files — they carry credentials (ADR-0009).
+.env
+.env.*
+!.env.example
