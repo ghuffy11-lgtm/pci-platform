@@ -1,26 +1,27 @@
 # PCI Implementation Status
 
 **Active Work Package:** WP-0001 — PCI Kernel Foundation
-**Status:** IMPLEMENTED — VERIFICATION IN PROGRESS ON AUTHORIZED HOST
+**Status:** **VERIFIED ON AUTHORIZED HOST** — all ten acceptance criteria met; stack not yet reproducible (DISC-0007, DISC-0008)
 **Last Updated:** 2026-08-19
 
 ## Current State
 
 Architecture and documentation baseline is established. Permanent Claude Code operating rules are defined in `CLAUDE.md`. The initial server bootstrap contract is defined in `docs/operations/pci-server-bootstrap.md`.
 
-The kernel is implemented and its domain, authorization, audit, tenancy, and HTTP contract are
-verified: **203 tests pass, 0 fail, 1 tier skipped**, with a clean typecheck.
+**WP-0001 has been verified against real infrastructure.** The authorized Ubuntu host is
+bootstrapped, Docker runs with `DockerRootDir` = `/data/docker`, PostgreSQL runs as a container with
+its volume inside that boundary, and the full test suite has executed on the target platform:
+**229 tests pass, 0 fail** across unit (102), contract (101), and integration (26).
 
-The work package is **not complete**. AC-02 (database initialization) and the integration tier
-of AC-09 remain unverified: no PostgreSQL instance and no container runtime exist on the
-authoring host, and the authorized Ubuntu implementation host has not yet been bootstrapped.
+All ten acceptance criteria are met. The ADR-0016 tenant-isolation obligations — FORCE RLS, a
+runtime role without SUPERUSER or BYPASSRLS, cross-tenant reads blocked, fail-closed on missing
+tenant context — are proven against a live database rather than asserted.
 
-> **Updated when the bootstrap contract landed.** This file previously said "no execution host
-> is recorded in the repository". That is no longer true.
-> `docs/operations/pci-server-bootstrap.md` records the target Ubuntu host, the `claude`
-> account, and the `/data/docker` boundary — which answers MSG-0001. BLK-0001 narrows
-> accordingly: from "no execution environment is defined" to "the defined environment is not
-> yet stood up".
+**Two defects were found by running the stack for the first time**, and they matter more than the
+green result: the database init script creates a passwordless role and reports healthy anyway
+(DISC-0007), and the compose kernel service cannot start as committed (DISC-0008). Neither weakens
+the verified kernel, but together they mean **a clean checkout plus `docker compose up` still
+produces a broken stack**. WP-0001 is verified; it is not yet deployable.
 
 ## Implementation Environment
 
@@ -43,9 +44,14 @@ reads it at startup and executes the highest-priority READY task.
 
 | # | Task | Priority | Status |
 |---|---|---|---|
-| TASK-0001 | Complete WP-0001 verification on the authorized host | 1 | **READY** — prerequisite P1 (bootstrap executed) currently UNMET |
-| TASK-0002 | Make test entry points shell-independent (DISC-0005) | 2 | PROPOSED — not authorized |
+| TASK-0001 | Complete WP-0001 verification on the authorized host | 1 | **DONE** — 2026-08-19 |
+| TASK-0002 | Make test entry points shell-independent (DISC-0005) | — | **WITHDRAWN** — premise disproven |
 | TASK-0003 | Normalise `*.md` line endings to LF (DISC-0006) | 3 | PROPOSED — not authorized |
+| TASK-0004 | Fix database role provisioning (DISC-0007) | 1 | PROPOSED — not authorized |
+| TASK-0005 | Fix compose kernel service configuration (DISC-0008) | 2 | PROPOSED — not authorized |
+
+**No task is currently READY.** TASK-0004 and TASK-0005 address the defects found while executing
+TASK-0001 and need the architecture lead to mark them READY before any work starts.
 
 Only the architecture lead may authorize new work or change a task's priority or scope. A PROPOSED
 task is not executable.
@@ -60,31 +66,44 @@ task is not executable.
 
 ## Verification Summary
 
+**Verified on the authorized host, 2026-08-19.**
+
 | Tier | Result |
 |---|---|
 | Typecheck | PASS |
-| Unit | 102 pass / 0 fail |
-| Contract | 101 pass / 0 fail |
-| Integration (PostgreSQL) | **SKIPPED — never executed** |
+| Unit | **102 pass / 0 fail** |
+| Contract | **101 pass / 0 fail** |
+| Integration (real PostgreSQL) | **26 pass / 0 fail / 0 skipped** |
+| **Total** | **229 pass / 0 fail** |
+
+Every tier reported a non-zero test count.
 
 | AC | Verdict |
 |---|---|
-| AC-01 Build | PARTIAL — container image never built |
-| AC-02 Database | **NOT MET** |
+| AC-01 Build | **MET** — both images built; `DockerRootDir` = `/data/docker` |
+| AC-02 Database | **MET** — migrations applied to real PostgreSQL, idempotency verified |
 | AC-03 Create object | MET |
 | AC-04 Relationships | MET |
-| AC-05 Tenant isolation | PARTIAL — row-level security unverified |
-| AC-06 Audit | MET |
+| AC-05 Tenant isolation | **MET** — RLS + FORCE RLS proven live |
+| AC-06 Audit | MET — append-only proven under the runtime role |
 | AC-07 Validation | MET |
-| AC-08 Health | MET |
-| AC-09 Tests | PARTIAL — integration tier never run |
-| AC-10 Evidence | MET |
+| AC-08 Health | MET — `/health/ready` 200 with `store: ok` against real PostgreSQL |
+| AC-09 Tests | **MET** — all three tiers executed |
+| AC-10 Evidence | MET — report section 11 |
+
+**All ten acceptance criteria are met.** Full evidence:
+`implementation/reports/WP-0001-kernel-foundation-report.md` section 11.
+
+> **But the stack is not reproducible from a clean checkout.** Reaching this state required two
+> manual steps that are not in the repository — see DISC-0007 and DISC-0008. The kernel is verified;
+> the deployment artifacts are not yet correct. WP-0001 is therefore reported as **verified, not
+> deployable**.
 
 ## Open Communications
 
 Index: `implementation/comms/README.md` carries the full message register with links and status.
 
-One message is OPEN and requires operator action: **MSG-0008**.
+**No message is OPEN.** MSG-0008 closed when the bootstrap was executed and verified.
 
 | ID | Subject | Status |
 |---|---|---|
@@ -96,7 +115,7 @@ One message is OPEN and requires operator action: **MSG-0008**.
 | MSG-0006 | Absolute host file boundary (override) | DECIDED — correction applied, awaiting review |
 | MSG-0007 | Permanent operating rule hardening | DECIDED — applied to CLAUDE.md and AGENTS.md |
 | MSG-0009 | Documentation Is Mandatory rule added to `CLAUDE.md` | DECIDED — applied |
-| MSG-0008 | Authorized bootstrap: exact operator procedure and path — `implementation/comms/MSG-0008-authorized-bootstrap-command.md` | **OPEN** — awaiting operator execution |
+| MSG-0008 | Authorized bootstrap: exact operator procedure and path | **CLOSED** — executed and verified 2026-08-19 |
 
 ## Repository / GitHub State
 
@@ -118,17 +137,11 @@ required as a messenger.
 
 ## Open Blockers
 
-| ID | Subject | Severity |
-|---|---|---|
-| BLK-0001 | Authorized host not yet bootstrapped (narrowed — environment is now defined) | High |
-| BLK-0004 | No privilege to bootstrap the authorized host (no passwordless sudo) | High |
+**None.** BLK-0001 and BLK-0004 were both RESOLVED on 2026-08-19; BLK-0002 and BLK-0003 earlier.
 
-Both open blockers are operational, not architectural. BLK-0001: the host, account, and
-`/data/docker` boundary are defined by the accepted contract, but the host has not been stood up,
-so AC-02 and the integration tier of AC-09 remain unverified. BLK-0004: SSH access now works, but
-Docker is absent and `claude` has no passwordless sudo, so nothing could be installed. A
-verifying bootstrap script is committed for the operator to run. No architecture decision is
-required for either.
+There are no open blockers. The two defects found during verification (DISC-0007, DISC-0008) are
+recorded as discoveries with proposed tasks, not as blockers: nothing is prevented from proceeding,
+but the deployment artifacts are not yet correct.
 
 ## Recently Closed
 
@@ -137,6 +150,9 @@ required for either.
 | BLK-0002 | GitHub push unavailable — communication channel down | 2026-08-19 | **RESOLVED.** All commits reached `origin/main`. Diagnosis history preserved in the blocker. |
 | BLK-0003 | PCI server key could not be unlocked | 2026-08-19 | **RESOLVED.** Key loaded into a reachable agent; SSH access to the host verified. Passphrase retained. |
 | MSG-0001 | Authorized Ubuntu host and `/data/docker` storage boundary | 2026-08-19 | **ANSWERED** by `docs/operations/pci-server-bootstrap.md` (accepted contract). |
+| BLK-0001 | No PostgreSQL or container execution environment | 2026-08-19 | **RESOLVED.** Host bootstrapped; all four gated acceptance criteria verified. |
+| BLK-0004 | No privilege to bootstrap the authorized host | 2026-08-19 | **RESOLVED.** Operator executed the bootstrap; `DockerRootDir` = `/data/docker` verified directly. |
+| MSG-0008 | Authorized bootstrap procedure | 2026-08-19 | **CLOSED.** All three steps complete and verified. |
 
 ## Permanent Operating Rules
 
@@ -211,6 +227,8 @@ precedence has changed.
 | DISC-0004 | Compose stack predates the `/data/docker` boundary |
 | DISC-0005 | `npm test` reports success while running zero tests under POSIX shells |
 | DISC-0006 | CRLF line endings silently defeat anchored text edits |
+| DISC-0007 | Init refuses to create a passwordless role, then creates one anyway (**High**) |
+| DISC-0008 | Compose kernel service cannot start as committed |
 
 ## Report
 
@@ -227,9 +245,27 @@ precedence has changed.
 
 ## Next Action
 
-**Blocked on BLK-0004, step 3 — one privileged command remains.**
+**Awaiting the architecture lead. No task is READY and nothing is blocked.**
 
-MSG-0008 steps 1 and 2 are **COMPLETE and verified** (2026-08-19):
+TASK-0001 is DONE: WP-0001 is verified on the authorized host, all ten acceptance criteria met,
+229 tests passing. The decision now needed is whether to authorize the two defect fixes:
+
+| Task | Addresses | Why it matters |
+|---|---|---|
+| TASK-0004 | DISC-0007 | The database init creates a passwordless role and reports healthy anyway. Highest priority — it is the one with a security shape, even though its current effect is availability. Verifying the fix needs a **destructive** volume re-initialisation, which requires explicit authorization under Rule 9. |
+| TASK-0005 | DISC-0008 | The compose kernel service cannot start as committed. Needs a decision on how a development principal is supplied without committing a token. |
+
+Until both are fixed, **a clean checkout plus `docker compose up` produces a broken stack.** That is
+the honest reading of WP-0001's state: the kernel is verified, the deployment artifacts are not.
+
+Also awaiting a decision: TASK-0003 (`*.md` line-ending normalisation, DISC-0006), and whether
+WP-0001 may now be declared COMPLETE given that every acceptance criterion is met while the
+reproducibility defects remain open. Claude Code has not declared it complete.
+
+---
+
+**Historical — MSG-0008 progress record.** Steps 1 and 2 were **COMPLETE and verified**
+(2026-08-19):
 
 - `/data/pci-platform` provisioned by the operator: `claude:claude 0755`, on the `/dev/sdb1` 8.7T
   `/data` mount.

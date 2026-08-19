@@ -1,6 +1,6 @@
 # BLK-0004 — No Privilege to Bootstrap the Authorized Host
 
-**Status:** OPEN
+**Status:** **RESOLVED / CLOSED** — 2026-08-19. Bootstrap executed by the operator; `DockerRootDir` verified as `/data/docker`.
 **Severity:** High — blocks all remaining WP-0001 verification
 **Raised:** 2026-08-19
 **Work package:** WP-0001 — PCI Kernel Foundation
@@ -321,3 +321,27 @@ and a real PostgreSQL instance.
 
 Closure condition unchanged: `docker info --format '{{.DockerRootDir}}'` reporting a path under
 `/data/docker`, verified directly by Claude Code.
+
+---
+
+## RESOLVED — 2026-08-19
+
+**Status: RESOLVED / CLOSED.** The operator executed the authorized bootstrap. Closure condition
+verified directly by Claude Code rather than accepted from a report:
+
+```text
+$ docker info --format '{{.DockerRootDir}}'
+/data/docker
+
+$ docker --version          Docker version 29.1.3, build 29.1.3-0ubuntu3~24.04.2
+$ systemctl is-active docker    active
+$ id -nG                    claude sudo users docker
+$ cat /etc/docker/daemon.json   {"data-root": "/data/docker"}
+```
+
+`DockerRootDir` resolves inside `/data/docker`, which was the stated closure condition. `claude` is
+in the `docker` group, so no further privilege is required for WP-0001 verification — and none was
+used: everything after the bootstrap ran unprivileged.
+
+The verification log's final row: third GO — workspace present, repo cloned, **Docker present,
+bootstrap executed** — proceeded to complete WP-0001 verification.

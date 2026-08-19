@@ -1,7 +1,16 @@
 # WP-0001 — PCI Kernel Foundation — Implementation Report
 
-**Status:** IMPLEMENTATION COMPLETE — **WORK PACKAGE NOT COMPLETE**
-**Date:** 2026-08-19
+**Status:** **ALL TEN ACCEPTANCE CRITERIA MET AND VERIFIED ON REAL INFRASTRUCTURE** — with two
+reproducibility defects recorded (DISC-0007, DISC-0008) that must be fixed before the stack can be
+called deployable.
+**Date:** 2026-08-19, host verification appended same day
+
+> ## Host verification — 2026-08-19
+>
+> Everything below this banner was written before any of it had been executed. It has now been run
+> against the authorized Ubuntu host. **The results are recorded in section 11 at the end of this
+> report, which supersedes the earlier verdicts in sections 3 and 7.** The original text is left
+> unchanged so the difference between "written" and "verified" stays visible.
 **Author:** Claude Code (implementation agent)
 **Work package:** `docs/program/work-packages/WP-0001-kernel-foundation.md`
 
@@ -239,3 +248,115 @@ claimed anywhere in this work.
 5. Only then proceed to the next work package.
 
 **Do not treat WP-0001 as complete until items 1 and 2 are done.**
+
+---
+
+# 11. Host verification — 2026-08-19
+
+Executed on the authorized Ubuntu PCI server (`hcaisrv`, Ubuntu 24.04.4 LTS) after the operator ran
+the one-time privileged bootstrap. **This section supersedes sections 3 and 7 where they conflict.**
+
+## 11.1 Environment
+
+| Property | Value |
+|---|---|
+| Docker | 29.1.3 (Ubuntu archive), Compose 2.40.3 |
+| `DockerRootDir` | `/data/docker` — **inside the mandatory boundary** |
+| `daemon.json` | `{"data-root": "/data/docker"}` |
+| Workspace | `/data/pci-platform`, `claude:claude`, repository at `dc3d3f2` |
+| PostgreSQL | `postgres:16.4-alpine`, healthy |
+| Volume | `/data/docker/volumes/pci-kernel_postgres-data/_data` — inside the boundary |
+| Images built | `pci-kernel-kernel:latest`, `pci-kernel-migrate:latest` (227 MB each) |
+
+No PCI project artifact exists outside `/data`. The only file outside it is
+`~/.ssh/known_hosts`, which contract v0.2 explicitly exempts as an infrastructure credential.
+
+## 11.2 Acceptance criteria — verified verdicts
+
+| AC | Previous | **Verified** | Evidence |
+|---|---|---|---|
+| AC-01 Build | PARTIAL | **MET** | Both images built from the committed Dockerfile; `DockerRootDir` confirmed under `/data/docker` |
+| AC-02 Database | **NOT MET** | **MET** | `applying 0001_kernel_foundation … migrations complete: 1 applied, 0 already present`; idempotency re-verified by the integration tier |
+| AC-03 Create object | MET | MET | contract + integration |
+| AC-04 Relationships | MET | MET | contract + integration |
+| AC-05 Tenant isolation | PARTIAL | **MET** | RLS + FORCE RLS live; see 11.4 |
+| AC-06 Audit | MET | MET | `audit records cannot be updated or deleted by the runtime role` ✔ |
+| AC-07 Validation | MET | MET | contract tier |
+| AC-08 Health | MET | MET | `/health/ready` 200 with `store: ok` against real PostgreSQL; `/health/live` 200 |
+| AC-09 Tests | PARTIAL | **MET** | all three tiers executed with non-zero counts; see 11.3 |
+| AC-10 Evidence | MET | MET | this section |
+
+## 11.3 Test tiers — all executed on the target platform
+
+| Tier | Result |
+|---|---|
+| Unit | **102 pass / 0 fail** |
+| Contract | **101 pass / 0 fail** |
+| Integration (real PostgreSQL) | **26 pass / 0 fail / 0 skipped / 0 cancelled** |
+| **Total** | **229 pass / 0 fail** |
+
+Every tier reported a non-zero test count, which the standing rule requires before a pass may be
+claimed. The integration tier had previously never executed.
+
+## 11.4 ADR-0016 obligations — proven against a live database
+
+| Obligation | Evidence |
+|---|---|
+| Runtime role holds neither SUPERUSER nor BYPASSRLS | `pci_app \| super=false \| bypassrls=false` from `pg_authid` |
+| FORCE RLS on every tenant-scoped table | `audit_records, events, knowledge_object_versions, knowledge_objects, provenance_records, relationships` — all `rls=true FORCE=true` |
+| Cross-tenant read blocked | ✔ `ADR-0016 layer 3 — row-level security blocks a cross-tenant read` |
+| Fail-closed on missing tenant context | ✔ `an unset tenant GUC returns no rows rather than all rows` |
+| Cross-tenant relationship rejected | ✔ `a cross-tenant relationship is rejected by the composite foreign key` |
+| Audit append-only under the runtime role | ✔ `audit records cannot be updated or deleted by the runtime role` |
+
+Ratification was never verification; these obligations are now demonstrated rather than asserted.
+
+## 11.5 Two defects found on first execution
+
+Both were found *because* the stack ran for the first time, and both are recorded in full:
+
+- **DISC-0007** — `initdb/00-roles.sql` creates `pci_app` **before** the guard that is supposed to
+  prevent a passwordless role, the resulting exception does not stop initialisation, and the stack
+  reports **healthy** with an unusable role. It also grants the role nothing and never creates the
+  `pci_test` database the integration tier documents. Severity: high.
+- **DISC-0008** — the compose `kernel` service sets `PCI_IDENTITY_MODE=static` but never supplies
+  `PCI_STATIC_PRINCIPALS`, so the service refuses to start. The kernel's fail-closed validation
+  behaved correctly; the wiring is incomplete.
+
+### What this means for the verdicts above
+
+The acceptance criteria are genuinely met — the software does what WP-0001 requires, proven against
+real infrastructure. **But the stack as committed is not reproducible.** Reaching the verified state
+needed two manual steps not present in the repository:
+
+1. `ALTER ROLE pci_app WITH PASSWORD …` and `CREATE DATABASE pci_test OWNER pci_app` (DISC-0007);
+2. appending a generated `PCI_STATIC_PRINCIPALS` entry to the uncommitted `.env` (DISC-0008).
+
+A clean checkout plus `docker compose up` still produces a broken stack. That gap is a defect in the
+deployment artifacts, not in the kernel, and it is why this report does not describe WP-0001 as
+"deployable" despite every acceptance criterion being met.
+
+## 11.6 Secrets handling
+
+All credentials were generated **on the host** with `openssl rand`, written only to
+`/data/pci-platform/.env` (mode `0600`, matched by `.gitignore:5`), and never printed to a
+terminal, a log, a commit, or a conversation. `git check-ignore -v .env` was confirmed before use.
+No credential value appears anywhere in this repository.
+
+## 11.7 Corrections to earlier records
+
+- **DISC-0005 was wrong** about the target platform and has been corrected. `npm test` runs all 203
+  unit and contract tests correctly under `/bin/sh`; the zero-test failure is confined to Git Bash
+  on Windows. Notably, the "obvious fix" it recommended (pointing `--test` at a directory) is the
+  variant that actually breaks — measured, not assumed.
+- Section 7's limitation "the container image has never been built" no longer holds. Both images
+  are built.
+
+## 11.8 Remaining limitations
+
+- The compose stack is not reproducible from a clean checkout (DISC-0007, DISC-0008).
+- The fixed initialisation path cannot be verified without destroying and re-creating the
+  PostgreSQL volume, which is a destructive operation and is not authorized.
+- Images are tag-pinned, not digest-pinned. Unchanged from the original report.
+- The static identity adapter remains a development fixture, prohibited in production, and it warns
+  loudly at startup (DISC-0003).

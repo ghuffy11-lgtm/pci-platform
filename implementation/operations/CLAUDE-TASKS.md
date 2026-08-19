@@ -26,16 +26,22 @@ not proceed by another route.
 
 | # | Task | Priority | Status |
 |---|---|---|---|
-| TASK-0001 | Complete WP-0001 verification on the authorized host | 1 | **READY** — prerequisite P1 currently UNMET |
-| TASK-0002 | Make the test entry points shell-independent (DISC-0005) | 2 | PROPOSED — not authorized |
+| TASK-0001 | Complete WP-0001 verification on the authorized host | 1 | **DONE** — 2026-08-19, all ten AC met and verified |
+| TASK-0002 | Make the test entry points shell-independent (DISC-0005) | — | **WITHDRAWN** — premise disproven by measurement |
 | TASK-0003 | Normalise `*.md` line endings to LF (DISC-0006) | 3 | PROPOSED — not authorized |
+| TASK-0004 | Fix database role provisioning (DISC-0007) | 1 | PROPOSED — not authorized |
+| TASK-0005 | Fix compose kernel service configuration (DISC-0008) | 2 | PROPOSED — not authorized |
+
+**No task is currently READY.** TASK-0001 is complete; TASK-0004 and TASK-0005 address the two
+defects found while executing it and require the architecture lead to mark them READY before any
+work begins.
 
 ---
 
 ## TASK-0001 — Complete WP-0001 verification on the authorized host
 
 **Priority:** 1
-**Status:** READY — prerequisite P1 is currently UNMET, so execution stops at the prerequisite check
+**Status:** **DONE** — 2026-08-19. All ten acceptance criteria met and verified on the authorized host. See the completion record at the end of this task.
 **Work package:** WP-0001 — PCI Kernel Foundation
 **Authority:** MSG-0005 (implementation authorization), MSG-0008 (bootstrap procedure)
 **Blocker:** BLK-0004 — step 3 of MSG-0008 not executed
@@ -50,7 +56,7 @@ container runtime and a real PostgreSQL instance.
 
 | ID | Prerequisite | State |
 |---|---|---|
-| P1 | Docker installed and healthy, `DockerRootDir` under `/data/docker` — i.e. `sudo bash /data/pci-platform/deploy/bootstrap/pci-server-bootstrap.sh` has been run by the operator | **UNMET** |
+| P1 | Docker installed and healthy, `DockerRootDir` under `/data/docker` — i.e. `sudo bash /data/pci-platform/deploy/bootstrap/pci-server-bootstrap.sh` has been run by the operator | **MET** — verified 2026-08-19, `DockerRootDir` = `/data/docker` |
 | P2 | `/data/pci-platform` exists, owned by `claude`, containing the repository | MET — verified 2026-08-19, clone at `9f19bce` |
 | P3 | SSH access to the host as `claude` | MET — verified 2026-08-19 |
 
@@ -125,8 +131,14 @@ complete on the strength of code running.
 
 ## TASK-0002 — Make test entry points shell-independent (PROPOSED)
 
-**Status:** PROPOSED — not authorized. Do not execute.
-**Source:** DISC-0005
+**Status:** **WITHDRAWN** 2026-08-19 — the premise is disproven. Do not execute.
+**Source:** DISC-0005 (corrected)
+
+> **The paragraph below is retained but WRONG.** Measured on the authorized host: `npm test` runs
+> all 203 unit and contract tests correctly under `/bin/sh`. The zero-test failure is confined to
+> Git Bash on Windows. Worse, the proposed fix — pointing `--test` at a directory — is the variant
+> that actually breaks (1 test, 1 fail). Applying it would have introduced the failure it was meant
+> to prevent. See the correction in DISC-0005.
 
 `npm test` exits 0 while running zero tests under a POSIX shell, which is the default on the target
 host. The scripts single-quote their globs, so `node --test` matches nothing. This can manufacture
@@ -135,6 +147,9 @@ AC-09 evidence that does not exist.
 Proposed fix: make each tier's glob shell-independent and treat a zero test count as failure.
 Folded into TASK-0001 step 1 as a precondition for trusting any result there, but recorded
 separately because the package definition change deserves its own review.
+
+**Withdrawn.** The only part worth keeping is the standing rule that a tier reporting zero tests is
+a failure — which now lives in `CLAUDE.md` Rule 10.
 
 ## TASK-0003 — Normalise `*.md` line endings to LF (PROPOSED)
 
@@ -146,3 +161,66 @@ matches nothing and exits 0. This has already produced one inaccurate commit mes
 
 Proposed fix: add `*.md text eol=lf` to `.gitattributes`. This is repository-wide normalisation
 touching files owned by the architecture lead, so it is proposed rather than applied.
+
+---
+
+## TASK-0001 — completion record (2026-08-19)
+
+**DONE.** Executed on the authorized Ubuntu host after the operator ran the privileged bootstrap.
+
+| Prerequisite | Outcome |
+|---|---|
+| P1 Docker healthy, `DockerRootDir` under `/data/docker` | MET — verified directly, `/data/docker` |
+| P2 workspace with repository | MET |
+| P3 SSH access | MET |
+
+Results:
+
+- **229 tests pass, 0 fail** — 102 unit, 101 contract, 26 integration against real PostgreSQL.
+  Every tier reported a non-zero count.
+- **All ten acceptance criteria MET.** AC-02 moved from NOT MET; AC-01, AC-05, AC-09 from PARTIAL.
+- **ADR-0016 proven live**: FORCE RLS on all six tenant-scoped tables, runtime role without
+  SUPERUSER or BYPASSRLS, cross-tenant reads blocked, unset tenant context returning no rows rather
+  than all rows, audit records not updatable or deletable by the runtime role.
+- **Boundary held**: no PCI artifact outside `/data`; PostgreSQL volume inside `/data/docker`;
+  credentials generated on the host, never printed or committed.
+
+Full evidence: section 11 of `implementation/reports/WP-0001-kernel-foundation-report.md`.
+
+Two defects were found by running the stack for the first time — DISC-0007 and DISC-0008. They are
+recorded as TASK-0004 and TASK-0005 and are **not** authorized. The acceptance criteria are met, but
+**the stack is not reproducible from a clean checkout** until they are fixed.
+
+The forbidden actions held throughout: nothing was created outside `/data`, no permission denial was
+worked around, no pre-existing non-PCI directory was touched, and no acceptance criterion is
+reported met without recorded evidence.
+
+## TASK-0004 — Fix database role provisioning (PROPOSED)
+
+**Status:** PROPOSED — not authorized. Do not execute.
+**Source:** DISC-0007 | **Suggested priority:** 1 — highest of the outstanding work
+
+`initdb/00-roles.sql` creates `pci_app` before the guard meant to prevent a passwordless role, the
+resulting exception does not stop initialisation, and the stack reports healthy with an unusable
+role. It also grants the role nothing and never creates the `pci_test` database the integration
+tier documents.
+
+Proposed: reorder the guard before creation; pass the password in via `PGOPTIONS`; grant the
+minimum privileges explicitly; provision `pci_test` or align the documented usage.
+
+**Note a destructive dependency:** `initdb` runs only on first initialisation, so verifying the fix
+requires destroying and re-creating the `pci-kernel_postgres-data` volume. That volume holds only
+verification data, but the deletion needs explicit authorization under Rule 9.
+
+## TASK-0005 — Fix compose kernel service configuration (PROPOSED)
+
+**Status:** PROPOSED — not authorized. Do not execute.
+**Source:** DISC-0008 | **Suggested priority:** 2
+
+The compose `kernel` service sets `PCI_IDENTITY_MODE=static` but never supplies
+`PCI_STATIC_PRINCIPALS`, so the service refuses to start. The kernel's fail-closed validation is
+correct; the wiring is incomplete.
+
+Proposed: ship `.env.example` with a clearly fake placeholder and document generation, optionally
+generating a development principal during bootstrap. The fail-closed guard must not be relaxed to
+make the demo convenient.

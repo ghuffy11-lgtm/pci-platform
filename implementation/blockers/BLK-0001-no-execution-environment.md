@@ -1,6 +1,6 @@
 # BLK-0001 — No PostgreSQL or Container Execution Environment
 
-**Status:** OPEN — narrowed 2026-08-19 by the accepted bootstrap contract
+**Status:** **RESOLVED / CLOSED** — 2026-08-19. Execution environment exists; all four gated acceptance criteria verified.
 **Severity:** High — prevents formal verification of two acceptance criteria
 **Raised:** 2026-08-19
 **Work package:** WP-0001 — PCI Kernel Foundation
@@ -73,3 +73,30 @@ Clearing it now requires no decision, only execution: bootstrap the authorised h
 contract, bring up PostgreSQL with persistent state under `/data/docker` (see DISC-0004), run the
 integration tier (see DISC-0005 before trusting any tier's result), and record the outcome in the
 WP-0001 report.
+
+---
+
+## RESOLVED — 2026-08-19
+
+**Status: RESOLVED / CLOSED.** The execution environment exists and has been used.
+
+The operator ran the authorized bootstrap. Docker 29.1.3 and Compose 2.40.3 are installed on the
+authorized Ubuntu host, `DockerRootDir` is `/data/docker`, PostgreSQL 16.4 runs as a container with
+its volume at `/data/docker/volumes/pci-kernel_postgres-data/_data`, and the workspace is
+`/data/pci-platform`.
+
+Every acceptance criterion this blocker gated has been verified:
+
+| AC | Was | Now |
+|---|---|---|
+| AC-01 Build | PARTIAL — image never built | **MET** — both images built |
+| AC-02 Database | NOT MET | **MET** — migrations applied to real PostgreSQL |
+| AC-05 Tenant isolation | PARTIAL — RLS unverified | **MET** — RLS and FORCE RLS proven live |
+| AC-09 Tests | PARTIAL — integration never run | **MET** — 26 integration tests pass |
+
+Evidence is recorded in section 11 of `implementation/reports/WP-0001-kernel-foundation-report.md`.
+
+Two defects were found the moment the stack ran for real — DISC-0007 (role provisioning) and
+DISC-0008 (compose kernel service wiring). They do not reopen this blocker: the environment exists
+and works. They mean the stack is not yet reproducible from a clean checkout, which is tracked
+separately.

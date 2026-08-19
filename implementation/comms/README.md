@@ -10,7 +10,7 @@ a defect in the record, not a missing message.
 
 | ID | Subject | Status | File |
 |---|---|---|---|
-| **MSG-0008** | **Authorized one-time privileged bootstrap — exact operator procedure** | **OPEN — awaiting operator execution** | [MSG-0008-authorized-bootstrap-command.md](MSG-0008-authorized-bootstrap-command.md) |
+| MSG-0008 | Authorized one-time privileged bootstrap — exact operator procedure | **CLOSED** — executed and verified 2026-08-19 | [MSG-0008-authorized-bootstrap-command.md](MSG-0008-authorized-bootstrap-command.md) |
 | MSG-0009 | Permanent rule added: Documentation Is Mandatory | DECIDED — applied | [MSG-0009-documentation-is-mandatory.md](MSG-0009-documentation-is-mandatory.md) |
 | MSG-0007 | Permanent operating rule hardening | DECIDED — applied | [MSG-0007-operating-rule-hardening.md](MSG-0007-operating-rule-hardening.md) |
 | MSG-0006 | Absolute host file boundary (architecture lead override) | DECIDED — applied, contract v0.2 | [MSG-0006-absolute-host-file-boundary.md](MSG-0006-absolute-host-file-boundary.md) |
@@ -20,10 +20,17 @@ a defect in the record, not a missing message.
 | MSG-0002 | Kernel implementation stack selection | CLOSED — ADR-0015 ratified by MSG-0005 | [MSG-0002-kernel-runtime-stack.md](MSG-0002-kernel-runtime-stack.md) |
 | MSG-0001 | Authorized execution host and persistent storage boundary | ANSWERED — bootstrap contract accepted | [MSG-0001-execution-host-and-storage-boundary.md](MSG-0001-execution-host-and-storage-boundary.md) |
 
-## ACTION REQUIRED — MSG-0008
+## No action currently required
 
-One item awaits the operator. The authorized bootstrap cannot be executed by Claude Code because
-`sudo` on the PCI server requires a password this environment must not handle.
+**MSG-0008 is CLOSED.** The operator executed the authorized bootstrap on 2026-08-19 and Claude Code
+verified the result directly (`DockerRootDir` = `/data/docker`). WP-0001 verification followed and
+completed: 229 tests passing, all ten acceptance criteria met.
+
+Two defects found during that verification are recorded as DISC-0007 and DISC-0008, with proposed
+tasks TASK-0004 and TASK-0005 in `implementation/operations/CLAUDE-TASKS.md`. **Neither is
+authorized**; both await the architecture lead.
+
+The historical bootstrap procedure is retained below for the record.
 
 Full detail, rationale, and verification steps:
 [`MSG-0008-authorized-bootstrap-command.md`](MSG-0008-authorized-bootstrap-command.md).
@@ -46,7 +53,7 @@ sudo bash /data/pci-platform/deploy/bootstrap/pci-server-bootstrap.sh
 ```
 
 Script: [`deploy/bootstrap/pci-server-bootstrap.sh`](../../deploy/bootstrap/pci-server-bootstrap.sh)
-— idempotent, never executed, writes only to `/data/pci-platform`, `/data/docker`,
+— idempotent, **executed successfully 2026-08-19**, writes only to `/data/pci-platform`, `/data/docker`,
 `/etc/docker/daemon.json`, and apt package state.
 
 Two things to decide consciously before running it: it adds `claude` to the `docker` group, which

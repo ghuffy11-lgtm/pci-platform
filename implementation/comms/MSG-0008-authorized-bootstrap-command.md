@@ -1,6 +1,6 @@
 # MSG-0008 — Authorized One-Time Privileged Bootstrap: Exact Operator Command
 
-**Status:** OPEN — procedure amended 2026-08-19 for execution from an existing repository copy; awaiting operator execution
+**Status:** **CLOSED** — 2026-08-19. Bootstrap executed and verified; `DockerRootDir` = `/data/docker`. Retained as a historical record.
 **Raised:** 2026-08-19
 **Raised by:** Claude Code (implementation agent)
 **Work package:** WP-0001 — PCI Kernel Foundation
@@ -334,3 +334,29 @@ privilege was not worked around. Nothing on the host was modified beyond the aut
 `/data/pci-platform`.
 
 **MSG-0008 remains OPEN**, now blocked on step 3 alone.
+
+---
+
+## CLOSED — 2026-08-19
+
+All three steps are complete. The operator executed step 3, and Claude Code verified the outcome
+directly rather than accepting it from a report:
+
+```text
+$ docker info --format '{{.DockerRootDir}}'   -> /data/docker
+$ docker --version                            -> 29.1.3
+$ systemctl is-active docker                  -> active
+$ id -nG                                      -> claude sudo users docker
+```
+
+The stated closure condition — `DockerRootDir` under `/data/docker` — is satisfied.
+
+WP-0001 verification followed immediately and completed: 229 tests passing across all three tiers
+(102 unit, 101 contract, 26 integration against real PostgreSQL), all ten acceptance criteria met,
+and the ADR-0016 tenant-isolation obligations proven against a live database. Evidence is in
+section 11 of `implementation/reports/WP-0001-kernel-foundation-report.md`.
+
+Two defects surfaced on first execution and are recorded as DISC-0007 and DISC-0008. They do not
+affect this message's closure.
+
+**MSG-0008 is CLOSED.** No further operator action is required for the bootstrap.
