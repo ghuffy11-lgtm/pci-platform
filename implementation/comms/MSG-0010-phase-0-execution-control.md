@@ -1,6 +1,6 @@
 # MSG-0010 — Phase 0: Autonomous Execution, Task Roadmap, and Recovery
 
-**Status:** OPEN — system built; awaiting authorization of TASK-0004 and TASK-0005
+**Status:** **CLOSED** 2026-08-19 — TASK-0004 and TASK-0005 were authorized by MSG-0012 and are now COMPLETE. See MSG-0015.
 **Raised:** 2026-08-19
 **Raised by:** Claude Code (implementation agent)
 **Type:** Record — Phase 0 implementation

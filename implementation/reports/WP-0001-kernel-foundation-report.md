@@ -360,3 +360,70 @@ No credential value appears anywhere in this repository.
 - Images are tag-pinned, not digest-pinned. Unchanged from the original report.
 - The static identity adapter remains a development fixture, prohibited in production, and it warns
   loudly at startup (DISC-0003).
+
+---
+
+# 12. Reproducibility defects fixed — 2026-08-19 (TASK-0004, TASK-0005)
+
+Authorized by MSG-0012. Both defects recorded in section 11.5 are now fixed and verified.
+
+## 12.1 TASK-0004 — database role provisioning (DISC-0007)
+
+`deploy/compose/initdb/00-roles.sql` and the compose postgres service:
+
+- the password guard runs **before** `CREATE ROLE`;
+- `\set ON_ERROR_STOP on`, so a failed init exits non-zero instead of continuing;
+- minimum password length of 16;
+- idempotent `ALTER ROLE` path preserving NOSUPERUSER / NOBYPASSRLS;
+- explicit post-creation assertion that neither SUPERUSER nor BYPASSRLS is held;
+- grants: `CONNECT` (via `current_database()`), `USAGE` + `CREATE` on `public`;
+- `pci_test` created and owned by `pci_app`;
+- `PGOPTIONS` supplies `pci.app_password` from `PCI_APP_PASSWORD`.
+
+**Gate G1 — passed**, on a throwaway container with its own ephemeral volume, leaving
+`pci-kernel_postgres-data` untouched:
+
+```text
+NEGATIVE (no password):  exited exit=3, guard message x3 -- init FAILS, no healthy-but-broken stack
+POSITIVE (PGOPTIONS):    password_set=true super=false bypassrls=false login=true
+                         CREATE on public: true   USAGE on public: true
+                         pci_test: exists=true owner=pci_app
+                         no ERROR/FATAL in the init log
+```
+
+No manual SQL was run.
+
+## 12.2 TASK-0005 — development principal (DISC-0008)
+
+`.env.example` added per MSG-0012's selection of DISC-0008 option 1: placeholder-only values,
+documented generation, and the fail-closed guard left intact.
+
+**Gate G2 — passed:**
+
+```text
+no principals      -> refused
+placeholder token  -> refused ("token must be a string of at least 16 characters")
+documented setup   -> kernel Up (healthy), /health/ready HTTP 200
+```
+
+## 12.3 Two defects found in the fixes themselves
+
+1. `GRANT CONNECT ON DATABASE :"POSTGRES_DB"` used a psql variable the entrypoint does not define
+   and aborted initialisation — fixed in `a259888`. The abort was itself evidence that the
+   `ON_ERROR_STOP` change works.
+2. The first placeholder token was 35 characters and therefore **passed** the 16-character minimum.
+   An unedited copy of `.env.example` would have produced a running service authenticating against a
+   token published in a public repository, while the file claimed all placeholders were rejected.
+   Fixed in `4519dfa`.
+
+The second was a security defect introduced by a security fix, caught only because the guard was
+run rather than read.
+
+## 12.4 What remains
+
+**A full `docker compose up` from a fresh volume is still unproven.** The live
+`pci-kernel_postgres-data` carries the manual workaround from 2026-08-19 and will not re-run
+`initdb`, so its state is not evidence of these fixes.
+
+WP-0001 remains **verified but not yet demonstrated reproducible**. Closing that gap is TASK-0006,
+which needs explicit authorization to destroy the volume (MSG-0015).

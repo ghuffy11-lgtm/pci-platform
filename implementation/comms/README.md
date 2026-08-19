@@ -10,8 +10,12 @@ a defect in the record, not a missing message.
 
 | ID | Subject | Status | File |
 |---|---|---|---|
+| **MSG-0015** | **TASK-0004 / TASK-0005 complete; TASK-0006 authorization required** | **OPEN** — awaiting destructive-volume authorization | [MSG-0015-task-0004-0005-complete.md](MSG-0015-task-0004-0005-complete.md) |
+| MSG-0014 | Queue authorization reconciliation | DECIDED — reconciled in `de35bf4` | [MSG-0014-queue-ready-authorized.md](MSG-0014-queue-ready-authorized.md) |
+| MSG-0013 | Architecture review checkpoint | DECIDED — acted on | [MSG-0013-architecture-review-checkpoint.md](MSG-0013-architecture-review-checkpoint.md) |
+| MSG-0012 | Architecture lead decisions: TASK-0004 and TASK-0005 | DECIDED — both executed | [MSG-0012-architecture-lead-decisions-task-0004-0005.md](MSG-0012-architecture-lead-decisions-task-0004-0005.md) |
 | MSG-0011 | Execution Supervisor — built, tested, not installed | **OPEN** — awaiting the install/enable decision | [MSG-0011-execution-supervisor.md](MSG-0011-execution-supervisor.md) |
-| **MSG-0010** | **Phase 0 — execution control, roadmap, queue, recovery** | **OPEN** — awaiting authorization of TASK-0004 / TASK-0005 | [MSG-0010-phase-0-execution-control.md](MSG-0010-phase-0-execution-control.md) |
+| MSG-0010 | Phase 0 — execution control, roadmap, queue, recovery | **CLOSED** — TASK-0004 / TASK-0005 authorized by MSG-0012 and executed | [MSG-0010-phase-0-execution-control.md](MSG-0010-phase-0-execution-control.md) |
 | MSG-0008 | Authorized one-time privileged bootstrap — exact operator procedure | **CLOSED** — executed and verified 2026-08-19 | [MSG-0008-authorized-bootstrap-command.md](MSG-0008-authorized-bootstrap-command.md) |
 | MSG-0009 | Permanent rule added: Documentation Is Mandatory | DECIDED — applied | [MSG-0009-documentation-is-mandatory.md](MSG-0009-documentation-is-mandatory.md) |
 | MSG-0007 | Permanent operating rule hardening | DECIDED — applied | [MSG-0007-operating-rule-hardening.md](MSG-0007-operating-rule-hardening.md) |
@@ -35,20 +39,27 @@ tasks.** That is why it ships disabled.
 Detail: [`MSG-0011-execution-supervisor.md`](MSG-0011-execution-supervisor.md).
 Implementation and docs: [`../operations/supervisor/`](../operations/supervisor/README.md).
 
-## ACTION REQUIRED — MSG-0010
+## ACTION REQUIRED — MSG-0015 (TASK-0006 authorization)
 
-The Phase 0 execution-control system is built. **No task is READY**: every remaining path needs an
-architecture-lead decision.
+TASK-0004 and TASK-0005 are **COMPLETE** (gates G1 and G2 passed, 2026-08-19), authorized by
+MSG-0012 and reconciled per MSG-0013 / MSG-0014.
+
+**One decision now stands between WP-0001 and a reproducible stack:**
 
 | Decision | Task |
 |---|---|
-| Authorize the DISC-0007 database role-provisioning fix | TASK-0004 |
-| Choose the credential approach for DISC-0008, then authorize | TASK-0005 |
-| Grant or withhold destructive authorization to re-initialise the PostgreSQL volume | TASK-0006 |
+| **Explicit authorization to destroy `pci-kernel_postgres-data`** (`docker compose down -v`) so the stack can be rebuilt from scratch and gate G3 evaluated | TASK-0006 |
 | Optionally authorize `*.md` line-ending normalisation | TASK-0003 |
+| Whether to install/enable the Execution Supervisor | TASK-0010 / MSG-0011 |
 
-Once any is recorded, `COMMS` or `GO` runs the authorized chain without further prompting — the
-continuation rule in `CLAUDE.md` means Claude Code no longer stops between authorized tasks.
+The volume holds only TASK-0001 verification data — nothing irreplaceable — but the operation is
+destructive and irreversible, so Rule 9 requires the authorization to be explicit rather than
+inferred from it being the obvious next step.
+
+Granting it runs TASK-0006 -> TASK-0007 -> TASK-0008 as one continuous authorized chain, stopping at
+TASK-0009, which is the architecture lead's decision.
+
+Detail: [`MSG-0015-task-0004-0005-complete.md`](MSG-0015-task-0004-0005-complete.md).
 
 Detail: [`MSG-0010-phase-0-execution-control.md`](MSG-0010-phase-0-execution-control.md).
 Roadmap and queue: [`../operations/ROADMAP.md`](../operations/ROADMAP.md),

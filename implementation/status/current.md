@@ -50,15 +50,16 @@ The execution-control system (Phase 0, MSG-0010):
 Every session reads the roadmap and queue at startup and executes the highest-priority READY task,
 continuing automatically through authorized work rather than stopping after each subtask.
 
-**Current task: none is READY.** TASK-0001 is COMPLETE; every remaining path needs an
-architecture-lead decision. The queue's status board is the live view.
+**Current task: none is READY.** TASK-0001, TASK-0004, TASK-0005, and TASK-0010 are COMPLETE.
+TASK-0006 is the only remaining gate to a reproducible stack; its dependencies are met and it needs
+one thing — explicit authorization to destroy the PostgreSQL volume (MSG-0015).
 
 | ID | Task | Status | Depends On | Owner |
 |---|---|---|---|---|
 | TASK-0001 | WP-0001 verification on the authorized host | **COMPLETE** | — | Claude Code |
-| TASK-0004 | Fix database role provisioning (DISC-0007) | **WAITING_FOR_ARCHITECTURE_LEAD** | TASK-0001 | Architecture lead |
-| TASK-0005 | Fix compose kernel service configuration (DISC-0008) | **WAITING_FOR_ARCHITECTURE_LEAD** | TASK-0001 | Architecture lead |
-| TASK-0006 | Clean-room reproducibility verification | **BLOCKED** | TASK-0004, TASK-0005 | Architecture lead (destructive authorization) |
+| TASK-0004 | Fix database role provisioning (DISC-0007) | **COMPLETE** — G1 passed | TASK-0001 | Claude Code |
+| TASK-0005 | Fix compose kernel service configuration (DISC-0008) | **COMPLETE** — G2 passed | TASK-0001 | Claude Code |
+| TASK-0006 | Clean-room reproducibility verification | **WAITING_FOR_ARCHITECTURE_LEAD** — deps met | TASK-0004 ✅, TASK-0005 ✅ | Architecture lead (destructive authorization) |
 | TASK-0007 | Full re-verification after fixes | **BLOCKED** | TASK-0006 | Claude Code |
 | TASK-0008 | Final report and status reconciliation | **BLOCKED** | TASK-0007 | Claude Code |
 | TASK-0009 | WP-0001 completion decision | **WAITING_FOR_ARCHITECTURE_LEAD** | TASK-0008 | Architecture lead |
@@ -119,9 +120,9 @@ Every tier reported a non-zero test count.
 
 Index: `implementation/comms/README.md` carries the full message register with links and status.
 
-**Two messages are OPEN.** MSG-0010 — the Phase 0 execution-control system, awaiting authorization of
-TASK-0004 and TASK-0005. MSG-0011 — the Execution Supervisor, built and tested but **not installed**
-and **not enabled**, awaiting the decision on whether unattended sessions are wanted.
+**Two messages are OPEN.** MSG-0015 — TASK-0004 and TASK-0005 are complete; TASK-0006 needs explicit
+authorization to destroy the PostgreSQL volume. MSG-0011 — the Execution Supervisor, built and
+tested but **not installed** and **not enabled**.
 
 | ID | Subject | Status |
 |---|---|---|
@@ -134,7 +135,11 @@ and **not enabled**, awaiting the decision on whether unattended sessions are wa
 | MSG-0007 | Permanent operating rule hardening | DECIDED — applied to CLAUDE.md and AGENTS.md |
 | MSG-0009 | Documentation Is Mandatory rule added to `CLAUDE.md` | DECIDED — applied |
 | MSG-0008 | Authorized bootstrap: exact operator procedure and path | **CLOSED** — executed and verified 2026-08-19 |
-| MSG-0010 | Phase 0 — execution control, roadmap, queue, recovery | **OPEN** — awaiting authorization of TASK-0004 / TASK-0005 |
+| MSG-0010 | Phase 0 — execution control, roadmap, queue, recovery | **CLOSED** — authorized via MSG-0012, executed |
+| MSG-0012 | Architecture lead decisions: TASK-0004 / TASK-0005 | DECIDED — both COMPLETE |
+| MSG-0013 | Architecture review checkpoint | DECIDED — queue reconciled |
+| MSG-0014 | Queue authorization reconciliation | DECIDED — reconciled in `de35bf4` |
+| MSG-0015 | TASK-0004 / TASK-0005 complete; TASK-0006 authorization required | **OPEN** |
 | MSG-0011 | Execution Supervisor — built, tested, not installed | **OPEN** — awaiting install/enable decision |
 
 ## Repository / GitHub State
@@ -247,8 +252,8 @@ precedence has changed.
 | DISC-0004 | Compose stack predates the `/data/docker` boundary |
 | DISC-0005 | `npm test` reports success while running zero tests under POSIX shells |
 | DISC-0006 | CRLF line endings silently defeat anchored text edits |
-| DISC-0007 | Init refuses to create a passwordless role, then creates one anyway (**High**) |
-| DISC-0008 | Compose kernel service cannot start as committed |
+| DISC-0007 | Init refuses to create a passwordless role, then creates one anyway | **RESOLVED** |
+| DISC-0008 | Compose kernel service cannot start as committed | **RESOLVED** |
 
 ## Report
 

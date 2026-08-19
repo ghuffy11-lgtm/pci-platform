@@ -1,8 +1,8 @@
 # DISC-0007 — Database Init Refuses To Create a Passwordless Role, Then Creates One Anyway
 
-**Status:** OPEN — defect found on first real execution; workaround applied, fix not yet made
+**Status:** **RESOLVED** 2026-08-19 by TASK-0004 (MSG-0012). Fix verified against a clean initialisation; full compose clean-room proof remains gated by TASK-0006.
 **Raised:** 2026-08-19
-**Severity:** High — the stack reports healthy while the least-privilege runtime role is unusable
+**Severity:** Was High — the stack reports healthy while the least-privilege runtime role is unusable
 **Work package:** WP-0001 — PCI Kernel Foundation
 **Related:** ADR-0016 (tenant isolation), TASK-0001, DISC-0004
 
@@ -109,3 +109,56 @@ Verifying the fix requires re-initialising the volume — `initdb` scripts run o
 initialisation — which is a destructive operation on `pci-kernel_postgres-data`. That volume
 currently holds only data created during this verification, but destroying it is not authorized
 under `CLAUDE.md` Rule 9 and is therefore proposed rather than done.
+
+---
+
+## RESOLVED — 2026-08-19 (TASK-0004)
+
+All three defects are fixed in `deploy/compose/initdb/00-roles.sql` and
+`deploy/compose/docker-compose.yml`:
+
+| Defect | Fix |
+|---|---|
+| Guard ran after `CREATE ROLE` | Guard is now **first**; a missing password prevents creation |
+| Exception did not stop initialisation | `\set ON_ERROR_STOP on` — a failure now exits non-zero |
+| Nothing granted; no `pci_test` | `CONNECT` (via `current_database()`), `USAGE` + `CREATE` on `public`, and `pci_test` owned by `pci_app` |
+
+Also added: a minimum password length of 16; an idempotent `ALTER ROLE` path; and an explicit
+post-creation assertion that `pci_app` holds neither SUPERUSER nor BYPASSRLS, because either would
+make every ADR-0016 policy inert. The password reaches initdb through `PGOPTIONS` on the postgres
+service, from `PCI_APP_PASSWORD`.
+
+### Verification — gate G1
+
+Run against a **throwaway container with its own ephemeral volume**, so the protected
+`pci-kernel_postgres-data` volume was never touched (TASK-0006 is not authorized):
+
+```text
+NEGATIVE — no pci.app_password:
+  container state: exited exit=3
+  "Refusing to initialise without a runtime role password" x3
+  -> initialisation FAILS instead of reporting healthy with an unusable role
+
+POSITIVE — PGOPTIONS supplied:
+  role: password_set=true  super=false  bypassrls=false  login=true
+  CREATE on public: true      USAGE on public: true
+  pci_test: exists=true  owner=pci_app
+  no ERROR/FATAL in the init log
+```
+
+**No manual SQL was run in either case** — which is the whole point, since manual SQL is what this
+discovery was about.
+
+### What is still not proven
+
+A full `docker compose up` from a fresh `pci-kernel_postgres-data` volume. That is TASK-0006's
+clean-room gate and requires the destructive authorization MSG-0012 explicitly withheld. The live
+database still carries the manual workaround from 2026-08-19 and will not re-run `initdb` — a
+resuming session must not mistake its state for evidence of this fix.
+
+### One defect found while fixing this one
+
+`GRANT CONNECT ON DATABASE :"POSTGRES_DB"` referenced a psql variable the postgres entrypoint does
+not define, and aborted initialisation with a syntax error. Corrected to dynamic SQL over
+`current_database()` in `a259888`. The abort was itself evidence that the `ON_ERROR_STOP` fix
+works: before this change, an error at that point would have been ignored.

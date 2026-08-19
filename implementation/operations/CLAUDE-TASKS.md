@@ -18,9 +18,9 @@ Claude Code may propose tasks; a proposed task is **not** executable.
 | ID | Task | Status | Depends On | Last Verified | Next Action | Owner |
 |---|---|---|---|---|---|---|
 | TASK-0001 | WP-0001 verification on the authorized host | **COMPLETE** | — | 2026-08-19 `a693910` | none | Claude Code |
-| TASK-0004 | Fix database role provisioning (DISC-0007) | **READY** | TASK-0001 | — | Execute (authorized by MSG-0012) | Claude Code |
-| TASK-0005 | Fix compose kernel service configuration (DISC-0008) | **READY** | TASK-0001 | — | Execute (authorized by MSG-0012, DISC-0008 option 1) | Claude Code |
-| TASK-0006 | Clean-room reproducibility verification | **BLOCKED** | TASK-0004, TASK-0005 | — | Await dependencies **and** destructive-operation authorization | Architecture lead |
+| TASK-0004 | Fix database role provisioning (DISC-0007) | **COMPLETE** | TASK-0001 | 2026-08-19 G1 pass | none — clean-room proof is TASK-0006 | Claude Code |
+| TASK-0005 | Fix compose kernel service configuration (DISC-0008) | **COMPLETE** | TASK-0001 | 2026-08-19 G2 pass | none | Claude Code |
+| TASK-0006 | Clean-room reproducibility verification | **WAITING_FOR_ARCHITECTURE_LEAD** | TASK-0004 ✅, TASK-0005 ✅ | — | **Dependencies now met.** Awaiting destructive-operation authorization only | Architecture lead |
 | TASK-0007 | Full re-verification after fixes | **BLOCKED** | TASK-0006 | — | Await dependency | Claude Code |
 | TASK-0008 | Final report and status reconciliation | **BLOCKED** | TASK-0007 | — | Await dependency | Claude Code |
 | TASK-0009 | WP-0001 completion decision | **WAITING_FOR_ARCHITECTURE_LEAD** | TASK-0008 | — | Lead declares complete or names gaps | Architecture lead |
@@ -28,9 +28,12 @@ Claude Code may propose tasks; a proposed task is **not** executable.
 | TASK-0010 | Execution Supervisor (dev machine, not installed) | **COMPLETE** | — | 2026-08-19 `tests 17/17` | none — installation is a separate operator decision | Claude Code |
 | TASK-0002 | Make test entry points shell-independent | **ABORTED** | — | 2026-08-19 | none — premise disproven by measurement | — |
 
-**TASK-0004 and TASK-0005 are READY**, authorized by MSG-0012 and reconciled per MSG-0013 / MSG-0014.
-The continuation rule applies: both run without stopping in between. **TASK-0006 remains BLOCKED and
-unauthorized** — its destructive volume re-initialisation is explicitly not granted by MSG-0012.
+**TASK-0004 and TASK-0005 are COMPLETE** (2026-08-19, gates G1 and G2 passed). The continuation
+rule was applied: both ran without stopping in between.
+
+**No task is READY.** TASK-0006 is now the only thing standing between WP-0001 and a reproducible
+stack, and its dependencies are satisfied — but its destructive volume re-initialisation was
+explicitly **not** granted by MSG-0012. That single authorization is the entire remaining gate.
 
 ### Status values
 
@@ -67,6 +70,7 @@ unmet stops at the prerequisite and records why.
 | MSG-0012 | Decision | DECIDED | Architecture lead | Claude Code | **TASK-0004 and TASK-0005 AUTHORIZED / READY.** DISC-0008 option 1 (fake placeholder in `.env.example`). TASK-0006 and later remain unauthorized | TASK-0004, TASK-0005 |
 | MSG-0013 | Directive | DECIDED | Architecture lead | Claude Code | Reconcile the queue to READY from MSG-0012; do not infer authorization from conversation | TASK-0004, TASK-0005 |
 | MSG-0014 | Directive | DECIDED | Architecture lead | Claude Code | Queue reconciliation record, discoverable to a fresh session | TASK-0004, TASK-0005 |
+| MSG-0015 | Record | OPEN | Claude Code | Architecture lead | **TASK-0004 and TASK-0005 COMPLETE (G1, G2 passed). TASK-0006 needs explicit destructive-volume authorization.** | TASK-0006 |
 
 **What remains, in one line:** everything is verified and recorded; nothing is executable until the
 architecture lead authorizes the two defect fixes.
@@ -168,7 +172,7 @@ outside `/data`. Evidence: WP-0001 report section 11; commit `a693910`.
 
 ## TASK-0004 — Fix database role provisioning
 
-**Priority:** 1 | **Status:** **READY** (authorized by MSG-0012, 2026-08-19) | **Owner:** Claude Code
+**Priority:** 1 | **Status:** **COMPLETE** — 2026-08-19, gate G1 passed | **Owner:** Claude Code
 **Depends on:** TASK-0001 | **Source:** DISC-0007 | **Next eligible task:** TASK-0005, then TASK-0006
 
 ### Objective
@@ -241,7 +245,7 @@ be established before anything is changed.
 
 ## TASK-0005 — Fix compose kernel service configuration
 
-**Priority:** 2 | **Status:** **READY** (authorized by MSG-0012, 2026-08-19; DISC-0008 option 1) | **Owner:** Claude Code
+**Priority:** 2 | **Status:** **COMPLETE** — 2026-08-19, gate G2 passed | **Owner:** Claude Code
 **Depends on:** TASK-0001 | **Source:** DISC-0008 | **Next eligible task:** TASK-0006
 
 ### Objective
@@ -316,8 +320,8 @@ database or environment surgery — the criterion WP-0001 currently fails.
 
 | ID | Prerequisite | State |
 |---|---|---|
-| P1 | TASK-0004 COMPLETE | **UNMET** |
-| P2 | TASK-0005 COMPLETE | **UNMET** |
+| P1 | TASK-0004 COMPLETE | **MET** — 2026-08-19 |
+| P2 | TASK-0005 COMPLETE | **MET** — 2026-08-19 |
 | P3 | **Explicit authorization to destroy the PostgreSQL volume** | **UNMET** |
 
 ### Dependencies

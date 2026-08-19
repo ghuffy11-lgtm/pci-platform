@@ -1,8 +1,8 @@
 # DISC-0008 — Compose Kernel Service Cannot Start As Committed
 
-**Status:** OPEN — defect found on first real execution; workaround applied, fix not yet made
+**Status:** **RESOLVED** 2026-08-19 by TASK-0005 (MSG-0012, option 1). Guard verified intact.
 **Raised:** 2026-08-19
-**Severity:** Medium — the service cannot start from the committed stack; no security weakness
+**Severity:** Was Medium — the service cannot start from the committed stack; no security weakness
 **Work package:** WP-0001 — PCI Kernel Foundation
 **Related:** DISC-0003 (development identity adapter), DISC-0007
 
@@ -85,3 +85,37 @@ GET /health/live   -> 200  {"status":"ok","uptimeSeconds":28}
 
 Note for future sessions: the health routes are `/health/ready` and `/health/live`. There is no
 `/health` — requesting it correctly returns an RFC 9457 problem document with `status: 404`.
+
+---
+
+## RESOLVED — 2026-08-19 (TASK-0005)
+
+MSG-0012 selected **option 1**: a clearly fake placeholder in `.env.example` plus documented
+setup. Implemented at the repository root, with generation instructions (`openssl rand`) and the
+instruction to generate on the machine that will use the values.
+
+**The fail-closed guard was not weakened.** Option 3 — defaulting to a no-principal mode — remains
+rejected: it would convert a security control into a convenience.
+
+### Verification — gate G2
+
+```text
+G2a  no principals      -> refused: "PCI_IDENTITY_MODE=static requires at least one entry
+                                     in PCI_STATIC_PRINCIPALS"
+G2b  placeholder token  -> refused: "PCI_STATIC_PRINCIPALS[0].token must be a string of at
+                                     least 16 characters"
+G2c  documented setup   -> pci-kernel-kernel-1 Up (healthy), /health/ready HTTP 200
+```
+
+### A defect in the first version of the fix
+
+The placeholder token was originally `REPLACE_ME_with_openssl_rand_hex_24` — **35 characters,
+which passes the 16-character minimum.** Copying `.env.example` without editing would have
+produced a *running* service authenticating against a token published in a public repository, and
+the file claimed every placeholder was rejected at startup, which was false for that one.
+
+Corrected in `4519dfa` to `REPLACE_ME` (10 characters), which the guard refuses — so an unedited
+copy now yields a service that will not start, rather than one that starts insecurely.
+
+It was found by *running* the guard rather than reading it, which is the only reason it was caught
+before the record claimed the task was done.
