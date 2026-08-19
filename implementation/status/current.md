@@ -69,29 +69,38 @@ authoring host, and the authorized Ubuntu implementation host has not yet been b
 | MSG-0001 | Authorized Ubuntu host and `/data/docker` storage boundary | **ANSWERED** — bootstrap contract accepted | No |
 | MSG-0002 | Kernel runtime stack ratification (ADR-0015) | OPEN | No |
 | MSG-0003 | Repository layout authority and document corrections | OPEN | No |
+| MSG-0004 | Prepared repository corrections for MSG-0003 (not applied) | OPEN | No |
+
+## Repository / GitHub State
+
+**The communication channel is operational.** Verified 2026-08-19:
+
+```text
+HEAD          383de3a5e60adf71a0f991f33f788a797899fd78
+origin/main   383de3a5e60adf71a0f991f33f788a797899fd78
+ahead 0, behind 0
+```
+
+Local and remote are identical. All WP-0001 implementation and communication artifacts are on
+`origin/main`, rebased onto the accepted bootstrap contract `d738a60`. The architecture lead can
+read every artifact directly; the operator is no longer required as a messenger.
 
 ## Open Blockers
 
 | ID | Subject | Severity |
 |---|---|---|
 | BLK-0001 | Authorized host not yet bootstrapped (narrowed — environment is now defined) | High |
-| BLK-0002 | **GitHub push unavailable — the architecture lead cannot see any of this** | Critical |
 
-> **BLK-0002 supersedes everything else in priority.** Six commits exist locally
-> (`7cd6d33`, `be4502d`, `bf90f78`, `1e7656c`, `3fad337`, and the reconciliation commit)
-> carrying the full WP-0001 implementation and every communication artifact, rebased onto the
-> accepted bootstrap contract. None have reached the remote.
->
-> **Root cause corrected 2026-08-19.** This file previously recorded the cause as an
-> unregistered SSH key. A verbose handshake disproved that: GitHub responds `Server accepts
-> key`, so the key **is** registered and **does** carry access. The private key is
-> passphrase-protected, the tool environment has no controlling terminal, and no reachable
-> `ssh-agent` holds the decrypted key — so authentication aborts client-side with no fallback
-> (`IdentitiesOnly yes` pins it to that one credential). Nothing on the GitHub account, the
-> key, or the remote needs to change.
->
-> The key is currently loaded in an operator-side agent whose socket the tool environment
-> cannot address. See BLK-0002 for the three remaining resolution options.
+BLK-0001 is the only open blocker. It is operational, not architectural: the host, account, and
+`/data/docker` boundary are defined by the accepted contract, but the host has not been stood up,
+so AC-02 and the integration tier of AC-09 remain unverified.
+
+## Recently Closed
+
+| ID | Subject | Closed | Outcome |
+|---|---|---|---|
+| BLK-0002 | GitHub push unavailable — communication channel down | 2026-08-19 | **RESOLVED.** All commits reached `origin/main`. Diagnosis history preserved in the blocker. |
+| MSG-0001 | Authorized Ubuntu host and `/data/docker` storage boundary | 2026-08-19 | **ANSWERED** by `docs/operations/pci-server-bootstrap.md` (accepted contract). |
 
 ## Proposed Decisions Awaiting Ratification
 
@@ -100,7 +109,14 @@ authoring host, and the authorized Ubuntu implementation host has not yet been b
 | ADR-0015 | Kernel implementation stack (Node.js 24 + TypeScript, zero-framework) |
 | ADR-0016 | Tenant isolation enforcement (three layers; 404 over 403) |
 
-Neither is accepted. No architecture-lead approval is claimed for any decision in this work.
+Both remain **PROPOSED** as of 2026-08-19. The architecture review of the committed WP-0001
+artifacts did not ratify either one, and neither has been promoted to `docs/decisions/`. No
+architecture-lead approval is claimed for any decision in this work, and none has been inferred
+from the review taking place.
+
+Implementation continues to run on the assumptions these ADRs describe, because the kernel is
+already built on them. That is a recorded risk, not an approval: if either is overturned, the
+affected kernel code changes accordingly.
 
 ## Discoveries
 
@@ -127,7 +143,21 @@ Neither is accepted. No architecture-lead approval is claimed for any decision i
 
 ## Next Action
 
-Claude Code should read `CLAUDE.md`, `AGENTS.md`, this status file, the active work package, and its referenced architecture/ADR/specification documents. It may then bootstrap the authorized Ubuntu implementation host according to `docs/operations/pci-server-bootstrap.md` and begin WP-0001.
+**No new work package is to be started.** Per the 2026-08-19 architecture review, the repository
+is reconciled and implementation holds here. WP-0001 remains the active work package and is
+still IMPLEMENTED, not COMPLETE.
+
+Awaiting the architecture lead on four items, none of which Claude Code may decide:
+
+- **MSG-0002** — ratify or overturn ADR-0015 (kernel runtime stack).
+- **MSG-0003** — the three repository-layout decisions. Remains OPEN and is the decision of record.
+- **MSG-0004** — approve the prepared corrections. They are written out exactly and NOT applied.
+- **ADR-0016** — ratify or overturn tenant isolation enforcement.
+
+When implementation resumes, the standing instruction is unchanged: read `CLAUDE.md`, `AGENTS.md`,
+this status file, the active work package, and its referenced architecture/ADR/specification
+documents; then bootstrap the authorized Ubuntu implementation host according to
+`docs/operations/pci-server-bootstrap.md`.
 
 For WP-0001 specifically, that bootstrap is what closes the outstanding acceptance criteria. On
 the authorized host, with all persistent state under `/data/docker`:

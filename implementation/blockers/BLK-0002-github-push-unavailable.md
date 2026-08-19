@@ -1,7 +1,7 @@
 # BLK-0002 — GitHub Push Unavailable (Communication Channel Down)
 
-**Status:** OPEN — root cause corrected 2026-08-19, resolution is operator-side
-**Severity:** Critical — the mandatory communication channel is non-functional
+**Status:** **RESOLVED / CLOSED** — 2026-08-19. All commits have reached `origin/main`.
+**Severity:** Was Critical — the mandatory communication channel was non-functional. Now operational.
 **Raised:** 2026-08-19
 **Work package:** WP-0001
 
@@ -156,3 +156,51 @@ empty.
 Restating the constraint precisely, because it has now been misdiagnosed twice: **an agent
 holding the key is not sufficient. The agent's socket must be reachable by the process invoking
 `git`.** Option A below is the only variant of that which the tool environment can use.
+
+---
+
+## Resolution — 2026-08-19, CLOSED
+
+The blocker is cleared. The credential was made available to a process able to reach the remote,
+and every local commit has been pushed.
+
+Verified at closure:
+
+```text
+$ git rev-parse HEAD          -> 383de3a5e60adf71a0f991f33f788a797899fd78
+$ git rev-parse origin/main   -> 383de3a5e60adf71a0f991f33f788a797899fd78
+$ git rev-list --left-right --count origin/main...HEAD  -> 0   0
+```
+
+Local and remote are identical, with nothing ahead and nothing behind. The six commits listed in
+the previous update — `7cd6d33`, `be4502d`, `bf90f78`, `1e7656c`, `3fad337`, `383de3a` — are all
+present on `origin/main`, on top of the accepted bootstrap contract at `d738a60`.
+
+**The mandatory communication channel is operational.** The architecture lead can read every
+WP-0001 artifact: MSG-0001 through MSG-0003, BLK-0001, ADR-0015 and ADR-0016 as proposals,
+DISC-0001 through DISC-0005, the WP-0001 implementation report, and the status file. Normal
+repository-as-channel protocol resumes; the operator is no longer needed as a messenger.
+
+### Why the historical record above is retained
+
+The diagnosis in this file was wrong once and corrected once. Both versions are deliberately kept
+rather than tidied away:
+
+1. The original conclusion — "the key has never been registered on the GitHub account" — was
+   inferred from a bare `Permission denied (publickey)` without running a verbose handshake. It
+   was wrong, and it sent the operator toward a GitHub account problem that did not exist.
+2. The corrected diagnosis — an encrypted private key with no terminal to prompt on and no
+   reachable agent — was right about the cause but incomplete in practice: an agent holding the
+   key still did not help while its socket was unreachable from the process invoking `git`.
+
+The lesson worth keeping is procedural rather than technical: **a bare authentication error is
+not a diagnosis.** A verbose handshake distinguishes "the server rejected this credential" from
+"the client could not present one", and those have opposite remedies. Recording the wrong turn
+costs nothing and prevents the next session from repeating it.
+
+### Residual note
+
+No credential was generated, replaced, registered, or handled by Claude Code at any point. The
+passphrase was never requested in conversation and never written to any file. The transient
+helper agent started during diagnosis (`ssh-agent -a /tmp/pci-ssh-agent.sock`) held no keys and
+can be terminated; it is not part of any documented workflow and nothing depends on it.

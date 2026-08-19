@@ -7,5 +7,5 @@ by an open blocker must never be reported as met.
 
 | ID | Title | Severity | Status |
 |---|---|---|---|
-| BLK-0001 | No PostgreSQL or container execution environment | High | OPEN |
-| BLK-0002 | GitHub push unavailable — communication channel down | Critical | OPEN |
+| BLK-0001 | Authorized host not yet bootstrapped (narrowed) | High | OPEN |
+| BLK-0002 | GitHub push unavailable — communication channel down | Critical | **RESOLVED** 2026-08-19 |
