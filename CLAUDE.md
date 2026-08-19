@@ -366,7 +366,8 @@ At the start of EVERY session, Claude MUST read:
 3. `implementation/status/current.md`
 4. `implementation/operations/CLAUDE-TASKS.md`
 
-`implementation/operations/CLAUDE-TASKS.md` is the **authoritative execution queue**.
+`implementation/operations/CLAUDE-TASKS.md` is the **authoritative execution queue**, and
+`implementation/operations/ROADMAP.md` is the A→Z plan it implements. Read both.
 
 Claude MUST execute the highest-priority READY task and follow its:
 
@@ -392,6 +393,56 @@ A task's prerequisites are checked before its actions begin, not assumed from th
 marked READY whose prerequisite is unmet stops at that prerequisite and records why — READY means
 authorized to attempt, never authorized to force.
 
+## Continuation
+
+**Claude MUST NOT stop merely because one authorized subtask completed.**
+
+If the next task is READY, its prerequisites are satisfied, and no architecture or operator decision
+is required, Claude MUST continue automatically — checkpointing, documenting, and pushing as it goes.
+
+Stopping after each task is as much a failure as skipping documentation. The queue exists so that
+authorized work flows without a human clicking "next". Report at the end of the authorized run, not
+after every step.
+
+## Stop Boundaries
+
+Claude MUST stop, document, commit, push, and report when:
+
+- architecture approval is required;
+- privileged operator action is required;
+- a security boundary would be crossed;
+- a prerequisite cannot be satisfied;
+- documentation conflicts with documentation, or with the instruction given;
+- **actual state differs materially from recorded state**;
+- an operation is destructive or irreversible and is not explicitly authorized.
+
+Stopping means recording *why* — in the queue, a blocker, or a communication — not falling silent.
+A stop with no record is indistinguishable from a crash.
+
+## Checkpointing and Recovery
+
+Every significant task checkpoints its state in the repository, at
+`implementation/operations/checkpoints/TASK-XXXX.md`, committed and pushed.
+
+A checkpoint MUST identify: task ID; checkpoint number; current phase; completed operations; the last
+**verified** operation; the next operation; the actual external/system state as observed; the Git
+commit/HEAD; and whether resumption is safe.
+
+Write a checkpoint **after** an operation is verified, never in anticipation of one.
+
+Before resuming after ANY interruption, crash, network failure, machine restart, or in a new session:
+
+- **a.** Read the task checkpoint.
+- **b.** Read GitHub state.
+- **c.** Inspect the actual system state directly.
+- **d.** Inspect git state.
+- **e.** Compare documented state against actual state.
+- **f.** **NEVER repeat an operation merely because the checkpoint says it was incomplete.** The
+  checkpoint records what was known before the interruption; the system may have moved on. Re-running
+  a migration, a volume creation, or a credential change on that basis can destroy data.
+- **g.** If state disagrees — STOP, document the discrepancy, and reconcile safely.
+- **h.** Resume only from the first operation whose completion is not verified by observation.
+
 ## COMMS Protocol
 
 `COMMS` is the project communication and checkpoint command.
@@ -406,6 +457,15 @@ When the architecture lead sends `COMMS`, Claude MUST:
 6. Document all resulting actions, verification, discoveries, blockers, and decisions in GitHub.
 7. Commit and push the resulting documentation.
 8. Stop at the next defined boundary or blocker.
+
+Specifically, on `COMMS` Claude must: read all OPEN communications; reconcile them with the task
+queue and current status; incorporate newly authorized instructions; **continue the highest-priority
+authorized task**; and document and push the resulting state.
+
+**`COMMS` must NOT require the human operator to relay ordinary technical information.** If a fact
+can be established by reading the repository or inspecting the system, establish it — do not ask.
+The operator is needed only for credentials, privileged actions, and decisions that are genuinely
+theirs.
 
 Claude MUST NOT treat the conversation as the project record. **GitHub documentation is the
 authoritative record.**

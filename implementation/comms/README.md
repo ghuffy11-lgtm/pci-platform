@@ -10,6 +10,7 @@ a defect in the record, not a missing message.
 
 | ID | Subject | Status | File |
 |---|---|---|---|
+| **MSG-0010** | **Phase 0 — execution control, roadmap, queue, recovery** | **OPEN** — awaiting authorization of TASK-0004 / TASK-0005 | [MSG-0010-phase-0-execution-control.md](MSG-0010-phase-0-execution-control.md) |
 | MSG-0008 | Authorized one-time privileged bootstrap — exact operator procedure | **CLOSED** — executed and verified 2026-08-19 | [MSG-0008-authorized-bootstrap-command.md](MSG-0008-authorized-bootstrap-command.md) |
 | MSG-0009 | Permanent rule added: Documentation Is Mandatory | DECIDED — applied | [MSG-0009-documentation-is-mandatory.md](MSG-0009-documentation-is-mandatory.md) |
 | MSG-0007 | Permanent operating rule hardening | DECIDED — applied | [MSG-0007-operating-rule-hardening.md](MSG-0007-operating-rule-hardening.md) |
@@ -20,7 +21,26 @@ a defect in the record, not a missing message.
 | MSG-0002 | Kernel implementation stack selection | CLOSED — ADR-0015 ratified by MSG-0005 | [MSG-0002-kernel-runtime-stack.md](MSG-0002-kernel-runtime-stack.md) |
 | MSG-0001 | Authorized execution host and persistent storage boundary | ANSWERED — bootstrap contract accepted | [MSG-0001-execution-host-and-storage-boundary.md](MSG-0001-execution-host-and-storage-boundary.md) |
 
-## No action currently required
+## ACTION REQUIRED — MSG-0010
+
+The Phase 0 execution-control system is built. **No task is READY**: every remaining path needs an
+architecture-lead decision.
+
+| Decision | Task |
+|---|---|
+| Authorize the DISC-0007 database role-provisioning fix | TASK-0004 |
+| Choose the credential approach for DISC-0008, then authorize | TASK-0005 |
+| Grant or withhold destructive authorization to re-initialise the PostgreSQL volume | TASK-0006 |
+| Optionally authorize `*.md` line-ending normalisation | TASK-0003 |
+
+Once any is recorded, `COMMS` or `GO` runs the authorized chain without further prompting — the
+continuation rule in `CLAUDE.md` means Claude Code no longer stops between authorized tasks.
+
+Detail: [`MSG-0010-phase-0-execution-control.md`](MSG-0010-phase-0-execution-control.md).
+Roadmap and queue: [`../operations/ROADMAP.md`](../operations/ROADMAP.md),
+[`../operations/CLAUDE-TASKS.md`](../operations/CLAUDE-TASKS.md).
+
+## Bootstrap — closed
 
 **MSG-0008 is CLOSED.** The operator executed the authorized bootstrap on 2026-08-19 and Claude Code
 verified the result directly (`DockerRootDir` = `/data/docker`). WP-0001 verification followed and

@@ -39,16 +39,31 @@ produces a broken stack**. WP-0001 is verified; it is not yet deployable.
 
 ## Execution Queue
 
-`implementation/operations/CLAUDE-TASKS.md` is the **authoritative execution queue**. Every session
-reads it at startup and executes the highest-priority READY task.
+The execution-control system (Phase 0, MSG-0010):
 
-| # | Task | Priority | Status |
-|---|---|---|---|
-| TASK-0001 | Complete WP-0001 verification on the authorized host | 1 | **DONE** — 2026-08-19 |
-| TASK-0002 | Make test entry points shell-independent (DISC-0005) | — | **WITHDRAWN** — premise disproven |
-| TASK-0003 | Normalise `*.md` line endings to LF (DISC-0006) | 3 | PROPOSED — not authorized |
-| TASK-0004 | Fix database role provisioning (DISC-0007) | 1 | PROPOSED — not authorized |
-| TASK-0005 | Fix compose kernel service configuration (DISC-0008) | 2 | PROPOSED — not authorized |
+| Artifact | Purpose |
+|---|---|
+| `implementation/operations/ROADMAP.md` | A→Z plan from the post-bootstrap state to genuine WP-0001 completion: dependencies, five verification gates, architecture and operator boundaries, completion criteria |
+| `implementation/operations/CLAUDE-TASKS.md` | **Authoritative execution queue** — status board, communication ledger, per-task prerequisites, allowed/forbidden actions, verification, documentation, checkpoint, stop conditions, recovery, next eligible task |
+| `implementation/operations/checkpoints/` | Resumable state; one file per IN_PROGRESS task |
+
+Every session reads the roadmap and queue at startup and executes the highest-priority READY task,
+continuing automatically through authorized work rather than stopping after each subtask.
+
+**Current task: none is READY.** TASK-0001 is COMPLETE; every remaining path needs an
+architecture-lead decision. The queue's status board is the live view.
+
+| ID | Task | Status | Depends On | Owner |
+|---|---|---|---|---|
+| TASK-0001 | WP-0001 verification on the authorized host | **COMPLETE** | — | Claude Code |
+| TASK-0004 | Fix database role provisioning (DISC-0007) | **WAITING_FOR_ARCHITECTURE_LEAD** | TASK-0001 | Architecture lead |
+| TASK-0005 | Fix compose kernel service configuration (DISC-0008) | **WAITING_FOR_ARCHITECTURE_LEAD** | TASK-0001 | Architecture lead |
+| TASK-0006 | Clean-room reproducibility verification | **BLOCKED** | TASK-0004, TASK-0005 | Architecture lead (destructive authorization) |
+| TASK-0007 | Full re-verification after fixes | **BLOCKED** | TASK-0006 | Claude Code |
+| TASK-0008 | Final report and status reconciliation | **BLOCKED** | TASK-0007 | Claude Code |
+| TASK-0009 | WP-0001 completion decision | **WAITING_FOR_ARCHITECTURE_LEAD** | TASK-0008 | Architecture lead |
+| TASK-0003 | Normalise `*.md` line endings (DISC-0006) | **WAITING_FOR_ARCHITECTURE_LEAD** | — | Architecture lead |
+| TASK-0002 | Make test entry points shell-independent | **ABORTED** | — | — |
 
 **No task is currently READY.** TASK-0004 and TASK-0005 address the defects found while executing
 TASK-0001 and need the architecture lead to mark them READY before any work starts.
@@ -103,7 +118,8 @@ Every tier reported a non-zero test count.
 
 Index: `implementation/comms/README.md` carries the full message register with links and status.
 
-**No message is OPEN.** MSG-0008 closed when the bootstrap was executed and verified.
+**One message is OPEN: MSG-0010** — the Phase 0 execution-control system, awaiting authorization of
+TASK-0004 and TASK-0005.
 
 | ID | Subject | Status |
 |---|---|---|
@@ -116,6 +132,7 @@ Index: `implementation/comms/README.md` carries the full message register with l
 | MSG-0007 | Permanent operating rule hardening | DECIDED — applied to CLAUDE.md and AGENTS.md |
 | MSG-0009 | Documentation Is Mandatory rule added to `CLAUDE.md` | DECIDED — applied |
 | MSG-0008 | Authorized bootstrap: exact operator procedure and path | **CLOSED** — executed and verified 2026-08-19 |
+| MSG-0010 | Phase 0 — execution control, roadmap, queue, recovery | **OPEN** — awaiting authorization of TASK-0004 / TASK-0005 |
 
 ## Repository / GitHub State
 
