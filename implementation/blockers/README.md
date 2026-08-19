@@ -9,3 +9,4 @@ by an open blocker must never be reported as met.
 |---|---|---|---|
 | BLK-0001 | Authorized host not yet bootstrapped (narrowed) | High | OPEN |
 | BLK-0002 | GitHub push unavailable — communication channel down | Critical | **RESOLVED** 2026-08-19 |
+| BLK-0003 | PCI server key cannot be unlocked from the tool environment | High | OPEN |
