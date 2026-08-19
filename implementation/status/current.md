@@ -67,7 +67,9 @@ authoring host, and the authorized Ubuntu implementation host has not yet been b
 
 ## Open Communications
 
-All architecture communications are now closed. None are blocking.
+Index: `implementation/comms/README.md` carries the full message register with links and status.
+
+One message is OPEN and requires operator action: **MSG-0008**.
 
 | ID | Subject | Status |
 |---|---|---|
@@ -78,7 +80,7 @@ All architecture communications are now closed. None are blocking.
 | MSG-0005 | Architecture lead decisions | DECIDED — acted on 2026-08-19 |
 | MSG-0006 | Absolute host file boundary (override) | DECIDED — correction applied, awaiting review |
 | MSG-0007 | Permanent operating rule hardening | DECIDED — applied to CLAUDE.md and AGENTS.md |
-| MSG-0008 | Authorized bootstrap: exact operator procedure and path | **OPEN** — amended for execution from an existing repository copy; awaiting operator execution |
+| MSG-0008 | Authorized bootstrap: exact operator procedure and path — `implementation/comms/MSG-0008-authorized-bootstrap-command.md` | **OPEN** — awaiting operator execution |
 
 ## Repository / GitHub State
 
