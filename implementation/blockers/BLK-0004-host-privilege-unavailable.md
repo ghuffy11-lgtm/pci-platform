@@ -292,3 +292,32 @@ no PCI artifact created anywhere on the host, inside `/data` or outside it.
 
 This blocker closes when `docker info --format '{{.DockerRootDir}}'` reports a path under
 `/data/docker`, verified directly by Claude Code rather than accepted from a report.
+
+---
+
+## Narrowed 2026-08-19 — workspace provisioned, clone complete
+
+The operator executed step 1 of MSG-0008. `/data/pci-platform` now exists as `claude:claude 0755`
+on the `/dev/sdb1` 8.7T `/data` mount, and Claude Code has cloned the repository into it at
+`9f19bce`, clean, with the bootstrap script byte-identical to the committed blob
+(`ef2a74ff…3525c`).
+
+| Verification log | `/data/pci-platform` | repo clone | Docker | `sudo -n` | Outcome |
+|---|---|---|---|---|---|
+| first GO | absent | — | absent | password required | stopped |
+| second GO | absent | — | absent | password required | stopped |
+| third GO | **present, owned by claude** | **cloned, verified** | absent | password required | stopped at step 3 |
+
+This blocker is now narrower than when raised. It is no longer "no workspace and no privilege" —
+it is **one privileged command**:
+
+```bash
+sudo bash /data/pci-platform/deploy/bootstrap/pci-server-bootstrap.sh
+```
+
+Everything that could be done without privilege has been done. Nothing else in WP-0001 can advance
+until Docker exists, because AC-01, AC-02, AC-05, and AC-09 all require a running container runtime
+and a real PostgreSQL instance.
+
+Closure condition unchanged: `docker info --format '{{.DockerRootDir}}'` reporting a path under
+`/data/docker`, verified directly by Claude Code.

@@ -253,3 +253,84 @@ This message is the record of the exact command and path required.
 **This message remains OPEN.** It closes when step 3 has run and Claude Code has verified
 `docker info --format '{{.DockerRootDir}}'` resolves under `/data/docker`, directly rather than
 from a report.
+
+---
+
+## Step 1 and Step 2 — COMPLETE, verified 2026-08-19
+
+### Step 1 — workspace provisioned by the operator
+
+```text
+$ ls -ld /data/pci-platform
+drwxr-xr-x 2 claude claude 4096 Aug 19 15:45 /data/pci-platform
+writable by claude: YES        empty: YES
+$ findmnt -no SOURCE,SIZE,TARGET /data
+/dev/sdb1  8.7T /data
+```
+
+### Step 2 — repository cloned into the workspace by Claude Code
+
+Cloned over SSH agent forwarding; no credential was written to the host.
+
+```text
+$ cd /data/pci-platform && git log --oneline -1
+9f19bce docs(comms): record second GO — bootstrap authorized but not executed
+$ git status --porcelain | wc -l
+0
+$ ls -l deploy/bootstrap/pci-server-bootstrap.sh
+-rwxrwxr-x 1 claude claude 7960 Aug 19 15:46 ...
+$ bash -n deploy/bootstrap/pci-server-bootstrap.sh
+syntax OK (parsed, not executed)
+```
+
+**Integrity verified against the committed blob** — the script on the host is byte-identical to
+`origin/main`, so what will run is exactly what was reviewed:
+
+```text
+blob sha256 (origin/main) : ef2a74ff27b3c043dab50411835ba318c7ca37d488bc7044c9ff13c692a3525c
+file sha256 (on host)     : ef2a74ff27b3c043dab50411835ba318c7ca37d488bc7044c9ff13c692a3525c
+```
+
+### Boundary compliance after step 2
+
+```text
+$ ls -A /home/claude
+.bash_history  .bash_logout  .bashrc  .cache  .profile  .ssh
+
+$ find / -xdev -user claude -newer <step-1> -not -path "/data/*" ...
+/home/claude/.ssh
+/home/claude/.ssh/known_hosts
+```
+
+The only artifact outside `/data` is `~/.ssh/known_hosts`, recreated by the clone when it recorded
+GitHub's host key. Contract v0.2's **SSH exception** places `~/.ssh` outside this boundary as
+infrastructure credentials, and states it must not be deleted or recreated merely to satisfy the
+project boundary. It is therefore left in place — deliberately, and in contrast to the earlier
+cleanup recorded in MSG-0006 where deleting it was the wrong call.
+
+**No PCI project artifact exists outside `/data`.**
+
+## Step 3 — NOT EXECUTED. Privilege unavailable.
+
+```text
+$ sudo -n true
+sudo: a password is required
+$ command -v docker
+(absent)
+```
+
+The authorized command is in place at the authorized path and cannot be run by Claude Code:
+
+```bash
+sudo bash /data/pci-platform/deploy/bootstrap/pci-server-bootstrap.sh
+```
+
+This is the **only** remaining action. Steps 1 and 2 are done; step 3 is one command; steps 4 and 5
+(bootstrap verification and WP-0001 verification) follow from it and require no further operator
+involvement.
+
+Stopped here per the instruction to stop if a prerequisite fails, and per `CLAUDE.md` Rule 2 —
+privilege was not worked around. Nothing on the host was modified beyond the authorized clone into
+`/data/pci-platform`.
+
+**MSG-0008 remains OPEN**, now blocked on step 3 alone.

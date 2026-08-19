@@ -213,22 +213,26 @@ precedence has changed.
 
 ## Next Action
 
-**Blocked on BLK-0004 — host privilege. Verified again 2026-08-19 after the bootstrap was
-authorized.** The authorization in MSG-0008 is recorded, but its privileged commands have not been
-executed: `/data/pci-platform` still does not exist, Docker is still absent, `/etc/docker` does not
-exist, and `sudo` still requires a password. Authorization and execution are different things, and
-only execution changes the host.
+**Blocked on BLK-0004, step 3 — one privileged command remains.**
 
-The single outstanding action is step 1 of the MSG-0008 procedure, which Claude Code cannot
-perform:
+MSG-0008 steps 1 and 2 are **COMPLETE and verified** (2026-08-19):
+
+- `/data/pci-platform` provisioned by the operator: `claude:claude 0755`, on the `/dev/sdb1` 8.7T
+  `/data` mount.
+- Repository cloned into it by Claude Code at `9f19bce`, clean working tree, bootstrap script
+  byte-identical to the committed blob (`ef2a74ff…3525c`) and parsing cleanly.
+- Boundary verified after the clone: the only artifact outside `/data` is `~/.ssh/known_hosts`,
+  which contract v0.2's SSH exception explicitly places outside this boundary. **No PCI project
+  artifact exists outside `/data`.**
+
+Step 3 is not executed — `sudo` requires a password and Docker is still absent:
 
 ```bash
-sudo install -d -m 0755 -o claude -g claude /data/pci-platform
+sudo bash /data/pci-platform/deploy/bootstrap/pci-server-bootstrap.sh
 ```
 
-Once it exists, Claude Code performs step 2 (clone into the workspace) unattended, and step 3 is
-the one remaining privileged command. Nothing was worked around and no PCI artifact exists anywhere
-on the host.
+That single command is the whole remaining blocker. Steps 4 and 5 — bootstrap verification and
+WP-0001 verification — follow from it with no further operator involvement.
 
 **Earlier record — first GO attempt.** GO was issued 2026-08-19 and stopped at the privilege
 boundary: `/data/pci-platform` does not exist, `/data` is `root:root` and not writable by
