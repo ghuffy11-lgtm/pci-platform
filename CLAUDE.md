@@ -64,26 +64,45 @@ If implementation reveals a missing or incorrect architectural decision:
 
 If work can safely continue without changing architecture, continue and record the discovery in `implementation/discoveries/`.
 
-## Communication Protocol
+## Mandatory Repository Communication
 
-Maintain these files as appropriate:
+GitHub is the communication channel between Claude Code and the PCI architecture lead. The user must not be used as a technical messenger.
 
-- `implementation/status/current.md` — current state
+Any blocker, ambiguity, failed test that prevents progress, architecture conflict, security concern, implementation discovery, or proposed architectural change MUST be recorded in the repository before stopping or asking for direction.
+
+Use:
+
+- `implementation/status/current.md` — current state and next action
 - `implementation/reports/` — completed work reports
-- `implementation/blockers/` — blockers
+- `implementation/blockers/` — blockers requiring attention
 - `implementation/discoveries/` — implementation discoveries
 - `implementation/decisions/` — proposed architecture decisions
+- `implementation/comms/` — direct asynchronous communication with the architecture lead
 
-Do not use these files as a substitute for accepted architecture. They are the implementation communication layer.
+### Architecture Communication Protocol
+
+When a decision or response is required from the architecture lead:
+
+1. Create a numbered message in `implementation/comms/` using `MSG-XXXX-<short-name>.md`.
+2. State the issue clearly.
+3. Include relevant work package, files, evidence, options, recommendation, and the exact decision required.
+4. Set `Status: OPEN`.
+5. Do not continue past a decision boundary that could materially change architecture.
+
+When the architecture lead responds, the response will be written to the same message or as the next numbered response file. Read repository communications before continuing.
+
+Claude must periodically check `implementation/comms/` while executing long-running work.
+
+Never claim that the architecture lead approved something unless an explicit repository communication or accepted ADR records that approval.
 
 ## Status Commands
 
 When the user says:
 
 - `GO` — read the active work package and continue implementation.
-- `STATUS` — inspect the repository and update `implementation/status/current.md` with current state, tests, blockers, and next action.
-- `COMMS` — read and update the implementation communication files, then report anything requiring architectural attention.
-- `CHECK` — run the relevant tests/checks and inspect the active work package acceptance criteria.
+- `STATUS` — inspect the repository and update `implementation/status/current.md` with current state, tests, blockers, communications, and next action.
+- `COMMS` — inspect `implementation/comms/`, respond to open architecture communications when possible, and update implementation communication files.
+- `CHECK` — verify tests and active work package acceptance criteria.
 - `REPORT` — create/update the implementation report for the current work package.
 - `STOP` — stop implementation and record the current state without making speculative changes.
 
