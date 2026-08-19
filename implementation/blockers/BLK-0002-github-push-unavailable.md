@@ -1,6 +1,6 @@
 # BLK-0002 — GitHub Push Unavailable (Communication Channel Down)
 
-**Status:** OPEN
+**Status:** OPEN — root cause corrected 2026-08-19, resolution is operator-side
 **Severity:** Critical — the mandatory communication channel is non-functional
 **Raised:** 2026-08-19
 **Work package:** WP-0001
@@ -16,6 +16,14 @@ there rather than relayed through the user.
 The architecture lead cannot see MSG-0001, MSG-0002, MSG-0003, BLK-0001, ADR-0015, ADR-0016,
 DISC-0001…0003, or the WP-0001 report, because none of them have reached the remote.
 
+## Correction to the original diagnosis
+
+> The first version of this blocker stated that the public key "has never been registered on
+> the GitHub account" and classified the fault as a missing authorisation. **That was wrong.**
+> It was inferred from the bare `Permission denied (publickey)` message without running a
+> verbose handshake. A subsequent `ssh -v` trace disproved it. The corrected analysis follows;
+> the erroneous conclusion is retained here deliberately so the record shows what changed.
+
 ## Evidence
 
 ```text
@@ -24,58 +32,86 @@ git@github.com: Permission denied (publickey).
 fatal: Could not read from remote repository.
 ```
 
-Remote: `git@github-pci:ghuffy11-lgtm/pci-platform.git` (SSH host alias `github-pci`).
+Remote: `git@github-pci:ghuffy11-lgtm/pci-platform.git` (SSH host alias `github-pci`, which
+resolves to `github.com` with `IdentityFile ~/.ssh/pci_github_ed25519` and `IdentitiesOnly yes`).
 
-Diagnosis — the key exists and is offered, but the server rejects it:
+Verbose handshake — the decisive lines:
 
 ```text
-debug1: identity file C:/Users/Administrator/.ssh/pci_github_ed25519 type 2
+debug1: no identity pubkey loaded from C:/Users/Administrator/.ssh/pci_github_ed25519
 debug1: Offering public key: ... ED25519 SHA256:zed3jBUKn8dIOM3K6il7VWqgMmJZ9wjjKksHX+Thh0I
-debug1: Authentications that can continue: publickey
-git@github.com: Permission denied (publickey).
+debug1: Server accepts key: ... ED25519 SHA256:zed3jBUKn8dIOM3K6il7VWqgMmJZ9wjjKksHX+Thh0I
+debug1: read_passphrase: can't open /dev/tty: No such device or address
+debug1: No more authentication methods to try.
 ```
 
-The key pair was created 2026-08-19 08:49 and has never been registered on the GitHub account.
-This is a missing authorisation, not a missing or malformed key.
+`Server accepts key` is GitHub confirming the key **is** registered and **does** carry access to
+this repository. Authentication then fails one step later, entirely client-side.
 
-A second issue was found and resolved locally: no Git commit identity was configured in either
-local or global scope, so `git commit` refused to run at all. Resolved by setting **local**
-repository identity to match this repository's existing commit author
-(`ghuffy11-lgtm <ghuffy11@gmail.com>`). No global Git configuration was modified. If that
-attribution is wrong, amend with `git commit --amend --reset-author`.
+Confirmed independently:
+
+```text
+$ ssh-keygen -y -P "" -f ~/.ssh/pci_github_ed25519   -> fails: key is passphrase-protected
+$ echo $SSH_AUTH_SOCK                                -> unset
+$ ssh-add -l                                         -> Could not open a connection to your authentication agent
+```
+
+## Root cause
+
+The private key is encrypted with a passphrase. The environment executing `git` is
+non-interactive and has no controlling terminal, so OpenSSH cannot prompt for that passphrase,
+and no `ssh-agent` is reachable to supply the decrypted key on its behalf. With
+`IdentitiesOnly yes` pinning authentication to this single credential, there is no fallback
+method and the handshake aborts.
+
+This is a **credential-availability** fault in the execution environment, not an authorisation
+fault on the GitHub account. Nothing about the key, the account, or the remote needs to change.
 
 ## What is committed but unpushed
 
 | Commit | Contents |
 |---|---|
+| `9945a00` | `docs(comms)` — this blocker |
 | `eabed9b` | `docs(comms)` — all WP-0001 communications, blockers, discoveries, proposed ADRs, report, status |
 | `55095d7` | `build(kernel)` — Dockerfile, compose stack, developer documentation |
 | `9a18b09` | `feat(kernel)` — WP-0001 kernel implementation and tests |
 
 ## Resolution — requires operator action
 
-Only the account holder can authorise the key. Claude Code must not, and did not, attempt to
-modify GitHub account settings or generate replacement credentials.
+The passphrase belongs to the operator. Claude Code must not handle it, must not request it in
+conversation, and must not write it to any file. Claude Code did not generate, replace, or
+register any credential.
 
-**Option A — register the existing key (recommended).** Add this public key as a deploy key
-with write access on `ghuffy11-lgtm/pci-platform`, or as an account SSH key:
+**The key must be loaded into an `ssh-agent` that the process running `git` can reach.** Both
+halves of that sentence matter: an agent holding the key is not sufficient if `git` cannot see
+its socket.
 
-```text
-ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIA2Vc13mSAXGm80KjX551LfHJmZRIfkR5WZ9OGiMC107 pci-platform-github
-```
+Attempted 2026-08-19: an agent was started at a fixed, shareable socket
+(`/tmp/pci-ssh-agent.sock`) so that both an interactive shell and the tool environment could
+address the same agent. The operator loaded the key into a *different* agent instance
+(pid 1663), whose socket is not present under any temporary directory visible to the tool
+environment. The shared agent remains empty (`The agent has no identities`), so the push still
+fails.
 
-Fingerprint: `SHA256:zed3jBUKn8dIOM3K6il7VWqgMmJZ9wjjKksHX+Thh0I`
+Remaining options:
 
-Then verify and push:
+**Option A — load the key into the shared agent.** From an interactive Git Bash terminal:
 
 ```bash
-ssh -T git@github-pci          # expect: "Hi ghuffy11-lgtm! You've successfully authenticated"
+SSH_AUTH_SOCK=/tmp/pci-ssh-agent.sock ssh-add ~/.ssh/pci_github_ed25519
+```
+
+Then `SSH_AUTH_SOCK=/tmp/pci-ssh-agent.sock git push origin main` succeeds from either context.
+
+**Option B — the operator pushes directly** from the terminal whose agent already holds the key:
+
+```bash
 git push origin main
 ```
 
-**Option B — authenticate over HTTPS** with a personal access token carrying `repo` scope.
-Note that ADR-0009 forbids committing credentials; a token must be supplied through a
-credential helper or the environment, never written into a tracked file.
+**Option C — remove the passphrase** from the local key copy. Not recommended: it trades an
+operational inconvenience for an at-rest credential weakness on a machine that also holds the
+repository.
 
 ## Note on the protocol
 

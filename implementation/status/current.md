@@ -77,12 +77,20 @@ authoring host, and the authorized Ubuntu implementation host has not yet been b
 | BLK-0001 | No PostgreSQL or container execution environment | High |
 | BLK-0002 | **GitHub push unavailable — the architecture lead cannot see any of this** | Critical |
 
-> **BLK-0002 supersedes everything else in priority.** Three commits exist locally
-> (`9a18b09`, `55095d7`, `eabed9b`) carrying the full WP-0001 implementation and every
-> communication artifact. None have reached the remote: the SSH key at
-> `~/.ssh/pci_github_ed25519` is offered but rejected by GitHub, because it has never been
-> registered on the account. Until an operator registers it, MSG-0001 cannot be read and
-> therefore cannot be answered.
+> **BLK-0002 supersedes everything else in priority.** Four commits exist locally
+> (`9a18b09`, `55095d7`, `eabed9b`, `9945a00`) carrying the full WP-0001 implementation and
+> every communication artifact. None have reached the remote.
+>
+> **Root cause corrected 2026-08-19.** This file previously recorded the cause as an
+> unregistered SSH key. A verbose handshake disproved that: GitHub responds `Server accepts
+> key`, so the key **is** registered and **does** carry access. The private key is
+> passphrase-protected, the tool environment has no controlling terminal, and no reachable
+> `ssh-agent` holds the decrypted key — so authentication aborts client-side with no fallback
+> (`IdentitiesOnly yes` pins it to that one credential). Nothing on the GitHub account, the
+> key, or the remote needs to change.
+>
+> The key is currently loaded in an operator-side agent whose socket the tool environment
+> cannot address. See BLK-0002 for the three remaining resolution options.
 
 ## Proposed Decisions Awaiting Ratification
 
