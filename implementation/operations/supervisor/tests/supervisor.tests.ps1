@@ -291,6 +291,55 @@ Test-Case 'an empty argument list yields an empty line' {
     Assert-Equal '' (ConvertTo-RunnerCommandLine -Arguments @())
 }
 
+Write-Host ''
+Write-Host 'runner launch' -ForegroundColor Cyan
+
+Test-Case 'a successful runner reports exit code 0 and captures stdout' {
+    $dir = New-TempDir
+    try {
+        $r = Start-RunnerProcess -FilePath 'cmd.exe' -CommandLine '/c echo LAUNCH_OK' `
+            -WorkingDirectory $dir -StdOutPath (Join-Path $dir 'o.log') -StdErrPath (Join-Path $dir 'e.log')
+        Assert-Equal 0 $r.ExitCode 'a clean run must report 0'
+        Assert-True ($r.StdOut -like '*LAUNCH_OK*') 'stdout must be captured'
+        Assert-True (Test-Path (Join-Path $dir 'o.log')) 'stdout must be persisted to a file'
+    }
+    finally { Remove-Item -LiteralPath $dir -Recurse -Force }
+}
+
+Test-Case 'a failing runner reports its real exit code' {
+    $dir = New-TempDir
+    try {
+        $r = Start-RunnerProcess -FilePath 'cmd.exe' -CommandLine '/c exit 3' `
+            -WorkingDirectory $dir -StdOutPath (Join-Path $dir 'o.log') -StdErrPath (Join-Path $dir 'e.log')
+        Assert-Equal 3 $r.ExitCode 'a nonzero exit must not be reported as 0 -- Start-Process could not do this'
+    }
+    finally { Remove-Item -LiteralPath $dir -Recurse -Force }
+}
+
+Test-Case 'the started callback receives the runner pid' {
+    $dir = New-TempDir
+    try {
+        $script:seenPid = 0
+        $r = Start-RunnerProcess -FilePath 'cmd.exe' -CommandLine '/c exit 0' `
+            -WorkingDirectory $dir -StdOutPath (Join-Path $dir 'o.log') -StdErrPath (Join-Path $dir 'e.log') `
+            -OnStarted { param($p) $script:seenPid = $p }
+        Assert-Equal $r.Pid $script:seenPid 'the lock must be repointed at the runner pid, not the supervisor pid'
+    }
+    finally { Remove-Item -LiteralPath $dir -Recurse -Force }
+}
+
+Test-Case 'the lock can be repointed at the runner pid' {
+    $dir = New-TempDir
+    try {
+        New-RunnerLock -StateDirectory $dir -TaskId 'TASK-0003' -RunnerPid $PID | Out-Null
+        Update-RunnerLockPid -StateDirectory $dir -RunnerPid 4242 | Out-Null
+        $lock = Get-RunnerLock -StateDirectory $dir
+        Assert-Equal 4242 $lock.pid 'the lock must carry the runner pid after the update'
+        Assert-Equal 'TASK-0003' $lock.taskId 'the task id must survive the update'
+    }
+    finally { Remove-Item -LiteralPath $dir -Recurse -Force }
+}
+
 # ---------------------------------------------------------------- summary
 
 Write-Host ''

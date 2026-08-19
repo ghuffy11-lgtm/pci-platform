@@ -332,6 +332,38 @@ function New-RunnerLock {
     return $path
 }
 
+function Update-RunnerLockPid {
+    <#
+        Repoint an existing lock at the runner process.
+
+        The lock must be created BEFORE the runner starts, or two supervisors could both decide to
+        start one. But it is necessarily created with the supervisor's own PID, and the supervisor
+        is a short-lived `-Once` process. Left that way, every completed run would leave a lock
+        whose PID is already dead -- which Test-RunnerActive correctly reports as stale, and which
+        the policy says never to clear automatically. The supervisor would stall permanently after
+        its first task.
+    #>
+    param(
+        [Parameter(Mandatory)][string]$StateDirectory,
+        [Parameter(Mandatory)][int]$RunnerPid
+    )
+
+    $path = Join-Path $StateDirectory 'runner.lock'
+    if (-not (Test-Path -LiteralPath $path)) { return $null }
+
+    $lock = Get-RunnerLock -StateDirectory $StateDirectory
+    if ($null -eq $lock) { return $null }
+
+    $payload = [ordered]@{
+        taskId   = $lock.taskId
+        pid      = $RunnerPid
+        acquired = $lock.acquired
+        host     = $env:COMPUTERNAME
+    }
+    ($payload | ConvertTo-Json -Depth 3) | Out-File -LiteralPath $path -Encoding utf8 -Force
+    return $path
+}
+
 function Remove-RunnerLock {
     param([Parameter(Mandatory)][string]$StateDirectory)
     $path = Join-Path $StateDirectory 'runner.lock'
@@ -362,6 +394,60 @@ function ConvertTo-RunnerCommandLine {
         }
     }
     return ($parts -join ' ')
+}
+
+function Start-RunnerProcess {
+    <#
+        Launch the runner, capture both streams to files, and return a RELIABLE exit code.
+
+        Start-Process -PassThru does not surface ExitCode in this environment -- verified against
+        `cmd /c exit 3`, which reported an empty ExitCode even after WaitForExit and Refresh. Code
+        branching on that would have reported every successful run as a failure. System.Diagnostics
+        .Process reports 0 and 3 correctly, so the runner is launched through it directly.
+
+        Both streams are read asynchronously before WaitForExit: reading one to completion first
+        can deadlock if the other fills its buffer.
+    #>
+    param(
+        [Parameter(Mandatory)][string]$FilePath,
+        [Parameter(Mandatory)][AllowEmptyString()][string]$CommandLine,
+        [Parameter(Mandatory)][string]$WorkingDirectory,
+        [Parameter(Mandatory)][string]$StdOutPath,
+        [Parameter(Mandatory)][string]$StdErrPath,
+        [scriptblock]$OnStarted
+    )
+
+    $psi = New-Object System.Diagnostics.ProcessStartInfo
+    $psi.FileName               = $FilePath
+    $psi.Arguments              = $CommandLine
+    $psi.WorkingDirectory       = $WorkingDirectory
+    $psi.UseShellExecute        = $false
+    $psi.RedirectStandardOutput = $true
+    $psi.RedirectStandardError  = $true
+    $psi.CreateNoWindow         = $true
+
+    $proc = [System.Diagnostics.Process]::Start($psi)
+
+    if ($null -ne $OnStarted) { & $OnStarted $proc.Id }
+
+    $outTask = $proc.StandardOutput.ReadToEndAsync()
+    $errTask = $proc.StandardError.ReadToEndAsync()
+    $proc.WaitForExit()
+
+    $out = $outTask.Result
+    $err = $errTask.Result
+
+    $dir = Split-Path -Parent $StdOutPath
+    if (-not (Test-Path -LiteralPath $dir)) { New-Item -ItemType Directory -Path $dir -Force | Out-Null }
+    $out | Out-File -LiteralPath $StdOutPath -Encoding utf8 -Force
+    $err | Out-File -LiteralPath $StdErrPath -Encoding utf8 -Force
+
+    return [pscustomobject]@{
+        ExitCode = $proc.ExitCode
+        Pid      = $proc.Id
+        StdOut   = $out
+        StdErr   = $err
+    }
 }
 
 # --------------------------------------------------------------------------- git
@@ -484,8 +570,40 @@ function Invoke-SupervisorCycle {
             $args = @()
             foreach ($a in $Config.runnerArguments) { $args += ($a -replace '\{TASK_ID\}', $ready.Id) }
             $commandLine = ConvertTo-RunnerCommandLine -Arguments $args
-            Start-Process -FilePath $Config.runnerCommand -ArgumentList $commandLine -WorkingDirectory $repo -NoNewWindow | Out-Null
-            return Complete-Cycle 'STARTED' ('runner started for ' + $ready.Id) $ready $git.Head $true
+
+            # Persist the runner's output. Without this the runner writes to a console that closes
+            # with the scheduled task, so a failure leaves no trace anywhere -- which is exactly how
+            # the first live start presented: a window appearing and vanishing with nothing to read.
+            $stamp = (Get-Date).ToUniversalTime().ToString('yyyyMMdd-HHmmss')
+            $runOut = Join-Path $logDir ('runner-{0}-{1}.out.log' -f $ready.Id, $stamp)
+            $runErr = Join-Path $logDir ('runner-{0}-{1}.err.log' -f $ready.Id, $stamp)
+
+            # Record the EXACT command before launching, so a failure to launch is still diagnosable.
+            Write-SupervisorLog -Level 'ACTION' -Event 'RUNNER_COMMAND' `
+                -Detail ($Config.runnerCommand + ' ' + $commandLine) -LogDirectory $logDir | Out-Null
+
+            $result = Start-RunnerProcess -FilePath $Config.runnerCommand -CommandLine $commandLine `
+                -WorkingDirectory $repo -StdOutPath $runOut -StdErrPath $runErr `
+                -OnStarted {
+                    param($runnerPid)
+                    # The lock was created with the supervisor's PID, but the supervisor is a
+                    # short-lived `-Once` process. Point it at the runner instead, or every
+                    # completed run would leave a lock whose PID is already dead -- read as
+                    # "stale", which blocks every subsequent cycle forever.
+                    Update-RunnerLockPid -StateDirectory $stateDir -RunnerPid $runnerPid | Out-Null
+                    Write-SupervisorLog -Level 'ACTION' -Event 'RUNNER_STARTED' `
+                        -Detail ('pid=' + $runnerPid + ' task=' + $ready.Id) -LogDirectory $logDir | Out-Null
+                }
+
+            $code = $result.ExitCode
+            Remove-RunnerLock -StateDirectory $stateDir
+
+            $outSize = 0
+            if (Test-Path -LiteralPath $runOut) { $outSize = (Get-Item -LiteralPath $runOut).Length }
+            $detail = ('{0} exited {1}; stdout {2} bytes -> {3}' -f $ready.Id, $code, $outSize, (Split-Path -Leaf $runOut))
+
+            if ($code -eq 0) { return Complete-Cycle 'STARTED' ('runner completed: ' + $detail) $ready $git.Head $false }
+            return Complete-Cycle 'ERROR' ('runner failed: ' + $detail) $ready $git.Head $false
         }
         catch {
             Remove-RunnerLock -StateDirectory $stateDir
