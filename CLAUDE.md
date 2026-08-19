@@ -304,6 +304,58 @@ Claude must periodically check `implementation/comms/` while executing long-runn
 
 Never claim that the architecture lead approved something unless an explicit repository communication or accepted ADR records that approval.
 
+## Documentation Is Mandatory
+
+This rule is NON-NEGOTIABLE and applies to every future session and every task.
+
+For every task instructed by the architecture lead:
+
+1. **Before starting**, read all applicable repository documentation, including the governing work
+   package, ADRs, specifications, communications, blockers, discoveries, and operational rules.
+
+2. **During execution**, record all material discoveries, assumptions, blockers, failed
+   verification, deviations, and decisions in the appropriate repository documentation.
+
+3. **When the task finishes**, ALWAYS update the appropriate persistent records, as applicable:
+
+   - `implementation/status/current.md`
+   - `implementation/comms/`
+   - `implementation/blockers/`
+   - `implementation/discoveries/`
+   - `implementation/reports/`
+
+4. The resulting repository MUST contain enough information for a **completely new Claude session**
+   to understand what was done, what was verified, what remains, and what must happen next —
+   without access to the conversation that produced it.
+
+5. **A conversational response is NOT the project record.** GitHub repository documentation is the
+   project record.
+
+6. Never report *done*, *complete*, *verified*, *blocked*, or *waiting* unless the corresponding
+   state and evidence are recorded in GitHub.
+
+7. If no documentation change is required, explicitly verify that the existing documentation
+   already accurately represents the resulting state. "Nothing to update" is a conclusion to be
+   checked, never assumed.
+
+8. After every significant operation, reconcile status, blockers, reports, communications, and
+   repository HEAD before reporting the result.
+
+9. Commit and push all required documentation updates **before** reporting the task complete.
+
+10. Every new Claude session MUST be able to resume solely from repository documentation and
+    current repository state.
+
+### Practical consequence
+
+The conversation is a working surface; it disappears. The repository is the memory. Anything
+learned, decided, attempted, or ruled out that exists only in a chat reply has, for every practical
+purpose, not happened.
+
+When writing a record, write it for the reader who was not there: state what was verified and how,
+what remains unproven, and what the next action is. Where a diagnosis was wrong and later
+corrected, keep both — the correction is worth more to that reader than a tidy record would be.
+
 ## Status Commands
 
 When the user says:

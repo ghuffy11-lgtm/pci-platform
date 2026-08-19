@@ -118,6 +118,33 @@ required for either.
 | BLK-0003 | PCI server key could not be unlocked | 2026-08-19 | **RESOLVED.** Key loaded into a reachable agent; SSH access to the host verified. Passphrase retained. |
 | MSG-0001 | Authorized Ubuntu host and `/data/docker` storage boundary | 2026-08-19 | **ANSWERED** by `docs/operations/pci-server-bootstrap.md` (accepted contract). |
 
+## Permanent Operating Rules
+
+The permanent rules in `CLAUDE.md` and `AGENTS.md` govern every session. Two hardening rounds are
+recorded:
+
+| Date | Change | Record |
+|---|---|---|
+| 2026-08-19 | Twelve non-negotiable rules, mandatory startup checklist, mandatory pre-action checklist | MSG-0007 |
+| 2026-08-19 | **Documentation Is Mandatory** — ten clauses added to `CLAUDE.md` | this section |
+
+**Documentation Is Mandatory** (`CLAUDE.md`) requires, for every task: reading the applicable
+documentation before starting; recording discoveries, assumptions, blockers, failed verification,
+deviations, and decisions during execution; updating the persistent records on completion; and
+committing and pushing those updates *before* reporting the task complete.
+
+Its operative constraints:
+
+- A conversational response is **not** the project record. The repository is.
+- Never report *done*, *complete*, *verified*, *blocked*, or *waiting* unless the state and its
+  evidence are recorded in GitHub.
+- "No documentation change required" must be **verified**, never assumed.
+- A completely new Claude session must be able to resume from repository documentation and
+  repository state alone, without access to any conversation.
+
+Both files were extended additively. Every original line of `CLAUDE.md` was checked for presence
+after the change: none removed. `CLAUDE.md` is now 415 lines.
+
 ## Accepted Decisions
 
 | ID | Subject | Authoritative record |
