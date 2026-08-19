@@ -4,14 +4,17 @@ This directory is the asynchronous communication channel between Claude Code and
 
 ## Message Register
 
-Every message in this directory, newest first. Each row links to the file. Claude Code updates this register whenever a message is created or its status changes — a message that is not listed here is a defect in the record, not a missing message.
+Every message in this directory, newest first. Each row links to the file. Claude Code updates this
+register whenever a message is created or its status changes — a message that is not listed here is
+a defect in the record, not a missing message.
 
 | ID | Subject | Status | File |
 |---|---|---|---|
-| **MSG-0022** | **Resolve MSG-0020 conflict — WP-0001 COMPLETE** | **DECIDED** | [MSG-0022-resolve-msg-0020-conflict.md](MSG-0022-resolve-msg-0020-conflict.md) |
-| MSG-0021 | Which MSG-0020 stands? Two contradictory completion decisions | **CLOSED** — resolved by MSG-0022 | [MSG-0021-msg-0020-conflict.md](MSG-0021-msg-0020-conflict.md) |
-| MSG-0020 (a) | WP-0001 completion decision — NOT COMPLETE, authorizes TASK-0012 | **SUPERSEDED** — MSG-0022 | [MSG-0020-wp-0001-completion-decision.md](MSG-0020-wp-0001-completion-decision.md) |
-| MSG-0020 (b) | WP-0001 completion decision — COMPLETE, no remediation | **SUPERSEDED** — MSG-0022 restates final ruling | [MSG-0020-wp0001-completion-decision.md](MSG-0020-wp0001-completion-decision.md) |
+| **MSG-0023** | **Correct TASK-0009 boundary — no TASK-0012 in WP-0001 path** | **DECIDED** | [MSG-0023-correct-task-0009-boundary.md](MSG-0023-correct-task-0009-boundary.md) |
+| MSG-0022 | Resolve MSG-0020 conflict — WP-0001 COMPLETE | **DECIDED — superseded/clarified by MSG-0023** | [MSG-0022-resolve-msg-0020-conflict.md](MSG-0022-resolve-msg-0020-conflict.md) |
+| MSG-0021 | Which MSG-0020 stands? Two contradictory completion decisions | **CLOSED — resolved by MSG-0022 and clarified by MSG-0023** | [MSG-0021-msg-0020-conflict.md](MSG-0021-msg-0020-conflict.md) |
+| MSG-0020 (a) | WP-0001 completion decision — NOT COMPLETE, authorizes TASK-0012 | **SUPERSEDED — MSG-0023** | [MSG-0020-wp-0001-completion-decision.md](MSG-0020-wp-0001-completion-decision.md) |
+| MSG-0020 (b) | WP-0001 completion decision — COMPLETE, no remediation | **SURVIVING COMPLETION RULING — clarified by MSG-0023** | [MSG-0020-wp0001-completion-decision.md](MSG-0020-wp0001-completion-decision.md) |
 | MSG-0019 | TASK-0007 / TASK-0008 complete — WP-0001 ready for the completion decision | OPEN | [MSG-0019-task-0007-0008-complete.md](MSG-0019-task-0007-0008-complete.md) |
 | MSG-0018 | Authorize TASK-0007 | DECIDED — executed, G4 passed | [MSG-0018-authorize-task-0007.md](MSG-0018-authorize-task-0007.md) |
 | MSG-0017 | TASK-0006 complete — WP-0001 is reproducible | OPEN | [MSG-0017-task-0006-complete.md](MSG-0017-task-0006-complete.md) |
