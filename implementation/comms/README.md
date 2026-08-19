@@ -11,6 +11,7 @@ a defect in the record, not a missing message.
 | ID | Subject | Status | File |
 |---|---|---|---|
 | **MSG-0008** | **Authorized one-time privileged bootstrap — exact operator procedure** | **OPEN — awaiting operator execution** | [MSG-0008-authorized-bootstrap-command.md](MSG-0008-authorized-bootstrap-command.md) |
+| MSG-0009 | Permanent rule added: Documentation Is Mandatory | DECIDED — applied | [MSG-0009-documentation-is-mandatory.md](MSG-0009-documentation-is-mandatory.md) |
 | MSG-0007 | Permanent operating rule hardening | DECIDED — applied | [MSG-0007-operating-rule-hardening.md](MSG-0007-operating-rule-hardening.md) |
 | MSG-0006 | Absolute host file boundary (architecture lead override) | DECIDED — applied, contract v0.2 | [MSG-0006-absolute-host-file-boundary.md](MSG-0006-absolute-host-file-boundary.md) |
 | MSG-0005 | Architecture lead decisions (ADR-0015, ADR-0016, repository layout) | DECIDED — acted on | [MSG-0005-architecture-lead-decisions.md](MSG-0005-architecture-lead-decisions.md) |

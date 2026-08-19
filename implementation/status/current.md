@@ -80,6 +80,7 @@ One message is OPEN and requires operator action: **MSG-0008**.
 | MSG-0005 | Architecture lead decisions | DECIDED — acted on 2026-08-19 |
 | MSG-0006 | Absolute host file boundary (override) | DECIDED — correction applied, awaiting review |
 | MSG-0007 | Permanent operating rule hardening | DECIDED — applied to CLAUDE.md and AGENTS.md |
+| MSG-0009 | Documentation Is Mandatory rule added to `CLAUDE.md` | DECIDED — applied |
 | MSG-0008 | Authorized bootstrap: exact operator procedure and path — `implementation/comms/MSG-0008-authorized-bootstrap-command.md` | **OPEN** — awaiting operator execution |
 
 ## Repository / GitHub State
@@ -126,7 +127,7 @@ recorded:
 | Date | Change | Record |
 |---|---|---|
 | 2026-08-19 | Twelve non-negotiable rules, mandatory startup checklist, mandatory pre-action checklist | MSG-0007 |
-| 2026-08-19 | **Documentation Is Mandatory** — ten clauses added to `CLAUDE.md` | this section |
+| 2026-08-19 | **Documentation Is Mandatory** — ten clauses added to `CLAUDE.md` | MSG-0009 |
 
 **Documentation Is Mandatory** (`CLAUDE.md`) requires, for every task: reading the applicable
 documentation before starting; recording discoveries, assumptions, blockers, failed verification,
