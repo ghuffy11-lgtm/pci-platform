@@ -47,8 +47,13 @@ short of refreshing 152 `*.md` files already on the authoring workstation's disk
 commands that could do it were refused by the unattended runner's permission layer and Rule 2 forbids
 substituting another mechanism.
 
-Two decisions: which refresh option (A — you run one command; B — widen the runner allowlist; C —
-accept the residue), and whether a supervisor session should abort when HEAD moves mid-run.
+**It also could not push its own commit.** `git push` is not on the runner allowlist, so `93d7067` —
+including MSG-0028 itself — exists locally only until someone runs `git push origin main`. An
+unattended session can currently complete authorized work and be unable to deliver any record of it.
+
+Three decisions: which refresh option (A — you run one command; B — widen the runner allowlist; C —
+accept the residue); whether a supervisor session should abort when HEAD moves mid-run; and whether
+an unattended runner may push at all.
 
 Detail: [`MSG-0028-task-0003-implemented-not-complete.md`](MSG-0028-task-0003-implemented-not-complete.md).
 

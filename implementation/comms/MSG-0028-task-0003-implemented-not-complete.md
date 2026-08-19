@@ -128,13 +128,46 @@ The finding from this first live run is §2: **in `acceptEdits` with no approver
 unattended runner can only execute Bash commands already on the allowlist.** Read-only git worked
 throughout; `git add`, `git commit`, and `git config` are allowlisted; anything else stops dead. That
 is a sound fail-closed posture and it behaved correctly — but it means the allowlist, not the deny
-list, sets the ceiling on what unattended work can finish. `git push` is likewise not allowlisted;
-whether this session's push succeeded is recorded in the status file.
+list, sets the ceiling on what unattended work can finish.
+
+### 4a. THIS MESSAGE COULD NOT BE PUSHED — read this first
+
+`git push` is not on the allowlist either:
+
+```text
+$ git push origin main
+This command requires approval
+
+$ git status -sb
+## main...origin/main [ahead 1]
+```
+
+TASK-0003's commit `93d7067` — including this message — **exists locally only**. If you are reading
+this on GitHub, someone has since run `git push origin main` and the fault is cleared. If you are
+reading it on the workstation, it has not reached you through the channel at all.
+
+`git push --force` and `-f` are correctly denied by `runner-settings.json`. Plain `git push` is not
+denied; it is simply un-allowlisted. The consequence is structural and worth deciding on
+deliberately:
+
+**An unattended supervisor session can complete authorized work, document it correctly, commit it —
+and then be unable to deliver any of it.** Every record it wrote is invisible to you until a human
+notices. The supervisor reports a runner exit code; it has no notion of "the work never left the
+machine". Silence from the channel is indistinguishable from no work having been done, which is the
+same failure shape the supervisor's own design notes warn about for missed webhooks.
+
+Suggested fix, if you want unattended sessions to be able to report at all: allowlist exactly
+`Bash(git push origin main)` — not `git push:*`, which would readmit the refspec games the force-push
+denial exists to prevent. That is a widening of unattended authority and therefore your decision, not
+mine, which is why it is proposed here rather than applied.
 
 ## Decision required
 
-1. Choose **A**, **B**, or **C** for the working-tree refresh (§2), and
+1. Choose **A**, **B**, or **C** for the working-tree refresh (§2).
 2. Rule on §3(a) — whether a mid-run HEAD move should abort a supervisor session.
+3. Rule on §4a — whether an unattended runner may push, and if so under exactly what pattern.
+   **Until this is settled, no supervisor-started session can deliver its own record.** This one
+   could not deliver the message you are reading.
 
 §3(b) needs no decision unless you intend task detail sections to exist.
 

@@ -229,6 +229,37 @@ working tree: .gitattributes modified (TASK-0003), TASK-0003 checkpoint untracke
 start path actually work`, pushed by a **concurrent actor while TASK-0003 was running**. That is
 recorded here because it is the evidence behind MSG-0028 §3(a), not as routine housekeeping.
 
+### The TASK-0003 commit is COMMITTED but NOT PUSHED
+
+```text
+$ git log --oneline -2
+93d7067 feat(records): TASK-0003 - pin *.md to LF; refresh refused, not worked around
+aaf0d34 fix(supervisor): capture runner output and make the start path actually work
+
+$ git status -sb
+## main...origin/main [ahead 1]
+
+$ git push origin main
+This command requires approval
+```
+
+`git push` is not on the `.claude/settings.local.json` allowlist, so the unattended runner cannot
+perform it. **`93d7067` exists locally only.** The architecture lead cannot read any of it on GitHub
+until someone runs:
+
+```bash
+git push origin main
+```
+
+This is the one case `CLAUDE.md` Rule 7 exempts from repository-first communication — a fault that
+prevents pushing at all. It is recorded here so it lands the moment the channel recovers, and it is
+also reported directly. **Do not read this file's TASK-0003 records as visible to the lead until the
+push happens.**
+
+`git push --force` and `git push -f` are separately and correctly denied by the governance deny list.
+The plain push is merely un-allowlisted, which is a gap in the runner's grant rather than a policy
+decision — and it means **an unattended session can complete work it cannot deliver.**
+
 Local and remote are identical. All WP-0001 implementation and communication artifacts are on
 `origin/main`. The architecture lead can read every artifact directly; the operator is no longer
 required as a messenger.
