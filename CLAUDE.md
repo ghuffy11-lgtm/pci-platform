@@ -58,14 +58,15 @@ satisfied by recalling a previous session.
 - [ ] 1. Read `CLAUDE.md` (this file).
 - [ ] 2. Read `AGENTS.md`.
 - [ ] 3. Read `implementation/status/current.md`.
-- [ ] 4. Read the active work package under `docs/program/work-packages/`.
-- [ ] 5. Read every ADR, specification, and architecture document that work package references.
-- [ ] 6. Read `docs/operations/pci-server-bootstrap.md` before any host operation.
-- [ ] 7. Read all OPEN items in `implementation/comms/`, `implementation/blockers/`, and
+- [ ] 4. Read `implementation/operations/CLAUDE-TASKS.md` — the authoritative execution queue.
+- [ ] 5. Read the active work package under `docs/program/work-packages/`.
+- [ ] 6. Read every ADR, specification, and architecture document that work package references.
+- [ ] 7. Read `docs/operations/pci-server-bootstrap.md` before any host operation.
+- [ ] 8. Read all OPEN items in `implementation/comms/`, `implementation/blockers/`, and
        `implementation/discoveries/`.
-- [ ] 8. Run `git status` and `git log --oneline -5`; confirm whether the working tree is clean and
+- [ ] 9. Run `git status` and `git log --oneline -5`; confirm whether the working tree is clean and
        whether local and `origin/main` agree.
-- [ ] 9. Verify current host or environment state directly before acting on it. Do not assume a
+- [ ] 10. Verify current host or environment state directly before acting on it. Do not assume a
        previous session's result still holds.
 
 **You MUST NOT rely on memory from previous sessions.** Session memory, summaries, and recalled
@@ -355,6 +356,63 @@ purpose, not happened.
 When writing a record, write it for the reader who was not there: state what was verified and how,
 what remains unproven, and what the next action is. Where a diagnosis was wrong and later
 corrected, keep both — the correction is worth more to that reader than a tidy record would be.
+
+## Task Queue
+
+At the start of EVERY session, Claude MUST read:
+
+1. `CLAUDE.md`
+2. `AGENTS.md`
+3. `implementation/status/current.md`
+4. `implementation/operations/CLAUDE-TASKS.md`
+
+`implementation/operations/CLAUDE-TASKS.md` is the **authoritative execution queue**.
+
+Claude MUST execute the highest-priority READY task and follow its:
+
+- prerequisites;
+- allowed actions;
+- forbidden actions;
+- verification requirements;
+- documentation requirements;
+- stop conditions.
+
+Claude MUST NOT:
+
+- rely on conversation history;
+- invent or self-authorize work;
+- change task scope without authorization;
+- continue past a stop condition;
+- skip documentation;
+- execute a proposed follow-up task until the architecture lead marks it READY.
+
+**Only the architecture lead may authorize new work or change task priority or scope.**
+
+A task's prerequisites are checked before its actions begin, not assumed from the queue. A task
+marked READY whose prerequisite is unmet stops at that prerequisite and records why — READY means
+authorized to attempt, never authorized to force.
+
+## COMMS Protocol
+
+`COMMS` is the project communication and checkpoint command.
+
+When the architecture lead sends `COMMS`, Claude MUST:
+
+1. Read the current task queue and all newly relevant communications.
+2. Check for new architecture-lead decisions, instructions, blockers, approvals, or task changes.
+3. Reconcile those communications against `implementation/status/current.md` and the active task.
+4. Determine the next authorized action.
+5. Execute the next READY task when authorization exists.
+6. Document all resulting actions, verification, discoveries, blockers, and decisions in GitHub.
+7. Commit and push the resulting documentation.
+8. Stop at the next defined boundary or blocker.
+
+Claude MUST NOT treat the conversation as the project record. **GitHub documentation is the
+authoritative record.**
+
+Every significant task must leave a persistent GitHub record before Claude reports completion.
+
+A completely new Claude session must be able to resume from the repository alone.
 
 ## Status Commands
 

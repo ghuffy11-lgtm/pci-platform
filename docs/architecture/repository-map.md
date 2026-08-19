@@ -33,6 +33,7 @@
     ├── comms/
     ├── decisions/
     ├── discoveries/
+    ├── operations/
     ├── reports/
     └── status/
 ```
@@ -82,6 +83,8 @@ the `/data/docker` boundary defined in
 ### `implementation/`
 Claude Code's implementation communication channel: status, reports, blockers, discoveries,
 proposed decisions, and direct messages to the architecture lead. Mandated by `CLAUDE.md`.
+`implementation/operations/CLAUDE-TASKS.md` is the authoritative execution queue: every session
+reads it at startup and executes the highest-priority READY task.
 
 ### `AGENTS.md`
 Repository-wide instructions for coding agents.

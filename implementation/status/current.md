@@ -36,6 +36,20 @@ authoring host, and the authorized Ubuntu implementation host has not yet been b
   checkout only, and is not an execution host. The `/data` boundary governs the PCI server; it
   does not apply to this workstation.
 
+## Execution Queue
+
+`implementation/operations/CLAUDE-TASKS.md` is the **authoritative execution queue**. Every session
+reads it at startup and executes the highest-priority READY task.
+
+| # | Task | Priority | Status |
+|---|---|---|---|
+| TASK-0001 | Complete WP-0001 verification on the authorized host | 1 | **READY** — prerequisite P1 (bootstrap executed) currently UNMET |
+| TASK-0002 | Make test entry points shell-independent (DISC-0005) | 2 | PROPOSED — not authorized |
+| TASK-0003 | Normalise `*.md` line endings to LF (DISC-0006) | 3 | PROPOSED — not authorized |
+
+Only the architecture lead may authorize new work or change a task's priority or scope. A PROPOSED
+task is not executable.
+
 ## Active Work Package
 
 `docs/program/work-packages/WP-0001-kernel-foundation.md`

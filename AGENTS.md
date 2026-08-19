@@ -27,9 +27,15 @@ Decided by the architecture lead in `implementation/comms/MSG-0005-architecture-
 
 ## Session Start — Mandatory
 
-Every session re-reads the documents listed above, plus `implementation/status/current.md`, the
-active work package, and all open items in `implementation/comms/`, `implementation/blockers/`,
-and `implementation/discoveries/`.
+Every session re-reads the documents listed above, plus `implementation/status/current.md`,
+`implementation/operations/CLAUDE-TASKS.md` (the authoritative execution queue), the active work
+package, and all open items in `implementation/comms/`, `implementation/blockers/`, and
+`implementation/discoveries/`.
+
+Work comes from the execution queue, not from conversation. Execute the highest-priority READY
+task and follow its prerequisites, allowed and forbidden actions, verification requirements, and
+stop conditions. Only the architecture lead may authorize new work or change a task's priority or
+scope; a PROPOSED task is not executable.
 
 **Do not rely on memory from previous sessions.** Recalled context is a pointer to where to look,
 never evidence that something is still true. Re-read and re-verify.
