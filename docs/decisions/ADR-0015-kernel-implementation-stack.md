@@ -16,7 +16,7 @@ The runtime choice applies to the **platform kernel only**. It does not constrai
 
 ## Rationale
 
-The decision satisfies the technology-selection principles for standards support, security, maturity, interoperability, operational simplicity, performance, licensing, and replaceability. Node.js 24 is an LTS line, with official support continuing through April 2028. citeturn0search0turn0search2
+The decision satisfies the technology-selection principles for standards support, security, maturity, interoperability, operational simplicity, performance, licensing, and replaceability. Node.js 24 is an LTS line and remains supported through April 2028.
 
 The kernel is structured so that domain and application logic remain independent of the runtime; PostgreSQL and transport concerns are isolated behind adapters/ports. The HTTP/JSON contract and SQL schema are durable artifacts and are not defined by Node.js.
 
