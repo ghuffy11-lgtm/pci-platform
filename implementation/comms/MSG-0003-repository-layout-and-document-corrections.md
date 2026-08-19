@@ -1,6 +1,6 @@
 # MSG-0003 — Repository Layout Authority and Document Corrections
 
-**Status:** OPEN (non-blocking — proceeding, corrections required in architecture documents)
+**Status:** **CLOSED — DECIDED** 2026-08-19 by MSG-0005. Retained as a historical communication record; not deleted.
 **Raised:** 2026-08-19
 **Raised by:** Claude Code (implementation agent)
 **Work package:** WP-0001 — PCI Kernel Foundation
@@ -85,3 +85,28 @@ projection or be removed?
 1. Confirm WP-0001 lifts the `repository-map.md:57` gate; approve updating that document.
 2. Choose the canonical work-package location and correct `CLAUDE.md` accordingly.
 3. Designate the authoritative governance tree (`knowledge/` vs `docs/`).
+
+---
+
+## Resolution — 2026-08-19
+
+Decided by the architecture lead in `implementation/comms/MSG-0005-architecture-lead-decisions.md`:
+
+- **Issue 1 (repository map / sequencing gate).** The WP-0001 layout is accepted. `services/`,
+  `deploy/`, and `implementation/` are valid top-level areas, and the sequencing gate is lifted
+  for this approved layout. Future top-level code areas still require an approved work package or
+  ADR. `docs/architecture/repository-map.md` has been updated accordingly.
+- **Issue 2 (work-package location).** `docs/program/work-packages/` is canonical. `CLAUDE.md`
+  startup step 4 has been corrected to point there. Option 1A of MSG-0004; nothing moved.
+- **Issue 3 (mandated directories).** No decision needed; the directories were scaffolding
+  required by `CLAUDE.md` and now appear in the repository map.
+- **Issue 4 (governance tree).** `docs/` is authoritative for architecture, ADRs, specifications,
+  engineering, operations, product, program, and security governance.
+  `knowledge/governance/constitution.md` remains authoritative for the Constitution itself. Other
+  `knowledge/` duplicates are legacy and must not override `docs/`. `AGENTS.md` now records this.
+
+**The legacy duplicates were deliberately NOT deleted.** The lead directed that migration or
+removal is a separate controlled cleanup task. The divergence recorded in DISC-0001 therefore
+still exists on disk; what has changed is that precedence is now unambiguous.
+
+This message is closed and retained as a historical record.

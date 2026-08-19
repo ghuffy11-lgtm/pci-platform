@@ -1,6 +1,6 @@
-# ADR-0016 — Tenant Isolation Enforcement Strategy (PROPOSED)
+# ADR-0016 — Tenant Isolation Enforcement Strategy (RATIFIED)
 
-**Status:** PROPOSED — requires ratification by the architecture lead
+**Status:** **RATIFIED** 2026-08-19 — accepted as `docs/decisions/ADR-0016-tenant-isolation-enforcement.md`. The proposed text below is retained unchanged as the historical record.
 **Date:** 2026-08-19
 **Proposed by:** Claude Code (implementation agent)
 **Work package:** WP-0001 — PCI Kernel Foundation
@@ -78,3 +78,23 @@ are out of scope. Recorded as a known limitation.
 1. Ratify, amend, or reject the three-layer strategy.
 2. Confirm 404-over-403 for cross-tenant reads.
 3. Confirm that system-tenant governance is correctly deferred beyond WP-0001.
+
+---
+
+## Ratification — 2026-08-19
+
+The architecture lead ratified this decision in
+`implementation/comms/MSG-0005-architecture-lead-decisions.md` and promoted it to
+`docs/decisions/ADR-0016-tenant-isolation-enforcement.md` (**Status: ACCEPTED**), which is now the
+authoritative record. This file is the implementation-side proposal it originated from and is
+retained for history.
+
+As ratified: the three-layer strategy — type/application tenant context, query/data-model tenant
+constraints, and PostgreSQL RLS with FORCE RLS. Cross-tenant reads return 404. Runtime database
+roles must not be SUPERUSER or BYPASSRLS.
+
+**Scope limit stated by the lead:** system-tenant governance remains outside WP-0001.
+
+The FORCE RLS and non-BYPASSRLS requirements are verification obligations, not just design
+statements. They remain unproven until exercised against a real PostgreSQL instance — the work
+that BLK-0001 still gates.

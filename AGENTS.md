@@ -6,10 +6,24 @@ This repository is governed by the PCI Engineering Constitution.
 
 Before making changes, read:
 
-1. `knowledge/governance/constitution.md`
+1. `knowledge/governance/constitution.md` — the PCI Constitution. This file remains
+   authoritative for the Constitution itself.
 2. `docs/architecture/architecture-principles.md`
-3. the relevant ADRs and SPECs
+3. the relevant ADRs and SPECs under `docs/decisions/` and `docs/specifications/`
 4. `docs/engineering/claude-code-rules.md`
+
+## Governance Tree Authority
+
+`docs/` is authoritative for architecture, ADRs, specifications, engineering, operations,
+product, program, and security governance. The single exception is
+`knowledge/governance/constitution.md`, which remains authoritative for the PCI Constitution.
+
+Other duplicated governance content under `knowledge/` is **legacy** and must not override
+`docs/`. Where the two trees disagree, `docs/` wins. The legacy duplicates are retained
+deliberately for now; their migration or removal is a separate controlled cleanup task and must
+not be performed opportunistically.
+
+Decided by the architecture lead in `implementation/comms/MSG-0005-architecture-lead-decisions.md`.
 
 ## Non-Negotiable Rules
 

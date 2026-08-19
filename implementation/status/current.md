@@ -1,7 +1,7 @@
 # PCI Implementation Status
 
 **Active Work Package:** WP-0001 — PCI Kernel Foundation
-**Status:** IMPLEMENTED — BLOCKED ON VERIFICATION
+**Status:** IMPLEMENTED — VERIFICATION IN PROGRESS ON AUTHORIZED HOST
 **Last Updated:** 2026-08-19
 
 ## Current State
@@ -64,12 +64,15 @@ authoring host, and the authorized Ubuntu implementation host has not yet been b
 
 ## Open Communications
 
-| ID | Subject | Status | Blocking |
-|---|---|---|---|
-| MSG-0001 | Authorized Ubuntu host and `/data/docker` storage boundary | **ANSWERED** — bootstrap contract accepted | No |
-| MSG-0002 | Kernel runtime stack ratification (ADR-0015) | OPEN | No |
-| MSG-0003 | Repository layout authority and document corrections | OPEN | No |
-| MSG-0004 | Prepared repository corrections for MSG-0003 (not applied) | OPEN | No |
+All architecture communications are now closed. None are blocking.
+
+| ID | Subject | Status |
+|---|---|---|
+| MSG-0001 | Authorized Ubuntu host and `/data/docker` storage boundary | ANSWERED — bootstrap contract |
+| MSG-0002 | Kernel runtime stack ratification | CLOSED — ADR-0015 ratified |
+| MSG-0003 | Repository layout authority and document corrections | CLOSED — decided by MSG-0005 |
+| MSG-0004 | Prepared repository corrections | CLOSED — approved and applied |
+| MSG-0005 | Architecture lead decisions | DECIDED — acted on 2026-08-19 |
 
 ## Repository / GitHub State
 
@@ -102,21 +105,41 @@ so AC-02 and the integration tier of AC-09 remain unverified.
 | BLK-0002 | GitHub push unavailable — communication channel down | 2026-08-19 | **RESOLVED.** All commits reached `origin/main`. Diagnosis history preserved in the blocker. |
 | MSG-0001 | Authorized Ubuntu host and `/data/docker` storage boundary | 2026-08-19 | **ANSWERED** by `docs/operations/pci-server-bootstrap.md` (accepted contract). |
 
-## Proposed Decisions Awaiting Ratification
+## Accepted Decisions
 
-| ID | Subject |
+| ID | Subject | Authoritative record |
+|---|---|---|
+| ADR-0015 | Kernel implementation stack (Node.js 24 LTS + TypeScript, zero-framework, `pg`) | `docs/decisions/ADR-0015-kernel-implementation-stack.md` — ACCEPTED |
+| ADR-0016 | Tenant isolation enforcement (three layers, FORCE RLS, 404 over 403) | `docs/decisions/ADR-0016-tenant-isolation-enforcement.md` — ACCEPTED |
+
+Both were ratified by the architecture lead on 2026-08-19 in MSG-0005 and promoted to
+`docs/decisions/`. The implementation-side proposals in `implementation/decisions/` are retained
+as history and now record their ratification.
+
+**Stated scope limits, which implementation must respect:**
+
+- ADR-0015 applies to the kernel only. It does not constrain future AI, ingestion, connector, or
+  UI runtimes.
+- ADR-0016 excludes system-tenant governance from WP-0001.
+- ADR-0016's FORCE RLS and non-BYPASSRLS requirements remain **unverified**. They are design
+  obligations that have never been exercised against a real PostgreSQL instance. Ratification
+  does not constitute verification.
+
+## Applied Repository Corrections — 2026-08-19
+
+Authorized by MSG-0005; prepared in MSG-0004.
+
+| File | Correction |
 |---|---|
-| ADR-0015 | Kernel implementation stack (Node.js 24 + TypeScript, zero-framework) |
-| ADR-0016 | Tenant isolation enforcement (three layers; 404 over 403) |
+| `CLAUDE.md` | Startup step 4 now reads the active work package from `docs/program/work-packages/`. |
+| `AGENTS.md` | New Governance Tree Authority section: `docs/` authoritative, `knowledge/governance/constitution.md` excepted, other `knowledge/` content legacy. |
+| `docs/architecture/repository-map.md` | Records `services/`, `deploy/`, `implementation/`, `CLAUDE.md`, and `docs/program/`; sequencing gate replaced with the lifted-gate statement. |
+| `implementation/decisions/ADR-0015`, `ADR-0016` | Ratification recorded; proposed text retained. |
+| `implementation/comms/MSG-0003`, `MSG-0004` | Closed and retained as historical records; not deleted. |
 
-Both remain **PROPOSED** as of 2026-08-19. The architecture review of the committed WP-0001
-artifacts did not ratify either one, and neither has been promoted to `docs/decisions/`. No
-architecture-lead approval is claimed for any decision in this work, and none has been inferred
-from the review taking place.
-
-Implementation continues to run on the assumptions these ADRs describe, because the kernel is
-already built on them. That is a recorded risk, not an approval: if either is overturned, the
-affected kernel code changes accordingly.
+Legacy `knowledge/` duplicates were **not** deleted, by explicit instruction — their migration is
+a separate controlled cleanup task. DISC-0001's divergence therefore still exists on disk; only
+precedence has changed.
 
 ## Discoveries
 
@@ -143,33 +166,19 @@ affected kernel code changes accordingly.
 
 ## Next Action
 
-**No new work package is to be started.** Per the 2026-08-19 architecture review, the repository
-is reconciled and implementation holds here. WP-0001 remains the active work package and is
-still IMPLEMENTED, not COMPLETE.
+**Resume WP-0001 on the authorized Ubuntu PCI server.** Authorized by MSG-0005 after the
+repository corrections above were committed and pushed. No new work package is to be started.
 
-Awaiting the architecture lead on four items, none of which Claude Code may decide:
+The objective is real verification, not further construction: bootstrap the host per
+`docs/operations/pci-server-bootstrap.md`, stand up PostgreSQL with all persistent state under
+`/data/docker`, run the integration tier, and prove tenant isolation against a live database with
+FORCE RLS and a non-BYPASSRLS runtime role.
 
-- **MSG-0002** — ratify or overturn ADR-0015 (kernel runtime stack).
-- **MSG-0003** — the three repository-layout decisions. Remains OPEN and is the decision of record.
-- **MSG-0004** — approve the prepared corrections. They are written out exactly and NOT applied.
-- **ADR-0016** — ratify or overturn tenant isolation enforcement.
+That closes AC-02 and the integration tier of AC-09, and converts AC-01 and AC-05 from partial to
+verified. Two recorded items must be handled on the way:
 
-When implementation resumes, the standing instruction is unchanged: read `CLAUDE.md`, `AGENTS.md`,
-this status file, the active work package, and its referenced architecture/ADR/specification
-documents; then bootstrap the authorized Ubuntu implementation host according to
-`docs/operations/pci-server-bootstrap.md`.
-
-For WP-0001 specifically, that bootstrap is what closes the outstanding acceptance criteria. On
-the authorized host, with all persistent state under `/data/docker`:
-
-```bash
-docker compose -f deploy/compose/docker-compose.yml up -d postgres
-cd services/kernel
-PCI_TEST_DATABASE_URL=postgres://pci_app:<dev-password>@localhost:5432/pci_test \
-  npm run test:integration
-```
-
-Then update the WP-0001 report with the real result and re-assess AC-01, AC-02, AC-05, and AC-09.
-
-Do not begin the next work package until WP-0001's acceptance criteria are genuinely met and
-ADR-0015 / ADR-0016 are ratified or overturned.
+- **DISC-0004** — the compose stack uses a named volume and predates the `/data/docker` boundary.
+  Correct it on the host, where it can be verified.
+- **DISC-0005** — `npm test` exits 0 while running zero tests under POSIX shells, which is the
+  default on the target Ubuntu host. Fix before trusting any tier's result there, or the
+  integration evidence will be worthless.

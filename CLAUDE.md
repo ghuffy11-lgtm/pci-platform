@@ -24,7 +24,7 @@ At the beginning of every session:
 1. Read this file.
 2. Read `AGENTS.md`.
 3. Read `implementation/status/current.md` if present.
-4. Read the active work package under `implementation/work-packages/`.
+4. Read the active work package under `docs/program/work-packages/`.
 5. Read all referenced ADRs/specifications/architecture documents.
 6. Inspect the current repository state before modifying anything.
 

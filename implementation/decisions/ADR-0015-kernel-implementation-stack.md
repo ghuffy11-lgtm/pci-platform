@@ -1,6 +1,6 @@
-# ADR-0015 — Kernel Implementation Stack (PROPOSED)
+# ADR-0015 — Kernel Implementation Stack (RATIFIED)
 
-**Status:** PROPOSED — requires ratification by the architecture lead
+**Status:** **RATIFIED** 2026-08-19 — accepted as `docs/decisions/ADR-0015-kernel-implementation-stack.md`. The proposed text below is retained unchanged as the historical record.
 **Date:** 2026-08-19
 **Proposed by:** Claude Code (implementation agent)
 **Work package:** WP-0001 — PCI Kernel Foundation
@@ -100,3 +100,20 @@ and schema. `domain/` and `application/` translate mechanically.
 
 Ratify, amend, or reject. If ratified, promote to `docs/decisions/ADR-0015-...` and update
 `docs/architecture/technology-standards.md`.
+
+---
+
+## Ratification — 2026-08-19
+
+The architecture lead ratified this decision in
+`implementation/comms/MSG-0005-architecture-lead-decisions.md` and promoted it to
+`docs/decisions/ADR-0015-kernel-implementation-stack.md` (**Status: ACCEPTED**), which is now the
+authoritative record. This file is the implementation-side proposal it originated from and is
+retained for history.
+
+As ratified: Node.js 24 LTS with TypeScript for the PCI kernel, zero-framework posture retained,
+`pg` as the PostgreSQL driver.
+
+**Scope limit stated by the lead:** the decision applies to the kernel only. It does not
+constrain future AI, ingestion, connector, or UI runtimes. Nothing here authorises extending this
+stack to other components.

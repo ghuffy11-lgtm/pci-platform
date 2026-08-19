@@ -1,10 +1,10 @@
 # MSG-0004 — Prepared Repository Corrections for MSG-0003
 
-**Status:** OPEN — prepared, NOT applied. Awaiting architecture-lead approval.
+**Status:** **CLOSED — APPLIED** 2026-08-19. Approved by MSG-0005; corrections 1, 2, and 4 applied, plus the governance-tree ruling. Retained as a historical communication record; not deleted.
 **Raised:** 2026-08-19
 **Raised by:** Claude Code (implementation agent)
 **Work package:** WP-0001 — PCI Kernel Foundation (reconciliation only; no new work package started)
-**Supersedes nothing.** `MSG-0003` remains **OPEN** and is the decision of record.
+**Supersedes nothing.** `MSG-0003` was the decision of record; both are now CLOSED by MSG-0005 and retained as history.
 
 ## Purpose
 
@@ -12,7 +12,7 @@ The architecture lead asked for the *minimum* repository corrections that would 
 to be **prepared but not executed**. This message is that preparation.
 
 Every change below is written out exactly as it would be applied, against verified current file
-content. **None of them have been made.** No file named in this message has been modified by the
+content. **None of them had been made when this message was written.** (They were applied later, on approval — see Outcome at the end.) No file named in this message was modified by the
 commit that adds this message. Each targets a document owned by the architecture lead
 (`CLAUDE.md`, `docs/architecture/repository-map.md`) or the governance trees, and applying any of
 them unilaterally would be the silent architecture change that Constitution principle 13 and
@@ -253,3 +253,23 @@ applied in a single commit. Correction 3 needs the lead's ruling before any file
 its options are mutually exclusive and destructive in one direction.
 
 `MSG-0003` stays **OPEN** as the decision of record; this message only supplies the exact edits.
+
+---
+
+## Outcome — 2026-08-19
+
+Approved by `implementation/comms/MSG-0005-architecture-lead-decisions.md` and applied.
+
+| # | Correction | Outcome |
+|---|---|---|
+| 1 | Canonical work-package location | **Option 1A adopted.** `docs/program/work-packages/` is canonical; no files moved. |
+| 2 | `CLAUDE.md` line 27 | **Applied** exactly as prepared. |
+| 3 | Authoritative governance tree | **Decided:** `docs/` authoritative, with `knowledge/governance/constitution.md` excepted. `AGENTS.md` updated. Legacy duplicates retained by explicit instruction — deletion is a separate controlled task. |
+| 4 | Repository map | **Applied**, extended beyond the prepared text to record `implementation/`, `CLAUDE.md`, and `docs/program/` per the lead's ruling. |
+
+One deviation from the prepared text is worth stating plainly: correction 3 was prepared as a
+straight choice between the two trees, and the lead's ruling was narrower — `docs/` wins
+generally, but the Constitution stays in `knowledge/governance/`. The applied wording follows the
+ruling, not the prepared recommendation.
+
+This message is closed and retained as a historical record.
