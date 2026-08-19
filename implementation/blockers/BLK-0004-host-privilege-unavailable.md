@@ -227,3 +227,30 @@ the host itself as the contract's Host Responsibilities envisage.
 
 Option B is recommended: one command, no standing privilege, and it produces the evidence block
 WP-0001 needs for AC-01.
+
+---
+
+## Authorized 2026-08-19 — awaiting operator execution
+
+The architecture lead authorized the one-time privileged bootstrap. The exact command and path are
+recorded in `implementation/comms/MSG-0008-authorized-bootstrap-command.md`.
+
+Authorized sequence:
+
+```bash
+# 1. operator, privileged — create the mandatory workspace
+sudo install -d -m 0755 -o claude -g claude /data/pci-platform
+
+# 2. Claude Code, unprivileged — clone into it over agent forwarding
+git clone git@github.com:ghuffy11-lgtm/pci-platform.git /data/pci-platform
+
+# 3. operator, privileged — the authorized bootstrap, from the authorized /data path
+sudo bash /data/pci-platform/deploy/bootstrap/pci-server-bootstrap.sh
+```
+
+Steps 1 and 3 may be collapsed into a single run from the operator's own copy, since the script is
+location-independent and provisions the workspace itself. Contract v0.2 reserves that choice to the
+architecture lead; see MSG-0008.
+
+This blocker closes when step 3 has run and `docker info` reports `DockerRootDir` under
+`/data/docker`. Claude Code will verify that directly rather than assume it from a report.

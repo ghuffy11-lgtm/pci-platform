@@ -78,6 +78,7 @@ All architecture communications are now closed. None are blocking.
 | MSG-0005 | Architecture lead decisions | DECIDED — acted on 2026-08-19 |
 | MSG-0006 | Absolute host file boundary (override) | DECIDED — correction applied, awaiting review |
 | MSG-0007 | Permanent operating rule hardening | DECIDED — applied to CLAUDE.md and AGENTS.md |
+| MSG-0008 | Authorized bootstrap: exact operator command and path | **OPEN** — awaiting operator execution |
 
 ## Repository / GitHub State
 
@@ -179,7 +180,8 @@ precedence has changed.
 **Blocked on BLK-0004 — host privilege.** GO was issued 2026-08-19 and stopped at the privilege
 boundary: `/data/pci-platform` does not exist, `/data` is `root:root` and not writable by
 `claude`, and `sudo` requires a password. Docker remains absent. No workaround was taken and the
-host is unchanged. One privileged command unblocks it — see BLK-0004.
+host is unchanged. The one-time privileged bootstrap is now **authorized**; the exact command and path are in
+MSG-0008. Awaiting operator execution.
 
 **Previously stopped by instruction (MSG-0006).** Implementation
 is held pending architecture-lead review of the contract v0.2 correction. Docker was not
