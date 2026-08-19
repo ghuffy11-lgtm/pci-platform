@@ -254,3 +254,41 @@ architecture lead; see MSG-0008.
 
 This blocker closes when step 3 has run and `docker info` reports `DockerRootDir` under
 `/data/docker`. Claude Code will verify that directly rather than assume it from a report.
+
+---
+
+## Verification log
+
+Each entry is a direct check of the host, run before any action was attempted. Nothing was
+modified on the host in any of them.
+
+| When | `/data/pci-platform` | Docker | `sudo -n` | Outcome |
+|---|---|---|---|---|
+| 2026-08-19, first GO | absent | absent | password required | stopped; blocker raised |
+| 2026-08-19, second GO (post-authorization) | absent | absent | password required | stopped; no change since authorization |
+
+The second check followed the architecture lead's authorization of the one-time privileged
+bootstrap (MSG-0008). **The authorization is recorded, but the privileged commands have not been
+executed.** Authorization and execution are different things, and only the second changes the host.
+
+State verified on the second check:
+
+```text
+$ ls -ld /data/pci-platform
+ls: cannot access '/data/pci-platform': No such file or directory
+
+$ command -v docker          -> absent
+$ ls -la /etc/docker         -> No such file or directory
+$ id -nG                     -> claude sudo users
+$ sudo -n true               -> sudo: a password is required
+```
+
+Step 1 of the MSG-0008 procedure — `sudo install -d -m 0755 -o claude -g claude /data/pci-platform`
+— has not run. Steps 2 and 3 depend on it and therefore cannot proceed. Claude Code cannot perform
+step 1: `/data` is `root:root` and `sudo` requires a password this environment must not handle.
+
+Nothing was worked around. No alternative workspace, no temporary location, no piped script, and
+no PCI artifact created anywhere on the host, inside `/data` or outside it.
+
+This blocker closes when `docker info --format '{{.DockerRootDir}}'` reports a path under
+`/data/docker`, verified directly by Claude Code rather than accepted from a report.

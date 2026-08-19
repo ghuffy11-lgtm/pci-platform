@@ -238,3 +238,18 @@ SSH rather than taking the outcome on trust, then continues WP-0001 without furt
 
 Claude Code has **stopped** and made no host change. Nothing was created inside or outside `/data`.
 This message is the record of the exact command and path required.
+
+---
+
+## Execution log
+
+| When | Event |
+|---|---|
+| 2026-08-19 | Message raised; bootstrap not yet authorized. |
+| 2026-08-19 | Architecture lead authorized the one-time privileged bootstrap. |
+| 2026-08-19 | Procedure amended for execution from an existing repository copy. |
+| 2026-08-19 | GO issued. Host verified directly: `/data/pci-platform` absent, Docker absent, `/etc/docker` absent, `sudo` requires a password. **Step 1 has not been executed.** Stopped without host change. |
+
+**This message remains OPEN.** It closes when step 3 has run and Claude Code has verified
+`docker info --format '{{.DockerRootDir}}'` resolves under `/data/docker`, directly rather than
+from a report.

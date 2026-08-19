@@ -213,7 +213,24 @@ precedence has changed.
 
 ## Next Action
 
-**Blocked on BLK-0004 — host privilege.** GO was issued 2026-08-19 and stopped at the privilege
+**Blocked on BLK-0004 — host privilege. Verified again 2026-08-19 after the bootstrap was
+authorized.** The authorization in MSG-0008 is recorded, but its privileged commands have not been
+executed: `/data/pci-platform` still does not exist, Docker is still absent, `/etc/docker` does not
+exist, and `sudo` still requires a password. Authorization and execution are different things, and
+only execution changes the host.
+
+The single outstanding action is step 1 of the MSG-0008 procedure, which Claude Code cannot
+perform:
+
+```bash
+sudo install -d -m 0755 -o claude -g claude /data/pci-platform
+```
+
+Once it exists, Claude Code performs step 2 (clone into the workspace) unattended, and step 3 is
+the one remaining privileged command. Nothing was worked around and no PCI artifact exists anywhere
+on the host.
+
+**Earlier record — first GO attempt.** GO was issued 2026-08-19 and stopped at the privilege
 boundary: `/data/pci-platform` does not exist, `/data` is `root:root` and not writable by
 `claude`, and `sudo` requires a password. Docker remains absent. No workaround was taken and the
 host is unchanged. The one-time privileged bootstrap is now **authorized**; the exact command and path are in
