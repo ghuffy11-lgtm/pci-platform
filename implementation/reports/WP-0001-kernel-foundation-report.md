@@ -427,3 +427,54 @@ run rather than read.
 
 WP-0001 remains **verified but not yet demonstrated reproducible**. Closing that gap is TASK-0006,
 which needs explicit authorization to destroy the volume (MSG-0015).
+
+---
+
+# 13. Clean-room reproducibility — 2026-08-19 (TASK-0006)
+
+Authorized by MSG-0016, which explicitly permitted the destructive PostgreSQL volume
+re-initialisation for this purpose and for nothing else.
+
+## 13.1 What was destroyed
+
+`pci-kernel_postgres-data`, inspected first and recorded in checkpoint 1 **before** the operation:
+databases `pci` and `pci_test`, 8 tables, 0 knowledge objects, 0 audit records, 1 tenant row — only
+TASK-0001 verification artifacts and the 2026-08-19 manual workaround.
+
+## 13.2 Gate G3 — PASSED
+
+Rebuilt with `docker compose up -d` from repository configuration and the host `.env` only.
+**No manual SQL was run.**
+
+```text
+migrations   applying 0001_kernel_foundation ... applied
+             migrations complete: 1 applied, 0 already present
+role         password_set=true  super=false  bypassrls=false  login=true
+privileges   CREATE on public: true | USAGE on public: true
+pci_test     exists=true  owner=pci_app
+schema       8 tables | 6 with FORCE RLS | 6 policies
+kernel       /health/ready HTTP 200 — store ok (1ms), identity ok (static), policy ok
+boundary     /data/docker/volumes/pci-kernel_postgres-data/_data
+```
+
+## 13.3 What this changes
+
+Sections 11 and 12 recorded WP-0001 as **verified but not reproducible**: the working system had
+been reached through two manual steps that did not exist in the repository. That qualifier no
+longer applies. A clean initialisation now produces:
+
+- a `pci_app` role with a password and the correct least-privilege posture, created by the
+  repository's own init script rather than by hand;
+- the `pci_test` database the integration tier documents;
+- the full schema with FORCE RLS on all six tenant-scoped tables;
+- a kernel that starts and reports healthy against it.
+
+**The DISC-0007 and DISC-0008 fixes are now demonstrated, not merely asserted.** The live database
+is, for the first time, evidence of the repository's own behaviour.
+
+## 13.4 Scope boundary
+
+MSG-0016 authorized TASK-0006 alone. The full test-tier re-verification (TASK-0007) was **not**
+run, and no acceptance criterion is re-asserted here on the strength of this rebuild. The AC
+verdicts in section 11 stand on their original evidence; section 13 adds reproducibility, which was
+the missing completion criterion, not new AC evidence.

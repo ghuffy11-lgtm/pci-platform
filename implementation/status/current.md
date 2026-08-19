@@ -1,7 +1,7 @@
 # PCI Implementation Status
 
 **Active Work Package:** WP-0001 — PCI Kernel Foundation
-**Status:** **VERIFIED ON AUTHORIZED HOST** — all ten acceptance criteria met; stack not yet reproducible (DISC-0007, DISC-0008)
+**Status:** **VERIFIED AND REPRODUCIBLE** — all ten acceptance criteria met; clean-room rebuild verified 2026-08-19 (gate G3)
 **Last Updated:** 2026-08-19
 
 ## Current State
@@ -111,10 +111,13 @@ Every tier reported a non-zero test count.
 **All ten acceptance criteria are met.** Full evidence:
 `implementation/reports/WP-0001-kernel-foundation-report.md` section 11.
 
-> **But the stack is not reproducible from a clean checkout.** Reaching this state required two
-> manual steps that are not in the repository — see DISC-0007 and DISC-0008. The kernel is verified;
-> the deployment artifacts are not yet correct. WP-0001 is therefore reported as **verified, not
-> deployable**.
+> **Reproducibility: CLOSED (2026-08-19, gate G3).** The two manual steps that once stood between a
+> clean checkout and a working stack are fixed (DISC-0007, DISC-0008) and the fixes are demonstrated:
+> the PostgreSQL volume was destroyed under MSG-0016 and rebuilt from repository configuration alone,
+> with no manual SQL. See report section 13.
+>
+> **Not yet re-verified:** the three test tiers have not been re-run against the clean-room stack.
+> That is TASK-0007, which is not authorized. The AC verdicts above stand on their TASK-0001 evidence.
 
 ## Open Communications
 
@@ -139,7 +142,9 @@ tested but **not installed** and **not enabled**.
 | MSG-0012 | Architecture lead decisions: TASK-0004 / TASK-0005 | DECIDED — both COMPLETE |
 | MSG-0013 | Architecture review checkpoint | DECIDED — queue reconciled |
 | MSG-0014 | Queue authorization reconciliation | DECIDED — reconciled in `de35bf4` |
-| MSG-0015 | TASK-0004 / TASK-0005 complete; TASK-0006 authorization required | **OPEN** |
+| MSG-0015 | TASK-0004 / TASK-0005 complete; TASK-0006 authorization required | **CLOSED** — authorized by MSG-0016, executed |
+| MSG-0016 | Authorize TASK-0006 | DECIDED — executed, G3 passed |
+| MSG-0017 | TASK-0006 complete; WP-0001 reproducible | **OPEN** — awaiting TASK-0007 authorization |
 | MSG-0011 | Execution Supervisor — built, tested, not installed | **OPEN** — awaiting install/enable decision |
 
 ## Repository / GitHub State

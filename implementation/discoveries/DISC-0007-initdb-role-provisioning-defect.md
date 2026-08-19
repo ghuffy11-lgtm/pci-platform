@@ -162,3 +162,17 @@ resuming session must not mistake its state for evidence of this fix.
 not define, and aborted initialisation with a syntax error. Corrected to dynamic SQL over
 `current_database()` in `a259888`. The abort was itself evidence that the `ON_ERROR_STOP` fix
 works: before this change, an error at that point would have been ignored.
+
+### Clean-room confirmation — 2026-08-19 (TASK-0006)
+
+The "what is still not proven" caveat above is now discharged. After `docker compose down -v` and a
+rebuild from repository configuration only, with **no manual SQL**:
+
+```text
+role      password_set=true  super=false  bypassrls=false  login=true
+privs     CREATE on public: true | USAGE: true
+pci_test  exists=true  owner=pci_app
+schema    8 tables | 6 with FORCE RLS | 6 policies
+```
+
+The live database is now evidence of the repository's own init path rather than of a hand-repair.

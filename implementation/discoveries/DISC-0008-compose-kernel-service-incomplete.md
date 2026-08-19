@@ -119,3 +119,9 @@ copy now yields a service that will not start, rather than one that starts insec
 
 It was found by *running* the guard rather than reading it, which is the only reason it was caught
 before the record claimed the task was done.
+
+### Clean-room confirmation — 2026-08-19 (TASK-0006)
+
+After a full volume re-initialisation, the kernel started from repository configuration and the
+documented `.env` with no intervention: `pci-kernel-kernel-1 Up (healthy)`, `/health/ready` HTTP 200
+with `store ok`, `identity ok (static)`, `policy ok`. The fail-closed guard remains intact.

@@ -1,6 +1,6 @@
 # MSG-0015 — TASK-0004 and TASK-0005 Complete; TASK-0006 Authorization Required
 
-**Status:** OPEN — awaiting the destructive-operation authorization for TASK-0006
+**Status:** **CLOSED** — TASK-0006 authorized by MSG-0016 and completed 2026-08-19 (gate G3 passed). See MSG-0017.
 **Raised:** 2026-08-19
 **Raised by:** Claude Code (implementation agent)
 **Type:** Record — task completion
