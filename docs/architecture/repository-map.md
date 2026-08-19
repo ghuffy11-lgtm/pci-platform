@@ -26,6 +26,7 @@
 ├── services/
 │   └── kernel/
 ├── deploy/
+│   ├── bootstrap/
 │   └── compose/
 └── implementation/
     ├── blockers/
@@ -74,7 +75,8 @@ Deployable platform services. Each subdirectory is one independently buildable s
 
 ### `deploy/`
 Deployment topology and orchestration definitions. `deploy/compose/` holds the Docker Compose
-stack. Persistent runtime state belongs under the `/data/docker` boundary defined in
+stack and `deploy/bootstrap/` the host bootstrap script. Persistent runtime state belongs under
+the `/data/docker` boundary defined in
 `docs/operations/pci-server-bootstrap.md`, never inside the repository.
 
 ### `implementation/`

@@ -26,7 +26,10 @@ authoring host, and the authorized Ubuntu implementation host has not yet been b
 
 - Initial implementation host: customer-controlled Ubuntu PCI server.
 - Implementation account: `claude`.
-- Runtime/application data boundary: `/data/docker`.
+- Source workspace on the host: `/data/pci-platform` (mandatory).
+- Runtime/application data boundary: `/data/docker` (mandatory).
+- **No PCI artifact of any kind may exist outside `/data` on the PCI server** (contract v0.2,
+  MSG-0006).
 - Container runtime: Docker.
 - Host address: intentionally not stored in Git.
 - Authoring host (this machine): Windows, no Docker and no PostgreSQL. It is a source
@@ -73,6 +76,7 @@ All architecture communications are now closed. None are blocking.
 | MSG-0003 | Repository layout authority and document corrections | CLOSED — decided by MSG-0005 |
 | MSG-0004 | Prepared repository corrections | CLOSED — approved and applied |
 | MSG-0005 | Architecture lead decisions | DECIDED — acted on 2026-08-19 |
+| MSG-0006 | Absolute host file boundary (override) | DECIDED — correction applied, awaiting review |
 
 ## Repository / GitHub State
 
@@ -171,6 +175,11 @@ precedence has changed.
 
 ## Next Action
 
+**Stopped by instruction (MSG-0006), and blocked on BLK-0004 — host privilege.** Implementation
+is held pending architecture-lead review of the contract v0.2 correction. Docker was not
+installed, the host was not bootstrapped, `/data/pci-platform` was not created, and the host has
+not been modified since the out-of-boundary clone was removed.
+
 **Blocked on BLK-0004 — host privilege.** Resuming WP-0001 on the authorized Ubuntu PCI server is
 authorized by MSG-0005 and was attempted 2026-08-19. SSH access is verified and the host was
 surveyed read-only: Ubuntu 24.04.4 LTS, `/data` on a dedicated 8.7T disk, `/data/docker` present
@@ -181,7 +190,7 @@ modified.**
 `deploy/bootstrap/pci-server-bootstrap.sh` is committed and awaits one privileged run:
 
 ```bash
-sudo bash deploy/bootstrap/pci-server-bootstrap.sh
+sudo bash /data/pci-platform/deploy/bootstrap/pci-server-bootstrap.sh
 ```
 
 Once BLK-0004 clears, the objective is unchanged. Original text follows.

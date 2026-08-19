@@ -86,7 +86,7 @@ evidence WP-0001 needs. It has **never been executed**.
 **Option A — run the script once (simplest, no standing privilege).**
 
 ```bash
-sudo bash deploy/bootstrap/pci-server-bootstrap.sh
+sudo bash /data/pci-platform/deploy/bootstrap/pci-server-bootstrap.sh
 ```
 
 The operator holds the password; Claude Code never sees it. The script's output is the evidence
@@ -121,3 +121,38 @@ DISC-0005's test-runner fix against the target platform.
 This is an operational privilege issue on the customer's host. It is not an architectural
 question, and no architecture-lead decision is required. Nothing on the host was created,
 installed, or modified while raising this blocker.
+
+---
+
+## Update — 2026-08-19, absolute host file boundary
+
+MSG-0006 established a hard boundary: **no PCI project artifact may exist outside `/data`** on the
+PCI server, and `/data/pci-platform` is the mandatory source workspace.
+
+This changes what the operator needs to do, because the workspace is now part of the blocker
+rather than an incidental detail. `claude` cannot create it — `/data` is `root:root` and not
+writable by the account.
+
+**Required operator action, in order:**
+
+```bash
+# 1. Provision the mandatory workspace (root)
+sudo install -d -m 0755 -o claude -g claude /data/pci-platform
+
+# 2. As claude, clone the repository into it — nothing lands outside /data
+git clone git@github.com:ghuffy11-lgtm/pci-platform.git /data/pci-platform
+
+# 3. Bootstrap from the authorized path (root)
+sudo bash /data/pci-platform/deploy/bootstrap/pci-server-bootstrap.sh
+```
+
+Step 3 alone is sufficient if the operator prefers to run it from their own copy: the script's
+step 2 provisions `/data/pci-platform` itself, after which the repository can be cloned into it.
+
+The earlier instruction in this file to run the script from `~/pci-platform` is withdrawn. That
+clone existed briefly, violated the boundary as now defined, and has been removed along with the
+`known_hosts` file it created. Nothing of this project remains outside `/data` on the host — and
+nothing has been placed inside `/data` either.
+
+Granting scoped passwordless sudo (Option B above) remains the alternative if Claude Code is to
+perform the bootstrap itself rather than the operator running it.
