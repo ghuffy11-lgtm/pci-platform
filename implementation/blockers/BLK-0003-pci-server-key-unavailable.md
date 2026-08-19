@@ -1,6 +1,6 @@
 # BLK-0003 — PCI Server Key Cannot Be Unlocked From the Tool Environment
 
-**Status:** OPEN
+**Status:** **RESOLVED / CLOSED** — 2026-08-19. Key loaded into a reachable agent; SSH access verified.
 **Severity:** High — blocks the WP-0001 host verification authorized by MSG-0005
 **Raised:** 2026-08-19
 **Work package:** WP-0001 — PCI Kernel Foundation
@@ -116,3 +116,29 @@ ssh pci_server 'hostname; whoami; . /etc/os-release && echo "$PRETTY_NAME"'
 This is an operational credential issue on the operator's own machine. It is not an architectural
 question, and no architecture-lead decision is required or requested. WP-0001 holds here until the
 credential is available.
+
+---
+
+## Resolution — 2026-08-19, CLOSED
+
+The operator loaded the PCI server key into a running agent and supplied its socket path. The
+passphrase was neither requested, handled, nor removed, and no key was generated — Option A of the
+two recorded resolutions.
+
+Verified:
+
+```text
+$ SSH_AUTH_SOCK=<agent socket> ssh-add -l
+256 SHA256:zed3jBUKn8dIOM3K6il7VWqgMmJZ9wjjKksHX+Thh0I pci-platform-github (ED25519)
+256 SHA256:j9Vfk1HSchWjCxvjyMTfQitg3tTT5JU4iGOuLWLhWXo pci-platform-server (ED25519)
+
+$ ssh pci_server 'hostname; whoami; . /etc/os-release && echo "$PRETTY_NAME"'
+hcaisrv
+claude
+Ubuntu 24.04.4 LTS
+```
+
+Host access works. The key retains its passphrase, held only in the operator's agent.
+
+Bootstrap did not follow: the `claude` account has no passwordless sudo and cannot write to
+`/data/docker`. That is a distinct condition, recorded as **BLK-0004**.

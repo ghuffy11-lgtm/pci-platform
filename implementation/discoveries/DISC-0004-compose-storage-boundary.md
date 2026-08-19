@@ -1,6 +1,6 @@
 # DISC-0004 — Compose Stack Predates the `/data/docker` Boundary
 
-**Status:** OPEN — actionable, not blocking
+**Status:** RESOLVED — 2026-08-19. The daemon `data-root` question is answered by a pre-staged `/data/docker/daemon.json` on the authorized host. No compose change is strictly required.
 **Raised:** 2026-08-19
 **Work package:** WP-0001 — PCI Kernel Foundation
 **Related:** `docs/operations/pci-server-bootstrap.md`, MSG-0001, BLK-0001
@@ -60,3 +60,37 @@ While bootstrapping the authorised Ubuntu host:
 - verify with `docker inspect` that no PCI container writes persistent state outside
   `/data/docker`;
 - record the result in the WP-0001 report as evidence for AC-01 and AC-02.
+
+---
+
+## Resolved — 2026-08-19
+
+Inspection of the authorized host settles the question this discovery raised. `/data/docker/daemon.json`
+was pre-staged on 2026-08-18:
+
+```json
+{
+    "data-root": "/data/docker"
+}
+```
+
+Point 1 of "why this was not fixed in place" asked whether the contract requires relocating the
+daemon's `data-root` or only per-service bind mounts. **It requires relocation, and the operator
+has already staged it.** Consequences:
+
+- The `postgres-data` named volume in `deploy/compose/docker-compose.yml` resolves under
+  `/data/docker/volumes/`, inside the mandatory boundary. **The compose stack is compliant as
+  written; no bind-mount change is needed.**
+- Relocation is the stronger guarantee, since image layers and container writable state are
+  captured too, not only the volumes that were explicitly bind-mounted.
+- Point 2 (sub-path layout beneath the root) is moot for WP-0001: Docker owns the tree under its
+  data-root, and PCI does not place files there by hand.
+
+The comment block at the head of the compose file still describes the boundary as unresolved and
+recommends substituting bind mounts. That guidance is now obsolete and should be replaced when the
+stack is first executed on the host — deliberately deferred to that point, since the file has
+still never been run.
+
+One caution recorded in BLK-0004: `/data` also contains a pre-existing non-PCI layout including
+`/data/postgres`. That directory is **not** the PCI database location and must not be used as
+such. PCI's PostgreSQL state belongs inside the relocated Docker root.

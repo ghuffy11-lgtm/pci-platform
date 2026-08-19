@@ -93,13 +93,13 @@ read every artifact directly; the operator is no longer required as a messenger.
 | ID | Subject | Severity |
 |---|---|---|
 | BLK-0001 | Authorized host not yet bootstrapped (narrowed — environment is now defined) | High |
-| BLK-0003 | PCI server key cannot be unlocked from the tool environment (blocks host access) | High |
+| BLK-0004 | No privilege to bootstrap the authorized host (no passwordless sudo) | High |
 
 Both open blockers are operational, not architectural. BLK-0001: the host, account, and
 `/data/docker` boundary are defined by the accepted contract, but the host has not been stood up,
-so AC-02 and the integration tier of AC-09 remain unverified. BLK-0003: host access itself is
-unavailable — the PCI server key is passphrase-protected and cannot be unlocked without a
-terminal or a reachable agent, so bootstrap could not begin. No architecture decision is
+so AC-02 and the integration tier of AC-09 remain unverified. BLK-0004: SSH access now works, but
+Docker is absent and `claude` has no passwordless sudo, so nothing could be installed. A
+verifying bootstrap script is committed for the operator to run. No architecture decision is
 required for either.
 
 ## Recently Closed
@@ -107,6 +107,7 @@ required for either.
 | ID | Subject | Closed | Outcome |
 |---|---|---|---|
 | BLK-0002 | GitHub push unavailable — communication channel down | 2026-08-19 | **RESOLVED.** All commits reached `origin/main`. Diagnosis history preserved in the blocker. |
+| BLK-0003 | PCI server key could not be unlocked | 2026-08-19 | **RESOLVED.** Key loaded into a reachable agent; SSH access to the host verified. Passphrase retained. |
 | MSG-0001 | Authorized Ubuntu host and `/data/docker` storage boundary | 2026-08-19 | **ANSWERED** by `docs/operations/pci-server-bootstrap.md` (accepted contract). |
 
 ## Accepted Decisions
@@ -170,12 +171,20 @@ precedence has changed.
 
 ## Next Action
 
-**Blocked on BLK-0003 — host access.** Resuming WP-0001 on the authorized Ubuntu PCI server is
-authorized by MSG-0005 and was attempted 2026-08-19. The host is configured and accepts the key,
-but the key is passphrase-protected and cannot be unlocked from the tool environment, so no
-bootstrap step ran. Nothing on the host was created, installed, or modified.
+**Blocked on BLK-0004 — host privilege.** Resuming WP-0001 on the authorized Ubuntu PCI server is
+authorized by MSG-0005 and was attempted 2026-08-19. SSH access is verified and the host was
+surveyed read-only: Ubuntu 24.04.4 LTS, `/data` on a dedicated 8.7T disk, `/data/docker` present
+with a pre-staged `daemon.json` setting `data-root`. Docker is absent and `claude` has no
+passwordless sudo, so no bootstrap step ran. **Nothing on the host was created, installed, or
+modified.**
 
-Once BLK-0003 clears, the objective is unchanged. Original text follows.
+`deploy/bootstrap/pci-server-bootstrap.sh` is committed and awaits one privileged run:
+
+```bash
+sudo bash deploy/bootstrap/pci-server-bootstrap.sh
+```
+
+Once BLK-0004 clears, the objective is unchanged. Original text follows.
 
 **Resume WP-0001 on the authorized Ubuntu PCI server.** Authorized by MSG-0005 after the
 repository corrections above were committed and pushed. No new work package is to be started.
