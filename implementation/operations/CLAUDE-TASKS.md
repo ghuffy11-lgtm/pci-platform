@@ -20,7 +20,7 @@ Only the architecture lead may authorize new work, mark a task READY, or change 
 | TASK-0007 | Full re-verification after fixes | **COMPLETE** | TASK-0006 | 2026-08-19 G4 pass, 229 tests | none | Claude Code |
 | TASK-0008 | Final report and status reconciliation | **COMPLETE** | TASK-0007 | 2026-08-19 G5 pass | none — TASK-0009 decision recorded in MSG-0022 | Claude Code |
 | TASK-0009 | WP-0001 completion decision | **COMPLETE** | TASK-0008 | 2026-08-19 | none — WP-0001 complete; no post-WP-0001 work authorized | Architecture lead |
-| TASK-0003 | Normalise `*.md` line endings (DISC-0006) | **READY** | — | 2026-08-19 MSG-0027 | Execute via Supervisor | Architecture lead |
+| TASK-0003 | Normalise `*.md` line endings (DISC-0006) | **IMPLEMENTED — NOT COMPLETE** | — | 2026-08-20 attribute set, 0 content changed | Architecture lead to choose A/B/C in MSG-0028 §2 | Claude Code |
 | TASK-0010 | Execution Supervisor (installed and **ENABLED**, 10-min) | **COMPLETE** | — | 2026-08-19 tests 21/21, enabled cycle verified | none — start path unproven until a task is READY (MSG-0026) | Claude Code |
 | TASK-0002 | Make test entry points shell-independent | **ABORTED** | — | 2026-08-19 | none — premise disproven by measurement | — |
 
@@ -31,6 +31,19 @@ Only the architecture lead may authorize new work, mark a task READY, or change 
 **TASK-0009 is COMPLETE.** MSG-0022 explicitly resolves the duplicate MSG-0020 conflict: the COMPLETE decision stands, TASK-0012 is not authorized, and WP-0001 is complete. Execution stops at the next unauthorized boundary.
 
 **TASK-0006 is COMPLETE** (2026-08-19, gate G3 passed). Its destructive volume re-initialisation was authorized by MSG-0016 and verified directly.
+
+**TASK-0003 is IMPLEMENTED but NOT COMPLETE** (2026-08-20, MSG-0027). `*.md text eol=lf` is committed
+and every clone from now on is correct; `git add --renormalize` changed **zero** committed content
+because the index was already pure LF. What remains is 152 `*.md` files already on the authoring
+workstation's disk that still carry CRLF — refreshing them needs `git checkout` / `git rm --cached` /
+`git checkout-index`, all refused by the unattended runner's permission layer. Rule 2 forbids
+substituting another mechanism, so the denial is reported rather than routed around. Decision in
+**MSG-0028 §2**. Detail: [`checkpoints/TASK-0003.md`](checkpoints/TASK-0003.md).
+
+**Note on this row's status value.** `IMPLEMENTED — NOT COMPLETE` is not in the table below. It is
+used deliberately rather than rounding up to COMPLETE, which the Completion Rule forbids, or down to
+BLOCKED, which would misdescribe a task whose authorized change is applied and verified. If the lead
+prefers a defined value, the honest mapping is **WAITING_FOR_OPERATOR**.
 
 ### Status values
 
@@ -80,6 +93,7 @@ READY means *authorized to attempt*, never *authorized to force*. A READY task w
 | MSG-0025 | Question | OPEN | Claude Code | Architecture lead | **Supervisor installed and verified in dry-run; NOT enabled.** Runner invocation and permission posture required | TASK-0010 |
 | MSG-0026 | Record | OPEN | Claude Code | Architecture lead | **Supervisor ENABLED.** acceptEdits + version-controlled deny list; no bypassPermissions. Deny rules are the effective control, not the mode. Start path unproven until a task is READY | TASK-0010 |
 | MSG-0027 | Decision | DECIDED | Architecture lead | Claude Code | **TASK-0003 authorized and marked READY; line-ending normalization only** | TASK-0003 |
+| MSG-0028 | Record | **OPEN** | Claude Code | Architecture lead | **TASK-0003 implemented, NOT complete.** Attribute set, zero content changed; working-tree refresh of 152 files refused by the permission layer and not worked around. Decisions required: refresh option A/B/C, and whether a mid-run HEAD move aborts a supervisor session | TASK-0003, TASK-0010 |
 
 ## Interruption and recovery protocol
 

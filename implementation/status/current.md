@@ -2,7 +2,7 @@
 
 **Active Work Package:** WP-0001 — PCI Kernel Foundation
 **Status:** **COMPLETE** — declared by the architecture lead 2026-08-19 (MSG-0020(b), resolved by MSG-0022 / MSG-0023, TASK-0009)
-**Last Updated:** 2026-08-19
+**Last Updated:** 2026-08-20 (TASK-0003)
 
 ## Current State
 
@@ -50,9 +50,9 @@ The execution-control system (Phase 0, MSG-0010):
 Every session reads the roadmap and queue at startup and executes the highest-priority READY task,
 continuing automatically through authorized work rather than stopping after each subtask.
 
-**Current task: none is READY.** TASK-0001, TASK-0004, TASK-0005, and TASK-0010 are COMPLETE.
-TASK-0006 is the only remaining gate to a reproducible stack; its dependencies are met and it needs
-one thing — explicit authorization to destroy the PostgreSQL volume (MSG-0015).
+**Current task: none is READY.** TASK-0001 and TASK-0004 through TASK-0010 are COMPLETE. TASK-0003
+was authorized by MSG-0027, executed on 2026-08-20 by a supervisor-started session, and is
+**IMPLEMENTED but NOT COMPLETE** — see the TASK-0003 block below and MSG-0028.
 
 | ID | Task | Status | Depends On | Owner |
 |---|---|---|---|---|
@@ -63,15 +63,64 @@ one thing — explicit authorization to destroy the PostgreSQL volume (MSG-0015)
 | TASK-0007 | Full re-verification after fixes | **COMPLETE** — G4 passed | TASK-0006 | Claude Code |
 | TASK-0008 | Final report and status reconciliation | **COMPLETE** — G5 passed | TASK-0007 | Claude Code |
 | TASK-0009 | WP-0001 completion decision | **COMPLETE** — WP-0001 declared complete | TASK-0008 | Architecture lead |
-| TASK-0003 | Normalise `*.md` line endings (DISC-0006) | **WAITING_FOR_ARCHITECTURE_LEAD** | — | Architecture lead |
+| TASK-0003 | Normalise `*.md` line endings (DISC-0006) | **IMPLEMENTED — NOT COMPLETE** (2026-08-20) | — | Claude Code → architecture lead (MSG-0028) |
 | TASK-0010 | Execution Supervisor (installed and **ENABLED**) | **COMPLETE** | — | Claude Code |
 | TASK-0002 | Make test entry points shell-independent | **ABORTED** | — | — |
 
-**No task is currently READY.** TASK-0004 and TASK-0005 address the defects found while executing
-TASK-0001 and need the architecture lead to mark them READY before any work starts.
+**No task is currently READY.**
 
 Only the architecture lead may authorize new work or change a task's priority or scope. A PROPOSED
 task is not executable.
+
+### TASK-0003 — executed 2026-08-20, IMPLEMENTED but NOT COMPLETE
+
+Authorized by MSG-0027 and executed by the **first session the Execution Supervisor started on its
+own**. `.gitattributes` now pins `*.md text eol=lf`.
+
+DISC-0006 had flagged this as a risky repository-wide rewrite. It was not one. Every tracked `*.md`
+blob was already LF in the index — `core.autocrlf=true` had normalised on commit all along, and the
+CRLF lived only in the working tree:
+
+```text
+$ git ls-files --eol "*.md" | grep -c "i/lf"
+195                     <- every index blob already LF
+
+$ git add --renormalize -- "*.md"
+$ git diff --cached --stat
+(no output)             <- ZERO committed content changed
+```
+
+**Fixed:** every clone or checkout from now on writes `*.md` as LF.
+
+**Not fixed:** 152 `*.md` files already on this workstation's disk still carry CRLF. Setting the
+attribute does not rewrite files already written. The three commands that could refresh them —
+`git checkout`, `git rm --cached`, `git checkout-index` — were each refused by the unattended
+runner's permission layer. Not by the governance deny list (which covers only `sudo`, destructive
+`docker`, force-push, `git reset --hard`, `git clean -fd`, `rm -rf`, and the SSH key commands) but by
+the ordinary allowlist in `.claude/settings.local.json`, which permits `git add`/`git commit`/
+`git config` and nothing else — and an unattended runner has no one to approve a prompt.
+
+**No substitute was used.** Rule 2 forbids routing around a permission denial, so the denial is
+reported instead. The decision is MSG-0028 §2: (A) the operator runs one path-scoped command,
+(B) widen the runner allowlist, or (C) accept a residue that exists only on this workstation.
+
+Evidence: [`../operations/checkpoints/TASK-0003.md`](../operations/checkpoints/TASK-0003.md).
+
+### Supervisor start path — proven, with a caveat
+
+MSG-0026 left the supervisor's start path "unproven until a task is READY". TASK-0003 proved it: lock
+acquired naming the task, runner launched, startup checklist run, queue read, authorized task
+executed, boundary respected.
+
+The first live run produced two findings, both in MSG-0028:
+
+- **The allowlist, not the deny list, is the real ceiling on unattended work.** In `acceptEdits` with
+  no approver present, only already-allowlisted Bash commands run. This is sound fail-closed
+  behaviour and it is why TASK-0003 stopped where it did.
+- **A concurrent actor committed to this repository mid-task** (`aaf0d34`, moving HEAD and
+  `origin/main` under a running session). No overlap with TASK-0003, so no harm — but `runner.lock`
+  guards against a second *supervisor*, not against a human or manually-started session in the same
+  tree. Whether a mid-run HEAD move should abort the session is an open decision.
 
 ## Active Work Package
 
@@ -159,18 +208,26 @@ mode. Its start path is unproven until a task is genuinely READY. MSG-0011 and M
 | MSG-0023 | Correct TASK-0009 boundary | DECIDED — TASK-0009 terminal; no TASK-0012 |
 | MSG-0024 | Execution Supervisor enable decision | DECIDED — enablement authorized |
 | MSG-0025 | Supervisor installed, dry-run verified, NOT enabled | **CLOSED** — answered by MSG-0026 |
-| MSG-0026 | Supervisor **ENABLED**; permission mode determined and verified | **OPEN** — informational; start path unproven until a task is READY |
+| MSG-0026 | Supervisor **ENABLED**; permission mode determined and verified | **OPEN** — start path now **PROVEN** by TASK-0003 (MSG-0028 §4) |
+| MSG-0027 | TASK-0003 authorized; line-ending normalization only | DECIDED — executed 2026-08-20 |
+| MSG-0028 | **TASK-0003 implemented, NOT complete** — refresh refused by the permission layer | **OPEN — DECISION REQUIRED** |
 | MSG-0011 | Execution Supervisor — built, tested, not installed | **OPEN** — awaiting install/enable decision |
 
 ## Repository / GitHub State
 
-**The communication channel is operational.** Verified 2026-08-19:
+**The communication channel is operational.** Verified 2026-08-20, immediately before the TASK-0003
+commit:
 
 ```text
-HEAD          8efc454
-origin/main   8efc454
-ahead 0, behind 0, working tree clean
+HEAD          aaf0d34
+origin/main   aaf0d34
+ahead 0, behind 0
+working tree: .gitattributes modified (TASK-0003), TASK-0003 checkpoint untracked
 ```
+
+`aaf0d34` is not this session's commit — it is `fix(supervisor): capture runner output and make the
+start path actually work`, pushed by a **concurrent actor while TASK-0003 was running**. That is
+recorded here because it is the evidence behind MSG-0028 §3(a), not as routine housekeeping.
 
 Local and remote are identical. All WP-0001 implementation and communication artifacts are on
 `origin/main`. The architecture lead can read every artifact directly; the operator is no longer
@@ -274,7 +331,7 @@ precedence has changed.
 | DISC-0003 | Development identity adapter boundary |
 | DISC-0004 | Compose stack predates the `/data/docker` boundary |
 | DISC-0005 | `npm test` reports success while running zero tests under POSIX shells |
-| DISC-0006 | CRLF line endings silently defeat anchored text edits |
+| DISC-0006 | CRLF line endings silently defeat anchored text edits | **MOSTLY RESOLVED** — TASK-0003; residue on this workstation only |
 | DISC-0009 | Docker CLI writes client state to `/home/claude`, outside `/data` | **OPEN** |
 | DISC-0007 | Init refuses to create a passwordless role, then creates one anyway | **RESOLVED** |
 | DISC-0008 | Compose kernel service cannot start as committed | **RESOLVED** |
@@ -294,7 +351,28 @@ precedence has changed.
 
 ## Next Action
 
-**Awaiting the architecture lead. No task is READY and nothing is blocked.**
+**Awaiting the architecture lead on MSG-0028. No task is READY.**
+
+WP-0001 is COMPLETE. TASK-0003 — the last authorized task — ran on 2026-08-20 and is IMPLEMENTED but
+NOT COMPLETE. Two decisions are open, both in MSG-0028:
+
+1. **The `*.md` working-tree refresh** — option A (operator runs one path-scoped command),
+   B (widen the runner allowlist), or C (accept a residue confined to this workstation).
+2. **Whether a supervisor session should abort when HEAD moves mid-run**, after a concurrent actor
+   committed `aaf0d34` during TASK-0003.
+
+Also recorded, needing no decision unless the lead intends otherwise: **no task in the queue has a
+detail specification.** MSG-0027 directed the executor to follow TASK-0003's "existing prerequisites,
+allowed/forbidden actions, verification, documentation, checkpoint, and recovery requirements", and
+none exist — `CLAUDE-TASKS.md` has only status-board rows, verified against `4d9f736` as well as the
+current file. TASK-0003 was still unambiguous because MSG-0027 and DISC-0006 together fixed its
+scope, but a future authorization leaning on those sections will find nothing there.
+
+---
+
+**Historical — the WP-0001 defect-fix decision, since taken.** The text below records the state
+before TASK-0004 and TASK-0005 were authorized (MSG-0012) and completed. Both are now COMPLETE and
+the reproducibility gate G3 has passed; it is retained as the record of what was asked and why.
 
 TASK-0001 is DONE: WP-0001 is verified on the authorized host, all ten acceptance criteria met,
 229 tests passing. The decision now needed is whether to authorize the two defect fixes:

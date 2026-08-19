@@ -3,3 +3,8 @@
 
 # Supervisor scripts run on Windows PowerShell; keep native CRLF and ASCII-only content.
 *.ps1 text eol=crlf
+
+# Record files acquire CRLF on a Windows checkout, which silently defeats line-anchored edits:
+# `$` sits before the `\r`, the substitution matches nothing, and the tool exits 0 having done
+# nothing (DISC-0006). Pin them to LF so the hazard cannot recur. Authorized by MSG-0027.
+*.md text eol=lf

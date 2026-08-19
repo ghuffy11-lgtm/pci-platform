@@ -1,6 +1,7 @@
 # DISC-0006 — CRLF Line Endings Silently Defeat Anchored Text Edits
 
-**Status:** OPEN — process hazard, affects record integrity
+**Status:** **MOSTLY RESOLVED** (2026-08-20, TASK-0003) — the recommended action is applied and
+verified; one residue remains on the authoring workstation. See *Resolution* at the end.
 **Raised:** 2026-08-19
 **Work package:** WP-0001 — PCI Kernel Foundation (tooling, not product code)
 **Related:** DISC-0005 (silent false-green in test tooling), `CLAUDE.md` Rule 5, Rule 12
@@ -61,3 +62,39 @@ Any file may join that list after a checkout, so the count is not the point — 
 Add `*.md text eol=lf` to `.gitattributes` so communication and status records stop acquiring CRLF
 on checkout. This is a repository-wide normalisation and touches files owned by the architecture
 lead, so it is recorded here for approval rather than applied unilaterally.
+
+## Resolution — TASK-0003, 2026-08-20
+
+Approved by **MSG-0027** and executed by a supervisor-started session. `.gitattributes` now carries:
+
+```gitattributes
+*.md text eol=lf
+```
+
+**The feared repository-wide rewrite did not happen, because it was never needed.** Every tracked
+`*.md` blob was *already* LF in the index — `core.autocrlf=true` had been normalising on commit all
+along, and the CRLF existed only in the working tree. Measured before and after:
+
+```text
+$ git ls-files --eol "*.md" | grep -c "i/lf"
+195                     <- all index blobs LF, before and after
+
+$ git add --renormalize -- "*.md"
+$ git diff --cached --stat
+(no output)             <- zero committed content changed
+```
+
+So the commit is one line of `.gitattributes` plus records. No document owned by the architecture
+lead had its content altered.
+
+**What is fixed:** every checkout and clone from now on writes `*.md` as LF. The hazard cannot
+recur for anyone starting from the repository.
+
+**What is not:** 152 `*.md` files already present in the authoring workstation's working tree still
+carry CRLF, because setting the attribute does not rewrite files already on disk. Refreshing them
+requires `git checkout`, `git rm --cached`, or `git checkout-index` — all three refused by the
+unattended runner's permission layer, and Rule 2 forbids substituting another mechanism. Until an
+operator refreshes them, **the mitigations below still apply to those files on that machine.**
+
+The mitigations are worth keeping permanently in any case. The `.gitattributes` pin removes this
+particular cause; it does not make "verify the file after editing it" unnecessary.

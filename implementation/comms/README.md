@@ -10,7 +10,9 @@ a defect in the record, not a missing message.
 
 | ID | Subject | Status | File |
 |---|---|---|---|
-| **MSG-0026** | **Execution Supervisor ENABLED — permission mode determined and verified** | **OPEN** — informational; start path unproven until a task is READY | [MSG-0026-supervisor-enabled.md](MSG-0026-supervisor-enabled.md) |
+| **MSG-0028** | **TASK-0003 implemented but not complete — one permission grant required** | **OPEN — DECISION REQUIRED** | [MSG-0028-task-0003-implemented-not-complete.md](MSG-0028-task-0003-implemented-not-complete.md) |
+| MSG-0027 | TASK-0003 authorization — line-ending normalization only | DECIDED — executed 2026-08-20, see MSG-0028 | [MSG-0027-task-0003-authorization.md](MSG-0027-task-0003-authorization.md) |
+| **MSG-0026** | **Execution Supervisor ENABLED — permission mode determined and verified** | **OPEN** — start path now **PROVEN** by TASK-0003; see MSG-0028 §4 | [MSG-0026-supervisor-enabled.md](MSG-0026-supervisor-enabled.md) |
 | MSG-0025 | Execution Supervisor installed and dry-run verified — NOT enabled | **CLOSED** — answered by MSG-0026 | [MSG-0025-supervisor-enablement-status.md](MSG-0025-supervisor-enablement-status.md) |
 | MSG-0024 | Execution Supervisor enable decision | DECIDED — enablement authorized | [MSG-0024-execution-supervisor-enable-decision.md](MSG-0024-execution-supervisor-enable-decision.md) |
 | **MSG-0023** | **Correct TASK-0009 boundary — no TASK-0012 in WP-0001 path** | **DECIDED** | [MSG-0023-correct-task-0009-boundary.md](MSG-0023-correct-task-0009-boundary.md) |
@@ -37,6 +39,18 @@ a defect in the record, not a missing message.
 | MSG-0003 | Repository layout authority and document corrections | CLOSED — decided by MSG-0005 | [MSG-0003-repository-layout-and-document-corrections.md](MSG-0003-repository-layout-and-document-corrections.md) |
 | MSG-0002 | Kernel implementation stack selection | CLOSED — ADR-0015 ratified | [MSG-0002-kernel-runtime-stack.md](MSG-0002-kernel-runtime-stack.md) |
 | MSG-0001 | Authorized execution host and persistent storage boundary | ANSWERED | [MSG-0001-execution-host-and-storage-boundary.md](MSG-0001-execution-host-and-storage-boundary.md) |
+
+## ACTION REQUIRED — MSG-0028 (TASK-0003)
+
+TASK-0003 applied its authorized change and verified it changed **zero** committed content. It stopped
+short of refreshing 152 `*.md` files already on the authoring workstation's disk, because the three
+commands that could do it were refused by the unattended runner's permission layer and Rule 2 forbids
+substituting another mechanism.
+
+Two decisions: which refresh option (A — you run one command; B — widen the runner allowlist; C —
+accept the residue), and whether a supervisor session should abort when HEAD moves mid-run.
+
+Detail: [`MSG-0028-task-0003-implemented-not-complete.md`](MSG-0028-task-0003-implemented-not-complete.md).
 
 ## ACTION REQUIRED — MSG-0011 (Execution Supervisor)
 
