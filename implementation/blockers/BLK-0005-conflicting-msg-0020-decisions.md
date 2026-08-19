@@ -1,6 +1,6 @@
 # BLK-0005 — Two Contradictory MSG-0020 Decisions
 
-**Status:** OPEN
+**Status:** **RESOLVED / CLOSED** — 2026-08-19 by MSG-0022 and MSG-0023. The COMPLETE decision stands; TASK-0012 is not authorized and must not be created.
 **Severity:** High — blocks TASK-0009 and the WP-0001 completion state
 **Raised:** 2026-08-19
 **Work package:** WP-0001 — PCI Kernel Foundation
@@ -78,3 +78,23 @@ Claude Code will act on whichever is designated and will not proceed until then.
 Do not resolve this by taking the newer file. The timestamps are five minutes apart and there is no
 recorded supersession; a future session cannot distinguish "the lead changed their mind" from "two
 drafts were committed by accident". Ask.
+
+---
+
+## RESOLVED — 2026-08-19
+
+The architecture lead resolved the conflict explicitly, exactly as asked, in **MSG-0022** and
+**MSG-0023**:
+
+- **The COMPLETE decision stands.** WP-0001 is COMPLETE.
+- The duplicate that declared NOT COMPLETE and authorized TASK-0012 was created in error. Both
+  MSG-0020 files are now marked `SUPERSEDED` in their own headers and retained for history.
+- **TASK-0012 is not authorized** and must not be created, executed, or referenced as a required
+  follow-up.
+- DISC-0009 does not block completion: `/home/claude/.docker/buildx/*` is Docker CLI account-level
+  tool state, not a PCI project artifact. The named `~/.ssh` exception is unchanged, and the v0.2
+  boundary is not a blanket prohibition on all account-level tool state.
+- Any future change to Docker client state placement needs its own architecture decision and task.
+
+The boundary question this blocker flagged as outlasting the work package now has a recorded
+answer, which was the point of asking rather than guessing.

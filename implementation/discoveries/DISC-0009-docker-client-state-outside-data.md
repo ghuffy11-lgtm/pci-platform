@@ -1,6 +1,6 @@
 # DISC-0009 — Docker CLI Writes Client State to `/home/claude`, Outside the `/data` Boundary
 
-**Status:** OPEN — boundary question for the architecture lead; mitigation proposed, not applied
+**Status:** **CLOSED — ACCEPTED, NOT A VIOLATION.** Ruled 2026-08-19 by MSG-0020(b) / MSG-0022 / MSG-0023: Docker CLI account-level tool state is not a PCI project artifact under the v0.2 boundary.
 **Raised:** 2026-08-19 (during TASK-0007 verification)
 **Severity:** Low technically, but it touches a **hard** boundary rule
 **Related:** contract v0.2 Absolute Host File Boundary, MSG-0006, TASK-0007
@@ -80,3 +80,27 @@ work and arguably already the intent.
 
 Either way this should be settled explicitly, because the boundary check is now part of routine
 verification and will keep reporting these files until it is.
+
+---
+
+## RULED — 2026-08-19: not a violation
+
+The architecture lead ruled on the question this discovery raised (MSG-0020(b), confirmed by
+MSG-0022 and MSG-0023):
+
+> The observed `/home/claude/.docker/buildx/*` entries are Docker CLI account-level tool state, not
+> PCI project artifacts. The accepted v0.2 boundary forbids PCI project artifacts outside `/data`;
+> it does not prohibit all account-level tool state. The named `~/.ssh` exception remains unchanged.
+
+So **option A** was chosen: the boundary is about project artifacts, and account-level tool state
+sits outside its scope in the same way `~/.ssh` does. `DOCKER_CONFIG` is **not** being relocated,
+and no remediation task is authorized. Any future change to Docker client state placement needs its
+own architecture decision and task.
+
+This does **not** weaken the rule for project artifacts: nothing of PCI's own — clones, copies,
+build outputs, caches, logs, temporary files — may exist outside `/data`, and the routine boundary
+check continues to enforce that.
+
+Practical note for future verification: the boundary check will keep listing
+`/home/claude/.docker/...` and the OS shell dotfiles. Those are expected and ruled acceptable. What
+matters is whether anything *of the project's* appears there.

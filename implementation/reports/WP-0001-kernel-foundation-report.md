@@ -546,3 +546,66 @@ exception to account-level tool state, or keep the boundary literal and set
 
 Not deleted. Tidying the operator's account to make a check pass would be the wrong instinct, and
 the boundary's scope is the lead's to define rather than mine to narrow by inference.
+
+---
+
+# 15. WP-0001 declared COMPLETE — 2026-08-19 (TASK-0009)
+
+The architecture lead declared WP-0001 **COMPLETE**. The tenth completion criterion — the one Claude
+Code may never satisfy for itself — is met.
+
+## 15.1 The decision
+
+Recorded in MSG-0020(b), with the duplicate-numbering conflict resolved by MSG-0022 and the
+execution path corrected by MSG-0023:
+
+- The ten acceptance criteria are accepted as satisfied on the MSG-0019 evidence.
+- **DISC-0009 does not block completion.** `/home/claude/.docker/buildx/*` is Docker CLI
+  account-level tool state, not a PCI project artifact. The v0.2 boundary forbids PCI project
+  artifacts outside `/data`; it is not a blanket prohibition on account-level tool state. The named
+  `~/.ssh` exception is unchanged.
+- **TASK-0012 is not authorized** and was never created.
+
+## 15.2 Final state
+
+| Criterion | State |
+|---|---|
+| 1. Ten acceptance criteria | MET — §11, re-based in §14 |
+| 2. Reproducible from a clean checkout | MET — §13, gate G3 |
+| 3. Three tiers, non-zero counts | MET — §14, 229 pass / 0 fail |
+| 4. ADR-0016 proven live | MET — §14.2 |
+| 5. Security requirements | MET |
+| 6. Migrations and configuration documented | MET |
+| 7. Operational impact considered | MET |
+| 8. Records reconciled | MET — gate G5 |
+| 9. Limitations recorded | MET — §15.3 |
+| 10. Architecture lead declares complete | **MET — TASK-0009** |
+
+## 15.3 Limitations carried forward, unresolved
+
+None of these blocked completion; all are recorded so they are not rediscovered as surprises:
+
+- **DISC-0009** — Docker CLI state under `/home/claude`. Ruled acceptable; future relocation needs
+  its own decision.
+- **DISC-0006** — record files acquire CRLF on checkout, which silently defeats anchored edits.
+  TASK-0003 would fix it; still unauthorized.
+- **DISC-0002** — the in-memory adapter's test-fidelity gap is mitigated, not eliminated.
+- **DISC-0003** — the static identity adapter is a development fixture, prohibited in production,
+  and warns loudly at startup.
+- Images are **tag-pinned, not digest-pinned**.
+- The legacy `knowledge/` governance duplicates remain (MSG-0005 designated their removal a separate
+  controlled task).
+
+## 15.4 What this work package actually demonstrated
+
+Worth recording, because it shaped the process as much as the code:
+
+Three defects in this project reported success while doing nothing — a test tier passing with zero
+tests (DISC-0005), an edit exiting 0 while changing nothing (DISC-0006), and a database stack
+reporting healthy with an unusable role (DISC-0007). A fourth was introduced *by a security fix* and
+caught only by running the guard rather than reading it: a placeholder token long enough to pass
+validation, which would have shipped a working credential in a public repository.
+
+None of these would have been found by reading code. All were found by executing it and checking the
+result against what was claimed. That is the practice the WP-0001 verification gates encode, and it
+is why "implemented" and "verified" are tracked as different states in this repository.

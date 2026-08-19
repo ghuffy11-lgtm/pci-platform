@@ -1,7 +1,7 @@
 # PCI Implementation Status
 
 **Active Work Package:** WP-0001 — PCI Kernel Foundation
-**Status:** **VERIFIED AND REPRODUCIBLE** — all ten acceptance criteria met; clean-room rebuild verified 2026-08-19 (gate G3)
+**Status:** **COMPLETE** — declared by the architecture lead 2026-08-19 (MSG-0020(b), resolved by MSG-0022 / MSG-0023, TASK-0009)
 **Last Updated:** 2026-08-19
 
 ## Current State
@@ -62,7 +62,7 @@ one thing — explicit authorization to destroy the PostgreSQL volume (MSG-0015)
 | TASK-0006 | Clean-room reproducibility verification | **WAITING_FOR_ARCHITECTURE_LEAD** — deps met | TASK-0004 ✅, TASK-0005 ✅ | Architecture lead (destructive authorization) |
 | TASK-0007 | Full re-verification after fixes | **COMPLETE** — G4 passed | TASK-0006 | Claude Code |
 | TASK-0008 | Final report and status reconciliation | **COMPLETE** — G5 passed | TASK-0007 | Claude Code |
-| TASK-0009 | WP-0001 completion decision | **BLOCKED** — BLK-0005 | TASK-0008 | Architecture lead |
+| TASK-0009 | WP-0001 completion decision | **COMPLETE** — WP-0001 declared complete | TASK-0008 | Architecture lead |
 | TASK-0003 | Normalise `*.md` line endings (DISC-0006) | **WAITING_FOR_ARCHITECTURE_LEAD** | — | Architecture lead |
 | TASK-0010 | Execution Supervisor (dev machine, not installed) | **COMPLETE** | — | Claude Code |
 | TASK-0002 | Make test entry points shell-independent | **ABORTED** | — | — |
@@ -127,9 +127,9 @@ Every tier reported a non-zero test count.
 
 Index: `implementation/comms/README.md` carries the full message register with links and status.
 
-**Three messages are OPEN.** MSG-0021 — **two contradictory MSG-0020 decisions were committed five
-minutes apart; which stands?** (BLK-0005, blocking TASK-0009). MSG-0019 — TASK-0007 and TASK-0008
-complete. MSG-0011 — the Execution Supervisor, built and tested but **not installed**.
+**WP-0001 is COMPLETE.** MSG-0021 and BLK-0005 are closed; MSG-0019 is answered by the completion
+decision. The remaining open item is the **Execution Supervisor enablement** authorized by MSG-0024
+(MSG-0011 superseded by it).
 
 | ID | Subject | Status |
 |---|---|---|
@@ -150,7 +150,12 @@ complete. MSG-0011 — the Execution Supervisor, built and tested but **not inst
 | MSG-0016 | Authorize TASK-0006 | DECIDED — executed, G3 passed |
 | MSG-0017 | TASK-0006 complete; WP-0001 reproducible | **CLOSED** — TASK-0007 authorized and complete |
 | MSG-0018 | Authorize TASK-0007 | DECIDED — executed, G4 passed |
-| MSG-0019 | TASK-0007 / TASK-0008 complete; ready for completion decision | **OPEN** — awaiting TASK-0009 |
+| MSG-0019 | TASK-0007 / TASK-0008 complete; ready for completion decision | **CLOSED** — answered by the completion decision |
+| MSG-0020 (a) / (b) | WP-0001 completion decision — duplicate numbering | **SUPERSEDED** — both retained; resolved by MSG-0022 |
+| MSG-0021 | Which MSG-0020 stands? | **CLOSED** — COMPLETE stands; boundary ruling recorded |
+| MSG-0022 | Resolve MSG-0020 conflict | DECIDED — WP-0001 COMPLETE; TASK-0012 not authorized |
+| MSG-0023 | Correct TASK-0009 boundary | DECIDED — TASK-0009 terminal; no TASK-0012 |
+| MSG-0024 | Execution Supervisor enable decision | DECIDED — enablement authorized |
 | MSG-0011 | Execution Supervisor — built, tested, not installed | **OPEN** — awaiting install/enable decision |
 
 ## Repository / GitHub State
@@ -175,11 +180,8 @@ required as a messenger.
 
 | ID | Subject | Severity |
 |---|---|---|
-| **BLK-0005** | **Two contradictory MSG-0020 decisions — WP-0001 complete or not?** | High |
-
-BLK-0001 through BLK-0004 are all RESOLVED. BLK-0005 blocks TASK-0009 and cannot be resolved by
-Claude Code: it is a conflict between two architecture-lead records, and choosing one would mean
-deciding something reserved to the lead.
+**None.** BLK-0001 through BLK-0005 are all RESOLVED. BLK-0005 was closed by MSG-0022 / MSG-0023,
+which ruled that the COMPLETE decision stands and that TASK-0012 is not authorized.
 
 There are no open blockers. The two defects found during verification (DISC-0007, DISC-0008) are
 recorded as discoveries with proposed tasks, not as blockers: nothing is prevented from proceeding,

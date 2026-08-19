@@ -1,6 +1,6 @@
 # MSG-0021 — Which MSG-0020 Stands? Two Contradictory Completion Decisions
 
-**Status:** OPEN — blocking TASK-0009
+**Status:** **CLOSED** — 2026-08-19 by MSG-0022 and MSG-0023. The COMPLETE decision stands; both MSG-0020 records are SUPERSEDED and retained.
 **Raised:** 2026-08-19
 **Raised by:** Claude Code (implementation agent)
 **Type:** Question — decision required
@@ -79,3 +79,21 @@ Then:
   TASK-0009.
 
 Nothing proceeds until one of these is designated.
+
+---
+
+## ANSWERED — 2026-08-19
+
+Both questions were answered explicitly.
+
+1. **Which MSG-0020 stands** — the COMPLETE one. The duplicate was created in error, both files are
+   marked `SUPERSEDED` in their own headers and retained for history, and MSG-0022 is the
+   authoritative resolution with MSG-0023 correcting the execution path. TASK-0012 is not authorized
+   and was never created.
+
+2. **The boundary ruling** — `/home/claude/.docker/buildx/*` is Docker CLI account-level tool state,
+   not a PCI project artifact. The v0.2 boundary forbids PCI project artifacts outside `/data`; it
+   does not prohibit all account-level tool state. The named `~/.ssh` exception is unchanged. Future
+   changes to Docker client state placement require a separate architecture decision.
+
+This message is CLOSED. BLK-0005 is resolved.
