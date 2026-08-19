@@ -25,6 +25,7 @@ Claude Code may propose tasks; a proposed task is **not** executable.
 | TASK-0008 | Final report and status reconciliation | **BLOCKED** | TASK-0007 | — | Await dependency | Claude Code |
 | TASK-0009 | WP-0001 completion decision | **WAITING_FOR_ARCHITECTURE_LEAD** | TASK-0008 | — | Lead declares complete or names gaps | Architecture lead |
 | TASK-0003 | Normalise `*.md` line endings (DISC-0006) | **WAITING_FOR_ARCHITECTURE_LEAD** | — | — | Mark READY to authorize | Architecture lead |
+| TASK-0010 | Execution Supervisor (dev machine, not installed) | **COMPLETE** | — | 2026-08-19 `tests 17/17` | none — installation is a separate operator decision | Claude Code |
 | TASK-0002 | Make test entry points shell-independent | **ABORTED** | — | 2026-08-19 | none — premise disproven by measurement | — |
 
 **No task is currently READY.** Every path forward needs an architecture-lead decision. This is a
@@ -61,6 +62,7 @@ unmet stops at the prerequisite and records why.
 | MSG-0008 | Procedure | CLOSED | Claude Code | Operator | Authorized bootstrap executed; `DockerRootDir` = `/data/docker` verified | TASK-0001 |
 | MSG-0009 | Directive | DECIDED | Architecture lead | Claude Code | "Documentation Is Mandatory" — ten clauses | all |
 | MSG-0010 | Record | OPEN | Claude Code | Architecture lead | **Phase 0 execution-control system built. Awaiting authorization of TASK-0004 and TASK-0005.** | TASK-0004, TASK-0005 |
+| MSG-0011 | Record | OPEN | Claude Code | Architecture lead | **Execution Supervisor built, tested (17/17), NOT installed and NOT enabled. Awaiting the decision on whether to run unattended sessions at all.** | TASK-0010 |
 
 **What remains, in one line:** everything is verified and recorded; nothing is executable until the
 architecture lead authorizes the two defect fixes.
@@ -505,3 +507,102 @@ Windows. The proposed fix — pointing `--test` at a directory — is the varian
 
 Retained as a record of a wrong finding that reached the queue. The surviving principle — a tier
 reporting zero tests is a failure — is now `CLAUDE.md` Rule 10.
+
+---
+
+## TASK-0010 — Execution Supervisor
+
+**Priority:** 1 | **Status:** **COMPLETE** (2026-08-19) | **Owner:** Claude Code
+**Depends on:** — | **Record:** MSG-0011 | **Next eligible task:** none — installation is a
+separate operator decision, and no WP-0001 task is READY
+
+### Objective
+
+Provide fail-closed infrastructure that lets authorized queue tasks run without a human starting each
+session, and that recovers safely from interruption. Infrastructure only: it changes *when* work
+starts, never *what* is allowed.
+
+### Outcome
+
+Implemented at `implementation/operations/supervisor/`, **not installed and not enabled**:
+
+| Artifact | |
+|---|---|
+| `supervisor.ps1` | The supervisor. Windows PowerShell 5.1, ASCII-only, dot-sourceable for tests |
+| `supervisor-config.example.json` | Documented template; the real config is gitignored |
+| `README.md` | Architecture, install/remove, configuration, security model, failure/recovery, logging/heartbeat, concurrency/lock, tests |
+| `tests/supervisor.tests.ps1` | 17 tests, **17 passing**, no Pester required |
+| `state/`, `logs/` | Runtime directories, contents gitignored |
+
+Runs **on the Windows development machine only**. It has no SSH code path and cannot reach the PCI
+server.
+
+### Prerequisites
+
+| ID | Prerequisite | State |
+|---|---|---|
+| P1 | Windows development machine with PowerShell 5.1 and `git` | MET |
+| P2 | Repository clone readable | MET |
+| P3 | Operator decision to install/enable | **NOT MET — deliberately.** Out of this task's scope |
+
+### Dependencies
+
+None. Independent of the WP-0001 chain.
+
+### Permissions and allowed actions
+
+Read the repository; `git fetch` / `git rev-parse`; write `state/` and `logs/`; start one configured
+local process; register or unregister a Windows scheduled task on explicit `-Install` / `-Uninstall`.
+
+### Forbidden actions
+
+- **Never executes PCI-server commands.** No SSH path exists in the code.
+- **Never stores credentials, tokens, passphrases, or secrets.** The config schema has no field for
+  one.
+- **Never marks a task COMPLETE**, and never changes authorization, status, or priority — it has no
+  write path to the queue.
+- **Never starts a second concurrent session** — exclusive-create lock; a race loser does nothing.
+- **Never bypasses `CLAUDE.md`, `AGENTS.md`, task stop conditions, or operator boundaries.** It
+  starts a session; that session obeys the rules itself.
+- **Never clears a stale lock automatically** — a crashed session may have left partial work.
+- **Never replaces periodic reconciliation with a webhook.** A webhook may only reduce latency.
+- Installing or enabling itself without an explicit operator decision.
+
+### Verification requirements
+
+`powershell -NoProfile -ExecutionPolicy Bypass -File tests\supervisor.tests.ps1` exits 0.
+**Verified 2026-08-19: 17 passed, 0 failed**, covering READY detection, no-READY behaviour,
+duplicate-run prevention, stale-run handling, GitHub-unavailable behaviour, inconsistent-queue
+behaviour, and inert defaults.
+
+Additionally verified against the **real** queue, read-only: 9 tasks parsed with correct statuses,
+priorities, and dependencies; consistency `True`; READY task `none` — which is the correct answer for
+the current queue.
+
+### Documentation requirements
+
+`supervisor/README.md`; MSG-0011; ROADMAP section K; status file; `CLAUDE.md` supervisor section.
+All committed and pushed. Met.
+
+### Checkpoint requirements
+
+None during execution — this task wrote files on the development machine and started nothing. Once
+the supervisor is *enabled*, the runner sessions it starts carry the normal checkpoint obligations.
+
+### Stop conditions
+
+Reached and honoured: installation and enablement are **not** performed. Stop also if enabling would
+require storing a credential, if the runner command cannot be configured without one, or if tests
+fail.
+
+### Recovery procedure
+
+Nothing is in flight. On resumption, confirm no scheduled task named `PCI-Execution-Supervisor`
+exists (`Get-ScheduledTask`) and that `state/runner.lock` is absent. If either exists, the supervisor
+was installed or run outside this record — **stop and reconcile** before doing anything else.
+
+### Not done, deliberately
+
+The scheduled task is **not registered**, the supervisor is **not started**, `enabled` is `false`,
+`dryRun` is `true`, and `runnerCommand` is empty. Three independent settings must change before
+anything runs unattended. That is the operator's decision, recorded in MSG-0011.

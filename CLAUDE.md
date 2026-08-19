@@ -393,6 +393,29 @@ A task's prerequisites are checked before its actions begin, not assumed from th
 marked READY whose prerequisite is unmet stops at that prerequisite and records why — READY means
 authorized to attempt, never authorized to force.
 
+## Execution Supervisor
+
+An Execution Supervisor exists at `implementation/operations/supervisor/`. It runs on the **Windows
+development machine only** — never on the PCI server, which it cannot reach — and periodically
+reconciles with `origin/main`, reads this queue, and starts an authorized Claude runner when a READY
+task exists and no runner is active.
+
+**The supervisor is a trigger, not an authority.** It cannot mark a task COMPLETE, change a status,
+priority, or authorization, or approve anything. **The repository queue remains the sole authority.**
+A session started by the supervisor is bound by every rule in this file exactly as a session started
+by a human is.
+
+What a future session needs to know:
+
+- If `implementation/operations/supervisor/state/runner.lock` exists, another session may be running.
+  Do not assume it is stale; check the recorded PID before acting.
+- A supervisor-started session must run the startup checklist and the checkpoint/recovery procedure
+  like any other. Being started automatically grants nothing extra.
+- Periodic reconciliation is authoritative. A webhook may only reduce latency, never replace the
+  cycle — a missed webhook is silent, and silence is indistinguishable from "nothing to do".
+- The supervisor is inert by default: `enabled: false`, `dryRun: true`, and no runner command.
+  Installing it is a separate operator decision (MSG-0011).
+
 ## Continuation
 
 **Claude MUST NOT stop merely because one authorized subtask completed.**

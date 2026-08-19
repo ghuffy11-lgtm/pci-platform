@@ -177,3 +177,26 @@ Criteria 1, 3, and 4 are met today. Criterion 2 is the substance of the remainin
   are recorded limitations or explicitly out of WP-0001 scope; each needs its own authorization.
 - Removal of the legacy `knowledge/` duplicates — MSG-0005 designates that a separate controlled
   cleanup.
+
+---
+
+## K. Execution infrastructure (TASK-0010)
+
+Not part of the WP-0001 chain — infrastructure that changes *when* authorized work starts, never
+*what* is allowed.
+
+**Execution Supervisor**, at `implementation/operations/supervisor/`. Runs on the **Windows
+development machine only**; it has no SSH code path and cannot reach the PCI server. Every ten
+minutes it reconciles with `origin/main`, parses the queue, and starts an authorized Claude runner
+only when a READY task exists and no runner is active. Every uncertainty — unreachable remote,
+unparseable or contradictory queue, existing or corrupt lock, any unhandled error — results in doing
+nothing, logged and heartbeated.
+
+**Status: implemented, tested (17/17), NOT installed and NOT enabled.** Three independent settings
+must change before anything runs unattended: `enabled`, `dryRun`, and an empty `runnerCommand`.
+Whether to run unattended sessions at all is an operator decision, recorded in MSG-0011.
+
+The supervisor cannot mark a task COMPLETE, change a status or priority, or authorize anything. **The
+repository queue remains the sole authority**, and periodic reconciliation remains authoritative — a
+webhook, if ever added, may only reduce latency, because a missed webhook is silent and silence is
+indistinguishable from "nothing to do".

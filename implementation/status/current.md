@@ -63,6 +63,7 @@ architecture-lead decision. The queue's status board is the live view.
 | TASK-0008 | Final report and status reconciliation | **BLOCKED** | TASK-0007 | Claude Code |
 | TASK-0009 | WP-0001 completion decision | **WAITING_FOR_ARCHITECTURE_LEAD** | TASK-0008 | Architecture lead |
 | TASK-0003 | Normalise `*.md` line endings (DISC-0006) | **WAITING_FOR_ARCHITECTURE_LEAD** | — | Architecture lead |
+| TASK-0010 | Execution Supervisor (dev machine, not installed) | **COMPLETE** | — | Claude Code |
 | TASK-0002 | Make test entry points shell-independent | **ABORTED** | — | — |
 
 **No task is currently READY.** TASK-0004 and TASK-0005 address the defects found while executing
@@ -118,8 +119,9 @@ Every tier reported a non-zero test count.
 
 Index: `implementation/comms/README.md` carries the full message register with links and status.
 
-**One message is OPEN: MSG-0010** — the Phase 0 execution-control system, awaiting authorization of
-TASK-0004 and TASK-0005.
+**Two messages are OPEN.** MSG-0010 — the Phase 0 execution-control system, awaiting authorization of
+TASK-0004 and TASK-0005. MSG-0011 — the Execution Supervisor, built and tested but **not installed**
+and **not enabled**, awaiting the decision on whether unattended sessions are wanted.
 
 | ID | Subject | Status |
 |---|---|---|
@@ -133,6 +135,7 @@ TASK-0004 and TASK-0005.
 | MSG-0009 | Documentation Is Mandatory rule added to `CLAUDE.md` | DECIDED — applied |
 | MSG-0008 | Authorized bootstrap: exact operator procedure and path | **CLOSED** — executed and verified 2026-08-19 |
 | MSG-0010 | Phase 0 — execution control, roadmap, queue, recovery | **OPEN** — awaiting authorization of TASK-0004 / TASK-0005 |
+| MSG-0011 | Execution Supervisor — built, tested, not installed | **OPEN** — awaiting install/enable decision |
 
 ## Repository / GitHub State
 

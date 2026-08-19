@@ -1,2 +1,5 @@
 # Shell scripts run on Linux hosts; never let a Windows checkout write CRLF into them.
 *.sh text eol=lf
+
+# Supervisor scripts run on Windows PowerShell; keep native CRLF and ASCII-only content.
+*.ps1 text eol=crlf

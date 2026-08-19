@@ -1,0 +1,29 @@
+{
+  "_comment": "Copy to supervisor-config.json and edit. supervisor-config.json is gitignored and MUST NOT contain credentials, tokens, or passphrases of any kind.",
+
+  "enabled": false,
+  "dryRun": true,
+
+  "_enabled": "Master switch. While false the supervisor only reports what it WOULD do. Both enabled=true and dryRun=false are required before anything starts.",
+  "_dryRun": "Second switch, independent of enabled, so a live supervisor can be put back into observation mode without unregistering it.",
+
+  "repositoryPath": "D:\\Work\\pci-platform",
+  "queueRelativePath": "implementation/operations/CLAUDE-TASKS.md",
+  "remote": "origin",
+  "branch": "main",
+
+  "intervalMinutes": 10,
+  "_intervalMinutes": "Authoritative reconciliation cadence. A webhook may only ever be an optimisation on top of this; it must never replace it.",
+
+  "staleRunMinutes": 120,
+  "lockTimeoutMinutes": 240,
+  "_lockTimeoutMinutes": "After this, a lock whose process is gone is reported as stale. The supervisor still does not clear it or start anything — a human decides.",
+
+  "runnerCommand": "",
+  "runnerArguments": [],
+  "_runnerCommand": "Absolute path to the authorized Claude runner executable. Empty means the supervisor will never start anything, which is the safe default.",
+  "_runnerArguments": "Arguments passed to the runner. The token {TASK_ID} is replaced with the READY task id, e.g. [\"--task\", \"{TASK_ID}\"].",
+
+  "statePath": "state",
+  "logPath": "logs"
+}

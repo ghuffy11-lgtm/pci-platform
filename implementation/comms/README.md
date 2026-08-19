@@ -10,6 +10,7 @@ a defect in the record, not a missing message.
 
 | ID | Subject | Status | File |
 |---|---|---|---|
+| MSG-0011 | Execution Supervisor — built, tested, not installed | **OPEN** — awaiting the install/enable decision | [MSG-0011-execution-supervisor.md](MSG-0011-execution-supervisor.md) |
 | **MSG-0010** | **Phase 0 — execution control, roadmap, queue, recovery** | **OPEN** — awaiting authorization of TASK-0004 / TASK-0005 | [MSG-0010-phase-0-execution-control.md](MSG-0010-phase-0-execution-control.md) |
 | MSG-0008 | Authorized one-time privileged bootstrap — exact operator procedure | **CLOSED** — executed and verified 2026-08-19 | [MSG-0008-authorized-bootstrap-command.md](MSG-0008-authorized-bootstrap-command.md) |
 | MSG-0009 | Permanent rule added: Documentation Is Mandatory | DECIDED — applied | [MSG-0009-documentation-is-mandatory.md](MSG-0009-documentation-is-mandatory.md) |
@@ -20,6 +21,19 @@ a defect in the record, not a missing message.
 | MSG-0003 | Repository layout authority and document corrections | CLOSED — decided by MSG-0005 | [MSG-0003-repository-layout-and-document-corrections.md](MSG-0003-repository-layout-and-document-corrections.md) |
 | MSG-0002 | Kernel implementation stack selection | CLOSED — ADR-0015 ratified by MSG-0005 | [MSG-0002-kernel-runtime-stack.md](MSG-0002-kernel-runtime-stack.md) |
 | MSG-0001 | Authorized execution host and persistent storage boundary | ANSWERED — bootstrap contract accepted | [MSG-0001-execution-host-and-storage-boundary.md](MSG-0001-execution-host-and-storage-boundary.md) |
+
+## ACTION REQUIRED — MSG-0011 (Execution Supervisor)
+
+Built, tested (17/17), **not installed and not enabled**. Three independent settings keep it inert:
+`enabled: false`, `dryRun: true`, and an empty `runnerCommand`.
+
+The decision is not really about a scheduler. The supervisor itself only reads files, fetches, and
+starts one local process — but what it starts is a full Claude session with the developer's
+credentials. **Enabling it means consenting to unattended sessions acting on authorized queue
+tasks.** That is why it ships disabled.
+
+Detail: [`MSG-0011-execution-supervisor.md`](MSG-0011-execution-supervisor.md).
+Implementation and docs: [`../operations/supervisor/`](../operations/supervisor/README.md).
 
 ## ACTION REQUIRED — MSG-0010
 

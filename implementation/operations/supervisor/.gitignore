@@ -1,0 +1,8 @@
+# Local configuration: absolute paths and runner command. Never committed.
+supervisor-config.json
+
+# Runtime state and logs are machine-local.
+state/*
+logs/*
+!state/.gitkeep
+!logs/.gitkeep

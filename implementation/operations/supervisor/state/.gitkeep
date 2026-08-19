@@ -1,0 +1,2 @@
+Runtime state. Contents are gitignored: heartbeat.json and runner.lock are
+machine-local and must never be committed.
