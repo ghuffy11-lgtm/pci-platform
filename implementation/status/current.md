@@ -6,7 +6,15 @@
 
 ## Current State
 
-Architecture and documentation baseline is established. Permanent Claude Code operating rules are now defined in `CLAUDE.md`.
+Architecture and documentation baseline is established. Permanent Claude Code operating rules are defined in `CLAUDE.md`. The initial server bootstrap contract is defined in `docs/operations/pci-server-bootstrap.md`.
+
+## Implementation Environment
+
+- Initial implementation host: customer-controlled Ubuntu PCI server.
+- Implementation account: `claude`.
+- Runtime/application data boundary: `/data/docker`.
+- Container runtime: Docker.
+- Host address: intentionally not stored in Git.
 
 ## Active Work Package
 
@@ -23,4 +31,4 @@ Architecture and documentation baseline is established. Permanent Claude Code op
 
 ## Next Action
 
-Claude Code should read `CLAUDE.md`, `AGENTS.md`, the active work package, and its referenced architecture/ADR/specification documents, then begin WP-0001.
+Claude Code should read `CLAUDE.md`, `AGENTS.md`, this status file, the active work package, and its referenced architecture/ADR/specification documents. It may then bootstrap the authorized Ubuntu implementation host according to `docs/operations/pci-server-bootstrap.md` and begin WP-0001.
