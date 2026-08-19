@@ -10,6 +10,9 @@ a defect in the record, not a missing message.
 
 | ID | Subject | Status | File |
 |---|---|---|---|
+| **MSG-0021** | **Which MSG-0020 stands? Two contradictory completion decisions** | **OPEN** — blocking TASK-0009 | [MSG-0021-msg-0020-conflict.md](MSG-0021-msg-0020-conflict.md) |
+| MSG-0020 (a) | WP-0001 completion decision — **NOT COMPLETE**, authorizes TASK-0012 | **CONFLICTED** — see BLK-0005 | [MSG-0020-wp-0001-completion-decision.md](MSG-0020-wp-0001-completion-decision.md) |
+| MSG-0020 (b) | WP-0001 completion decision — **COMPLETE**, no remediation | **CONFLICTED** — see BLK-0005 | [MSG-0020-wp0001-completion-decision.md](MSG-0020-wp0001-completion-decision.md) |
 | **MSG-0019** | **TASK-0007 / TASK-0008 complete — WP-0001 ready for the completion decision** | **OPEN** | [MSG-0019-task-0007-0008-complete.md](MSG-0019-task-0007-0008-complete.md) |
 | MSG-0018 | Authorize TASK-0007 | DECIDED — executed, G4 passed | [MSG-0018-authorize-task-0007.md](MSG-0018-authorize-task-0007.md) |
 | MSG-0017 | **TASK-0006 complete — WP-0001 is reproducible; TASK-0007 authorization required** | **OPEN** | [MSG-0017-task-0006-complete.md](MSG-0017-task-0006-complete.md) |

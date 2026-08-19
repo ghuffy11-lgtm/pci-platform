@@ -62,7 +62,7 @@ one thing — explicit authorization to destroy the PostgreSQL volume (MSG-0015)
 | TASK-0006 | Clean-room reproducibility verification | **WAITING_FOR_ARCHITECTURE_LEAD** — deps met | TASK-0004 ✅, TASK-0005 ✅ | Architecture lead (destructive authorization) |
 | TASK-0007 | Full re-verification after fixes | **COMPLETE** — G4 passed | TASK-0006 | Claude Code |
 | TASK-0008 | Final report and status reconciliation | **COMPLETE** — G5 passed | TASK-0007 | Claude Code |
-| TASK-0009 | WP-0001 completion decision | **WAITING_FOR_ARCHITECTURE_LEAD** | TASK-0008 | Architecture lead |
+| TASK-0009 | WP-0001 completion decision | **BLOCKED** — BLK-0005 | TASK-0008 | Architecture lead |
 | TASK-0003 | Normalise `*.md` line endings (DISC-0006) | **WAITING_FOR_ARCHITECTURE_LEAD** | — | Architecture lead |
 | TASK-0010 | Execution Supervisor (dev machine, not installed) | **COMPLETE** | — | Claude Code |
 | TASK-0002 | Make test entry points shell-independent | **ABORTED** | — | — |
@@ -127,9 +127,9 @@ Every tier reported a non-zero test count.
 
 Index: `implementation/comms/README.md` carries the full message register with links and status.
 
-**Two messages are OPEN.** MSG-0019 — TASK-0007 and TASK-0008 are complete and WP-0001 is ready for
-the completion decision (TASK-0009). MSG-0011 — the Execution Supervisor, built and tested but **not
-installed** and **not enabled**.
+**Three messages are OPEN.** MSG-0021 — **two contradictory MSG-0020 decisions were committed five
+minutes apart; which stands?** (BLK-0005, blocking TASK-0009). MSG-0019 — TASK-0007 and TASK-0008
+complete. MSG-0011 — the Execution Supervisor, built and tested but **not installed**.
 
 | ID | Subject | Status |
 |---|---|---|
@@ -173,7 +173,13 @@ required as a messenger.
 
 ## Open Blockers
 
-**None.** BLK-0001 and BLK-0004 were both RESOLVED on 2026-08-19; BLK-0002 and BLK-0003 earlier.
+| ID | Subject | Severity |
+|---|---|---|
+| **BLK-0005** | **Two contradictory MSG-0020 decisions — WP-0001 complete or not?** | High |
+
+BLK-0001 through BLK-0004 are all RESOLVED. BLK-0005 blocks TASK-0009 and cannot be resolved by
+Claude Code: it is a conflict between two architecture-lead records, and choosing one would mean
+deciding something reserved to the lead.
 
 There are no open blockers. The two defects found during verification (DISC-0007, DISC-0008) are
 recorded as discoveries with proposed tasks, not as blockers: nothing is prevented from proceeding,

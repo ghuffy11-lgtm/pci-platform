@@ -19,7 +19,7 @@ Only the architecture lead may authorize new work, mark a task READY, or change 
 | TASK-0006 | Clean-room reproducibility verification | **COMPLETE** | TASK-0004, TASK-0005 | 2026-08-19 G3 pass | none — TASK-0007 not authorized | Claude Code |
 | TASK-0007 | Full re-verification after fixes | **COMPLETE** | TASK-0006 | 2026-08-19 G4 pass, 229 tests | none | Claude Code |
 | TASK-0008 | Final report and status reconciliation | **COMPLETE** | TASK-0007 | 2026-08-19 G5 pass | none — TASK-0009 is the lead's decision | Claude Code |
-| TASK-0009 | WP-0001 completion decision | **WAITING_FOR_ARCHITECTURE_LEAD** | TASK-0008 | — | Lead declares complete or names gaps | Architecture lead |
+| TASK-0009 | WP-0001 completion decision | **BLOCKED** | TASK-0008 | — | **BLK-0005: two contradictory MSG-0020 decisions** — which stands? | Architecture lead |
 | TASK-0003 | Normalise `*.md` line endings (DISC-0006) | **WAITING_FOR_ARCHITECTURE_LEAD** | — | — | Mark READY to authorize | Architecture lead |
 | TASK-0010 | Execution Supervisor (dev machine, not installed) | **COMPLETE** | — | 2026-08-19 `tests 17/17` | none — installation is a separate operator decision | Claude Code |
 | TASK-0002 | Make test entry points shell-independent | **ABORTED** | — | 2026-08-19 | none — premise disproven by measurement | — |
