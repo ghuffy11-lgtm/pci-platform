@@ -17,7 +17,7 @@ Only the architecture lead may authorize new work, mark a task READY, or change 
 | TASK-0004 | Fix database role provisioning (DISC-0007) | **COMPLETE** | TASK-0001 | 2026-08-19 G1 pass | none — clean-room proof is TASK-0006 | Claude Code |
 | TASK-0005 | Fix compose kernel service configuration (DISC-0008) | **COMPLETE** | TASK-0001 | 2026-08-19 G2 pass | none | Claude Code |
 | TASK-0006 | Clean-room reproducibility verification | **COMPLETE** | TASK-0004, TASK-0005 | 2026-08-19 G3 pass | none — TASK-0007 not authorized | Claude Code |
-| TASK-0007 | Full re-verification after fixes | **BLOCKED** | TASK-0006 | — | Await dependency | Claude Code |
+| TASK-0007 | Full re-verification after fixes | **IN_PROGRESS** | TASK-0006 | — | Executing under MSG-0018 | Claude Code |
 | TASK-0008 | Final report and status reconciliation | **BLOCKED** | TASK-0007 | — | Await dependency | Claude Code |
 | TASK-0009 | WP-0001 completion decision | **WAITING_FOR_ARCHITECTURE_LEAD** | TASK-0008 | — | Lead declares complete or names gaps | Architecture lead |
 | TASK-0003 | Normalise `*.md` line endings (DISC-0006) | **WAITING_FOR_ARCHITECTURE_LEAD** | — | — | Mark READY to authorize | Architecture lead |
@@ -25,6 +25,8 @@ Only the architecture lead may authorize new work, mark a task READY, or change 
 | TASK-0002 | Make test entry points shell-independent | **ABORTED** | — | 2026-08-19 | none — premise disproven by measurement | — |
 
 **TASK-0004 and TASK-0005 are COMPLETE** (2026-08-19, gates G1 and G2 passed). The continuation rule was applied: both ran without stopping in between.
+
+**TASK-0007 is IN_PROGRESS**, authorized by MSG-0018 and reconciled from it. Non-destructive: no volume re-initialisation, no manual SQL. The continuation rule extends to TASK-0008 once its prerequisites are met; **TASK-0009 is explicitly NOT authorized** and remains the architecture lead's decision.
 
 **TASK-0006 is COMPLETE** (2026-08-19, gate G3 passed). Its destructive volume re-initialisation was authorized by MSG-0016, executed, checkpointed before and after, and verified directly. **No authorization is granted for TASK-0007, TASK-0008, TASK-0009, or Execution Supervisor installation/enabling** — so execution stops here rather than continuing. See MSG-0017.
 
@@ -64,6 +66,7 @@ READY means *authorized to attempt*, never *authorized to force*. A READY task w
 | MSG-0014 | Directive | DECIDED | Architecture lead | Claude Code | Queue reconciliation record, discoverable to a fresh session | TASK-0004, TASK-0005 |
 | MSG-0015 | Record | OPEN | Claude Code | Architecture lead | TASK-0004 and TASK-0005 complete; TASK-0006 needs explicit destructive authorization | TASK-0006 |
 | MSG-0017 | Record | OPEN | Claude Code | Architecture lead | **TASK-0006 COMPLETE, gate G3 passed. WP-0001 is now reproducible.** Awaiting TASK-0007 authorization | TASK-0007 |
+| MSG-0018 | Decision | DECIDED | Architecture lead | Claude Code | **TASK-0007 AUTHORIZED**, non-destructive; continuation to TASK-0008 permitted; TASK-0009, TASK-0003 and supervisor install excluded | TASK-0007, TASK-0008 |
 | MSG-0016 | Decision | **DECIDED** | Architecture lead | Claude Code | **TASK-0006 AUTHORIZED / READY. Destructive PostgreSQL volume re-initialization authorized solely for clean-room verification.** | TASK-0006 |
 
 ## Interruption and recovery protocol
