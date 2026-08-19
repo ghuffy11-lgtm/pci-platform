@@ -123,3 +123,36 @@ architectural decision for the lead.
 
 Once push is restored, this file and every other communication artifact reach the architecture
 lead in a single push, and normal protocol resumes.
+
+---
+
+## Update — 2026-08-19, after rebase onto the bootstrap contract
+
+Upstream work reached the remote in the interim (`6765aa9`, `d738a60`) and was fetched at 12:43.
+The local branch was rebased onto `d738a60`; one conflict in `implementation/status/current.md`
+was resolved preserving both sides, and all five local commits replayed cleanly. Post-rebase
+verification: typecheck clean, 102 unit + 101 contract tests passing.
+
+The commit identifiers listed earlier in this file are pre-rebase and no longer exist. Current
+unpushed commits:
+
+| Commit | Contents |
+|---|---|
+| `7cd6d33` | `feat(kernel)` — WP-0001 kernel implementation and tests |
+| `be4502d` | `build(kernel)` — Dockerfile, compose stack, developer documentation |
+| `bf90f78` | `docs(comms)` — WP-0001 communications, blockers, proposed ADRs |
+| `1e7656c` | `docs(comms)` — this blocker |
+| `3fad337` | `docs(comms)` — BLK-0002 root-cause correction |
+| *(pending)* | `docs(comms)` — bootstrap-contract reconciliation: MSG-0001 answered, BLK-0001 narrowed, DISC-0004, DISC-0005 |
+
+**Push retried; still failing.** That the fetch succeeded confirms the operator's terminal has a
+working credential — it does not make that credential reachable from the tool environment. The
+operator's agent (pid 1663, started `ssh-agent -s`) holds the key, but its socket does not exist
+under the temporary directory this environment resolves as `/tmp`
+(`C:\Users\Administrator\AppData\Local\Temp\3`), so it was started under a different shell
+environment. The shared agent at `/tmp/pci-ssh-agent.sock` (pid 1619) remains reachable and
+empty.
+
+Restating the constraint precisely, because it has now been misdiagnosed twice: **an agent
+holding the key is not sufficient. The agent's socket must be reachable by the process invoking
+`git`.** Option A below is the only variant of that which the tool environment can use.

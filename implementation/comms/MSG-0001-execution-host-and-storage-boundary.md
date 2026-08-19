@@ -1,6 +1,6 @@
 # MSG-0001 — Authorized Execution Host and Persistent Storage Boundary
 
-**Status:** OPEN
+**Status:** ANSWERED — resolved by the accepted PCI Server Bootstrap Contract, 2026-08-19
 **Raised:** 2026-08-19
 **Raised by:** Claude Code (implementation agent)
 **Work package:** WP-0001 — PCI Kernel Foundation
@@ -88,3 +88,32 @@ other than this repository working tree.
 ## Constraint until answered
 
 I will not connect to, install on, or mutate any host outside this repository working tree.
+
+---
+
+## Answer — recorded 2026-08-19
+
+The architecture lead answered this message by publishing
+`docs/operations/pci-server-bootstrap.md` (**Accepted implementation contract, v0.1**,
+commits `6765aa9` and `d738a60`). Every question raised above is settled by it:
+
+| Question raised | Answer in the accepted contract |
+|---|---|
+| Which host may execute PCI workloads? | The customer-controlled Ubuntu PCI server, reached via the dedicated `claude` OS account and the dedicated PCI server SSH key. The host address is deliberately not stored in Git. |
+| Where may persistent state live? | `/data/docker`, mandatorily. Not `/opt`, `/srv`, `/home/claude`, or arbitrary host paths. |
+| What is the container runtime? | Docker, as the initial application isolation mechanism. PCI services run as containers wherever practical. |
+| May Claude prepare the host? | Yes, when an active work package requires it: OS packages, Docker Engine, Compose, `/data/docker` ownership and permissions, firewall and time-sync prerequisites, and service health checks. |
+| What may Claude *not* touch? | Unrelated host infrastructure, RAID/storage configuration, boot configuration, kernel settings, unrelated services, and network infrastructure — absent explicit work-package authorisation. |
+| Is the Git working tree the data boundary? | No. The source workspace is explicitly distinct from the application-data boundary. |
+
+**Consequence for WP-0001.** The blocking condition in this message is lifted: an execution
+host and a storage boundary are now recorded in the repository. What remains is operational,
+not architectural — the defined host has not yet been bootstrapped, so AC-02 and the
+integration tier of AC-09 stay unverified. That residue is tracked in BLK-0001, which has been
+narrowed accordingly.
+
+Persistent Docker data for the kernel must use explicit paths beneath `/data/docker`. The
+compose stack committed in `be4502d` has not yet been reviewed against that requirement — see
+`implementation/discoveries/DISC-0004-compose-storage-boundary.md`.
+
+**Status:** ANSWERED. No further response required from the architecture lead on this message.

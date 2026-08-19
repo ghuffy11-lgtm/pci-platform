@@ -1,6 +1,6 @@
 # BLK-0001 — No PostgreSQL or Container Execution Environment
 
-**Status:** OPEN
+**Status:** OPEN — narrowed 2026-08-19 by the accepted bootstrap contract
 **Severity:** High — prevents formal verification of two acceptance criteria
 **Raised:** 2026-08-19
 **Work package:** WP-0001 — PCI Kernel Foundation
@@ -52,3 +52,24 @@ docker compose -f deploy/compose/docker-compose.yml up -d postgres
 cd services/kernel
 PCI_TEST_DATABASE_URL=postgres://pci:<dev-password>@localhost:5432/pci_test npm run test:integration
 ```
+
+---
+
+## Narrowed — 2026-08-19
+
+`docs/operations/pci-server-bootstrap.md` was accepted, answering MSG-0001. The architectural
+half of this blocker is gone: an execution host (customer-controlled Ubuntu server, `claude`
+account) and a persistent-storage boundary (`/data/docker`, mandatory) are now recorded, and
+Claude Code is authorised to install Docker and prepare the host when a work package requires it.
+
+What remains is purely operational: **the authorised host has not yet been bootstrapped, and no
+PostgreSQL instance exists yet.** AC-02 and the integration tier of AC-09 stay unverified for
+that reason alone.
+
+Revised statement of the blocker: *the defined execution environment is not yet stood up* —
+rather than *no execution environment is defined*.
+
+Clearing it now requires no decision, only execution: bootstrap the authorised host per the
+contract, bring up PostgreSQL with persistent state under `/data/docker` (see DISC-0004), run the
+integration tier (see DISC-0005 before trusting any tier's result), and record the outcome in the
+WP-0001 report.

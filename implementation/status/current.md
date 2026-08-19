@@ -66,7 +66,7 @@ authoring host, and the authorized Ubuntu implementation host has not yet been b
 
 | ID | Subject | Status | Blocking |
 |---|---|---|---|
-| MSG-0001 | Authorized Ubuntu host and `/data/docker` storage boundary | OPEN | **YES** |
+| MSG-0001 | Authorized Ubuntu host and `/data/docker` storage boundary | **ANSWERED** — bootstrap contract accepted | No |
 | MSG-0002 | Kernel runtime stack ratification (ADR-0015) | OPEN | No |
 | MSG-0003 | Repository layout authority and document corrections | OPEN | No |
 
@@ -74,12 +74,13 @@ authoring host, and the authorized Ubuntu implementation host has not yet been b
 
 | ID | Subject | Severity |
 |---|---|---|
-| BLK-0001 | No PostgreSQL or container execution environment | High |
+| BLK-0001 | Authorized host not yet bootstrapped (narrowed — environment is now defined) | High |
 | BLK-0002 | **GitHub push unavailable — the architecture lead cannot see any of this** | Critical |
 
-> **BLK-0002 supersedes everything else in priority.** Four commits exist locally
-> (`9a18b09`, `55095d7`, `eabed9b`, `9945a00`) carrying the full WP-0001 implementation and
-> every communication artifact. None have reached the remote.
+> **BLK-0002 supersedes everything else in priority.** Six commits exist locally
+> (`7cd6d33`, `be4502d`, `bf90f78`, `1e7656c`, `3fad337`, and the reconciliation commit)
+> carrying the full WP-0001 implementation and every communication artifact, rebased onto the
+> accepted bootstrap contract. None have reached the remote.
 >
 > **Root cause corrected 2026-08-19.** This file previously recorded the cause as an
 > unregistered SSH key. A verbose handshake disproved that: GitHub responds `Server accepts
@@ -108,6 +109,8 @@ Neither is accepted. No architecture-lead approval is claimed for any decision i
 | DISC-0001 | Governance documents duplicated across `knowledge/` and `docs/` |
 | DISC-0002 | In-memory adapter test-fidelity gap |
 | DISC-0003 | Development identity adapter boundary |
+| DISC-0004 | Compose stack predates the `/data/docker` boundary |
+| DISC-0005 | `npm test` reports success while running zero tests under POSIX shells |
 
 ## Report
 
