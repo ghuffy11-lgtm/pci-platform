@@ -6,23 +6,23 @@
 #                SPEC-0026 Deployment and Air-Gapped Operation
 #                docs/security/supply-chain-security.md
 #
-# ⚠ NEVER EXECUTED. Docker was not available on the authoring host during WP-0001.
-#   See implementation/blockers/BLK-0001-no-execution-environment.md.
+# EXECUTED AND VERIFIED 2026-08-19 on the authorised host: PostgreSQL healthy, migrations
+#   applied, 26 integration tests passing against it. See WP-0001 report section 11.
 #
-# ⚠ STORAGE BOUNDARY UNRESOLVED.
-#   deployment-architecture.md:22 requires that persistent data live on explicitly managed
-#   storage rather than the OS root filesystem. The concrete boundary (referred to verbally as
-#   "/data/docker") is NOT recorded anywhere in the repository, so this file uses NAMED VOLUMES
-#   rather than inventing host paths. Substituting a guessed bind mount would be exactly the
-#   silent infrastructure decision the operating rules prohibit.
+# STORAGE BOUNDARY — RESOLVED (DISC-0004).
+#   The authorised data root is /data/docker, and the Docker daemon's `data-root` is set to it
+#   on the PCI server. Named volumes therefore resolve under /data/docker/volumes/... and
+#   already satisfy the boundary. Verified 2026-08-19:
 #
-#   Once implementation/comms/MSG-0001 is answered, replace the named volumes below with
-#   explicit bind mounts under the authorised data root, e.g.:
+#     /data/docker/volumes/pci-kernel_postgres-data/_data
 #
-#     volumes:
-#       - /data/docker/pci/postgres:/var/lib/postgresql/data
+#   Relocating `data-root` is the stronger guarantee, because it also captures image layers and
+#   container writable state — not only the paths someone remembered to bind-mount. Do NOT
+#   substitute bind mounts: they would be weaker, and they are no longer needed.
 #
-#   and set the Docker daemon `data-root` accordingly in /etc/docker/daemon.json.
+# SETUP: copy .env.example to .env and replace every REPLACE_ME value before running this
+#   stack. Both POSTGRES_SUPERUSER_PASSWORD and PCI_APP_PASSWORD are required, and the kernel
+#   refuses to start without at least one entry in PCI_STATIC_PRINCIPALS (DISC-0008).
 
 name: pci-kernel
 
@@ -38,6 +38,11 @@ services:
       # Injected from the environment. Never commit a real value (ADR-0009).
       POSTGRES_PASSWORD: ${POSTGRES_SUPERUSER_PASSWORD:?POSTGRES_SUPERUSER_PASSWORD is required}
       POSTGRES_INITDB_ARGS: "--data-checksums"
+      # Supplies pci.app_password to the initdb session so initdb/00-roles.sql can create the
+      # least-privilege runtime role with a password. Without this the role was created
+      # unusable and the stack still reported healthy (DISC-0007, fixed by TASK-0004).
+      # PGOPTIONS reaches the entrypoint's own psql; the value is never written to disk.
+      PGOPTIONS: -c pci.app_password=${PCI_APP_PASSWORD:?PCI_APP_PASSWORD is required}
     volumes:
       - postgres-data:/var/lib/postgresql/data
       # Creates the least-privilege runtime role. Runs once, on first initialisation only.
@@ -110,5 +115,5 @@ services:
 
 volumes:
   postgres-data:
-    # Replace with a bind mount under the authorised data root once MSG-0001 is answered.
+    # Resolves under the daemon data-root, which is /data/docker on the PCI server (DISC-0004).
     driver: local
