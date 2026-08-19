@@ -100,7 +100,14 @@ REVOKE CREATE ON SCHEMA public FROM PUBLIC;
 --    pci_app; migration 0001 sets FORCE ROW LEVEL SECURITY precisely so ownership does not
 --    become an escape from the policies.
 -- ---------------------------------------------------------------------------
-GRANT CONNECT ON DATABASE :"POSTGRES_DB" TO pci_app;
+-- current_database() rather than a psql variable: the postgres entrypoint does not define
+-- :POSTGRES_DB for these scripts, and referencing it aborts initialisation.
+DO $$
+BEGIN
+    EXECUTE format('GRANT CONNECT ON DATABASE %I TO pci_app', current_database());
+END
+$$;
+
 GRANT USAGE, CREATE ON SCHEMA public TO pci_app;
 
 -- ---------------------------------------------------------------------------
