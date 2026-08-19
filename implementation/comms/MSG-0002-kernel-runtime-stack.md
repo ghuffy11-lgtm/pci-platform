@@ -1,6 +1,6 @@
 # MSG-0002 — Kernel Implementation Stack Selection
 
-**Status:** OPEN (non-blocking — proceeding under delegated authority)
+**Status:** **CLOSED — DECIDED** 2026-08-19. ADR-0015 was ratified by MSG-0005 and promoted to `docs/decisions/ADR-0015-kernel-implementation-stack.md` (ACCEPTED). Retained as a historical record; not deleted.
 **Raised:** 2026-08-19
 **Raised by:** Claude Code (implementation agent)
 **Work package:** WP-0001 — PCI Kernel Foundation

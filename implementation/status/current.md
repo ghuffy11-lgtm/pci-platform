@@ -163,6 +163,7 @@ precedence has changed.
 | DISC-0003 | Development identity adapter boundary |
 | DISC-0004 | Compose stack predates the `/data/docker` boundary |
 | DISC-0005 | `npm test` reports success while running zero tests under POSIX shells |
+| DISC-0006 | CRLF line endings silently defeat anchored text edits |
 
 ## Report
 
