@@ -8,3 +8,4 @@ by an open blocker must never be reported as met.
 | ID | Title | Severity | Status |
 |---|---|---|---|
 | BLK-0001 | No PostgreSQL or container execution environment | High | OPEN |
+| BLK-0002 | GitHub push unavailable — communication channel down | Critical | OPEN |

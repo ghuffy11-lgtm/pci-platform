@@ -75,6 +75,14 @@ authoring host, and the authorized Ubuntu implementation host has not yet been b
 | ID | Subject | Severity |
 |---|---|---|
 | BLK-0001 | No PostgreSQL or container execution environment | High |
+| BLK-0002 | **GitHub push unavailable — the architecture lead cannot see any of this** | Critical |
+
+> **BLK-0002 supersedes everything else in priority.** Three commits exist locally
+> (`9a18b09`, `55095d7`, `eabed9b`) carrying the full WP-0001 implementation and every
+> communication artifact. None have reached the remote: the SSH key at
+> `~/.ssh/pci_github_ed25519` is offered but rejected by GitHub, because it has never been
+> registered on the account. Until an operator registers it, MSG-0001 cannot be read and
+> therefore cannot be answered.
 
 ## Proposed Decisions Awaiting Ratification
 
