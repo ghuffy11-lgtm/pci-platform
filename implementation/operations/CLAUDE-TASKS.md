@@ -1,15 +1,11 @@
 # Claude Code Execution Queue
 
-**This file is the authoritative execution queue.** `CLAUDE.md` requires every session to read it at
-startup and to execute the highest-priority **READY** task, following that task's prerequisites,
-dependencies, allowed actions, forbidden actions, verification requirements, documentation
-requirements, checkpoint requirements, stop conditions, and recovery procedure.
+**This file is the authoritative execution queue.** `CLAUDE.md` requires every session to read it at startup and to execute the highest-priority **READY** task, following that task's prerequisites, dependencies, allowed actions, forbidden actions, verification requirements, documentation requirements, checkpoint requirements, stop conditions, and recovery procedure.
 
 Roadmap: [`ROADMAP.md`](ROADMAP.md) — the A→Z sequence this queue implements.
 Checkpoints: [`checkpoints/`](checkpoints/) — resumable state for interrupted tasks.
 
-Only the architecture lead may authorize new work, mark a task READY, or change priority or scope.
-Claude Code may propose tasks; a proposed task is **not** executable.
+Only the architecture lead may authorize new work, mark a task READY, or change priority or scope. Claude Code may propose tasks; a proposed task is **not** executable.
 
 ---
 
@@ -20,7 +16,7 @@ Claude Code may propose tasks; a proposed task is **not** executable.
 | TASK-0001 | WP-0001 verification on the authorized host | **COMPLETE** | — | 2026-08-19 `a693910` | none | Claude Code |
 | TASK-0004 | Fix database role provisioning (DISC-0007) | **COMPLETE** | TASK-0001 | 2026-08-19 G1 pass | none — clean-room proof is TASK-0006 | Claude Code |
 | TASK-0005 | Fix compose kernel service configuration (DISC-0008) | **COMPLETE** | TASK-0001 | 2026-08-19 G2 pass | none | Claude Code |
-| TASK-0006 | Clean-room reproducibility verification | **WAITING_FOR_ARCHITECTURE_LEAD** | TASK-0004 ✅, TASK-0005 ✅ | — | **Dependencies now met.** Awaiting destructive-operation authorization only | Architecture lead |
+| TASK-0006 | Clean-room reproducibility verification | **READY** | TASK-0004 ✅, TASK-0005 ✅ | 2026-08-19 authorization | Execute clean-room verification under MSG-0016 | Claude Code |
 | TASK-0007 | Full re-verification after fixes | **BLOCKED** | TASK-0006 | — | Await dependency | Claude Code |
 | TASK-0008 | Final report and status reconciliation | **BLOCKED** | TASK-0007 | — | Await dependency | Claude Code |
 | TASK-0009 | WP-0001 completion decision | **WAITING_FOR_ARCHITECTURE_LEAD** | TASK-0008 | — | Lead declares complete or names gaps | Architecture lead |
@@ -28,12 +24,9 @@ Claude Code may propose tasks; a proposed task is **not** executable.
 | TASK-0010 | Execution Supervisor (dev machine, not installed) | **COMPLETE** | — | 2026-08-19 `tests 17/17` | none — installation is a separate operator decision | Claude Code |
 | TASK-0002 | Make test entry points shell-independent | **ABORTED** | — | 2026-08-19 | none — premise disproven by measurement | — |
 
-**TASK-0004 and TASK-0005 are COMPLETE** (2026-08-19, gates G1 and G2 passed). The continuation
-rule was applied: both ran without stopping in between.
+**TASK-0004 and TASK-0005 are COMPLETE** (2026-08-19, gates G1 and G2 passed). The continuation rule was applied: both ran without stopping in between.
 
-**No task is READY.** TASK-0006 is now the only thing standing between WP-0001 and a reproducible
-stack, and its dependencies are satisfied — but its destructive volume re-initialisation was
-explicitly **not** granted by MSG-0012. That single authorization is the entire remaining gate.
+**TASK-0006 is READY.** MSG-0016 explicitly authorizes its destructive PostgreSQL volume re-initialisation for clean-room reproducibility. No authorization is granted for TASK-0007, TASK-0008, TASK-0009, or Execution Supervisor installation/enabling.
 
 ### Status values
 
@@ -47,8 +40,7 @@ explicitly **not** granted by MSG-0012. That single authorization is the entire 
 | **WAITING_FOR_OPERATOR** | Needs a privileged or credential-holding action only the operator can perform. |
 | **ABORTED** | Withdrawn. Its premise was wrong or it was superseded. Kept for the record. |
 
-READY means *authorized to attempt*, never *authorized to force*. A READY task whose prerequisite is
-unmet stops at the prerequisite and records why.
+READY means *authorized to attempt*, never *authorized to force*. A READY task whose prerequisite is unmet stops at the prerequisite and records why.
 
 ---
 
@@ -65,37 +57,21 @@ unmet stops at the prerequisite and records why.
 | MSG-0007 | Directive | DECIDED | Architecture lead | Claude Code | Twelve non-negotiable rules; startup and pre-action checklists | all |
 | MSG-0008 | Procedure | CLOSED | Claude Code | Operator | Authorized bootstrap executed; `DockerRootDir` = `/data/docker` verified | TASK-0001 |
 | MSG-0009 | Directive | DECIDED | Architecture lead | Claude Code | "Documentation Is Mandatory" — ten clauses | all |
-| MSG-0010 | Record | OPEN | Claude Code | Architecture lead | **Phase 0 execution-control system built. Awaiting authorization of TASK-0004 and TASK-0005.** | TASK-0004, TASK-0005 |
-| MSG-0011 | Record | OPEN | Claude Code | Architecture lead | **Execution Supervisor built, tested (17/17), NOT installed and NOT enabled. Awaiting the decision on whether to run unattended sessions at all.** | TASK-0010 |
-| MSG-0012 | Decision | DECIDED | Architecture lead | Claude Code | **TASK-0004 and TASK-0005 AUTHORIZED / READY.** DISC-0008 option 1 (fake placeholder in `.env.example`). TASK-0006 and later remain unauthorized | TASK-0004, TASK-0005 |
-| MSG-0013 | Directive | DECIDED | Architecture lead | Claude Code | Reconcile the queue to READY from MSG-0012; do not infer authorization from conversation | TASK-0004, TASK-0005 |
+| MSG-0010 | Record | OPEN | Claude Code | Architecture lead | Phase 0 execution-control system built | TASK-0004, TASK-0005 |
+| MSG-0011 | Record | OPEN | Claude Code | Architecture lead | Execution Supervisor built, tested (17/17), NOT installed and NOT enabled | TASK-0010 |
+| MSG-0012 | Decision | DECIDED | Architecture lead | Claude Code | TASK-0004 and TASK-0005 authorized | TASK-0004, TASK-0005 |
+| MSG-0013 | Directive | DECIDED | Architecture lead | Claude Code | Reconcile queue to READY from MSG-0012 | TASK-0004, TASK-0005 |
 | MSG-0014 | Directive | DECIDED | Architecture lead | Claude Code | Queue reconciliation record, discoverable to a fresh session | TASK-0004, TASK-0005 |
-| MSG-0015 | Record | OPEN | Claude Code | Architecture lead | **TASK-0004 and TASK-0005 COMPLETE (G1, G2 passed). TASK-0006 needs explicit destructive-volume authorization.** | TASK-0006 |
-
-**What remains, in one line:** everything is verified and recorded; nothing is executable until the
-architecture lead authorizes the two defect fixes.
-
----
+| MSG-0015 | Record | OPEN | Claude Code | Architecture lead | TASK-0004 and TASK-0005 complete; TASK-0006 needs explicit destructive authorization | TASK-0006 |
+| MSG-0016 | Decision | **DECIDED** | Architecture lead | Claude Code | **TASK-0006 AUTHORIZED / READY. Destructive PostgreSQL volume re-initialization authorized solely for clean-room verification.** | TASK-0006 |
 
 ## Interruption and recovery protocol
 
-Applies after **any** interruption: crash, network failure, machine restart, context loss, or a new
-Claude session.
+Applies after any interruption: crash, network failure, machine restart, context loss, or a new Claude session.
 
 ### Checkpointing
 
-Every task with status IN_PROGRESS **must** maintain a checkpoint at
-`implementation/operations/checkpoints/TASK-XXXX.md`, committed and pushed. A checkpoint identifies:
-
-1. task ID;
-2. checkpoint number (monotonic);
-3. current phase;
-4. completed operations;
-5. last **verified** operation;
-6. next operation;
-7. actual external/system state as observed, not as intended;
-8. Git commit / HEAD at checkpoint time;
-9. whether resumption is safe, and if not, why.
+Every task with status IN_PROGRESS **must** maintain a checkpoint at `implementation/operations/checkpoints/TASK-XXXX.md`, committed and pushed. A checkpoint identifies task ID, checkpoint number, current phase, completed operations, last verified operation, next operation, actual external/system state, Git commit/HEAD, and whether resumption is safe.
 
 A checkpoint is written **after** an operation is verified, never in anticipation of one.
 
@@ -103,53 +79,26 @@ A checkpoint is written **after** an operation is verified, never in anticipatio
 
 Before resuming anything:
 
-- **a.** Read the task checkpoint.
-- **b.** Read GitHub state — status, queue, blockers, communications, discoveries.
-- **c.** Inspect the actual system state directly. Docker, database, filesystem, service health.
-- **d.** Inspect git state — `git status`, `git rev-parse HEAD origin/main`.
-- **e.** Compare documented state against actual state, item by item.
-- **f.** **NEVER repeat an operation merely because the checkpoint says it was incomplete.** The
-  checkpoint records what was known before the interruption; the system may have moved on. Re-running
-  a migration, a volume creation, or a role change on that basis can destroy data or corrupt state.
-  Determine what is *actually* true first.
-- **g.** If documented and actual state disagree — **STOP.** Document the discrepancy in the
-  checkpoint and in a blocker, and reconcile safely. A disagreement is evidence that something
-  happened outside the record, which is more important than the task.
-- **h.** Resume only from the first operation whose completion is **not verified** by direct
-  observation.
+- Read the task checkpoint.
+- Read GitHub state — status, queue, blockers, communications, discoveries.
+- Inspect actual system state directly.
+- Inspect git state — `git status`, `git rev-parse HEAD origin/main`.
+- Compare documented state against actual state.
+- **NEVER repeat an operation merely because the checkpoint says it was incomplete.** Observe actual state first.
+- If documented and actual state disagree — **STOP**, document the discrepancy, and reconcile safely.
+- Resume only from the first operation whose completion is not verified by direct observation.
 
 ### Idempotence
 
-Prefer operations that are safe to repeat, and verify-before-acting on those that are not. Where an
-operation cannot be made idempotent — volume initialisation, migrations that are not
-checksum-guarded, credential rotation — the checkpoint must say so explicitly, so a resuming session
-knows the difference between "unknown" and "unsafe".
-
----
+Prefer operations that are safe to repeat, and verify-before-acting on those that are not. Where an operation cannot be made idempotent — volume initialisation, migrations that are not checksum-guarded, credential rotation — the checkpoint must say so explicitly.
 
 ## Continuation rule
 
-**Claude Code MUST NOT stop merely because one authorized subtask completed.**
-
-If the next task is READY, its prerequisites are satisfied, and no architecture or operator decision
-is required, Claude Code **MUST continue automatically** — documenting and pushing as it goes.
-
-Stopping after each task is as much a failure as skipping documentation. The queue exists so that
-work flows without a human clicking "next".
+**Claude Code MUST NOT stop merely because one authorized subtask completed.** If the next task is READY, its prerequisites are satisfied, and no architecture or operator decision is required, Claude Code **MUST continue automatically** — documenting and pushing as it goes.
 
 ## Stop boundaries
 
-Claude Code MUST stop, document, commit, push, and report when:
-
-- architecture approval is required;
-- privileged operator action is required;
-- a security boundary would be crossed;
-- a prerequisite cannot be satisfied;
-- documentation conflicts with documentation, or with the instruction given;
-- actual state differs materially from recorded state;
-- an operation is destructive or irreversible and is not explicitly authorized.
-
-Stopping means recording *why*, not falling silent.
+Claude Code MUST stop, document, commit, push, and report when architecture approval is required; privileged operator action is required; a security boundary would be crossed; a prerequisite cannot be satisfied; documentation conflicts; actual state differs materially from recorded state; or an operation is destructive or irreversible and is not explicitly authorized.
 
 ---
 
@@ -162,9 +111,7 @@ Stopping means recording *why*, not falling silent.
 
 **Objective.** Convert WP-0001 from IMPLEMENTED to VERIFIED against real infrastructure.
 
-**Outcome.** All ten acceptance criteria MET. 229 tests pass, 0 fail — 102 unit, 101 contract, 26
-integration against real PostgreSQL. ADR-0016 obligations proven live. Boundary held: no PCI artifact
-outside `/data`. Evidence: WP-0001 report section 11; commit `a693910`.
+**Outcome.** All ten acceptance criteria MET. 229 tests pass, 0 fail — 102 unit, 101 contract, 26 integration against real PostgreSQL. ADR-0016 obligations proven live. Boundary held: no PCI artifact outside `/data`. Evidence: WP-0001 report section 11; commit `a693910`.
 
 **Findings that became work:** DISC-0007, DISC-0008 → TASK-0004, TASK-0005.
 
@@ -176,70 +123,13 @@ outside `/data`. Evidence: WP-0001 report section 11; commit `a693910`.
 **Depends on:** TASK-0001 | **Source:** DISC-0007 | **Next eligible task:** TASK-0005, then TASK-0006
 
 ### Objective
+Make the database stack provision its own access control correctly, so that a clean initialisation produces a usable least-privilege `pci_app` role without manual SQL.
 
-Make the database stack provision its own access control correctly, so that a clean initialisation
-produces a usable least-privilege `pci_app` role without manual SQL.
+### Verification
+Gate G1 passed. Clean-room proof remains TASK-0006.
 
-### Prerequisites
-
-| ID | Prerequisite | State |
-|---|---|---|
-| P1 | Architecture lead marks this task READY | **MET** — MSG-0012 |
-| P2 | Docker and PostgreSQL available on the host | MET — verified 2026-08-19 |
-| P3 | Workspace at `/data/pci-platform` with the repository | MET |
-
-### Dependencies
-
-TASK-0001 (complete). Verification of this fix additionally requires the destructive volume
-re-initialisation authorized under TASK-0006 — the fix can be *written* and reviewed without it, but
-**cannot be proven** until `initdb` runs again.
-
-### Allowed actions
-
-1. Reorder `deploy/compose/initdb/00-roles.sql` so the password guard runs **before** `CREATE ROLE`.
-2. Supply the password to the init session, e.g. `PGOPTIONS: "-c pci.app_password=${PCI_APP_PASSWORD:?...}"`.
-3. Grant `pci_app` the minimum privileges it needs, explicitly.
-4. Provision the `pci_test` database, or align the integration tier's documented usage with what the
-   stack creates — whichever the lead prefers; both are recorded in DISC-0007.
-5. Make the health check meaningful, or record explicitly that `pg_isready` says nothing about
-   provisioning.
-
-### Forbidden actions
-
-- Weakening the `NOSUPERUSER` / `NOBYPASSRLS` posture of `pci_app` — it is what makes ADR-0016 bite.
-- Committing any credential, or a real password in `.env.example`.
-- Destroying the PostgreSQL volume — that is TASK-0006 and needs its own authorization.
-- Creating any artifact outside `/data` on the host.
-- Declaring the fix verified on the strength of a code change alone.
-
-### Verification requirements
-
-Gate **G1**. On a freshly initialised volume: `pci_app` exists with a password, `super=false`,
-`bypassrls=false`, holds exactly the privileges it needs, and **no manual SQL was run**. Quote
-`pg_authid` output. Until G1 passes, the fix is written, not verified — and must be reported that way.
-
-### Documentation requirements
-
-Update DISC-0007 with the fix and its verification state; update the WP-0001 report; update status;
-update this queue's board and ledger; commit and push before reporting.
-
-### Checkpoint requirements
-
-Checkpoint after: (1) the SQL and compose changes are written and committed; (2) any verification
-attempt, recording whether G1 passed. Record actual database state observed, not intended.
-
-### Stop conditions
-
-Lead has not marked READY; verification would require destroying the volume without authorization;
-a fix would require relaxing the least-privilege posture; documentation conflicts.
-
-### Recovery procedure
-
-Read the checkpoint, then inspect the live database directly: does `pci_app` have a password now,
-and which privileges does it hold? **Do not re-run `ALTER ROLE` or re-apply grants because the
-checkpoint is silent** — observe first. If the volume was re-initialised outside the record, stop and
-reconcile: the manual workaround from 2026-08-19 will have been lost, and the stack's real state must
-be established before anything is changed.
+### Documentation / recovery
+DISC-0007, WP-0001 report, status, queue, and checkpoints were updated and pushed. Recovery requires direct observation before repeating role or grant operations.
 
 ---
 
@@ -249,368 +139,102 @@ be established before anything is changed.
 **Depends on:** TASK-0001 | **Source:** DISC-0008 | **Next eligible task:** TASK-0006
 
 ### Objective
+Allow the kernel service to start from a clean checkout with documented setup only, without relaxing its fail-closed configuration guard.
 
-Allow the kernel service to start from a clean checkout with documented setup only, without relaxing
-its fail-closed configuration guard.
+### Verification
+Gate G2 passed. Clean-room proof remains TASK-0006.
 
-### Prerequisites
-
-| ID | Prerequisite | State |
-|---|---|---|
-| P1 | Architecture lead marks this task READY | **MET** — MSG-0012 |
-| P2 | Architecture lead chooses how a development principal is supplied | **MET** — MSG-0012 selects DISC-0008 option 1 |
-| P3 | Docker available on the host | MET |
-
-### Dependencies
-
-TASK-0001 (complete). Independent of TASK-0004; either may run first.
-
-### Allowed actions
-
-Implement the option the lead selects: ship `.env.example` with a clearly fake placeholder and
-document generation (recommended); and/or generate a development principal during bootstrap.
-
-### Forbidden actions
-
-- **Relaxing the fail-closed guard** so the service starts without principals. Recorded in DISC-0008
-  as option 3 and explicitly not recommended: it converts a security control into a convenience.
-- Committing a real token. `.gitignore` already carries the `!.env.example` negation for this.
-- Making the static identity adapter usable in production — it is a development fixture (ADR-0007,
-  SPEC-0004, DISC-0003) and must keep warning loudly.
-
-### Verification requirements
-
-Gate **G2**. `docker compose up kernel` reaches healthy from a clean checkout following only the
-documented setup; `/health/ready` returns 200 with `store: ok`. Confirm the guard still refuses to
-start when principals are absent — a fix that silently starts without identity has failed.
-
-### Documentation requirements
-
-Update DISC-0008; update `services/kernel/README.md` with the setup step; update status and this
-queue; commit and push.
-
-### Checkpoint requirements
-
-Checkpoint after the change is committed, and after the clean start is verified.
-
-### Stop conditions
-
-P1 or P2 unmet; the only workable approach would require committing a credential or relaxing the
-guard.
-
-### Recovery procedure
-
-Inspect whether `.env.example` exists and whether the running kernel container is healthy. **Do not
-regenerate an existing `.env` principal** — a running service may depend on it, and regenerating
-invalidates issued tokens. Observe, then resume.
+### Documentation / recovery
+DISC-0008, kernel README, status, queue, and checkpoints were updated and pushed. Recovery requires direct observation before repeating service/configuration operations.
 
 ---
 
 ## TASK-0006 — Clean-room reproducibility verification
 
-**Priority:** 3 | **Status:** **BLOCKED** | **Owner:** Architecture lead (authorization) → Claude Code
+**Priority:** 1 | **Status:** **READY** — authorized by MSG-0016 | **Owner:** Claude Code
 **Depends on:** TASK-0004, TASK-0005 | **Next eligible task:** TASK-0007
 
 ### Objective
+Prove the fixes survive a genuinely clean PostgreSQL initialization and that the full stack remains within the accepted architecture and `/data` boundary.
 
-Prove that a clean checkout plus documented setup produces a working stack with **zero** manual
-database or environment surgery — the criterion WP-0001 currently fails.
-
-### Prerequisites
-
-| ID | Prerequisite | State |
-|---|---|---|
-| P1 | TASK-0004 COMPLETE | **MET** — 2026-08-19 |
-| P2 | TASK-0005 COMPLETE | **MET** — 2026-08-19 |
-| P3 | **Explicit authorization to destroy the PostgreSQL volume** | **UNMET** |
-
-### Dependencies
-
-Both fixes. Testing either alone cannot demonstrate reproducibility.
+### Authorization
+MSG-0016 explicitly authorizes the destructive PostgreSQL volume re-initialization required by this task. This authorization is limited to TASK-0006 and does not authorize later tasks or supervisor installation.
 
 ### Allowed actions
-
-Once P3 is granted: `docker compose down -v` to remove `pci-kernel_postgres-data`, then bring the
-stack up from scratch following only documented steps, and observe.
+1. Checkpoint immediately before destructive action.
+2. Stop/remove the relevant PostgreSQL stack state as required by the existing task procedure.
+3. Re-initialize the PostgreSQL volume cleanly.
+4. Start the stack from repository configuration only; do not apply manual SQL fixes.
+5. Verify role provisioning, database availability, privileges, RLS posture, kernel startup, and required health endpoints directly.
+6. Record exact evidence and checkpoint after each verified gate.
 
 ### Forbidden actions
-
-- **Destroying the volume without explicit authorization** (Rule 9). This is the task's defining
-  constraint.
-- Any manual `ALTER ROLE`, `CREATE DATABASE`, or `.env` surgery during the run — that is precisely
-  what is being tested. If a manual step proves necessary, the gate has **failed**; record it.
-- Touching the pre-existing non-PCI directories under `/data`.
+- Commit credentials or secrets.
+- Run manual SQL to make clean-room evidence pass.
+- Modify architecture or weaken security controls.
+- Create PCI artifacts outside `/data`.
+- Continue into TASK-0007 without completing and documenting TASK-0006.
 
 ### Verification requirements
+All clean-room gates defined by the existing WP-0001 acceptance criteria and task procedure must pass. Evidence must be from the clean initialization, not from the prior manually repaired state.
 
-Gate **G3**. From a fresh volume: PostgreSQL healthy → migrations applied → `pci_app` correctly
-provisioned → kernel healthy, with no manual intervention. Every step quoted.
-
-### Documentation requirements
-
-Record the full clean-room transcript in the WP-0001 report; update DISC-0007 and DISC-0008 to
-RESOLVED only if the gate passes; update status and queue; commit and push.
-
-### Checkpoint requirements
-
-Checkpoint **before** the destructive step, recording exactly what will be destroyed and the
-authorization that permits it; and after the rebuild, recording observed state.
-
-### Stop conditions
-
-P3 not granted; the rebuild needs manual surgery (gate failed — record, do not paper over); any data
-of value is discovered in the volume during the pre-destruction check.
-
-### Recovery procedure
-
-**This is the highest-risk recovery in the queue.** If interrupted around the destructive step:
-determine by direct observation whether the volume still exists and whether it is initialised.
-**Never re-run `down -v` because the checkpoint is ambiguous.** If the volume is gone and the rebuild
-incomplete, the stack is mid-provision — record that plainly, then continue the rebuild from the
-first unverified step rather than starting over.
+### Recovery
+After any interruption, inspect the actual Docker volumes, containers, database roles, and Git state before repeating any destructive or initialization operation. If state differs from the checkpoint, stop and document the discrepancy.
 
 ---
 
 ## TASK-0007 — Full re-verification after fixes
 
-**Priority:** 4 | **Status:** **BLOCKED** | **Owner:** Claude Code
-**Depends on:** TASK-0006 | **Next eligible task:** TASK-0008
+**Priority:** 1 | **Status:** **BLOCKED** | **Depends on:** TASK-0006 | **Owner:** Claude Code
 
-**Objective.** Re-run the complete verification against the cleanly provisioned stack, so the
-recorded evidence describes a reproducible system rather than a hand-patched one.
+### Objective
+Re-run the complete WP-0001 verification suite and acceptance criteria after clean-room fixes.
 
-**Allowed actions.** Run all three test tiers; re-prove the ADR-0016 obligations; re-confirm the
-`/data` boundary and that no credential appears in the repository.
-
-**Forbidden actions.** Reporting any tier as passing without a non-zero count; reusing TASK-0001's
-evidence in place of a fresh run; modifying tests to make them pass.
-
-**Verification requirements.** Gate **G4** — all tiers pass with non-zero counts; integration ≥ 26
-tests; FORCE RLS, non-BYPASSRLS role, cross-tenant blocking, and fail-closed tenant context all
-re-proven and quoted.
-
-**Documentation requirements.** New evidence section in the WP-0001 report; status and queue updated;
-committed and pushed.
-
-**Checkpoint requirements.** Checkpoint after each tier, recording actual counts.
-
-**Stop conditions.** Any tier fails; any tier reports zero tests; tenant isolation fails — which is a
-**security finding**, recorded as such before anything else proceeds.
-
-**Recovery procedure.** Test runs are idempotent and safe to repeat; re-run any tier whose result is
-not recorded. Verify the database is still cleanly provisioned before trusting results.
+### Stop condition
+Do not begin until TASK-0006 is COMPLETE.
 
 ---
 
 ## TASK-0008 — Final report and status reconciliation
 
-**Priority:** 5 | **Status:** **BLOCKED** | **Owner:** Claude Code
-**Depends on:** TASK-0007 | **Next eligible task:** TASK-0009
+**Priority:** 1 | **Status:** **BLOCKED** | **Depends on:** TASK-0007 | **Owner:** Claude Code
 
-**Objective.** Bring every record into agreement so the architecture lead can decide on completion
-from the repository alone.
+### Objective
+Reconcile implementation status, report, discoveries, blockers, communications, and task queue using verified evidence.
 
-**Allowed actions.** Update the WP-0001 report to final; reconcile status, blockers, discoveries,
-communications, queue board, and ledger; state remaining limitations explicitly.
-
-**Forbidden actions.** Declaring WP-0001 complete — that is TASK-0009 and belongs to the lead;
-omitting a limitation to make the record look finished.
-
-**Verification requirements.** Gate **G5** — every record describes the same state; `HEAD` =
-`origin/main`; working tree clean.
-
-**Documentation requirements.** This task *is* documentation. Committed and pushed.
-
-**Checkpoint requirements.** One checkpoint on completion, recording the reconciled SHA.
-
-**Stop conditions.** Two records disagree and the truth cannot be established by observation.
-
-**Recovery procedure.** Purely documentary and idempotent — re-read every record and re-reconcile.
+### Stop condition
+Do not begin until TASK-0007 is COMPLETE.
 
 ---
 
 ## TASK-0009 — WP-0001 completion decision
 
-**Priority:** 6 | **Status:** **WAITING_FOR_ARCHITECTURE_LEAD** | **Owner:** Architecture lead
-**Depends on:** TASK-0008 | **Next eligible task:** none — the next work package requires separate authorization
+**Priority:** 1 | **Status:** **WAITING_FOR_ARCHITECTURE_LEAD** | **Depends on:** TASK-0008 | **Owner:** Architecture lead
 
-**Objective.** The architecture lead declares WP-0001 complete, or names the gaps that prevent it.
-
-Claude Code does not self-certify completion (`CLAUDE.md` Completion Rule, ROADMAP section I,
-criterion 10). Its role here is to have the record ready and to answer questions.
-
-**Prerequisites.** TASK-0008 COMPLETE, so the lead decides on a reconciled record — **UNMET**.
-
-**Dependencies.** TASK-0008.
-
-**Allowed actions (Claude Code).** Answer questions from the record; correct any inaccuracy the lead
-identifies; record the decision once given.
-
-**Forbidden actions.** Declaring completion; implying completion by starting downstream work;
-omitting a known limitation to make the decision easier.
-
-**Verification requirements.** The decision itself is the outcome. Claude Code verifies only that
-the record the lead is deciding on is accurate and reconciled (gate G5).
-
-**Documentation requirements.** Record the decision in this queue, in `implementation/status/current.md`,
-and in the WP-0001 report. If gaps are named, create tasks for them.
-
-**Checkpoint requirements.** None — no operations to interrupt.
-
-**Stop conditions.** Absolute: no work package after WP-0001 may begin until this decision is
-recorded.
-
-**Recovery procedure.** None needed; nothing is in flight. On resumption, check whether the decision
-was recorded while away.
-
-**Next eligible task.** None. A subsequent work package requires separate authorization.
+### Objective
+Architecture lead decides whether WP-0001 is genuinely complete or identifies remaining gaps.
 
 ---
 
-## TASK-0003 — Normalise `*.md` line endings to LF
+## TASK-0003 — Normalise `*.md` line endings (DISC-0006)
 
-**Priority:** low | **Status:** **WAITING_FOR_ARCHITECTURE_LEAD** | **Owner:** Architecture lead → Claude Code
-**Depends on:** — | **Source:** DISC-0006
+**Priority:** 3 | **Status:** **WAITING_FOR_ARCHITECTURE_LEAD** | **Depends on:** — | **Owner:** Claude Code
 
-**Objective.** Stop record files acquiring CRLF on checkout, which silently defeats line-anchored
-edits — a substitution matches nothing and exits 0. This has already produced one inaccurate commit
-message.
-
-**Allowed action.** Add `*.md text eol=lf` to `.gitattributes` and renormalise.
-
-**Forbidden actions.** Renormalising without authorization — it touches every record file in the
-repository, including lead-owned documents, and would produce a large diff obscuring real changes.
-
-**Prerequisites.** Architecture lead marks this READY — **UNMET**.
-
-**Dependencies.** None. Independent of the WP-0001 chain; schedulable at any point once authorized.
-
-**Verification requirements.** After renormalisation, no `*.md` file reports CRLF (`file` on each),
-and an anchored substitution against a record file succeeds where it previously matched nothing.
-
-**Documentation requirements.** Update DISC-0006 to RESOLVED with the verification; note the
-renormalisation commit in status; commit and push.
-
-**Checkpoint requirements.** One checkpoint after renormalisation, recording the commit and how many
-files changed — the diff is large and a resuming session needs to know it was intentional.
-
-**Stop conditions.** Not marked READY; the renormalisation would conflict with uncommitted work.
-
-**Recovery procedure.** Renormalisation is idempotent, but a partially committed renormalisation is
-confusing. On resumption, check `git status` and whether `.gitattributes` already carries the rule
-before re-running anything.
-
-**Next eligible task.** Returns to whatever the queue's highest-priority READY task is.
-
----
-
-## TASK-0002 — Make test entry points shell-independent
-
-**Priority:** — | **Status:** **ABORTED** 2026-08-19 | **Source:** DISC-0005 (corrected)
-
-Withdrawn: the premise was disproven by measurement. `npm test` runs all 203 unit and contract tests
-correctly under `/bin/sh` on the target platform; the zero-test failure is confined to Git Bash on
-Windows. The proposed fix — pointing `--test` at a directory — is the variant that actually breaks
-(1 test, 1 fail), so applying it would have introduced the failure it was meant to prevent.
-
-Retained as a record of a wrong finding that reached the queue. The surviving principle — a tier
-reporting zero tests is a failure — is now `CLAUDE.md` Rule 10.
+### Objective
+Normalize repository markdown line endings if and when explicitly authorized by the architecture lead.
 
 ---
 
 ## TASK-0010 — Execution Supervisor
 
-**Priority:** 1 | **Status:** **COMPLETE** (2026-08-19) | **Owner:** Claude Code
-**Depends on:** — | **Record:** MSG-0011 | **Next eligible task:** none — installation is a
-separate operator decision, and no WP-0001 task is READY
+**Priority:** 0 | **Status:** **COMPLETE** — 2026-08-19 | **Owner:** Claude Code
 
-### Objective
+Built and tested (17/17). Installation and enabling remain a separate operator decision and are not authorized by MSG-0016.
 
-Provide fail-closed infrastructure that lets authorized queue tasks run without a human starting each
-session, and that recovers safely from interruption. Infrastructure only: it changes *when* work
-starts, never *what* is allowed.
+---
 
-### Outcome
+## TASK-0002 — Make test entry points shell-independent
 
-Implemented at `implementation/operations/supervisor/`, **not installed and not enabled**:
+**Priority:** 4 | **Status:** **ABORTED** — 2026-08-19 | **Owner:** —
 
-| Artifact | |
-|---|---|
-| `supervisor.ps1` | The supervisor. Windows PowerShell 5.1, ASCII-only, dot-sourceable for tests |
-| `supervisor-config.example.json` | Documented template; the real config is gitignored |
-| `README.md` | Architecture, install/remove, configuration, security model, failure/recovery, logging/heartbeat, concurrency/lock, tests |
-| `tests/supervisor.tests.ps1` | 17 tests, **17 passing**, no Pester required |
-| `state/`, `logs/` | Runtime directories, contents gitignored |
-
-Runs **on the Windows development machine only**. It has no SSH code path and cannot reach the PCI
-server.
-
-### Prerequisites
-
-| ID | Prerequisite | State |
-|---|---|---|
-| P1 | Windows development machine with PowerShell 5.1 and `git` | MET |
-| P2 | Repository clone readable | MET |
-| P3 | Operator decision to install/enable | **NOT MET — deliberately.** Out of this task's scope |
-
-### Dependencies
-
-None. Independent of the WP-0001 chain.
-
-### Permissions and allowed actions
-
-Read the repository; `git fetch` / `git rev-parse`; write `state/` and `logs/`; start one configured
-local process; register or unregister a Windows scheduled task on explicit `-Install` / `-Uninstall`.
-
-### Forbidden actions
-
-- **Never executes PCI-server commands.** No SSH path exists in the code.
-- **Never stores credentials, tokens, passphrases, or secrets.** The config schema has no field for
-  one.
-- **Never marks a task COMPLETE**, and never changes authorization, status, or priority — it has no
-  write path to the queue.
-- **Never starts a second concurrent session** — exclusive-create lock; a race loser does nothing.
-- **Never bypasses `CLAUDE.md`, `AGENTS.md`, task stop conditions, or operator boundaries.** It
-  starts a session; that session obeys the rules itself.
-- **Never clears a stale lock automatically** — a crashed session may have left partial work.
-- **Never replaces periodic reconciliation with a webhook.** A webhook may only reduce latency.
-- Installing or enabling itself without an explicit operator decision.
-
-### Verification requirements
-
-`powershell -NoProfile -ExecutionPolicy Bypass -File tests\supervisor.tests.ps1` exits 0.
-**Verified 2026-08-19: 17 passed, 0 failed**, covering READY detection, no-READY behaviour,
-duplicate-run prevention, stale-run handling, GitHub-unavailable behaviour, inconsistent-queue
-behaviour, and inert defaults.
-
-Additionally verified against the **real** queue, read-only: 9 tasks parsed with correct statuses,
-priorities, and dependencies; consistency `True`; READY task `none` — which is the correct answer for
-the current queue.
-
-### Documentation requirements
-
-`supervisor/README.md`; MSG-0011; ROADMAP section K; status file; `CLAUDE.md` supervisor section.
-All committed and pushed. Met.
-
-### Checkpoint requirements
-
-None during execution — this task wrote files on the development machine and started nothing. Once
-the supervisor is *enabled*, the runner sessions it starts carry the normal checkpoint obligations.
-
-### Stop conditions
-
-Reached and honoured: installation and enablement are **not** performed. Stop also if enabling would
-require storing a credential, if the runner command cannot be configured without one, or if tests
-fail.
-
-### Recovery procedure
-
-Nothing is in flight. On resumption, confirm no scheduled task named `PCI-Execution-Supervisor`
-exists (`Get-ScheduledTask`) and that `state/runner.lock` is absent. If either exists, the supervisor
-was installed or run outside this record — **stop and reconcile** before doing anything else.
-
-### Not done, deliberately
-
-The scheduled task is **not registered**, the supervisor is **not started**, `enabled` is `false`,
-`dryRun` is `true`, and `runnerCommand` is empty. Three independent settings must change before
-anything runs unattended. That is the operator's decision, recorded in MSG-0011.
+Premise disproven by measurement; retained for record.
