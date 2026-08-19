@@ -1,6 +1,6 @@
 # MSG-0008 — Authorized One-Time Privileged Bootstrap: Exact Operator Command
 
-**Status:** OPEN — awaiting operator execution
+**Status:** OPEN — procedure amended 2026-08-19 for execution from an existing repository copy; awaiting operator execution
 **Raised:** 2026-08-19
 **Raised by:** Claude Code (implementation agent)
 **Work package:** WP-0001 — PCI Kernel Foundation
@@ -30,6 +30,110 @@ the workspace, Claude Code clones into it unprivileged, and the second privilege
 script from the authorized `/data` path** exactly as the contract requires.
 
 No PCI artifact touches `/home/claude`, `/tmp`, or anywhere else outside `/data` at any point.
+
+## AUTHORIZED PROCEDURE — execute from an existing repository copy
+
+**Amended 2026-08-19.** The architecture lead acknowledged this message and authorized execution
+**from an existing repository copy**, provided the `/data` boundary is not violated. That is the
+procedure recorded below and it supersedes the three-step sequence originally proposed here (kept
+further down for history).
+
+All three commands run **on the PCI server**, as the `claude` account, in one interactive SSH
+session where `sudo` can prompt for the operator's password.
+
+### Prerequisite — an existing repository copy on the server
+
+There is none today, and this is the only genuinely awkward part: the workspace that must hold the
+copy cannot be created without root, and nothing may be staged outside `/data` to get around that.
+So the first privileged command creates the workspace, and the copy goes straight into it.
+
+### Step 1 — create the mandatory workspace (privileged)
+
+```bash
+sudo install -d -m 0755 -o claude -g claude /data/pci-platform
+```
+
+Creates `/data/pci-platform` owned by `claude`. Nothing else is touched. This is the only command
+that must precede the repository copy.
+
+### Step 2 — place the repository copy inside `/data` (unprivileged)
+
+Either let Claude Code do it — say the word and it clones over SSH agent forwarding, no credential
+reaching the host — or do it yourself in the same session:
+
+```bash
+git clone git@github.com:ghuffy11-lgtm/pci-platform.git /data/pci-platform
+```
+
+Requires GitHub access from the host. If you connect with `ssh -A`, your forwarded agent supplies
+it and nothing is stored on the server.
+
+If the host has no GitHub access at all, copy the tree from the workstation checkout instead —
+straight into `/data`, never via an intermediate location:
+
+```bash
+# run from the workstation copy, e.g. D:\Work\pci-platform
+scp -r ./deploy ./services ./docs ./implementation claude@<pci-server>:/data/pci-platform/
+```
+
+### Step 3 — the authorized bootstrap (privileged, one time)
+
+```bash
+sudo bash /data/pci-platform/deploy/bootstrap/pci-server-bootstrap.sh
+```
+
+**This is the authorized command and the authorized path.** Everything it writes stays inside
+`/data`, except `/etc/docker/daemon.json` and apt package state — the system configuration that
+contract v0.2 explicitly permits a privileged bootstrap to install.
+
+### If step 1 and step 3 must be collapsed
+
+The script provisions `/data/pci-platform` itself (its step 2), so a single privileged run from a
+copy that is already on the server outside `/data` would also work. **That variant is not used
+here**, because it would require a PCI artifact to exist outside `/data` first — exactly what the
+boundary forbids. The three steps above avoid it: nothing of this project is ever written outside
+`/data`.
+
+### Where the script records its own location
+
+The script now resolves its own path and prints it in the evidence block as `executed from`. If it
+is ever run from outside `/data` it says so explicitly in its output rather than passing silently:
+
+```text
+[bootstrap] NOTE: executing from <path>, which is outside /data.
+[bootstrap]       Permitted for the first bootstrap only, by explicit authorization (MSG-0008).
+```
+
+This is an audit-trail record, not a behavioural dependency — the script's actions are identical
+either way, and every path it writes to is absolute.
+
+### Verification, before and after
+
+Before step 3, confirm the workspace landed correctly:
+
+```bash
+ls -ld /data/pci-platform
+ls /data/pci-platform/deploy/bootstrap/
+```
+
+After step 3, the script's own final check must pass — it reads `DockerRootDir` back from the
+running daemon and **fails loudly** if it is not under `/data/docker`. Independently:
+
+```bash
+docker info --format '{{.DockerRootDir}}'      # expect /data/docker
+systemctl is-active docker                     # expect active
+ls -A /home/claude                             # expect no PCI artifact
+```
+
+Claude Code will run these itself over SSH rather than accept the outcome on trust.
+
+---
+
+## Original three-step sequence (historical)
+
+Retained for the record; superseded by the authorized procedure above, which differs only in that
+the repository copy is placed by the operator or by Claude Code into the already-created
+workspace, rather than being assumed to exist.
 
 ## Step 1 — operator, on the PCI server (privileged)
 

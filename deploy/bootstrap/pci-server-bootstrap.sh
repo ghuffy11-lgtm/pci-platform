@@ -28,6 +28,12 @@ DATA_ROOT=/data/docker
 STAGED_DAEMON_JSON="${DATA_ROOT}/daemon.json"
 PCI_USER=claude
 
+# Recorded for the audit trail only — the script's behaviour does not depend on where it
+# lives. Contract v0.2 requires execution from /data/pci-platform; the first bootstrap may
+# run from an operator copy outside /data by explicit authorization (MSG-0008), and that
+# fact belongs in the evidence rather than being silently absorbed.
+SCRIPT_PATH="$(readlink -f -- "$0" 2>/dev/null || printf '%s' "$0")"
+
 log()  { printf '[bootstrap] %s\n' "$*"; }
 fail() { printf '[bootstrap] FAILED: %s\n' "$*" >&2; exit 1; }
 
@@ -46,6 +52,17 @@ mountpoint -q /data || fail "/data is not a mount point; refusing to write platf
 log "/data: $(findmnt -no SOURCE,SIZE /data)"
 
 [[ -d "${DATA_ROOT}" ]] || fail "${DATA_ROOT} does not exist; the storage boundary must be prepared first"
+
+case "${SCRIPT_PATH}" in
+    /data/*)
+        log "executing from ${SCRIPT_PATH} (inside the /data boundary)"
+        ;;
+    *)
+        log "NOTE: executing from ${SCRIPT_PATH}, which is outside /data."
+        log "      Permitted for the first bootstrap only, by explicit authorization (MSG-0008)."
+        log "      Subsequent runs belong at ${WORKSPACE}/deploy/bootstrap/."
+        ;;
+esac
 
 # ---------------------------------------------------------------------------
 # 2. /data layout — established BEFORE any service is installed or started
@@ -154,6 +171,7 @@ cat <<REPORT
  kernel        : $(uname -r)
  docker        : $(docker --version)
  compose       : $(docker compose version 2>/dev/null | head -1)
+ executed from : ${SCRIPT_PATH}
  workspace     : ${WORKSPACE} (owner $(stat -c %U "${WORKSPACE}"))
  docker root   : ${ACTUAL_ROOT}
  /data mount   : $(findmnt -no SOURCE,SIZE,USE% /data)

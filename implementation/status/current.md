@@ -78,7 +78,7 @@ All architecture communications are now closed. None are blocking.
 | MSG-0005 | Architecture lead decisions | DECIDED — acted on 2026-08-19 |
 | MSG-0006 | Absolute host file boundary (override) | DECIDED — correction applied, awaiting review |
 | MSG-0007 | Permanent operating rule hardening | DECIDED — applied to CLAUDE.md and AGENTS.md |
-| MSG-0008 | Authorized bootstrap: exact operator command and path | **OPEN** — awaiting operator execution |
+| MSG-0008 | Authorized bootstrap: exact operator procedure and path | **OPEN** — amended for execution from an existing repository copy; awaiting operator execution |
 
 ## Repository / GitHub State
 
