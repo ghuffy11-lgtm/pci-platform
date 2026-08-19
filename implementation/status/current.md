@@ -32,16 +32,17 @@ authoring host, and the authorized Ubuntu implementation host has not yet been b
   MSG-0006).
 - Container runtime: Docker.
 - Host address: intentionally not stored in Git.
-- Authoring host (this machine): Windows, no Docker and no PostgreSQL. It is a source
-  workspace only, per the contract's Repository Boundary, and is not an execution host.
+- Authoring host (this machine): Windows, no Docker and no PostgreSQL. It is a workstation
+  checkout only, and is not an execution host. The `/data` boundary governs the PCI server; it
+  does not apply to this workstation.
 
 ## Active Work Package
 
 `docs/program/work-packages/WP-0001-kernel-foundation.md`
 
-> Corrected: this file previously pointed at `implementation/work-packages/`, which does not
-> exist. `CLAUDE.md` still points there and needs the same correction — see MSG-0003 Issue 2.
-> `CLAUDE.md` was not edited, as it is owned by the architecture lead.
+> Settled. This file and `CLAUDE.md` both previously pointed at `implementation/work-packages/`,
+> which does not exist. MSG-0005 designated `docs/program/work-packages/` canonical, and
+> `CLAUDE.md` startup step 4 was corrected accordingly in `fb49369`. Nothing outstanding.
 
 ## Verification Summary
 
@@ -88,14 +89,18 @@ One message is OPEN and requires operator action: **MSG-0008**.
 **The communication channel is operational.** Verified 2026-08-19:
 
 ```text
-HEAD          383de3a5e60adf71a0f991f33f788a797899fd78
-origin/main   383de3a5e60adf71a0f991f33f788a797899fd78
-ahead 0, behind 0
+HEAD          8efc454
+origin/main   8efc454
+ahead 0, behind 0, working tree clean
 ```
 
 Local and remote are identical. All WP-0001 implementation and communication artifacts are on
-`origin/main`, rebased onto the accepted bootstrap contract `d738a60`. The architecture lead can
-read every artifact directly; the operator is no longer required as a messenger.
+`origin/main`. The architecture lead can read every artifact directly; the operator is no longer
+required as a messenger.
+
+> This block records a point-in-time check and goes stale the moment anything is committed. Treat
+> the SHA as evidence that a reconciliation was performed on 2026-08-19, not as the current HEAD.
+> Verify with `git rev-parse HEAD origin/main` rather than trusting it.
 
 ## Open Blockers
 
