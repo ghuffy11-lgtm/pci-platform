@@ -60,8 +60,8 @@ one thing — explicit authorization to destroy the PostgreSQL volume (MSG-0015)
 | TASK-0004 | Fix database role provisioning (DISC-0007) | **COMPLETE** — G1 passed | TASK-0001 | Claude Code |
 | TASK-0005 | Fix compose kernel service configuration (DISC-0008) | **COMPLETE** — G2 passed | TASK-0001 | Claude Code |
 | TASK-0006 | Clean-room reproducibility verification | **WAITING_FOR_ARCHITECTURE_LEAD** — deps met | TASK-0004 ✅, TASK-0005 ✅ | Architecture lead (destructive authorization) |
-| TASK-0007 | Full re-verification after fixes | **BLOCKED** | TASK-0006 | Claude Code |
-| TASK-0008 | Final report and status reconciliation | **BLOCKED** | TASK-0007 | Claude Code |
+| TASK-0007 | Full re-verification after fixes | **COMPLETE** — G4 passed | TASK-0006 | Claude Code |
+| TASK-0008 | Final report and status reconciliation | **COMPLETE** — G5 passed | TASK-0007 | Claude Code |
 | TASK-0009 | WP-0001 completion decision | **WAITING_FOR_ARCHITECTURE_LEAD** | TASK-0008 | Architecture lead |
 | TASK-0003 | Normalise `*.md` line endings (DISC-0006) | **WAITING_FOR_ARCHITECTURE_LEAD** | — | Architecture lead |
 | TASK-0010 | Execution Supervisor (dev machine, not installed) | **COMPLETE** | — | Claude Code |
@@ -83,14 +83,14 @@ task is not executable.
 
 ## Verification Summary
 
-**Verified on the authorized host, 2026-08-19.**
+**Verified on the authorized host, 2026-08-19 — re-run against the clean-room stack (TASK-0007).**
 
 | Tier | Result |
 |---|---|
 | Typecheck | PASS |
 | Unit | **102 pass / 0 fail** |
 | Contract | **101 pass / 0 fail** |
-| Integration (real PostgreSQL) | **26 pass / 0 fail / 0 skipped** |
+| Integration (clean-room PostgreSQL) | **26 pass / 0 fail / 0 skipped** |
 | **Total** | **229 pass / 0 fail** |
 
 Every tier reported a non-zero test count.
@@ -116,16 +116,20 @@ Every tier reported a non-zero test count.
 > the PostgreSQL volume was destroyed under MSG-0016 and rebuilt from repository configuration alone,
 > with no manual SQL. See report section 13.
 >
-> **Not yet re-verified:** the three test tiers have not been re-run against the clean-room stack.
-> That is TASK-0007, which is not authorized. The AC verdicts above stand on their TASK-0001 evidence.
+> **Re-verified 2026-08-19 (TASK-0007, gate G4):** all three tiers re-run against the clean-room
+> stack — 229 pass / 0 fail — and the ADR-0016 obligations re-proven live. The AC verdicts above now
+> rest on evidence from a database the repository built itself, not one repaired by hand.
+>
+> Remaining: **TASK-0009**, the architecture lead's completion decision. Claude Code does not
+> self-certify completion.
 
 ## Open Communications
 
 Index: `implementation/comms/README.md` carries the full message register with links and status.
 
-**Two messages are OPEN.** MSG-0015 — TASK-0004 and TASK-0005 are complete; TASK-0006 needs explicit
-authorization to destroy the PostgreSQL volume. MSG-0011 — the Execution Supervisor, built and
-tested but **not installed** and **not enabled**.
+**Two messages are OPEN.** MSG-0019 — TASK-0007 and TASK-0008 are complete and WP-0001 is ready for
+the completion decision (TASK-0009). MSG-0011 — the Execution Supervisor, built and tested but **not
+installed** and **not enabled**.
 
 | ID | Subject | Status |
 |---|---|---|
@@ -144,7 +148,9 @@ tested but **not installed** and **not enabled**.
 | MSG-0014 | Queue authorization reconciliation | DECIDED — reconciled in `de35bf4` |
 | MSG-0015 | TASK-0004 / TASK-0005 complete; TASK-0006 authorization required | **CLOSED** — authorized by MSG-0016, executed |
 | MSG-0016 | Authorize TASK-0006 | DECIDED — executed, G3 passed |
-| MSG-0017 | TASK-0006 complete; WP-0001 reproducible | **OPEN** — awaiting TASK-0007 authorization |
+| MSG-0017 | TASK-0006 complete; WP-0001 reproducible | **CLOSED** — TASK-0007 authorized and complete |
+| MSG-0018 | Authorize TASK-0007 | DECIDED — executed, G4 passed |
+| MSG-0019 | TASK-0007 / TASK-0008 complete; ready for completion decision | **OPEN** — awaiting TASK-0009 |
 | MSG-0011 | Execution Supervisor — built, tested, not installed | **OPEN** — awaiting install/enable decision |
 
 ## Repository / GitHub State
@@ -257,6 +263,7 @@ precedence has changed.
 | DISC-0004 | Compose stack predates the `/data/docker` boundary |
 | DISC-0005 | `npm test` reports success while running zero tests under POSIX shells |
 | DISC-0006 | CRLF line endings silently defeat anchored text edits |
+| DISC-0009 | Docker CLI writes client state to `/home/claude`, outside `/data` | **OPEN** |
 | DISC-0007 | Init refuses to create a passwordless role, then creates one anyway | **RESOLVED** |
 | DISC-0008 | Compose kernel service cannot start as committed | **RESOLVED** |
 

@@ -1,6 +1,6 @@
 # MSG-0017 — TASK-0006 Complete: WP-0001 Is Now Reproducible
 
-**Status:** OPEN — awaiting authorization for TASK-0007
+**Status:** **CLOSED** — TASK-0007 authorized by MSG-0018 and completed 2026-08-19 (gate G4). See MSG-0019.
 **Raised:** 2026-08-19
 **Raised by:** Claude Code (implementation agent)
 **Type:** Record — task completion

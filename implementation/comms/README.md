@@ -10,7 +10,9 @@ a defect in the record, not a missing message.
 
 | ID | Subject | Status | File |
 |---|---|---|---|
-| **MSG-0017** | **TASK-0006 complete — WP-0001 is reproducible; TASK-0007 authorization required** | **OPEN** | [MSG-0017-task-0006-complete.md](MSG-0017-task-0006-complete.md) |
+| **MSG-0019** | **TASK-0007 / TASK-0008 complete — WP-0001 ready for the completion decision** | **OPEN** | [MSG-0019-task-0007-0008-complete.md](MSG-0019-task-0007-0008-complete.md) |
+| MSG-0018 | Authorize TASK-0007 | DECIDED — executed, G4 passed | [MSG-0018-authorize-task-0007.md](MSG-0018-authorize-task-0007.md) |
+| MSG-0017 | **TASK-0006 complete — WP-0001 is reproducible; TASK-0007 authorization required** | **OPEN** | [MSG-0017-task-0006-complete.md](MSG-0017-task-0006-complete.md) |
 | MSG-0016 | Authorize TASK-0006 (destructive volume re-init) | DECIDED — executed, G3 passed | [MSG-0016-authorize-task-0006.md](MSG-0016-authorize-task-0006.md) |
 | MSG-0015 | **TASK-0004 / TASK-0005 complete; TASK-0006 authorization required** | **OPEN** — awaiting destructive-volume authorization | [MSG-0015-task-0004-0005-complete.md](MSG-0015-task-0004-0005-complete.md) |
 | MSG-0014 | Queue authorization reconciliation | DECIDED — reconciled in `de35bf4` | [MSG-0014-queue-ready-authorized.md](MSG-0014-queue-ready-authorized.md) |

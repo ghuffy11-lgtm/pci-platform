@@ -478,3 +478,71 @@ MSG-0016 authorized TASK-0006 alone. The full test-tier re-verification (TASK-00
 run, and no acceptance criterion is re-asserted here on the strength of this rebuild. The AC
 verdicts in section 11 stand on their original evidence; section 13 adds reproducibility, which was
 the missing completion criterion, not new AC evidence.
+
+---
+
+# 14. Full re-verification against the clean-room stack — 2026-08-19 (TASK-0007)
+
+Authorized by MSG-0018, non-destructive. The stack verified here is the one TASK-0006 built from a
+destroyed volume, confirmed unchanged by its creation timestamp (`2026-08-19T18:25:02Z`).
+
+## 14.1 Test tiers — all three, all non-zero
+
+| Tier | Result |
+|---|---|
+| Unit | **102 pass / 0 fail** |
+| Contract | **101 pass / 0 fail** |
+| Integration (clean-room PostgreSQL) | **26 pass / 0 fail / 0 skipped / 0 cancelled** |
+| **Total** | **229 pass / 0 fail** |
+
+## 14.2 ADR-0016 — re-proven against the clean-room database
+
+```text
+runtime role   super=false  bypassrls=false
+FORCE RLS      6 of 6 RLS-enabled tables
+policies       6
+```
+
+Named tests, all passing:
+
+- `ADR-0016 layer 3 — row-level security blocks a cross-tenant read`
+- `an unset tenant GUC returns no rows rather than all rows` (fail-closed)
+- `a cross-tenant relationship is rejected by the composite foreign key`
+- `audit records cannot be updated or deleted by the runtime role` (append-only)
+- `audit records are not visible across tenants`
+- `an object from another tenant is invisible`
+- `updating an object in another tenant returns null`
+- `listing never returns another tenant's objects`
+
+## 14.3 Acceptance criteria — evidence now describes a reproducible system
+
+All ten remain **MET**. The difference from section 11 is not the verdicts but their basis: that
+evidence came from a database repaired by hand, this evidence comes from one the repository built
+itself.
+
+| AC | Evidence in this run |
+|---|---|
+| AC-01 | `pci-kernel-kernel:latest`, `pci-kernel-migrate:latest`; stack built and started from repository configuration |
+| AC-02 | Migrations applied by the clean-room rebuild; idempotency re-confirmed by the integration tier |
+| AC-03/04 | Contract + integration tiers |
+| AC-05 | Section 14.2 — RLS and FORCE RLS proven live |
+| AC-06 | `audit records cannot be updated or deleted by the runtime role` |
+| AC-07 | Contract tier |
+| AC-08 | `/health/ready` 200, `/health/live` 200 |
+| AC-09 | Section 14.1 — three tiers, every count non-zero |
+| AC-10 | This section |
+
+## 14.4 One boundary finding
+
+The routine `/data` boundary check reported 18 paths under `/home/claude`. Three are OS-provided
+shell dotfiles. The rest are `/home/claude/.docker/buildx/*` — **Docker CLI client state created by
+the earlier image builds**: builder references, a lock file, a node id. No source, no build output,
+no configuration, no data, no credential.
+
+It is nonetheless outside `/data`, and contract v0.2 forbids that with only a named `~/.ssh`
+exception. Recorded as **DISC-0009** with two options for the architecture lead: extend the
+exception to account-level tool state, or keep the boundary literal and set
+`DOCKER_CONFIG=/data/pci-platform/.docker`.
+
+Not deleted. Tidying the operator's account to make a check pass would be the wrong instinct, and
+the boundary's scope is the lead's to define rather than mine to narrow by inference.
