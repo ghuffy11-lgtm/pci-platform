@@ -1,0 +1,732 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "PCI Platform Kernel API",
+    "version": "0.1.0",
+    "summary": "Knowledge Objects, typed relationships, provenance, history, and audit evidence.",
+    "description": "Work package WP-0001. Source specifications: SPEC-0005 (Knowledge Object API), SPEC-0006 (Audit and Evidence), SPEC-0007 (Event Model), SPEC-0010 (Tenant and Data Isolation), SPEC-0011 (Policy and Authorization), SPEC-0004 (Identity Service).\n\nWritten as JSON rather than YAML so it can be parsed with no third-party dependency and checked against the implemented router by test/contract/openapi.test.ts — the specification and the code cannot drift apart silently.\n\nErrors use RFC 9457 problem documents. Cross-tenant access returns 404, never 403, so the error channel cannot be used to confirm that an identifier exists (see implementation/decisions/ADR-0016).",
+    "license": {
+      "name": "See docs/product/licensing-and-open-source-policy.md",
+      "identifier": "LicenseRef-PCI-Pending"
+    }
+  },
+  "servers": [{ "url": "/", "description": "Kernel service root" }],
+  "security": [{ "bearerAuth": [] }],
+  "tags": [
+    { "name": "objects", "description": "Knowledge Objects" },
+    { "name": "relationships", "description": "Typed relationships" },
+    { "name": "audit", "description": "Audit evidence" },
+    { "name": "operations", "description": "Health and readiness" }
+  ],
+  "paths": {
+    "/health/live": {
+      "get": {
+        "tags": ["operations"],
+        "summary": "Liveness probe",
+        "description": "Does not touch the database: a database outage must not cause an orchestrator to kill an otherwise healthy process.",
+        "security": [],
+        "responses": {
+          "200": {
+            "description": "Process is alive",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Liveness" } } }
+          }
+        }
+      }
+    },
+    "/health/ready": {
+      "get": {
+        "tags": ["operations"],
+        "summary": "Readiness probe",
+        "description": "Reports dependency status and the shape of the configuration. Never discloses the database URL, credentials, or principal identifiers (WP-0001 AC-08).",
+        "security": [],
+        "responses": {
+          "200": {
+            "description": "Ready to serve traffic",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Readiness" } } }
+          },
+          "503": {
+            "description": "A dependency is unavailable",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Readiness" } } }
+          }
+        }
+      }
+    },
+    "/api/v1/objects": {
+      "post": {
+        "tags": ["objects"],
+        "summary": "Create a Knowledge Object",
+        "description": "Creates an object with a stable identifier, controlled type, ownership, classification, lifecycle state, and provenance. When no provenance is supplied, an actor-attributed record is synthesised so every object can answer where it came from.",
+        "requestBody": {
+          "required": true,
+          "content": { "application/json": { "schema": { "$ref": "#/components/schemas/CreateObjectRequest" } } }
+        },
+        "responses": {
+          "201": {
+            "description": "Created",
+            "headers": {
+              "Location": { "schema": { "type": "string" }, "description": "URI of the created object" },
+              "ETag": { "schema": { "type": "string" }, "description": "Object version, for use as If-Match" }
+            },
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ObjectWithProvenance" } } }
+          },
+          "400": { "$ref": "#/components/responses/ValidationFailed" },
+          "401": { "$ref": "#/components/responses/Unauthenticated" },
+          "403": { "$ref": "#/components/responses/Forbidden" },
+          "413": { "$ref": "#/components/responses/PayloadTooLarge" },
+          "415": { "$ref": "#/components/responses/UnsupportedMediaType" }
+        }
+      },
+      "get": {
+        "tags": ["objects"],
+        "summary": "List Knowledge Objects",
+        "description": "Retired objects are excluded unless includeRetired=true.",
+        "parameters": [
+          { "$ref": "#/components/parameters/Type" },
+          { "$ref": "#/components/parameters/Status" },
+          { "$ref": "#/components/parameters/Classification" },
+          { "name": "owner", "in": "query", "schema": { "type": "string" } },
+          { "name": "organization", "in": "query", "schema": { "type": "string" } },
+          { "name": "includeRetired", "in": "query", "schema": { "type": "boolean", "default": false } },
+          { "$ref": "#/components/parameters/AsOf" },
+          { "$ref": "#/components/parameters/Limit" },
+          { "$ref": "#/components/parameters/Offset" }
+        ],
+        "responses": {
+          "200": {
+            "description": "A page of objects",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ObjectPage" } } }
+          },
+          "400": { "$ref": "#/components/responses/ValidationFailed" },
+          "401": { "$ref": "#/components/responses/Unauthenticated" },
+          "403": { "$ref": "#/components/responses/Forbidden" }
+        }
+      }
+    },
+    "/api/v1/objects/{id}": {
+      "parameters": [{ "$ref": "#/components/parameters/ObjectId" }],
+      "get": {
+        "tags": ["objects"],
+        "summary": "Retrieve a Knowledge Object",
+        "responses": {
+          "200": {
+            "description": "The object",
+            "headers": { "ETag": { "schema": { "type": "string" } } },
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/KnowledgeObject" } } }
+          },
+          "401": { "$ref": "#/components/responses/Unauthenticated" },
+          "403": { "$ref": "#/components/responses/Forbidden" },
+          "404": { "$ref": "#/components/responses/NotFound" }
+        }
+      },
+      "patch": {
+        "tags": ["objects"],
+        "summary": "Update a Knowledge Object",
+        "description": "Requires If-Match carrying the current version. id, tenantId, type, version, createdAt, and createdBy are immutable and are rejected rather than ignored.",
+        "parameters": [{ "$ref": "#/components/parameters/IfMatch" }],
+        "requestBody": {
+          "required": true,
+          "content": { "application/json": { "schema": { "$ref": "#/components/schemas/UpdateObjectRequest" } } }
+        },
+        "responses": {
+          "200": {
+            "description": "Updated",
+            "headers": { "ETag": { "schema": { "type": "string" } } },
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/KnowledgeObject" } } }
+          },
+          "400": { "$ref": "#/components/responses/ValidationFailed" },
+          "401": { "$ref": "#/components/responses/Unauthenticated" },
+          "403": { "$ref": "#/components/responses/Forbidden" },
+          "404": { "$ref": "#/components/responses/NotFound" },
+          "409": { "$ref": "#/components/responses/VersionConflict" }
+        }
+      }
+    },
+    "/api/v1/objects/{id}/retire": {
+      "parameters": [{ "$ref": "#/components/parameters/ObjectId" }],
+      "post": {
+        "tags": ["objects"],
+        "summary": "Retire a Knowledge Object",
+        "description": "A lifecycle transition, not a delete. Identifiers remain stable and are never reused. Requires the knowledge_steward role (separation of duties).",
+        "parameters": [{ "$ref": "#/components/parameters/IfMatch" }],
+        "responses": {
+          "200": {
+            "description": "Retired",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/KnowledgeObject" } } }
+          },
+          "400": { "$ref": "#/components/responses/ValidationFailed" },
+          "401": { "$ref": "#/components/responses/Unauthenticated" },
+          "403": { "$ref": "#/components/responses/Forbidden" },
+          "404": { "$ref": "#/components/responses/NotFound" },
+          "409": { "$ref": "#/components/responses/VersionConflict" }
+        }
+      }
+    },
+    "/api/v1/objects/{id}/history": {
+      "parameters": [{ "$ref": "#/components/parameters/ObjectId" }],
+      "get": {
+        "tags": ["objects"],
+        "summary": "Retrieve object history",
+        "description": "Immutable version snapshots, newest first.",
+        "parameters": [
+          { "$ref": "#/components/parameters/Limit" },
+          { "$ref": "#/components/parameters/Offset" }
+        ],
+        "responses": {
+          "200": {
+            "description": "A page of versions",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/VersionPage" } } }
+          },
+          "401": { "$ref": "#/components/responses/Unauthenticated" },
+          "403": { "$ref": "#/components/responses/Forbidden" },
+          "404": { "$ref": "#/components/responses/NotFound" }
+        }
+      }
+    },
+    "/api/v1/objects/{id}/provenance": {
+      "parameters": [{ "$ref": "#/components/parameters/ObjectId" }],
+      "get": {
+        "tags": ["objects"],
+        "summary": "Retrieve provenance",
+        "description": "Append-only provenance records describing where the object's facts came from.",
+        "responses": {
+          "200": {
+            "description": "Provenance records",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ProvenanceList" } } }
+          },
+          "401": { "$ref": "#/components/responses/Unauthenticated" },
+          "403": { "$ref": "#/components/responses/Forbidden" },
+          "404": { "$ref": "#/components/responses/NotFound" }
+        }
+      }
+    },
+    "/api/v1/objects/{id}/neighbourhood": {
+      "parameters": [{ "$ref": "#/components/parameters/ObjectId" }],
+      "get": {
+        "tags": ["objects", "relationships"],
+        "summary": "Retrieve the object neighbourhood",
+        "description": "Inbound and outbound relationships. Returns identifiers, never duplicated object records.",
+        "parameters": [{ "$ref": "#/components/parameters/Limit" }],
+        "responses": {
+          "200": {
+            "description": "The neighbourhood",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Neighbourhood" } } }
+          },
+          "401": { "$ref": "#/components/responses/Unauthenticated" },
+          "403": { "$ref": "#/components/responses/Forbidden" },
+          "404": { "$ref": "#/components/responses/NotFound" }
+        }
+      }
+    },
+    "/api/v1/relationships": {
+      "post": {
+        "tags": ["relationships"],
+        "summary": "Create a typed relationship",
+        "description": "Both endpoints must exist within the caller's tenant. Duplicate edges of the same type between the same ordered pair are rejected.",
+        "requestBody": {
+          "required": true,
+          "content": { "application/json": { "schema": { "$ref": "#/components/schemas/CreateRelationshipRequest" } } }
+        },
+        "responses": {
+          "201": {
+            "description": "Created",
+            "headers": { "Location": { "schema": { "type": "string" } } },
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Relationship" } } }
+          },
+          "400": { "$ref": "#/components/responses/ValidationFailed" },
+          "401": { "$ref": "#/components/responses/Unauthenticated" },
+          "403": { "$ref": "#/components/responses/Forbidden" },
+          "409": { "$ref": "#/components/responses/Conflict" }
+        }
+      },
+      "get": {
+        "tags": ["relationships"],
+        "summary": "Query relationships",
+        "parameters": [
+          { "name": "fromId", "in": "query", "schema": { "type": "string", "format": "uuid" } },
+          { "name": "toId", "in": "query", "schema": { "type": "string", "format": "uuid" } },
+          { "name": "eitherId", "in": "query", "schema": { "type": "string", "format": "uuid" } },
+          { "name": "type", "in": "query", "schema": { "$ref": "#/components/schemas/RelationshipType" } },
+          { "$ref": "#/components/parameters/AsOf" },
+          { "$ref": "#/components/parameters/Limit" },
+          { "$ref": "#/components/parameters/Offset" }
+        ],
+        "responses": {
+          "200": {
+            "description": "A page of relationships",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/RelationshipPage" } } }
+          },
+          "400": { "$ref": "#/components/responses/ValidationFailed" },
+          "401": { "$ref": "#/components/responses/Unauthenticated" },
+          "403": { "$ref": "#/components/responses/Forbidden" }
+        }
+      }
+    },
+    "/api/v1/relationships/{id}": {
+      "parameters": [{ "$ref": "#/components/parameters/RelationshipId" }],
+      "delete": {
+        "tags": ["relationships"],
+        "summary": "Remove a relationship",
+        "description": "High-risk action requiring the knowledge_steward role. The removal is audited.",
+        "responses": {
+          "204": { "description": "Removed" },
+          "401": { "$ref": "#/components/responses/Unauthenticated" },
+          "403": { "$ref": "#/components/responses/Forbidden" },
+          "404": { "$ref": "#/components/responses/NotFound" }
+        }
+      }
+    },
+    "/api/v1/audit": {
+      "get": {
+        "tags": ["audit"],
+        "summary": "Query audit evidence",
+        "description": "Requires the security_officer role. Records never contain secrets.",
+        "parameters": [
+          { "name": "action", "in": "query", "schema": { "type": "string" } },
+          { "name": "targetId", "in": "query", "schema": { "type": "string" } },
+          { "$ref": "#/components/parameters/Limit" },
+          { "$ref": "#/components/parameters/Offset" }
+        ],
+        "responses": {
+          "200": {
+            "description": "A page of audit records",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/AuditPage" } } }
+          },
+          "400": { "$ref": "#/components/responses/ValidationFailed" },
+          "401": { "$ref": "#/components/responses/Unauthenticated" },
+          "403": { "$ref": "#/components/responses/Forbidden" }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "description": "Bearer credential verified by the configured identity provider. PCI never issues or stores passwords (ADR-0007)."
+      }
+    },
+    "parameters": {
+      "ObjectId": {
+        "name": "id",
+        "in": "path",
+        "required": true,
+        "schema": { "type": "string", "format": "uuid" }
+      },
+      "RelationshipId": {
+        "name": "id",
+        "in": "path",
+        "required": true,
+        "schema": { "type": "string", "format": "uuid" }
+      },
+      "IfMatch": {
+        "name": "If-Match",
+        "in": "header",
+        "required": true,
+        "description": "The current object version, e.g. \"3\". Required on every mutation so a retry cannot silently clobber a concurrent change.",
+        "schema": { "type": "string" }
+      },
+      "Limit": {
+        "name": "limit",
+        "in": "query",
+        "schema": { "type": "integer", "minimum": 1, "maximum": 200, "default": 50 }
+      },
+      "Offset": {
+        "name": "offset",
+        "in": "query",
+        "schema": { "type": "integer", "minimum": 0, "default": 0 }
+      },
+      "AsOf": {
+        "name": "asOf",
+        "in": "query",
+        "description": "Point-in-time filter against the validity window.",
+        "schema": { "type": "string", "format": "date-time" }
+      },
+      "Type": {
+        "name": "type",
+        "in": "query",
+        "schema": { "$ref": "#/components/schemas/ObjectType" }
+      },
+      "Status": {
+        "name": "status",
+        "in": "query",
+        "schema": { "$ref": "#/components/schemas/LifecycleState" }
+      },
+      "Classification": {
+        "name": "classification",
+        "in": "query",
+        "schema": { "$ref": "#/components/schemas/Classification" }
+      }
+    },
+    "schemas": {
+      "ObjectType": {
+        "type": "string",
+        "description": "WP-0001 initial types only. The registry in docs/knowledge/object-type-registry.md is extensible; adding a type requires architecture review.",
+        "enum": ["Organization", "Person", "Service", "Asset", "Document", "Policy", "Agent"]
+      },
+      "LifecycleState": {
+        "type": "string",
+        "enum": ["proposed", "draft", "reviewed", "approved", "active", "deprecated", "retired"]
+      },
+      "Classification": {
+        "type": "string",
+        "enum": ["public", "internal", "confidential", "restricted"]
+      },
+      "RelationshipType": {
+        "type": "string",
+        "description": "docs/knowledge/relationship-taxonomy.md",
+        "enum": [
+          "OWNS", "MANAGES", "MEMBER_OF", "REPORTS_TO", "RESPONSIBLE_FOR",
+          "LOCATED_IN", "CONTAINS", "INSTALLED_AT", "CONNECTED_TO", "ADJACENT_TO",
+          "DEPENDS_ON", "HOSTS", "RUNS_ON", "EXPOSES", "CONNECTS_TO", "MONITORED_BY",
+          "SUPPORTS", "PROVIDED_BY", "AFFECTS", "USED_BY", "ASSIGNED_TO",
+          "GOVERNED_BY", "REQUIRES", "AUTHORIZED_BY", "APPROVED_BY", "EXEMPTED_BY",
+          "DOCUMENTED_BY", "DERIVED_FROM", "EVIDENCED_BY", "RELATED_TO", "SUPERSEDES",
+          "GENERATED", "RESOLVED_BY", "CHANGED_BY", "IMPACTS", "TRIGGERS"
+        ]
+      },
+      "SourceType": {
+        "type": "string",
+        "enum": [
+          "human_input", "service", "agent_proposal", "connector_observation",
+          "document_extraction", "imported_dataset", "derived"
+        ]
+      },
+      "Ownership": {
+        "type": "object",
+        "required": ["organization", "owner"],
+        "properties": {
+          "organization": { "type": "string", "maxLength": 256 },
+          "owner": { "type": "string", "maxLength": 256 }
+        }
+      },
+      "KnowledgeObject": {
+        "type": "object",
+        "required": [
+          "id", "type", "name", "status", "ownership", "classification",
+          "createdAt", "updatedAt", "version", "attributes", "createdBy", "updatedBy"
+        ],
+        "properties": {
+          "id": { "type": "string", "format": "uuid", "description": "Stable and never reused." },
+          "type": { "$ref": "#/components/schemas/ObjectType" },
+          "name": { "type": "string", "maxLength": 512 },
+          "status": { "$ref": "#/components/schemas/LifecycleState" },
+          "ownership": { "$ref": "#/components/schemas/Ownership" },
+          "classification": { "$ref": "#/components/schemas/Classification" },
+          "createdAt": { "type": "string", "format": "date-time" },
+          "updatedAt": { "type": "string", "format": "date-time" },
+          "validFrom": { "type": ["string", "null"], "format": "date-time" },
+          "validTo": { "type": ["string", "null"], "format": "date-time" },
+          "version": { "type": "integer", "minimum": 1 },
+          "attributes": {
+            "type": "object",
+            "description": "Domain extension bag. Must never contain credential material; requests carrying secret-shaped keys or values are rejected (ADR-0009).",
+            "additionalProperties": true
+          },
+          "createdBy": { "type": "string" },
+          "updatedBy": { "type": "string" }
+        }
+      },
+      "CreateObjectRequest": {
+        "type": "object",
+        "required": ["type", "name", "ownership", "classification"],
+        "properties": {
+          "type": { "$ref": "#/components/schemas/ObjectType" },
+          "name": { "type": "string", "minLength": 1, "maxLength": 512 },
+          "status": { "$ref": "#/components/schemas/LifecycleState" },
+          "ownership": { "$ref": "#/components/schemas/Ownership" },
+          "classification": { "$ref": "#/components/schemas/Classification" },
+          "validFrom": { "type": ["string", "null"], "format": "date-time" },
+          "validTo": { "type": ["string", "null"], "format": "date-time" },
+          "attributes": { "type": "object", "additionalProperties": true },
+          "provenance": {
+            "type": "array",
+            "items": { "$ref": "#/components/schemas/CreateProvenance" }
+          }
+        }
+      },
+      "UpdateObjectRequest": {
+        "type": "object",
+        "description": "All fields optional. Supplying an immutable field is an error, not a silent no-op.",
+        "properties": {
+          "name": { "type": "string", "minLength": 1, "maxLength": 512 },
+          "status": { "$ref": "#/components/schemas/LifecycleState" },
+          "ownership": { "$ref": "#/components/schemas/Ownership" },
+          "classification": { "$ref": "#/components/schemas/Classification" },
+          "validFrom": { "type": ["string", "null"], "format": "date-time" },
+          "validTo": { "type": ["string", "null"], "format": "date-time" },
+          "attributes": { "type": "object", "additionalProperties": true }
+        }
+      },
+      "CreateProvenance": {
+        "type": "object",
+        "required": ["sourceId", "sourceType"],
+        "properties": {
+          "sourceId": { "type": "string", "maxLength": 256 },
+          "sourceType": { "$ref": "#/components/schemas/SourceType" },
+          "sourceLocation": { "type": ["string", "null"] },
+          "observedAt": { "type": ["string", "null"], "format": "date-time" },
+          "transformation": { "type": ["string", "null"] },
+          "connector": { "type": ["string", "null"] },
+          "confidence": { "type": ["number", "null"], "minimum": 0, "maximum": 1 },
+          "validationState": {
+            "type": "string",
+            "enum": ["unvalidated", "validated", "rejected", "superseded"],
+            "description": "agent_proposal is always forced to unvalidated: a model cannot self-certify its output as authoritative."
+          },
+          "evidenceRef": { "type": ["string", "null"] }
+        }
+      },
+      "ProvenanceRecord": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string", "format": "uuid" },
+          "objectId": { "type": "string", "format": "uuid" },
+          "objectVersion": { "type": "integer" },
+          "sourceId": { "type": "string" },
+          "sourceType": { "$ref": "#/components/schemas/SourceType" },
+          "sourceLocation": { "type": ["string", "null"] },
+          "observedAt": { "type": ["string", "null"], "format": "date-time" },
+          "ingestedAt": { "type": "string", "format": "date-time" },
+          "transformation": { "type": ["string", "null"] },
+          "actorId": { "type": "string" },
+          "connector": { "type": ["string", "null"] },
+          "confidence": { "type": ["number", "null"] },
+          "validationState": { "type": "string" },
+          "evidenceRef": { "type": ["string", "null"] }
+        }
+      },
+      "ObjectWithProvenance": {
+        "allOf": [
+          { "$ref": "#/components/schemas/KnowledgeObject" },
+          {
+            "type": "object",
+            "properties": {
+              "provenance": {
+                "type": "array",
+                "items": { "$ref": "#/components/schemas/ProvenanceRecord" }
+              }
+            }
+          }
+        ]
+      },
+      "CreateRelationshipRequest": {
+        "type": "object",
+        "required": ["fromId", "toId", "type"],
+        "properties": {
+          "fromId": { "type": "string", "format": "uuid" },
+          "toId": { "type": "string", "format": "uuid" },
+          "type": { "$ref": "#/components/schemas/RelationshipType" },
+          "validFrom": { "type": ["string", "null"], "format": "date-time" },
+          "validTo": { "type": ["string", "null"], "format": "date-time" },
+          "confidence": { "type": ["number", "null"], "minimum": 0, "maximum": 1 },
+          "attributes": { "type": "object", "additionalProperties": true }
+        }
+      },
+      "Relationship": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string", "format": "uuid" },
+          "fromId": { "type": "string", "format": "uuid" },
+          "toId": { "type": "string", "format": "uuid" },
+          "type": { "$ref": "#/components/schemas/RelationshipType" },
+          "createdAt": { "type": "string", "format": "date-time" },
+          "createdBy": { "type": "string" },
+          "validFrom": { "type": ["string", "null"], "format": "date-time" },
+          "validTo": { "type": ["string", "null"], "format": "date-time" },
+          "confidence": { "type": ["number", "null"] },
+          "attributes": { "type": "object", "additionalProperties": true }
+        }
+      },
+      "Neighbourhood": {
+        "type": "object",
+        "properties": {
+          "objectId": { "type": "string", "format": "uuid" },
+          "outbound": { "type": "array", "items": { "$ref": "#/components/schemas/Relationship" } },
+          "inbound": { "type": "array", "items": { "$ref": "#/components/schemas/Relationship" } }
+        }
+      },
+      "AuditRecord": {
+        "type": "object",
+        "description": "SPEC-0006 Required Evidence. Never contains secrets.",
+        "properties": {
+          "id": { "type": "string", "format": "uuid" },
+          "occurredAt": { "type": "string", "format": "date-time" },
+          "actorId": { "type": "string" },
+          "actorType": { "type": "string", "enum": ["human", "service", "agent"] },
+          "delegatedBy": { "type": ["string", "null"] },
+          "action": { "type": "string" },
+          "targetType": { "type": "string" },
+          "targetId": { "type": ["string", "null"] },
+          "policyDecision": { "type": "string", "enum": ["allow", "deny", "approval_required"] },
+          "policyVersion": { "type": "string" },
+          "policyReason": { "type": "string" },
+          "correlationId": { "type": "string", "format": "uuid" },
+          "causationId": { "type": ["string", "null"] },
+          "outcome": { "type": "string", "enum": ["success", "denied", "approval_required", "error"] },
+          "errorCode": { "type": ["string", "null"] },
+          "changeSummary": { "type": "object", "additionalProperties": true },
+          "resultingVersion": { "type": ["integer", "null"] }
+        }
+      },
+      "PageMeta": {
+        "type": "object",
+        "required": ["total", "limit", "offset"],
+        "properties": {
+          "total": { "type": "integer" },
+          "limit": { "type": "integer" },
+          "offset": { "type": "integer" }
+        }
+      },
+      "ObjectPage": {
+        "allOf": [
+          { "$ref": "#/components/schemas/PageMeta" },
+          {
+            "type": "object",
+            "properties": {
+              "items": { "type": "array", "items": { "$ref": "#/components/schemas/KnowledgeObject" } }
+            }
+          }
+        ]
+      },
+      "RelationshipPage": {
+        "allOf": [
+          { "$ref": "#/components/schemas/PageMeta" },
+          {
+            "type": "object",
+            "properties": {
+              "items": { "type": "array", "items": { "$ref": "#/components/schemas/Relationship" } }
+            }
+          }
+        ]
+      },
+      "AuditPage": {
+        "allOf": [
+          { "$ref": "#/components/schemas/PageMeta" },
+          {
+            "type": "object",
+            "properties": {
+              "items": { "type": "array", "items": { "$ref": "#/components/schemas/AuditRecord" } }
+            }
+          }
+        ]
+      },
+      "VersionPage": {
+        "allOf": [
+          { "$ref": "#/components/schemas/PageMeta" },
+          {
+            "type": "object",
+            "properties": {
+              "items": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "version": { "type": "integer" },
+                    "recordedAt": { "type": "string", "format": "date-time" },
+                    "recordedBy": { "type": "string" },
+                    "changeKind": {
+                      "type": "string",
+                      "enum": ["created", "updated", "state_changed", "retired"]
+                    },
+                    "snapshot": { "$ref": "#/components/schemas/KnowledgeObject" }
+                  }
+                }
+              }
+            }
+          }
+        ]
+      },
+      "ProvenanceList": {
+        "type": "object",
+        "properties": {
+          "items": { "type": "array", "items": { "$ref": "#/components/schemas/ProvenanceRecord" } },
+          "total": { "type": "integer" }
+        }
+      },
+      "Liveness": {
+        "type": "object",
+        "properties": {
+          "status": { "type": "string" },
+          "service": { "type": "string" },
+          "version": { "type": "string" },
+          "uptimeSeconds": { "type": "integer" }
+        }
+      },
+      "Readiness": {
+        "type": "object",
+        "description": "Deliberately excludes the database URL, credentials, and principal identifiers (AC-08).",
+        "properties": {
+          "status": { "type": "string", "enum": ["ready", "not_ready"] },
+          "service": { "type": "string" },
+          "version": { "type": "string" },
+          "checks": { "type": "object", "additionalProperties": true },
+          "configuration": { "type": "object", "additionalProperties": true }
+        }
+      },
+      "Problem": {
+        "type": "object",
+        "description": "RFC 9457 problem document.",
+        "required": ["type", "title", "status", "detail", "instance", "correlationId", "code"],
+        "properties": {
+          "type": { "type": "string", "format": "uri" },
+          "title": { "type": "string" },
+          "status": { "type": "integer" },
+          "detail": { "type": "string" },
+          "instance": { "type": "string" },
+          "correlationId": { "type": "string", "format": "uuid" },
+          "code": { "type": "string" },
+          "errors": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "field": { "type": "string" },
+                "rule": { "type": "string" },
+                "message": { "type": "string" }
+              }
+            }
+          },
+          "expectedVersion": { "type": "integer" },
+          "actualVersion": { "type": "integer" },
+          "policyVersion": { "type": "string" }
+        }
+      }
+    },
+    "responses": {
+      "ValidationFailed": {
+        "description": "The request failed validation. Every problem is reported at once.",
+        "content": { "application/problem+json": { "schema": { "$ref": "#/components/schemas/Problem" } } }
+      },
+      "Unauthenticated": {
+        "description": "Authentication required. Absent, malformed, and unknown credentials are indistinguishable.",
+        "headers": { "WWW-Authenticate": { "schema": { "type": "string" } } },
+        "content": { "application/problem+json": { "schema": { "$ref": "#/components/schemas/Problem" } } }
+      },
+      "Forbidden": {
+        "description": "Policy denied the action, or explicit approval is required (code: approval_required).",
+        "content": { "application/problem+json": { "schema": { "$ref": "#/components/schemas/Problem" } } }
+      },
+      "NotFound": {
+        "description": "The resource does not exist in the caller's tenant. Also returned when it exists in another tenant, so the error channel cannot confirm an identifier.",
+        "content": { "application/problem+json": { "schema": { "$ref": "#/components/schemas/Problem" } } }
+      },
+      "Conflict": {
+        "description": "The request conflicts with current state.",
+        "content": { "application/problem+json": { "schema": { "$ref": "#/components/schemas/Problem" } } }
+      },
+      "VersionConflict": {
+        "description": "If-Match did not match the current version.",
+        "content": { "application/problem+json": { "schema": { "$ref": "#/components/schemas/Problem" } } }
+      },
+      "PayloadTooLarge": {
+        "description": "Request body exceeded the configured limit.",
+        "content": { "application/problem+json": { "schema": { "$ref": "#/components/schemas/Problem" } } }
+      },
+      "UnsupportedMediaType": {
+        "description": "Content-Type must be application/json.",
+        "content": { "application/problem+json": { "schema": { "$ref": "#/components/schemas/Problem" } } }
+      }
+    }
+  }
+}
