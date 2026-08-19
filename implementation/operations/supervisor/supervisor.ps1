@@ -338,6 +338,32 @@ function Remove-RunnerLock {
     if (Test-Path -LiteralPath $path) { Remove-Item -LiteralPath $path -Force }
 }
 
+# --------------------------------------------------------------------------- runner args
+
+function ConvertTo-RunnerCommandLine {
+    <#
+        Build a single, correctly quoted command line from an argument array.
+
+        Start-Process -ArgumentList <array> in Windows PowerShell 5.1 joins the elements with
+        spaces and does NOT quote them, so an argument containing whitespace -- a runner prompt,
+        for instance -- would arrive at the runner split into several arguments. That silently
+        changes what the unattended session is asked to do, which is exactly the class of failure
+        this repository keeps finding: a command that appears to work while doing something else.
+    #>
+    param([Parameter(Mandatory)][AllowEmptyCollection()][string[]]$Arguments)
+
+    $parts = @()
+    foreach ($a in $Arguments) {
+        if ($a -match '[\s"]') {
+            $parts += '"' + ($a -replace '(\\*)"', '$1$1\"' -replace '(\\+)$', '$1$1') + '"'
+        }
+        else {
+            $parts += $a
+        }
+    }
+    return ($parts -join ' ')
+}
+
 # --------------------------------------------------------------------------- git
 
 function Test-RepositoryReconciled {
@@ -457,7 +483,8 @@ function Invoke-SupervisorCycle {
         try {
             $args = @()
             foreach ($a in $Config.runnerArguments) { $args += ($a -replace '\{TASK_ID\}', $ready.Id) }
-            Start-Process -FilePath $Config.runnerCommand -ArgumentList $args -WorkingDirectory $repo -NoNewWindow | Out-Null
+            $commandLine = ConvertTo-RunnerCommandLine -Arguments $args
+            Start-Process -FilePath $Config.runnerCommand -ArgumentList $commandLine -WorkingDirectory $repo -NoNewWindow | Out-Null
             return Complete-Cycle 'STARTED' ('runner started for ' + $ready.Id) $ready $git.Head $true
         }
         catch {

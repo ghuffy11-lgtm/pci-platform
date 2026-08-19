@@ -1,6 +1,6 @@
 # MSG-0025 — Execution Supervisor: Installed and Verified, NOT Enabled
 
-**Status:** OPEN — stopped at the runner-invocation decision, per MSG-0024 clause 7
+**Status:** **CLOSED** — answered by MSG-0026. Supervisor enabled 2026-08-19 with `acceptEdits` and a version-controlled deny list.
 **Raised:** 2026-08-19
 **Raised by:** Claude Code (implementation agent)
 **Type:** Question — decision required

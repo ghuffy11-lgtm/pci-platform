@@ -21,7 +21,7 @@ Only the architecture lead may authorize new work, mark a task READY, or change 
 | TASK-0008 | Final report and status reconciliation | **COMPLETE** | TASK-0007 | 2026-08-19 G5 pass | none — TASK-0009 decision recorded in MSG-0022 | Claude Code |
 | TASK-0009 | WP-0001 completion decision | **COMPLETE** | TASK-0008 | 2026-08-19 | none — WP-0001 complete; no post-WP-0001 work authorized | Architecture lead |
 | TASK-0003 | Normalise `*.md` line endings (DISC-0006) | **WAITING_FOR_ARCHITECTURE_LEAD** | — | — | Mark READY to authorize | Architecture lead |
-| TASK-0010 | Execution Supervisor (installed, dry-run, NOT enabled) | **COMPLETE** | — | 2026-08-19 scheduled task verified | **MSG-0025: runner invocation + permission posture required before enabling** | Architecture lead |
+| TASK-0010 | Execution Supervisor (installed and **ENABLED**, 10-min) | **COMPLETE** | — | 2026-08-19 tests 21/21, enabled cycle verified | none — start path unproven until a task is READY (MSG-0026) | Claude Code |
 | TASK-0002 | Make test entry points shell-independent | **ABORTED** | — | 2026-08-19 | none — premise disproven by measurement | — |
 
 **TASK-0004 and TASK-0005 are COMPLETE** (2026-08-19, gates G1 and G2 passed). The continuation rule was applied.
@@ -78,6 +78,7 @@ READY means *authorized to attempt*, never *authorized to force*. A READY task w
 | MSG-0023 | Decision | DECIDED | Architecture lead | Claude Code | TASK-0009 terminal; TASK-0012 not in the WP-0001 path | TASK-0009 |
 | MSG-0024 | Decision | DECIDED | Architecture lead | Claude Code | **Execution Supervisor enablement authorized**, fail-closed preserved | TASK-0010 |
 | MSG-0025 | Question | OPEN | Claude Code | Architecture lead | **Supervisor installed and verified in dry-run; NOT enabled.** Runner invocation and permission posture required | TASK-0010 |
+| MSG-0026 | Record | OPEN | Claude Code | Architecture lead | **Supervisor ENABLED.** acceptEdits + version-controlled deny list; no bypassPermissions. Deny rules are the effective control, not the mode. Start path unproven until a task is READY | TASK-0010 |
 | MSG-0022 | Decision | DECIDED | Architecture lead | Claude Code | **WP-0001 COMPLETE; TASK-0012 NOT AUTHORIZED; duplicate MSG-0020 conflict resolved** | TASK-0009 |
 
 ## Interruption and recovery protocol

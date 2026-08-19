@@ -270,6 +270,27 @@ Test-Case 'default configuration is inert' {
     Assert-Equal 10 $c.intervalMinutes '10-minute fallback is the authoritative cadence'
 }
 
+Write-Host ''
+Write-Host 'runner command line' -ForegroundColor Cyan
+
+Test-Case 'an argument with spaces is quoted as one argument' {
+    $line = ConvertTo-RunnerCommandLine -Arguments @('-p', 'do the thing', '--permission-mode', 'acceptEdits')
+    Assert-Equal '-p "do the thing" --permission-mode acceptEdits' $line 'a prompt must survive as one argument'
+}
+
+Test-Case 'an argument without spaces is left bare' {
+    Assert-Equal '--settings' (ConvertTo-RunnerCommandLine -Arguments @('--settings'))
+}
+
+Test-Case 'embedded quotes are escaped, not dropped' {
+    $line = ConvertTo-RunnerCommandLine -Arguments @('say "hi" now')
+    Assert-True ($line -like '*\"hi\"*') 'embedded quotes must be escaped'
+}
+
+Test-Case 'an empty argument list yields an empty line' {
+    Assert-Equal '' (ConvertTo-RunnerCommandLine -Arguments @())
+}
+
 # ---------------------------------------------------------------- summary
 
 Write-Host ''

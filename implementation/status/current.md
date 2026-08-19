@@ -64,7 +64,7 @@ one thing — explicit authorization to destroy the PostgreSQL volume (MSG-0015)
 | TASK-0008 | Final report and status reconciliation | **COMPLETE** — G5 passed | TASK-0007 | Claude Code |
 | TASK-0009 | WP-0001 completion decision | **COMPLETE** — WP-0001 declared complete | TASK-0008 | Architecture lead |
 | TASK-0003 | Normalise `*.md` line endings (DISC-0006) | **WAITING_FOR_ARCHITECTURE_LEAD** | — | Architecture lead |
-| TASK-0010 | Execution Supervisor (installed, dry-run, not enabled) | **COMPLETE** | — | Claude Code |
+| TASK-0010 | Execution Supervisor (installed and **ENABLED**) | **COMPLETE** | — | Claude Code |
 | TASK-0002 | Make test entry points shell-independent | **ABORTED** | — | — |
 
 **No task is currently READY.** TASK-0004 and TASK-0005 address the defects found while executing
@@ -128,10 +128,10 @@ Every tier reported a non-zero test count.
 Index: `implementation/comms/README.md` carries the full message register with links and status.
 
 **WP-0001 is COMPLETE.** MSG-0021 and BLK-0005 are closed; MSG-0019 is answered by the completion
-decision. The remaining open item is **MSG-0025**: the Execution Supervisor is installed and verified running
-every ten minutes in dry-run, but **not enabled** — the runner invocation and its permission posture
-are undocumented and are the architecture lead's to decide (MSG-0024 clause 7). MSG-0011 is
-superseded by MSG-0024.
+decision. The **Execution Supervisor is ENABLED** and reconciling every ten minutes (MSG-0026). It runs
+`acceptEdits` with a version-controlled deny list and never `--dangerously-skip-permissions`.
+Testing showed the **deny list, not the permission mode, is the effective control** in headless
+mode. Its start path is unproven until a task is genuinely READY. MSG-0011 and MSG-0025 are closed.
 
 | ID | Subject | Status |
 |---|---|---|
@@ -158,7 +158,8 @@ superseded by MSG-0024.
 | MSG-0022 | Resolve MSG-0020 conflict | DECIDED — WP-0001 COMPLETE; TASK-0012 not authorized |
 | MSG-0023 | Correct TASK-0009 boundary | DECIDED — TASK-0009 terminal; no TASK-0012 |
 | MSG-0024 | Execution Supervisor enable decision | DECIDED — enablement authorized |
-| MSG-0025 | Supervisor installed, dry-run verified, NOT enabled | **OPEN** — runner invocation + permission posture required |
+| MSG-0025 | Supervisor installed, dry-run verified, NOT enabled | **CLOSED** — answered by MSG-0026 |
+| MSG-0026 | Supervisor **ENABLED**; permission mode determined and verified | **OPEN** — informational; start path unproven until a task is READY |
 | MSG-0011 | Execution Supervisor — built, tested, not installed | **OPEN** — awaiting install/enable decision |
 
 ## Repository / GitHub State
