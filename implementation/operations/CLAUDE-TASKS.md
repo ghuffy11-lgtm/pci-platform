@@ -94,6 +94,7 @@ READY means *authorized to attempt*, never *authorized to force*. A READY task w
 | MSG-0026 | Record | OPEN | Claude Code | Architecture lead | **Supervisor ENABLED.** acceptEdits + version-controlled deny list; no bypassPermissions. Deny rules are the effective control, not the mode. Start path unproven until a task is READY | TASK-0010 |
 | MSG-0027 | Decision | DECIDED | Architecture lead | Claude Code | **TASK-0003 authorized and marked READY; line-ending normalization only** | TASK-0003 |
 | MSG-0028 | Record | **OPEN** | Claude Code | Architecture lead | **TASK-0003 implemented, NOT complete.** Attribute set, zero content changed; working-tree refresh of 152 files refused by the permission layer and not worked around. **The commit could not be pushed** — `git push` is un-allowlisted, so the runner completed work it cannot deliver. Decisions: refresh option A/B/C; mid-run HEAD move; whether a runner may push | TASK-0003, TASK-0010 |
+| MSG-0029 | Record | OPEN | Claude Code | Architecture lead | **Supervisor start path diagnosed and fixed; first launch PROVEN.** Symptom was the reconciliation gate, not the runner. Three start-path defects fixed | TASK-0010 |
 
 ## Interruption and recovery protocol
 
