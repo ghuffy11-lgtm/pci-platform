@@ -340,6 +340,94 @@ Test-Case 'the lock can be repointed at the runner pid' {
     finally { Remove-Item -LiteralPath $dir -Recurse -Force }
 }
 
+Write-Host ''
+Write-Host 'reconciliation' -ForegroundColor Cyan
+
+function Invoke-FixtureGit {
+    # git writes ordinary progress to stderr; with ErrorActionPreference=Stop that would throw,
+    # so fixture git calls run with it relaxed.
+    param([Parameter(ValueFromRemainingArguments)][string[]]$GitArgs)
+    $old = $ErrorActionPreference
+    $ErrorActionPreference = 'Continue'
+    try { & git @GitArgs 2>&1 | Out-Null }
+    finally { $ErrorActionPreference = $old }
+}
+
+function New-FixtureRepoPair {
+    # origin (bare) <- work; returns paths
+    $root = New-TempDir
+    $bare = Join-Path $root 'origin.git'
+    $work = Join-Path $root 'work'
+    Invoke-FixtureGit init --bare -q $bare
+    Invoke-FixtureGit clone -q $bare $work
+    Push-Location $work
+    try {
+        Invoke-FixtureGit config user.email 't@t'
+        Invoke-FixtureGit config user.name 't'
+        'one' | Out-File -LiteralPath (Join-Path $work 'a.txt') -Encoding utf8
+        Invoke-FixtureGit add -A
+        Invoke-FixtureGit commit -qm one
+        Invoke-FixtureGit branch -M main
+        Invoke-FixtureGit push -q -u origin main
+    }
+    finally { Pop-Location }
+    return @{ Root = $root; Work = $work; Bare = $bare }
+}
+
+Test-Case 'a repository strictly behind with a clean tree is fast-forwarded' {
+    $fx = New-FixtureRepoPair
+    try {
+        # advance origin from a second clone, leaving the first behind
+        $other = Join-Path $fx.Root "other"
+        Invoke-FixtureGit clone -q $fx.Bare $other
+        Push-Location $other
+        try {
+            Invoke-FixtureGit config user.email "t@t"
+            Invoke-FixtureGit config user.name "t"
+            # The bare repo's HEAD still points at an unborn master, so a fresh clone lands there
+            # and `push origin main` would match nothing. Land on main explicitly.
+            Invoke-FixtureGit checkout -B main origin/main
+            "two" | Out-File -LiteralPath (Join-Path $other "b.txt") -Encoding utf8
+            Invoke-FixtureGit add -A
+            Invoke-FixtureGit commit -qm two
+            Invoke-FixtureGit push -q origin main
+        }
+        finally { Pop-Location }
+
+        # The test is worthless unless the fixture actually diverged.
+        Push-Location $fx.Work
+        try {
+            Invoke-FixtureGit fetch -q origin
+            $counts = (& git rev-list --left-right --count origin/main...HEAD 2>$null)
+            Assert-True ($counts -match '^\s*[1-9]') ('fixture must leave the work tree behind; counts were [' + $counts + ']')
+        }
+        finally { Pop-Location }
+
+        $r = Test-RepositoryReconciled -RepositoryPath $fx.Work -Remote 'origin' -Branch 'main'
+        Assert-True $r.Reconciled 'being behind is the one case a scheduler may resolve itself'
+        Assert-True $r.FastForwarded 'and it must say that it did so'
+    }
+    finally { Remove-Item -LiteralPath $fx.Root -Recurse -Force -ErrorAction SilentlyContinue }
+}
+
+Test-Case 'a repository ahead of the remote is NOT resolved automatically' {
+    $fx = New-FixtureRepoPair
+    try {
+        Push-Location $fx.Work
+        try {
+            "local" | Out-File -LiteralPath (Join-Path $fx.Work "c.txt") -Encoding utf8
+            Invoke-FixtureGit add -A
+            Invoke-FixtureGit commit -qm local
+        }
+        finally { Pop-Location }
+
+        $r = Test-RepositoryReconciled -RepositoryPath $fx.Work -Remote 'origin' -Branch 'main'
+        Assert-True (-not $r.Reconciled) 'unpushed local work is not a scheduler decision'
+        Assert-True ($r.Reason -like '*ahead*') 'and the reason must name it'
+    }
+    finally { Remove-Item -LiteralPath $fx.Root -Recurse -Force -ErrorAction SilentlyContinue }
+}
+
 # ---------------------------------------------------------------- summary
 
 Write-Host ''

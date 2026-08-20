@@ -461,12 +461,13 @@ function Test-RepositoryReconciled {
     param([Parameter(Mandatory)][string]$RepositoryPath, [string]$Remote = 'origin', [string]$Branch = 'main')
 
     $result = [ordered]@{
-        Readable   = $false
-        Reconciled = $false
-        Head       = ''
-        Remote     = ''
-        Clean      = $false
-        Reason     = ''
+        Readable       = $false
+        Reconciled     = $false
+        Head           = ''
+        Remote         = ''
+        Clean          = $false
+        FastForwarded  = $false
+        Reason         = ''
     }
 
     if (-not (Test-Path -LiteralPath (Join-Path $RepositoryPath '.git'))) {
@@ -500,7 +501,48 @@ function Test-RepositoryReconciled {
         }
         $result.Remote = $remoteHead.Trim()
         $result.Reconciled = ($result.Head -eq $result.Remote)
-        if (-not $result.Reconciled) { $result.Reason = 'local and remote differ' }
+
+        if (-not $result.Reconciled) {
+            # Distinguish the three ways local and remote can differ. Only one of them is safe to
+            # resolve automatically, and lumping them together is what stalled the supervisor: every
+            # push by the architecture lead left it refusing forever, because nothing ever pulled.
+            $behind = 0
+            $ahead  = 0
+            $counts = (& git rev-list --left-right --count "$Remote/$Branch...HEAD" 2>$null)
+            if ($LASTEXITCODE -eq 0 -and -not [string]::IsNullOrWhiteSpace($counts)) {
+                $parts = ($counts -split '\s+') | Where-Object { $_ -ne '' }
+                if ($parts.Count -ge 2) { $behind = [int]$parts[0]; $ahead = [int]$parts[1] }
+            }
+
+            if ($ahead -gt 0) {
+                # Local commits not on the remote. Never resolved automatically: deciding what to do
+                # with unpushed work is not a scheduler's business.
+                $result.Reason = ('local is ahead by {0} (and behind by {1})' -f $ahead, $behind)
+            }
+            elseif ($behind -le 0) {
+                $result.Reason = 'local and remote differ, but neither is ahead - unexpected'
+            }
+            elseif (-not $result.Clean) {
+                # A fast-forward would silently overwrite nothing, but an unclean tree means someone
+                # or something is mid-change. Refuse and let a human look.
+                $result.Reason = ('local is behind by {0} but the working tree is dirty' -f $behind)
+            }
+            else {
+                # Strictly behind, clean tree: a fast-forward is the whole of "reconcile". It cannot
+                # lose work, cannot merge, and cannot rewrite history.
+                & git merge --ff-only "$Remote/$Branch" --quiet 2>$null | Out-Null
+                if ($LASTEXITCODE -eq 0) {
+                    $newHead = (& git rev-parse HEAD 2>$null)
+                    $result.Head = $newHead.Trim()
+                    $result.Reconciled = ($result.Head -eq $result.Remote)
+                    $result.FastForwarded = $result.Reconciled
+                    if (-not $result.Reconciled) { $result.Reason = 'fast-forward did not reach the remote head' }
+                }
+                else {
+                    $result.Reason = ('fast-forward failed while {0} behind' -f $behind)
+                }
+            }
+        }
     }
     finally { Pop-Location }
 
@@ -530,8 +572,19 @@ function Invoke-SupervisorCycle {
     }
 
     try {
+        # Every invocation announces itself before doing anything, so a cycle that dies early still
+        # leaves a trace. An operator watching a console flash past needs the file to say what
+        # happened; "nothing in the log" and "the script never ran" must not look identical.
+        Write-SupervisorLog -Level 'INFO' -Event 'CYCLE_START' `
+            -Detail ('pid=' + $PID + ' repo=' + $repo + ' enabled=' + $Config.enabled + ' dryRun=' + $Config.dryRun) `
+            -LogDirectory $logDir | Out-Null
+
         # 1. Repository must be readable and reconciled with the remote.
         $git = Test-RepositoryReconciled -RepositoryPath $repo -Remote $Config.remote -Branch $Config.branch
+        if ($git.FastForwarded) {
+            Write-SupervisorLog -Level 'ACTION' -Event 'FAST_FORWARDED' `
+                -Detail ('local was behind; fast-forwarded to ' + $git.Head) -LogDirectory $logDir | Out-Null
+        }
         if (-not $git.Readable) { return Complete-Cycle 'NOOP' ('repository unreadable: ' + $git.Reason) $null '' $false }
         if (-not $git.Reconciled) { return Complete-Cycle 'NOOP' ('not reconciled: ' + $git.Reason) $null $git.Head $false }
 
