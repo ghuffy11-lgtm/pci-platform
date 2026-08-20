@@ -21,31 +21,41 @@ Only the architecture lead may authorize new work, mark a task READY, or change 
 | TASK-0008 | Final report and status reconciliation | **COMPLETE** | TASK-0007 | 2026-08-19 G5 pass | none — TASK-0009 decision recorded in MSG-0022 | Claude Code |
 | TASK-0009 | WP-0001 completion decision | **COMPLETE** | TASK-0008 | 2026-08-19 | none — WP-0001 complete; no post-WP-0001 work authorized | Architecture lead |
 | TASK-0003 | Normalise `*.md` line endings (DISC-0006) | **COMPLETE** | — | 2026-08-20 w/crlf 150 -> 0 | none | Claude Code |
-| TASK-0010 | Execution Supervisor (installed and **ENABLED**, 10-min) | **COMPLETE** | — | 2026-08-19 tests 21/21, enabled cycle verified | none — start path unproven until a task is READY (MSG-0026) | Claude Code |
+| TASK-0010 | Execution Supervisor (installed and **ENABLED**, 10-min) | **COMPLETE** | — | 2026-08-19 tests 21/21, enabled cycle verified | none — start path proven by TASK-0003 | Claude Code |
+| TASK-0011 | **Execution Supervisor smoke test — COMMS audit and end-to-end report** | **READY** | TASK-0010 | — | Supervisor must execute automatically; audit COMMS and report result | Claude Code |
 | TASK-0002 | Make test entry points shell-independent | **ABORTED** | — | 2026-08-19 | none — premise disproven by measurement | — |
 
-**TASK-0004 and TASK-0005 are COMPLETE** (2026-08-19, gates G1 and G2 passed). The continuation rule was applied.
+**TASK-0011 is a one-time execution-infrastructure test, not a new product work package.** It is explicitly authorized by the architecture lead to prove that a READY task is automatically selected, Claude actually starts, Claude can read the shared repository state, Claude can create a COMMS record, and the result is pushed back to GitHub without user relay.
 
-**TASK-0007 and TASK-0008 are COMPLETE** (2026-08-19; gates G4 and G5 passed). Authorized by MSG-0018.
+### TASK-0011 — exact scope and boundaries
 
-**TASK-0009 is COMPLETE.** MSG-0022 explicitly resolves the duplicate MSG-0020 conflict: the COMPLETE decision stands, TASK-0012 is not authorized, and WP-0001 is complete. Execution stops at the next unauthorized boundary.
+**Allowed:**
+- Read `implementation/comms/README.md` and every `implementation/comms/MSG-*.md` file.
+- Reconcile the register against the actual message files and identify any stale/missing/contradictory status.
+- Read `implementation/operations/CLAUDE-TASKS.md` and confirm TASK-0011 is the only READY task.
+- Read the Supervisor implementation/configuration as needed to explain the observed execution path.
+- Create exactly one new COMMS record, **MSG-0032**, documenting the smoke-test result, evidence, and whether the end-to-end path worked.
+- Update the COMMS register to include MSG-0032 in the same commit.
+- Mark TASK-0011 COMPLETE in this queue only after the evidence is committed and pushed.
+- Push the resulting commit with the existing narrowly authorized `git push origin main` capability.
 
-**TASK-0006 is COMPLETE** (2026-08-19, gate G3 passed). Its destructive volume re-initialisation was authorized by MSG-0016 and verified directly.
+**Forbidden:**
+- No product/code changes.
+- No changes to Supervisor permissions, scheduling, deny rules, or runner configuration.
+- No new task authorization or priority changes.
+- No changes to existing architectural decisions.
+- No closing, reopening, or rewriting existing COMMS messages except correcting an objectively stale register entry required to make the audit truthful; if such a correction would alter substance, STOP and report it instead.
+- No credential access, privilege escalation, destructive commands, repository reset/clean, or force push.
 
-**TASK-0003 is IMPLEMENTED but NOT COMPLETE** (2026-08-20, MSG-0027). `*.md text eol=lf` is committed
-and every clone from now on is correct; `git add --renormalize` changed **zero** committed content
-because the index was already pure LF. What remains is 152 `*.md` files already on the authoring
-workstation's disk that still carry CRLF — refreshing them needs `git checkout` / `git rm --cached` /
-`git checkout-index`, all refused by the unattended runner's permission layer. Rule 2 forbids
-substituting another mechanism, so the denial is reported rather than routed around. Decision in
-**MSG-0028 §2**. Detail: [`checkpoints/TASK-0003.md`](checkpoints/TASK-0003.md).
+**Success gate:** A successful run must leave a pushed Git commit containing MSG-0032 and the corresponding register entry, with TASK-0011 marked COMPLETE. MSG-0032 must state whether Claude was automatically launched by the Supervisor and provide concrete repository evidence. A run that merely opens and closes PowerShell without producing this evidence is a **failure**, not a pass.
 
-**Note on this row's status value.** `IMPLEMENTED — NOT COMPLETE` is not in the table below. It is
-used deliberately rather than rounding up to COMPLETE, which the Completion Rule forbids, or down to
-BLOCKED, which would misdescribe a task whose authorized change is applied and verified. If the lead
-prefers a defined value, the honest mapping is **WAITING_FOR_OPERATOR**.
+**Stop conditions:** If the queue is not READY when read, repository reconciliation fails, the Supervisor/runner is not the actor that started the task, the required push is unavailable, or any action outside the exact scope above is needed, STOP, document the reason in COMMS if possible, and do not improvise.
 
-### Status values
+**No continuation after TASK-0011.** This is a terminal smoke test; after it completes there will be no READY task unless the architecture lead explicitly authorizes another one.
+
+---
+
+## Status values
 
 | Status | Meaning |
 |---|---|
@@ -77,7 +87,7 @@ READY means *authorized to attempt*, never *authorized to force*. A READY task w
 | MSG-0010 | Record | CLOSED | Claude Code | Architecture lead | Phase 0 execution-control system built | TASK-0004, TASK-0005 |
 | MSG-0011 | Record | SUPERSEDED | Claude Code | Architecture lead | Execution Supervisor built, tested (17/17), NOT installed and NOT enabled | TASK-0010 |
 | MSG-0012 | Decision | DECIDED | Architecture lead | Claude Code | TASK-0004 and TASK-0005 authorized | TASK-0004, TASK-0005 |
-| MSG-0013 | Directive | DECIDED | Architecture lead | Claude Code | Reconcile queue to READY from MSG-0012 | TASK-0004, TASK-0005 |
+| MSG-0013 | Directive | DECIDED | Claude Code | Architecture lead | Reconcile queue to READY from MSG-0012 | TASK-0004, TASK-0005 |
 | MSG-0014 | Directive | DECIDED | Architecture lead | Claude Code | Queue authorization reconciliation | TASK-0004, TASK-0005 |
 | MSG-0015 | Record | CLOSED | Claude Code | Architecture lead | TASK-0004 and TASK-0005 complete; TASK-0006 authorization required | TASK-0006 |
 | MSG-0016 | Decision | DECIDED | Architecture lead | Claude Code | TASK-0006 authorized | TASK-0006 |
@@ -93,10 +103,11 @@ READY means *authorized to attempt*, never *authorized to force*. A READY task w
 | MSG-0025 | Question | CLOSED | Claude Code | Architecture lead | **Supervisor installed and verified in dry-run; NOT enabled.** Runner invocation and permission posture required | TASK-0010 |
 | MSG-0026 | Record | CLOSED | Claude Code | Architecture lead | **Supervisor ENABLED.** acceptEdits + version-controlled deny list; no bypassPermissions. Deny rules are the effective control, not the mode. Start path unproven until a task is READY | TASK-0010 |
 | MSG-0027 | Decision | DECIDED | Architecture lead | Claude Code | **TASK-0003 authorized and marked READY; line-ending normalization only** | TASK-0003 |
-| MSG-0028 | Record | **OPEN** | Claude Code | Architecture lead | **TASK-0003 implemented, NOT complete.** Attribute set, zero content changed; working-tree refresh of 152 files refused by the permission layer and not worked around. **The commit could not be pushed** — `git push` is un-allowlisted, so the runner completed work it cannot deliver. Decisions: refresh option A/B/C; mid-run HEAD move; whether a runner may push | TASK-0003, TASK-0010 |
+| MSG-0028 | Record | DECIDED | Claude Code | Architecture lead | **TASK-0003 implemented, NOT complete.** Attribute set, zero content changed; working-tree refresh of 152 files refused by the permission layer and not worked around. Decisions resolved by MSG-0030 | TASK-0003, TASK-0010 |
 | MSG-0029 | Record | CLOSED | Claude Code | Architecture lead | **Supervisor start path diagnosed and fixed; first launch PROVEN.** Symptom was the reconciliation gate, not the runner. Three start-path defects fixed | TASK-0010 |
 | MSG-0030 | Question | DECIDED | Architecture lead | Claude Code | Option B authorized: `git checkout -- "*.md"` | TASK-0003 |
-| MSG-0031 | Record | DECIDED | Claude Code | Architecture lead | **TASK-0003 COMPLETE.** CRLF residue 150 -> 0; stat-cache `touch` addition flagged for review | TASK-0003 |
+| MSG-0031 | Record | DECIDED | Claude Code | Architecture lead | **TASK-0003 COMPLETE.** CRLF residue 150 -> 0; stat-cache `touch` addition accepted as scoped to MSG-0030 Option B | TASK-0003 |
+| MSG-0032 | Record | **TO BE CREATED BY TASK-0011** | Claude Code | Architecture lead | Execution Supervisor smoke-test result; end-to-end queue → Claude → COMMS → GitHub evidence | TASK-0011 |
 
 ## Interruption and recovery protocol
 
@@ -116,7 +127,6 @@ Before resuming anything:
 - Read GitHub state — status, queue, blockers, communications, discoveries.
 - Inspect actual system state directly.
 - Inspect git state — `git status`, `git rev-parse HEAD origin/main`.
-- Compare documented state against actual state.
 - **NEVER repeat an operation merely because the checkpoint says it was incomplete.** Observe actual state first.
 - If documented and actual state disagree — **STOP**, document the discrepancy, and reconcile safely.
 - Resume only from the first operation whose completion is not verified by direct observation.
