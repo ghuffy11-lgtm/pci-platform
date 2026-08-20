@@ -22,7 +22,7 @@ Only the architecture lead may authorize new work, mark a task READY, or change 
 | TASK-0009 | WP-0001 completion decision | **COMPLETE** | TASK-0008 | 2026-08-19 | none — WP-0001 complete; no post-WP-0001 work authorized | Architecture lead |
 | TASK-0003 | Normalise `*.md` line endings (DISC-0006) | **COMPLETE** | — | 2026-08-20 w/crlf 150 -> 0 | none | Claude Code |
 | TASK-0010 | Execution Supervisor (installed and **ENABLED**, 10-min) | **COMPLETE** | — | 2026-08-19 tests 21/21, enabled cycle verified | none — start path proven by TASK-0003 | Claude Code |
-| TASK-0011 | **Execution Supervisor smoke test — COMMS audit and end-to-end report** | **READY** | TASK-0010 | — | Supervisor must execute automatically; audit COMMS and report result | Claude Code |
+| TASK-0011 | **Execution Supervisor smoke test — COMMS audit and end-to-end report** | **COMPLETE** | TASK-0010 | 2026-08-20 `d16665a` — PASSED | none — terminal by design; no task is READY | Claude Code |
 | TASK-0002 | Make test entry points shell-independent | **ABORTED** | — | 2026-08-19 | none — premise disproven by measurement | — |
 
 **TASK-0011 is a one-time execution-infrastructure test, not a new product work package.** It is explicitly authorized by the architecture lead to prove that a READY task is automatically selected, Claude actually starts, Claude can read the shared repository state, Claude can create a COMMS record, and the result is pushed back to GitHub without user relay.
@@ -52,6 +52,38 @@ Only the architecture lead may authorize new work, mark a task READY, or change 
 **Stop conditions:** If the queue is not READY when read, repository reconciliation fails, the Supervisor/runner is not the actor that started the task, the required push is unavailable, or any action outside the exact scope above is needed, STOP, document the reason in COMMS if possible, and do not improvise.
 
 **No continuation after TASK-0011.** This is a terminal smoke test; after it completes there will be no READY task unless the architecture lead explicitly authorizes another one.
+
+### TASK-0011 — RESULT: PASSED (2026-08-20)
+
+The Supervisor selected the READY task, launched Claude, Claude read shared repository state,
+produced the audit, and pushed it to GitHub. **No human relayed anything.** Full record and evidence:
+[`../comms/MSG-0032-task-0011-supervisor-smoke-test.md`](../comms/MSG-0032-task-0011-supervisor-smoke-test.md).
+
+Success gate, item by item:
+
+| Requirement | Verdict |
+|---|---|
+| Pushed commit containing MSG-0032 and its register entry | **MET** — `d16665a`, pushed `479dfa9..d16665a` |
+| TASK-0011 marked COMPLETE | **MET** — this row, in the follow-on commit |
+| MSG-0032 states whether the Supervisor launched Claude, with concrete evidence | **MET** — MSG-0032 §2, three independent artifacts |
+| Not merely a PowerShell window opening and closing | **MET** — that was the *prior* failure; diagnosed in MSG-0032 §3 |
+
+The earlier attempts failed at the **reconciliation gate**, before the queue was ever read: the clone
+was behind `origin/main` because the lead had just pushed this very authorization. A NOOP, not a
+runner, prompt, permission, or Claude-session failure. Corrected in `479dfa9`; this run is the first
+cycle after that fix.
+
+**Scope held.** No product or code change, no Supervisor permission/schedule/deny/runner change, no
+task authorized, no priority or scope changed, no architectural decision altered, no COMMS message
+opened, closed, reopened, or rewritten. Exactly one new COMMS record was created.
+
+**Two findings stop short of action and request a ruling** — MSG-0032 §6.2 (the blocker register
+contradicts the status file; correcting a blocker status is substantive and outside this scope) and
+§6.3 (message numbers have now been duplicated twice). Neither blocks anything.
+
+**Note for whoever authorizes next.** TASK-0011 is the first queue entry written with an explicit
+scope block — allowed, forbidden, success gate, stop conditions. It worked: the boundaries were
+unambiguous in execution, *including where to stop*. Recommended as the pattern.
 
 ---
 
@@ -107,7 +139,9 @@ READY means *authorized to attempt*, never *authorized to force*. A READY task w
 | MSG-0029 | Record | CLOSED | Claude Code | Architecture lead | **Supervisor start path diagnosed and fixed; first launch PROVEN.** Symptom was the reconciliation gate, not the runner. Three start-path defects fixed | TASK-0010 |
 | MSG-0030 | Question | DECIDED | Architecture lead | Claude Code | Option B authorized: `git checkout -- "*.md"` | TASK-0003 |
 | MSG-0031 | Record | DECIDED | Claude Code | Architecture lead | **TASK-0003 COMPLETE.** CRLF residue 150 -> 0; stat-cache `touch` addition accepted as scoped to MSG-0030 Option B | TASK-0003 |
-| MSG-0032 | Record | **TO BE CREATED BY TASK-0011** | Claude Code | Architecture lead | Execution Supervisor smoke-test result; end-to-end queue → Claude → COMMS → GitHub evidence | TASK-0011 |
+| MSG-0032 | Record | **CREATED — smoke test PASSED** | Claude Code | Architecture lead | Execution Supervisor smoke-test result; end-to-end queue → Supervisor → Claude → COMMS → GitHub evidence. Two findings request a ruling (§6.2 blocker register, §6.3 message numbering) | TASK-0011 |
+| MSG-0033 (a) | Directive | DECIDED | Architecture lead | Claude Code | TASK-0011 smoke-test diagnosis and corrective action; durable logging so a cycle that dies early still leaves a trace | TASK-0011 |
+| MSG-0033 (b) | Directive | DECIDED | Architecture lead | Claude Code | TASK-0011 retry: distinguish NOOP/reconciliation from runner, prompt, permission, and session failure; smallest correction only. **Duplicate number, non-conflicting** — both satisfied by `479dfa9` and answered in MSG-0032 §3 | TASK-0011, TASK-0010 |
 
 ## Interruption and recovery protocol
 
