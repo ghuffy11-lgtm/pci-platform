@@ -76,7 +76,7 @@ message on 2026-08-20 under MSG-0041 (MSG-0042) — the fifth.
 | TASK-0014 | Reconcile BLK-0005 in the blocker index | **COMPLETE** (2026-08-20) — MSG-0038 | TASK-0013, MSG-0037 ✅ | Claude Code |
 | TASK-0015 | Reconcile the discoveries index with the actual `DISC-*.md` records | **COMPLETE** (2026-08-20) — 3 rows -> 9, MSG-0040 | TASK-0014, MSG-0039 ✅ | Claude Code |
 | TASK-0016 | Close the resolved MSG-0034 informational record | **COMPLETE** (2026-08-20) — closure verified, MSG-0042 | TASK-0015, MSG-0041 ✅ | Claude Code |
-| TASK-0017 | Supervisor heartbeat / unattended observability | **IN_PROGRESS** (2026-08-20) — corrected, **tests NOT run**, MSG-0045 | TASK-0016, MSG-0043 ✅ | Claude Code |
+| TASK-0017 | Supervisor heartbeat / unattended observability | **COMPLETE** (2026-08-20) — tests 36/36, MSG-0047 | TASK-0016, MSG-0043 ✅ | Claude Code |
 | TASK-0002 | Make test entry points shell-independent | **ABORTED** | — | — |
 
 **No task is currently READY. TASK-0017 is IN_PROGRESS and stopped at a permission boundary.** It is
