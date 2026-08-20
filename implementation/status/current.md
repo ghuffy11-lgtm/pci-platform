@@ -2,7 +2,7 @@
 
 **Active Work Package:** WP-0001 — PCI Kernel Foundation
 **Status:** **COMPLETE** — declared by the architecture lead 2026-08-19 (MSG-0020(b), resolved by MSG-0022 / MSG-0023, TASK-0009)
-**Last Updated:** 2026-08-20 (TASK-0016 — MSG-0034 closed; **zero OPEN messages**, MSG-0041 / MSG-0042)
+**Last Updated:** 2026-08-20 (TASK-0017 — heartbeat corrected but **NOT verified**; MSG-0043 / MSG-0044 / MSG-0045)
 
 ## Current State
 
@@ -76,10 +76,13 @@ message on 2026-08-20 under MSG-0041 (MSG-0042) — the fifth.
 | TASK-0014 | Reconcile BLK-0005 in the blocker index | **COMPLETE** (2026-08-20) — MSG-0038 | TASK-0013, MSG-0037 ✅ | Claude Code |
 | TASK-0015 | Reconcile the discoveries index with the actual `DISC-*.md` records | **COMPLETE** (2026-08-20) — 3 rows -> 9, MSG-0040 | TASK-0014, MSG-0039 ✅ | Claude Code |
 | TASK-0016 | Close the resolved MSG-0034 informational record | **COMPLETE** (2026-08-20) — closure verified, MSG-0042 | TASK-0015, MSG-0041 ✅ | Claude Code |
+| TASK-0017 | Supervisor heartbeat / unattended observability | **IN_PROGRESS** (2026-08-20) — corrected, **tests NOT run**, MSG-0045 | TASK-0016, MSG-0043 ✅ | Claude Code |
 | TASK-0002 | Make test entry points shell-independent | **ABORTED** | — | — |
 
-**No task is currently READY.** TASK-0016 was the last authorized task; nothing follows it
-automatically. Only the architecture lead may authorize the next one.
+**No task is currently READY. TASK-0017 is IN_PROGRESS and stopped at a permission boundary.** It is
+deliberately not left READY: the Supervisor would select it again on its next cycle and repeat the
+work indefinitely. It is deliberately not COMPLETE: its success gate is unmet. Only the architecture
+lead may authorize the next task, and MSG-0045 §7 asks for one decision to close this one out.
 
 > There is no TASK-0012. MSG-0022 and MSG-0023 ruled it out of the WP-0001 path, and the number was
 > never reused. Do not infer a gap in the queue as missing work — the charter's own warning
@@ -204,9 +207,21 @@ Every tier reported a non-zero test count.
 
 Index: `implementation/comms/README.md` carries the full message register with links and status.
 
-**No message carries `Status: OPEN`.** Every communication is answered, decided, closed, or a record
-requesting no decision. Every task is COMPLETE except TASK-0002, which is ABORTED because its premise
-was disproven by measurement.
+**Two messages carry `Status: OPEN`, both raised on 2026-08-20 by TASK-0017.**
+
+| ID | Why it is open | Needs a decision? |
+|---|---|---|
+| MSG-0044 | TASK-0017 was authorized in MSG-0043 but had no queue row, so the Supervisor could never select it. The queue was reconciled and the structural finding recorded | **No** — informational |
+| MSG-0045 | TASK-0017 execution record. The heartbeat defect is corrected, but the **test suite could not be run**: no allowlist entry permits executing a PowerShell script | **Yes** — §7 offers three options; (A) is recommended |
+
+> The line this replaces read "**No message carries `Status: OPEN`**", which was true when TASK-0016
+> wrote it and stopped being true when TASK-0017 was authorized. It is corrected rather than quietly
+> swapped, because a status file that overstates calm is the specific failure Rule 12 exists to
+> prevent.
+
+Every other communication is answered, decided, closed, or a record requesting no decision. Every
+task is COMPLETE except TASK-0002 (ABORTED, premise disproven by measurement) and TASK-0017
+(IN_PROGRESS, stopped at a permission boundary).
 
 > **MSG-0034 was the last one, and it is now CLOSED (2026-08-20, TASK-0016, MSG-0041).** It had been
 > informational rather than a question — the TASK-0011 execution-path diagnosis, whose correction the
@@ -358,6 +373,9 @@ visible; it does not make it self-clearing.
 | MSG-0040 | TASK-0015 execution record — discoveries index reconciled, 3 rows -> 9 | **RECORD** — applied and verified; **no decision requested** |
 | MSG-0041 | Architecture decision: close the resolved MSG-0034 informational record | **DECIDED** — applied by TASK-0016, see MSG-0042 |
 | MSG-0042 | TASK-0016 execution record — MSG-0034 closed in record and register | **RECORD** — applied and verified; **no decision requested** |
+| MSG-0043 | Architecture decision: authorize TASK-0017 supervisor heartbeat observability | **DECIDED** — executed by TASK-0017; verification blocked, see MSG-0045 |
+| MSG-0044 | TASK-0017 authorized but absent from the queue; queue reconciled | **OPEN** — informational; no decision requested |
+| MSG-0045 | TASK-0017 execution record — heartbeat corrected, **NOT verified** | **OPEN** — **decision required**, §7 |
 
 ## Repository / GitHub State
 
@@ -591,11 +609,39 @@ nine records. The record file is the source of truth; both tables index it.
 
 ## Next Action
 
-**No task is READY. Awaiting the architecture lead.**
+**One decision is required: MSG-0045 §7.** TASK-0017 is IN_PROGRESS and stopped at a permission
+boundary.
 
-WP-0001 is COMPLETE. **TASK-0016 — the last authorized task — ran on 2026-08-20 and completed**
-(MSG-0042). MSG-0041 is applied: MSG-0034 is CLOSED in its own record and in the register, its
-substantive content intact. Nothing follows it automatically.
+The heartbeat defect MSG-0043 authorized fixing is **reproduced, diagnosed, and corrected**, with
+nine focused tests written for it. It is **not verified**, and TASK-0017 is therefore reported as
+IMPLEMENTED but NOT COMPLETE. The suite could not be executed by an unattended session — no allowlist
+entry permits running a PowerShell script — so the gate MSG-0043 set is unmet. One command run by
+someone who can approve it closes this out:
+
+```powershell
+cd D:\Work\pci-platform\implementation\operations\supervisor
+powershell -NoProfile -ExecutionPolicy Bypass -File .\tests\supervisor.tests.ps1
+```
+
+MSG-0045 §7 offers three options — (A) the operator runs it once, (B) a path-pinned allowlist entry,
+(C) revert until either is possible — and recommends (A) as the smallest grant.
+
+> **Note the risk while this sits open.** The Supervisor is ENABLED and will execute the changed
+> `supervisor.ps1` unverified on its next cycle. If it is faulty, unattended execution stops until a
+> human intervenes. `git revert` of the single TASK-0017 commit is the remedy.
+
+**The defect reproduced itself at no cost.** The session that fixed it was the defect: started at
+12:31:16Z, working, while `heartbeat.json` reported `NOOP :: no READY task` with `runnerActive:
+false`. Two of the last three tasks have now found the automation's own records lagging reality —
+first the queue (MSG-0044), then the heartbeat.
+
+---
+
+**Historical — the position after TASK-0016, when nothing was outstanding.**
+
+WP-0001 is COMPLETE. **TASK-0016 ran on 2026-08-20 and completed** (MSG-0042). MSG-0041 is applied:
+MSG-0034 is CLOSED in its own record and in the register, its substantive content intact. It was the
+last authorized task at that moment; TASK-0017 was authorized afterwards, in MSG-0043.
 
 That makes **five consecutive unattended deliveries** — TASK-0011, TASK-0013, TASK-0014, TASK-0015,
 TASK-0016. The Supervisor fast-forwarded onto the lead's push, saw the READY task, launched Claude,
@@ -613,10 +659,13 @@ row. Before `479dfa9`, a push by the lead left the Supervisor stuck at `NOOP :: 
 indefinitely — it could not see the very authorization it existed to act on. There is a small
 symmetry worth noting: the task that closed MSG-0034 was itself started by the fix MSG-0034 records.
 
-**Nothing needs the lead in order to unblock anything.** No blocker is open, **no message is OPEN**,
-and no task is in flight. **The index-drift work is finished** — blockers and discoveries both agree
-with their records (TASK-0013, TASK-0014, TASK-0015), and the communications register agrees with the
-message files (TASK-0016).
+Nothing needed the lead in order to unblock anything *at that moment*: no blocker was open, no message
+was OPEN, and no task was in flight. **The index-drift work is finished** — blockers and discoveries
+both agree with their records (TASK-0013, TASK-0014, TASK-0015), and the communications register
+agrees with the message files (TASK-0016).
+
+> **No longer current.** TASK-0017 is in flight and MSG-0044 and MSG-0045 are OPEN; MSG-0045 requests
+> a decision. See *Next Action* at the top of this section. The index-drift statement still holds.
 
 Two items sit available as future work if the lead wants them, neither requested by the executing
 session and neither blocking anything:

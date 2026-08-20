@@ -10,7 +10,9 @@ a defect in the record, not a missing message.
 
 | ID | Subject | Status | File |
 |---|---|---|---|
+| **MSG-0045** | **TASK-0017 execution record — heartbeat corrected, NOT verified** | **OPEN** — **decision required**: the test suite could not be run by an unattended session | [MSG-0045-task-0017-execution-record.md](MSG-0045-task-0017-execution-record.md) |
 | **MSG-0044** | **TASK-0017 was authorized but invisible to the supervisor — queue reconciled** | **OPEN** — informational | [MSG-0044-task-0017-queue-reconciliation.md](MSG-0044-task-0017-queue-reconciliation.md) |
+| **MSG-0043** | **Architecture decision: authorize TASK-0017 supervisor heartbeat observability** | **DECIDED** — applied by TASK-0017; verification blocked, see MSG-0045 | [MSG-0043-supervisor-heartbeat-decision.md](MSG-0043-supervisor-heartbeat-decision.md) |
 | **MSG-0042** | **TASK-0016 execution record — MSG-0034 closed** | **RECORD** — applied and verified; no decision requested | [MSG-0042-task-0016-execution-record.md](MSG-0042-task-0016-execution-record.md) |
 | **MSG-0041** | **Architecture decision: close resolved MSG-0034 informational record** | **DECIDED** — applied by TASK-0016, see MSG-0042 | [MSG-0041-architecture-decision-close-msg-0034.md](MSG-0041-architecture-decision-close-msg-0034.md) |
 | **MSG-0040** | **TASK-0015 execution record — discoveries index reconciled, three rows to nine** | **RECORD** — applied and verified; no decision requested | [MSG-0040-task-0015-execution-record.md](MSG-0040-task-0015-execution-record.md) |

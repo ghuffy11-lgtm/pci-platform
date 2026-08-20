@@ -1,6 +1,8 @@
 # TASK-0017 — Supervisor heartbeat / unattended observability
 
-**Status:** READY — authorized by MSG-0043
+**Status:** **IN_PROGRESS** (2026-08-20) — authorized READY by MSG-0043; executed, but the success
+gate below is **NOT met** because the test suite could not be run. See MSG-0045 and
+`checkpoints/TASK-0017.md`. The authorization text below is unchanged, as issued.
 **Owner:** Claude Code
 **Depends on:** TASK-0016
 **Priority:** Highest available maintenance task

@@ -316,6 +316,49 @@ Test-Case 'a failing runner reports its real exit code' {
     finally { Remove-Item -LiteralPath $dir -Recurse -Force }
 }
 
+Test-Case 'a long run reports progress while it is still running' {
+    $dir = New-TempDir
+    try {
+        $script:progressTicks = 0
+        $script:lastElapsed = -1
+        # ping -n 4 is roughly three seconds, so a one-second interval must tick at least once.
+        $r = Start-RunnerProcess -FilePath 'cmd.exe' -CommandLine '/c ping -n 4 127.0.0.1 >nul' `
+            -WorkingDirectory $dir -StdOutPath (Join-Path $dir 'o.log') -StdErrPath (Join-Path $dir 'e.log') `
+            -ProgressIntervalSeconds 1 `
+            -OnProgress { param($p, $elapsed) $script:progressTicks++; $script:lastElapsed = $elapsed }
+        Assert-Equal 0 $r.ExitCode 'polling must not change the reported exit code'
+        Assert-True ($script:progressTicks -ge 1) 'a multi-second run must report progress at least once'
+        Assert-True ($script:lastElapsed -ge 0) 'progress must carry the elapsed seconds'
+    }
+    finally { Remove-Item -LiteralPath $dir -Recurse -Force }
+}
+
+Test-Case 'a short run completes without any progress tick' {
+    $dir = New-TempDir
+    try {
+        $script:shortTicks = 0
+        $r = Start-RunnerProcess -FilePath 'cmd.exe' -CommandLine '/c exit 0' `
+            -WorkingDirectory $dir -StdOutPath (Join-Path $dir 'o.log') -StdErrPath (Join-Path $dir 'e.log') `
+            -ProgressIntervalSeconds 30 -OnProgress { param($p, $elapsed) $script:shortTicks++ }
+        Assert-Equal 0 $r.ExitCode
+        Assert-Equal 0 $script:shortTicks 'the poll must not spin on a process that has already exited'
+    }
+    finally { Remove-Item -LiteralPath $dir -Recurse -Force }
+}
+
+Test-Case 'stdout is still captured in full when the wait polls' {
+    $dir = New-TempDir
+    try {
+        $r = Start-RunnerProcess -FilePath 'cmd.exe' -CommandLine '/c ping -n 3 127.0.0.1 >nul & echo TAIL_MARKER' `
+            -WorkingDirectory $dir -StdOutPath (Join-Path $dir 'o.log') -StdErrPath (Join-Path $dir 'e.log') `
+            -ProgressIntervalSeconds 1 -OnProgress { param($p, $elapsed) }
+        # WaitForExit(int) does not drain redirected streams the way the argless overload does.
+        # Output written just before exit is the case that would be lost if .Result were dropped.
+        Assert-True ($r.StdOut -like '*TAIL_MARKER*') 'output written just before exit must not be truncated'
+    }
+    finally { Remove-Item -LiteralPath $dir -Recurse -Force }
+}
+
 Test-Case 'the started callback receives the runner pid' {
     $dir = New-TempDir
     try {
@@ -426,6 +469,170 @@ Test-Case 'a repository ahead of the remote is NOT resolved automatically' {
         Assert-True ($r.Reason -like '*ahead*') 'and the reason must name it'
     }
     finally { Remove-Item -LiteralPath $fx.Root -Recurse -Force -ErrorAction SilentlyContinue }
+}
+
+Write-Host ''
+Write-Host 'heartbeat content' -ForegroundColor Cyan
+
+Test-Case 'the heartbeat records the runner pid and an active runner' {
+    $dir = New-TempDir
+    try {
+        Write-SupervisorHeartbeat -StateDirectory $dir -Decision 'RUNNER_STARTED' -Reason 'launched' `
+            -ReadyTask ([pscustomobject]@{ Id = 'TASK-0004' }) -Head 'abc123' `
+            -RunnerActive $true -RunnerPid 4242 | Out-Null
+        $beat = Get-Content -LiteralPath (Join-Path $dir 'heartbeat.json') -Raw -Encoding UTF8 | ConvertFrom-Json
+        Assert-Equal 'RUNNER_STARTED' $beat.decision
+        Assert-Equal 'TASK-0004' $beat.readyTask 'an observer must be able to see WHICH task is running'
+        Assert-Equal $true $beat.runnerActive
+        Assert-Equal 4242 $beat.runnerPid 'the runner pid makes the claim checkable against the process table'
+    }
+    finally { Remove-Item -LiteralPath $dir -Recurse -Force }
+}
+
+Test-Case 'an idle heartbeat carries no runner pid' {
+    $dir = New-TempDir
+    try {
+        Write-SupervisorHeartbeat -StateDirectory $dir -Decision 'NOOP' -Reason 'no READY task' | Out-Null
+        $beat = Get-Content -LiteralPath (Join-Path $dir 'heartbeat.json') -Raw -Encoding UTF8 | ConvertFrom-Json
+        Assert-Equal 'NOOP' $beat.decision
+        Assert-Equal $false $beat.runnerActive
+        Assert-Equal 0 $beat.runnerPid
+    }
+    finally { Remove-Item -LiteralPath $dir -Recurse -Force }
+}
+
+Write-Host ''
+Write-Host 'live-run observability (TASK-0017 regression)' -ForegroundColor Cyan
+
+function New-FixtureCycleRepo {
+    <#
+        A fixture repository pair whose work tree carries a queue with one READY task, committed and
+        pushed so the work tree is reconciled with its origin. Returns the fixture plus the paths a
+        cycle will use.
+    #>
+    param([Parameter(Mandatory)][string]$Queue)
+
+    $fx = New-FixtureRepoPair
+    $supDir = Join-Path $fx.Work 'implementation/operations/supervisor'
+    New-Item -ItemType Directory -Path $supDir -Force | Out-Null
+    $queuePath = Join-Path $fx.Work 'queue.md'
+    $Queue | Out-File -LiteralPath $queuePath -Encoding ascii
+
+    Push-Location $fx.Work
+    try {
+        Invoke-FixtureGit add -A
+        Invoke-FixtureGit commit -qm queue
+        Invoke-FixtureGit push -q origin main
+    }
+    finally { Pop-Location }
+
+    return @{
+        Fx       = $fx
+        StateDir = (Join-Path $supDir 'state')
+        LogDir   = (Join-Path $supDir 'logs')
+    }
+}
+
+function New-FixtureCycleConfig {
+    param([Parameter(Mandatory)]$Repo, [Parameter(Mandatory)][string]$RunnerScript)
+    return [pscustomobject]@{
+        enabled = $true; dryRun = $false
+        repositoryPath = $Repo.Fx.Work
+        queueRelativePath = 'queue.md'; remote = 'origin'; branch = 'main'
+        intervalMinutes = 10; staleRunMinutes = 120; lockTimeoutMinutes = 240
+        heartbeatIntervalSeconds = 1
+        runnerCommand = 'cmd.exe'; runnerArguments = @('/c', $RunnerScript)
+        statePath = 'state'; logPath = 'logs'
+    }
+}
+
+Test-Case 'the heartbeat is NOT stale while a supervisor-started runner is alive' {
+    # This is the TASK-0017 defect as a regression test. The heartbeat is deliberately seeded with a
+    # stale idle beat -- exactly what was observed in production -- and the fake runner snapshots the
+    # file WHILE IT IS RUNNING. Before the fix the snapshot read "NOOP :: no READY task"; the run was
+    # invisible for its whole duration because the only heartbeat write happened after WaitForExit.
+    $repo = New-FixtureCycleRepo -Queue $QUEUE_WITH_READY
+    try {
+        New-Item -ItemType Directory -Path $repo.StateDir -Force | Out-Null
+        Write-SupervisorHeartbeat -StateDirectory $repo.StateDir -Decision 'NOOP' `
+            -Reason 'no READY task' -Head 'stale000' | Out-Null
+
+        $observed = Join-Path $repo.StateDir 'observed-during-run.json'
+        $runnerScript = Join-Path $repo.Fx.Root 'runner.cmd'
+        @(
+            '@echo off',
+            'ping -n 4 127.0.0.1 >nul',
+            ('copy /y "' + (Join-Path $repo.StateDir 'heartbeat.json') + '" "' + $observed + '" >nul'),
+            'exit /b 0'
+        ) | Out-File -LiteralPath $runnerScript -Encoding ascii
+
+        $r = Invoke-SupervisorCycle -Config (New-FixtureCycleConfig -Repo $repo -RunnerScript $runnerScript)
+
+        Assert-True (Test-Path -LiteralPath $observed) 'the runner must have been able to read a heartbeat at all'
+        $mid = Get-Content -LiteralPath $observed -Raw -Encoding UTF8 | ConvertFrom-Json
+
+        Assert-True ($mid.decision -ne 'NOOP') 'THE DEFECT: a live run must never read as an idle no-op'
+        Assert-True ($mid.decision -eq 'RUNNER_STARTED' -or $mid.decision -eq 'RUNNER_RUNNING') `
+            ('mid-run decision should name the run; got [' + $mid.decision + ']')
+        Assert-Equal $true $mid.runnerActive 'runnerActive must be true while the runner is alive'
+        Assert-Equal 'TASK-0004' $mid.readyTask 'the running task must be named'
+        Assert-True ($mid.runnerPid -gt 0) 'the live runner pid must be published'
+        Assert-True ($mid.head -ne 'stale000') 'the head must be refreshed, not left at the seeded value'
+
+        Assert-Equal 'COMPLETED' $r.Decision 'a clean run ends COMPLETED, distinct from RUNNER_STARTED'
+    }
+    finally { Remove-Item -LiteralPath $repo.Fx.Root -Recurse -Force -ErrorAction SilentlyContinue }
+}
+
+Test-Case 'the terminal heartbeat reports completion and releases the runner' {
+    $repo = New-FixtureCycleRepo -Queue $QUEUE_WITH_READY
+    try {
+        $runnerScript = Join-Path $repo.Fx.Root 'runner.cmd'
+        @('@echo off', 'echo done', 'exit /b 0') | Out-File -LiteralPath $runnerScript -Encoding ascii
+
+        $r = Invoke-SupervisorCycle -Config (New-FixtureCycleConfig -Repo $repo -RunnerScript $runnerScript)
+        Assert-Equal 'COMPLETED' $r.Decision
+
+        $beat = Get-Content -LiteralPath (Join-Path $repo.StateDir 'heartbeat.json') -Raw -Encoding UTF8 | ConvertFrom-Json
+        Assert-Equal 'COMPLETED' $beat.decision
+        Assert-Equal $false $beat.runnerActive 'a finished run must not still report an active runner'
+        Assert-Equal 'TASK-0004' $beat.readyTask 'the terminal beat must still name the task it ran'
+        Assert-True (-not (Test-Path -LiteralPath (Join-Path $repo.StateDir 'runner.lock'))) 'the lock must be released'
+    }
+    finally { Remove-Item -LiteralPath $repo.Fx.Root -Recurse -Force -ErrorAction SilentlyContinue }
+}
+
+Test-Case 'a runner that exits non-zero is FAILED, not COMPLETED' {
+    $repo = New-FixtureCycleRepo -Queue $QUEUE_WITH_READY
+    try {
+        $runnerScript = Join-Path $repo.Fx.Root 'runner.cmd'
+        @('@echo off', 'exit /b 7') | Out-File -LiteralPath $runnerScript -Encoding ascii
+
+        $r = Invoke-SupervisorCycle -Config (New-FixtureCycleConfig -Repo $repo -RunnerScript $runnerScript)
+        Assert-Equal 'FAILED' $r.Decision 'a failed run must be distinguishable from a successful one'
+
+        $beat = Get-Content -LiteralPath (Join-Path $repo.StateDir 'heartbeat.json') -Raw -Encoding UTF8 | ConvertFrom-Json
+        Assert-Equal 'FAILED' $beat.decision
+        Assert-True ($beat.reason -like '*exited 7*') 'the real exit code must reach the heartbeat'
+        Assert-Equal $false $beat.runnerActive
+    }
+    finally { Remove-Item -LiteralPath $repo.Fx.Root -Recurse -Force -ErrorAction SilentlyContinue }
+}
+
+Test-Case 'an idle cycle still reports NOOP' {
+    # The correction must not make every cycle look busy. NOOP has to keep working.
+    $repo = New-FixtureCycleRepo -Queue $QUEUE_NO_READY
+    try {
+        $runnerScript = Join-Path $repo.Fx.Root 'runner.cmd'
+        @('@echo off', 'exit /b 0') | Out-File -LiteralPath $runnerScript -Encoding ascii
+
+        $r = Invoke-SupervisorCycle -Config (New-FixtureCycleConfig -Repo $repo -RunnerScript $runnerScript)
+        Assert-Equal 'NOOP' $r.Decision
+        $beat = Get-Content -LiteralPath (Join-Path $repo.StateDir 'heartbeat.json') -Raw -Encoding UTF8 | ConvertFrom-Json
+        Assert-Equal 'NOOP' $beat.decision
+        Assert-Equal $false $beat.runnerActive
+    }
+    finally { Remove-Item -LiteralPath $repo.Fx.Root -Recurse -Force -ErrorAction SilentlyContinue }
 }
 
 # ---------------------------------------------------------------- summary

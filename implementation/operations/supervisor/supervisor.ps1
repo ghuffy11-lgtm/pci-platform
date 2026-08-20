@@ -51,6 +51,10 @@ function Get-SupervisorConfig {
         intervalMinutes    = 10
         staleRunMinutes    = 120
         lockTimeoutMinutes = 240
+        # How often the heartbeat is refreshed WHILE a runner is alive. This is not the schedule:
+        # the 10-minute cycle in intervalMinutes is untouched and remains the authoritative cadence.
+        # This governs only how quickly an observer learns that a long run is still progressing.
+        heartbeatIntervalSeconds = 30
         runnerCommand      = ''
         runnerArguments    = @()
         statePath          = 'state'
@@ -96,13 +100,22 @@ function Write-SupervisorLog {
 }
 
 function Write-SupervisorHeartbeat {
+    <#
+        Overwrite state/heartbeat.json.
+
+        This is the ONLY thing an external observer can read to answer "is the automation alive, and
+        what is it doing right now?". It is therefore written at every point where that answer
+        changes -- including in the middle of a run, not only when a cycle ends. See the decision
+        vocabulary below and section 6 of README.md.
+    #>
     param(
         [Parameter(Mandatory)][string]$StateDirectory,
         [Parameter(Mandatory)][string]$Decision,
         [string]$Reason = '',
         $ReadyTask = $null,
         [string]$Head = '',
-        [bool]$RunnerActive = $false
+        [bool]$RunnerActive = $false,
+        [int]$RunnerPid = 0
     )
 
     if (-not (Test-Path -LiteralPath $StateDirectory)) {
@@ -114,11 +127,18 @@ function Write-SupervisorHeartbeat {
 
     $beat = [ordered]@{
         timestamp    = (Get-Date).ToUniversalTime().ToString('yyyy-MM-ddTHH:mm:ssZ')
-        decision     = $Decision      # STARTED | NOOP | BLOCKED | ERROR | DRY_RUN
+        # NOOP | BLOCKED | DRY_RUN | RUNNER_STARTED | RUNNER_RUNNING | COMPLETED | FAILED | ERROR
+        #
+        # RUNNER_STARTED, RUNNER_RUNNING, COMPLETED and FAILED replace the single overloaded
+        # STARTED, which was written only when a cycle ended and so described a launch and a
+        # completed run identically. ERROR now means the SUPERVISOR itself failed; a runner that
+        # fails is FAILED. The two have different readers and different remedies.
+        decision     = $Decision
         reason       = $Reason
         readyTask    = $taskId
         head         = $Head
         runnerActive = $RunnerActive
+        runnerPid    = $RunnerPid
         supervisorPid = $PID
         host         = $env:COMPUTERNAME
     }
@@ -407,6 +427,11 @@ function Start-RunnerProcess {
 
         Both streams are read asynchronously before WaitForExit: reading one to completion first
         can deadlock if the other fills its buffer.
+
+        The wait is a POLL, not a single blocking call. A Claude run lasts minutes to hours, and a
+        supervisor blocked in WaitForExit() writes nothing for that whole time -- which is precisely
+        how the heartbeat came to describe an idle scheduler while a task was in flight (TASK-0017).
+        OnProgress fires roughly every ProgressIntervalSeconds so the caller can refresh state.
     #>
     param(
         [Parameter(Mandatory)][string]$FilePath,
@@ -414,7 +439,9 @@ function Start-RunnerProcess {
         [Parameter(Mandatory)][string]$WorkingDirectory,
         [Parameter(Mandatory)][string]$StdOutPath,
         [Parameter(Mandatory)][string]$StdErrPath,
-        [scriptblock]$OnStarted
+        [scriptblock]$OnStarted,
+        [scriptblock]$OnProgress,
+        [int]$ProgressIntervalSeconds = 30
     )
 
     $psi = New-Object System.Diagnostics.ProcessStartInfo
@@ -432,8 +459,23 @@ function Start-RunnerProcess {
 
     $outTask = $proc.StandardOutput.ReadToEndAsync()
     $errTask = $proc.StandardError.ReadToEndAsync()
-    $proc.WaitForExit()
 
+    $waitMs = $ProgressIntervalSeconds * 1000
+    if ($waitMs -lt 1000) { $waitMs = 1000 }
+    $startedUtc = (Get-Date).ToUniversalTime()
+
+    # WaitForExit([int]) returns $false on timeout, $true once the process has exited.
+    while (-not $proc.WaitForExit($waitMs)) {
+        if ($null -ne $OnProgress) {
+            $elapsed = ((Get-Date).ToUniversalTime() - $startedUtc).TotalSeconds
+            # A failing progress callback must never kill a running task. Report and keep waiting.
+            try { & $OnProgress $proc.Id ([int]$elapsed) }
+            catch { Write-Verbose ('OnProgress failed: ' + $_.Exception.Message) }
+        }
+    }
+
+    # The timed overload does NOT wait for the redirected streams to close, unlike the argless one.
+    # Reading .Result does: each task completes at EOF. Do not replace these with .IsCompleted checks.
     $out = $outTask.Result
     $err = $errTask.Result
 
@@ -562,9 +604,16 @@ function Invoke-SupervisorCycle {
     $stateDir = Join-Path $repo (Join-Path 'implementation/operations/supervisor' $Config.statePath)
     $logDir = Join-Path $repo (Join-Path 'implementation/operations/supervisor' $Config.logPath)
 
+    function Get-DecisionLogLevel {
+        param([string]$Decision)
+        if ($Decision -eq 'COMPLETED' -or $Decision -eq 'RUNNER_STARTED') { return 'ACTION' }
+        if ($Decision -eq 'FAILED' -or $Decision -eq 'ERROR') { return 'ERROR' }
+        return 'NOOP'
+    }
+
     function Complete-Cycle {
         param($Decision, $Reason, $Task, $Head, $RunnerActive)
-        Write-SupervisorLog -Level $(if ($Decision -eq 'STARTED') { 'ACTION' } elseif ($Decision -eq 'ERROR') { 'ERROR' } else { 'NOOP' }) `
+        Write-SupervisorLog -Level (Get-DecisionLogLevel -Decision $Decision) `
             -Event $Decision -Detail $Reason -LogDirectory $logDir | Out-Null
         Write-SupervisorHeartbeat -StateDirectory $stateDir -Decision $Decision -Reason $Reason `
             -ReadyTask $Task -Head $Head -RunnerActive $RunnerActive | Out-Null
@@ -635,8 +684,14 @@ function Invoke-SupervisorCycle {
             Write-SupervisorLog -Level 'ACTION' -Event 'RUNNER_COMMAND' `
                 -Detail ($Config.runnerCommand + ' ' + $commandLine) -LogDirectory $logDir | Out-Null
 
+            $interval = 30
+            if ($Config.PSObject.Properties.Name -contains 'heartbeatIntervalSeconds') {
+                $interval = [int]$Config.heartbeatIntervalSeconds
+            }
+
             $result = Start-RunnerProcess -FilePath $Config.runnerCommand -CommandLine $commandLine `
                 -WorkingDirectory $repo -StdOutPath $runOut -StdErrPath $runErr `
+                -ProgressIntervalSeconds $interval `
                 -OnStarted {
                     param($runnerPid)
                     # The lock was created with the supervisor's PID, but the supervisor is a
@@ -646,6 +701,21 @@ function Invoke-SupervisorCycle {
                     Update-RunnerLockPid -StateDirectory $stateDir -RunnerPid $runnerPid | Out-Null
                     Write-SupervisorLog -Level 'ACTION' -Event 'RUNNER_STARTED' `
                         -Detail ('pid=' + $runnerPid + ' task=' + $ready.Id) -LogDirectory $logDir | Out-Null
+                    # Heartbeat the launch IMMEDIATELY. Everything below this point blocks until the
+                    # runner exits, so without this write the file keeps describing the previous
+                    # idle cycle for the entire run -- the TASK-0017 defect exactly.
+                    Write-SupervisorHeartbeat -StateDirectory $stateDir -Decision 'RUNNER_STARTED' `
+                        -Reason ('runner launched for ' + $ready.Id) -ReadyTask $ready -Head $git.Head `
+                        -RunnerActive $true -RunnerPid $runnerPid | Out-Null
+                } `
+                -OnProgress {
+                    param($runnerPid, $elapsedSeconds)
+                    # Refreshed while the runner is alive. A moving timestamp is what distinguishes
+                    # "a long task is progressing" from "the supervisor died mid-run"; those look
+                    # identical from a single sample, and only one of them needs a human.
+                    Write-SupervisorHeartbeat -StateDirectory $stateDir -Decision 'RUNNER_RUNNING' `
+                        -Reason ('{0} running for {1}s' -f $ready.Id, $elapsedSeconds) -ReadyTask $ready `
+                        -Head $git.Head -RunnerActive $true -RunnerPid $runnerPid | Out-Null
                 }
 
             $code = $result.ExitCode
@@ -655,12 +725,12 @@ function Invoke-SupervisorCycle {
             if (Test-Path -LiteralPath $runOut) { $outSize = (Get-Item -LiteralPath $runOut).Length }
             $detail = ('{0} exited {1}; stdout {2} bytes -> {3}' -f $ready.Id, $code, $outSize, (Split-Path -Leaf $runOut))
 
-            if ($code -eq 0) { return Complete-Cycle 'STARTED' ('runner completed: ' + $detail) $ready $git.Head $false }
-            return Complete-Cycle 'ERROR' ('runner failed: ' + $detail) $ready $git.Head $false
+            if ($code -eq 0) { return Complete-Cycle 'COMPLETED' ('runner completed: ' + $detail) $ready $git.Head $false }
+            return Complete-Cycle 'FAILED' ('runner failed: ' + $detail) $ready $git.Head $false
         }
         catch {
             Remove-RunnerLock -StateDirectory $stateDir
-            return Complete-Cycle 'ERROR' ('runner failed to start: ' + $_.Exception.Message) $ready $git.Head $false
+            return Complete-Cycle 'FAILED' ('runner failed to start: ' + $_.Exception.Message) $ready $git.Head $false
         }
     }
     catch {

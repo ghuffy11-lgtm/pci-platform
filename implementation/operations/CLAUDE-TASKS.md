@@ -27,10 +27,46 @@ Only the architecture lead may authorize new work, mark a task READY, or change 
 | TASK-0014 | **Reconcile BLK-0005 in blocker index** | **COMPLETE** | TASK-0013, MSG-0037 | 2026-08-20 — row added, MSG-0038 | none | Claude Code |
 | TASK-0015 | **Reconcile discoveries index with actual DISC records** | **COMPLETE** | TASK-0014, MSG-0039 | 2026-08-20 — index 3 rows -> 9, MSG-0040 | none | Claude Code |
 | TASK-0016 | **Close resolved MSG-0034 informational record** | **COMPLETE** | TASK-0015, MSG-0041 | 2026-08-20 — closure verified, MSG-0042 | none | Claude Code |
-| TASK-0017 | **Supervisor heartbeat / unattended observability** | **READY** | TASK-0016 | — | Execute (authorized by MSG-0043) | Claude Code |
+| TASK-0017 | **Supervisor heartbeat / unattended observability** | **IN_PROGRESS** | TASK-0016 | 2026-08-20 — defect reproduced and corrected; **tests NOT run** | **Architecture lead / operator decision** — MSG-0045 §7 | Claude Code |
 | TASK-0002 | Make test entry points shell-independent | **ABORTED** | — | 2026-08-19 | none — premise disproven by measurement | — |
 
 **TASK-0016 is explicitly authorized by the architecture lead after WP-0001 completion.** It is maintenance/documentation work, not a new product work package.
+
+### TASK-0017 — result: IMPLEMENTED but NOT COMPLETE
+
+**IN_PROGRESS, 2026-08-20.** The defect was reproduced, diagnosed and corrected, and nine focused
+tests were written. **The success gate is NOT met**: MSG-0043 requires that the relevant test suite
+passes, and the suite **could not be executed** — no allowlist entry permits running a PowerShell
+script, so the command documented in the supervisor README was refused three times. Evidence and the
+decision request: **MSG-0045**. Both checkpoints: `checkpoints/TASK-0017.md`.
+
+**The reproduction cost nothing.** This session *was* the defect: the Supervisor started it at
+12:31:16Z and `state/heartbeat.json` went on reading `NOOP :: no READY task`, `runnerActive: false`,
+with a two-commit-old `head`, for the whole run. The log was correct throughout — the fault was
+confined to the state file and never touched scheduling.
+
+**Corrected** in `supervisor.ps1`: the runner wait polls instead of blocking, a heartbeat is written
+at launch and refreshed while the runner is alive, `runnerPid` is published, and the overloaded
+`STARTED` decision is split into `RUNNER_STARTED` / `RUNNER_RUNNING` / `COMPLETED` / `FAILED`, with
+`ERROR` narrowed to mean the supervisor itself failed. The ten-minute schedule, the reconciliation
+gate, the fail-closed behaviour, and every permission rule are **untouched**.
+
+**Status is IN_PROGRESS, deliberately, not COMPLETE and not READY.** Not COMPLETE because the gate is
+unmet. Not READY because that would have the Supervisor start the task again on its next cycle and
+repeat the work indefinitely. A checkpoint exists, as IN_PROGRESS requires.
+
+> **Operational risk, stated rather than buried.** The Supervisor is ENABLED and will run this changed
+> code unverified on its next cycle. If it contains a fault, unattended execution stops until a human
+> intervenes. The change is ASCII-verified, additive, and confined to the state-writing path — but a
+> static read is not a passing test. It is one commit and `git revert` undoes it.
+
+### TASK-0017 — authorization (as issued)
+
+**READY, 2026-08-20.** MSG-0043 authorizes diagnosing and correcting the heartbeat/observability
+defect. Full specification: [`TASK-0017-supervisor-heartbeat.md`](TASK-0017-supervisor-heartbeat.md);
+the queue section below carries prerequisites, allowed and forbidden actions, verification,
+documentation, checkpoint, stop conditions, and recovery. Queue reconciliation is recorded in
+MSG-0044.
 
 ### TASK-0016 — result
 
@@ -193,6 +229,7 @@ READY means *authorized to attempt*, never *authorized to force*. A READY task w
 | MSG-0042 | Record | CREATED — closure verified | Claude Code | Architecture lead | TASK-0016 execution evidence; MSG-0034 CLOSED in record and register; **no decision requested** | TASK-0016 |
 | MSG-0043 | Decision | DECIDED | Architecture lead | Claude Code | **TASK-0017 AUTHORIZED** — correct the stale-heartbeat defect; schedule, gates and permissions unchanged | TASK-0017 |
 | MSG-0044 | Record | OPEN | Claude Code | Architecture lead | **TASK-0017 authorized in MSG-0043 but absent from the queue**, so the supervisor could never select it. Queue reconciled; structural finding recorded | TASK-0017 |
+| MSG-0045 | Record | **OPEN — decision required** | Claude Code | Architecture lead | **TASK-0017 IMPLEMENTED but NOT COMPLETE.** Defect reproduced and corrected; the test suite **could not be run** — no allowlist entry permits executing a PowerShell script. Three options in §7 | TASK-0017 |
 
 ## Interruption and recovery protocol
 
@@ -232,9 +269,10 @@ Claude Code MUST stop, document, commit, push, and report when architecture appr
 
 ## TASK-0017 — Supervisor heartbeat / unattended observability
 
-**Priority:** 1 | **Status:** **READY** — authorized by MSG-0043 | **Owner:** Claude Code
+**Priority:** 1 | **Status:** **IN_PROGRESS** — authorized by MSG-0043; verification blocked, see MSG-0045 | **Owner:** Claude Code
 **Depends on:** TASK-0016 (COMPLETE) | **Next eligible task:** none — nothing follows automatically
 **Full specification:** [`TASK-0017-supervisor-heartbeat.md`](TASK-0017-supervisor-heartbeat.md)
+**Checkpoint:** [`checkpoints/TASK-0017.md`](checkpoints/TASK-0017.md)
 
 ### Objective
 

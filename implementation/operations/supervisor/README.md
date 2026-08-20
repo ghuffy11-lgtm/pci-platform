@@ -115,6 +115,7 @@ task keeps running and keeps logging, but starts nothing.
 | `intervalMinutes` | `10` | Authoritative cadence |
 | `staleRunMinutes` | `120` | When an IN_PROGRESS task is considered stale |
 | `lockTimeoutMinutes` | `240` | When a lock whose process is gone is reported stale |
+| `heartbeatIntervalSeconds` | `30` | How often the heartbeat is refreshed **while a runner is alive**. Not the schedule — `intervalMinutes` is untouched and remains authoritative. This governs only how quickly an observer learns a long run is still progressing |
 | `runnerCommand` | `""` | Absolute path to the authorized Claude runner. Empty = never starts anything |
 | `runnerArguments` | `[]` | `{TASK_ID}` is substituted with the READY task id |
 
@@ -187,27 +188,56 @@ operation merely because the checkpoint says it was incomplete**.
 2026-08-19T16:40:02Z [NOOP] NOOP :: no READY task
 2026-08-19T16:50:03Z [NOOP] NOOP :: not reconciled: local and remote differ
 2026-08-19T17:00:01Z [NOOP] BLOCKED :: queue inconsistent: TASK-0006 is READY but dependency TASK-0004 is BLOCKED
-2026-08-19T17:10:04Z [ACTION] STARTED :: runner started for TASK-0004
+2026-08-20T17:10:04Z [ACTION] RUNNER_STARTED :: pid=23668 task=TASK-0004
+2026-08-20T17:41:22Z [ACTION] COMPLETED :: runner completed: TASK-0004 exited 0; stdout 8412 bytes -> runner-TASK-0004-20260820-171004.out.log
 ```
 
-**Heartbeat:** `state/heartbeat.json`, overwritten each cycle — the answer to "is this thing alive
-and what did it decide?":
+**Heartbeat:** `state/heartbeat.json` — the answer to "is this thing alive and what is it doing
+*right now*?":
 
 ```json
 {
-  "timestamp": "2026-08-19T17:10:04Z",
-  "decision": "STARTED",
-  "reason": "runner started for TASK-0004",
+  "timestamp": "2026-08-20T17:23:41Z",
+  "decision": "RUNNER_RUNNING",
+  "reason": "TASK-0004 running for 810s",
   "readyTask": "TASK-0004",
   "head": "78c4a0f...",
   "runnerActive": true,
+  "runnerPid": 23668,
   "supervisorPid": 12345,
   "host": "DEV-WORKSTATION"
 }
 ```
 
-Decisions: `STARTED`, `NOOP`, `BLOCKED`, `DRY_RUN`, `ERROR`. A stale `timestamp` means the supervisor
-itself has stopped running — that is the signal to check Task Scheduler.
+### Decision vocabulary
+
+| `decision` | Meaning | `runnerActive` |
+|---|---|---|
+| `NOOP` | Nothing to do, or a reason not to act — no READY task, not reconciled, a runner already active | `false` |
+| `BLOCKED` | The queue contradicts itself, or a lock is stale. Needs a human | `false` |
+| `DRY_RUN` | A READY task was found, but `enabled`/`dryRun` prevented starting it | `false` |
+| `RUNNER_STARTED` | A runner has just been launched | `true` |
+| `RUNNER_RUNNING` | The runner is still alive; refreshed every `heartbeatIntervalSeconds` | `true` |
+| `COMPLETED` | The runner exited 0 | `false` |
+| `FAILED` | The runner exited non-zero, or could not be launched | `false` |
+| `ERROR` | The **supervisor itself** failed. Distinct from `FAILED`: different reader, different remedy | `false` |
+
+### Reading it correctly
+
+The heartbeat is written **during** a run, not only at the end of a cycle. That matters because a
+Claude run lasts minutes to hours, and the supervisor blocks for its whole duration.
+
+- A `timestamp` that is minutes old with `decision: RUNNER_RUNNING` is **healthy** — a long task is
+  progressing. Compare `runnerPid` against the process table to confirm.
+- A `timestamp` that has stopped advancing means the supervisor itself has stopped. Check Task
+  Scheduler.
+- `decision: NOOP` genuinely means idle. It no longer needs to be cross-checked against
+  `runner.lock` to find out whether a run is secretly in flight.
+
+> **This was not always true.** Until TASK-0017 the heartbeat was written only when a cycle *ended*,
+> so throughout a live run it kept describing the previous idle cycle — typically `NOOP :: no READY
+> task` with `runnerActive: false`. Unattended execution was indistinguishable from a dead scheduler
+> for exactly as long as it was working. See MSG-0045.
 
 ---
 
@@ -240,8 +270,7 @@ concurrent sessions against shared state, which is far worse than a stall.
 powershell -NoProfile -ExecutionPolicy Bypass -File .\tests\supervisor.tests.ps1
 ```
 
-Self-contained; no Pester required. Exit 0 = pass. **17 tests, all passing** as of 2026-08-19,
-covering every behaviour the task requires:
+Self-contained; no Pester required. Exit 0 = pass. **36 `Test-Case` blocks** as of 2026-08-20:
 
 | Area | Tests |
 |---|---|
@@ -252,9 +281,26 @@ covering every behaviour the task requires:
 | GitHub unavailable | non-repository is unreadable not an error; unreconciled repo yields `NOOP` |
 | Inconsistent queue | READY with incomplete dependency; two IN_PROGRESS; unknown status; empty parse |
 | Defaults | disabled, dry-run, no runner command, 10-minute interval |
+| Runner command line | spaces quoted as one argument; bare args left alone; embedded quotes escaped |
+| Runner launch | real exit code 0 and 3; `OnStarted` carries the pid; the lock is repointed |
+| **Progress polling** | a multi-second run ticks `OnProgress`; a fast run ticks zero times; output written just before exit is still captured |
+| **Heartbeat content** | an active beat carries `runnerPid` and the task id; an idle beat carries neither |
+| **Live-run observability** | mid-run the heartbeat is never `NOOP`; a clean run ends `COMPLETED`; a non-zero exit ends `FAILED`; an idle cycle still ends `NOOP` |
 
-The tests never start a runner, never touch a git remote, and never contact the PCI server. Fixtures
-are temporary directories on the development machine, removed afterwards.
+The tests never contact the PCI server. The live-run tests do start a process, but it is `cmd.exe`
+running a throwaway `.cmd` script in a temp directory, and the git fixtures are local bare
+repositories — no network, no remote, no credentials. Fixtures are removed afterwards.
+
+The live-run regression test is worth describing, because it tests the thing that actually broke: it
+seeds `heartbeat.json` with a stale idle beat, then has the fake runner **copy the heartbeat file
+while it is running**. That copy is what an external observer would have seen. Before TASK-0017 it
+read `NOOP :: no READY task`; the assertion is that it never does again.
+
+> **Verification status, stated plainly.** The counts above are a static count of `Test-Case` blocks,
+> not a test result. The suite could **not be executed** in the unattended session that wrote these
+> tests: no allowlist entry permits running a PowerShell script, so the documented command was
+> refused. The tests are written and committed; they are **not yet proven to pass**. See MSG-0045 and
+> `../checkpoints/TASK-0017.md` checkpoint 2.
 
 Note for maintainers: these scripts are **ASCII-only on purpose**. Windows PowerShell 5.1 reads a
 BOM-less file as ANSI, where a UTF-8 em dash decodes to `U+201D` — which PowerShell accepts as a
