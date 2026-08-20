@@ -2,7 +2,7 @@
 
 **Active Work Package:** WP-0001 — PCI Kernel Foundation
 **Status:** **COMPLETE** — declared by the architecture lead 2026-08-19 (MSG-0020(b), resolved by MSG-0022 / MSG-0023, TASK-0009)
-**Last Updated:** 2026-08-20 (TASK-0003)
+**Last Updated:** 2026-08-20 (TASK-0011 — Supervisor smoke test and full record reconciliation)
 
 ## Current State
 
@@ -50,9 +50,10 @@ The execution-control system (Phase 0, MSG-0010):
 Every session reads the roadmap and queue at startup and executes the highest-priority READY task,
 continuing automatically through authorized work rather than stopping after each subtask.
 
-**Current task: none is READY.** TASK-0001 and TASK-0004 through TASK-0010 are COMPLETE. TASK-0003
-was authorized by MSG-0027, executed on 2026-08-20 by a supervisor-started session, and is
-**IMPLEMENTED but NOT COMPLETE** — see the TASK-0003 block below and MSG-0028.
+**Current task: none is READY.** TASK-0001 and TASK-0003 through TASK-0011 are COMPLETE. TASK-0003
+was authorized by MSG-0027, executed on 2026-08-20 by a supervisor-started session, and completed
+later the same day once MSG-0030 authorized the refresh command — CRLF residue 150 -> 0, accepted in
+MSG-0031. TASK-0011, the Supervisor smoke test, completed 2026-08-20 (MSG-0032).
 
 | ID | Task | Status | Depends On | Owner |
 |---|---|---|---|---|
@@ -63,16 +64,23 @@ was authorized by MSG-0027, executed on 2026-08-20 by a supervisor-started sessi
 | TASK-0007 | Full re-verification after fixes | **COMPLETE** — G4 passed | TASK-0006 | Claude Code |
 | TASK-0008 | Final report and status reconciliation | **COMPLETE** — G5 passed | TASK-0007 | Claude Code |
 | TASK-0009 | WP-0001 completion decision | **COMPLETE** — WP-0001 declared complete | TASK-0008 | Architecture lead |
-| TASK-0003 | Normalise `*.md` line endings (DISC-0006) | **IMPLEMENTED — NOT COMPLETE** (2026-08-20) | — | Claude Code → architecture lead (MSG-0028) |
+| TASK-0003 | Normalise `*.md` line endings (DISC-0006) | **COMPLETE** (2026-08-20) — CRLF 150 -> 0, accepted in MSG-0031 | — | Claude Code |
 | TASK-0010 | Execution Supervisor (installed and **ENABLED**) | **COMPLETE** | — | Claude Code |
+| TASK-0011 | Execution Supervisor smoke test — COMMS audit, end to end | **COMPLETE** (2026-08-20) — passed, MSG-0032 | TASK-0010 ✅ | Claude Code |
 | TASK-0002 | Make test entry points shell-independent | **ABORTED** | — | — |
 
-**No task is currently READY.**
+**No task is currently READY.** TASK-0011 was terminal by its own terms: "after it completes there
+will be no READY task unless the architecture lead explicitly authorizes another one."
 
 Only the architecture lead may authorize new work or change a task's priority or scope. A PROPOSED
 task is not executable.
 
-### TASK-0003 — executed 2026-08-20, IMPLEMENTED but NOT COMPLETE
+### TASK-0003 — executed and COMPLETED 2026-08-20
+
+> **Reconciled 2026-08-20 (TASK-0011).** This block was written mid-task, when TASK-0003 was
+> genuinely IMPLEMENTED-but-NOT-COMPLETE, and it was never updated after MSG-0030 unblocked it. The
+> "Not fixed" paragraph below is retained as the record of what was tried and refused — but it is
+> **history, not current state.** The residue is gone: 150 -> 0, verified, accepted in MSG-0031.
 
 Authorized by MSG-0027 and executed by the **first session the Execution Supervisor started on its
 own**. `.gitattributes` now pins `*.md text eol=lf`.
@@ -104,7 +112,14 @@ the ordinary allowlist in `.claude/settings.local.json`, which permits `git add`
 reported instead. The decision is MSG-0028 §2: (A) the operator runs one path-scoped command,
 (B) widen the runner allowlist, or (C) accept a residue that exists only on this workstation.
 
-Evidence: [`../operations/checkpoints/TASK-0003.md`](../operations/checkpoints/TASK-0003.md).
+**Outcome — the above is now closed.** MSG-0030 authorized Option B (`git checkout -- "*.md"`). The
+authorized command was a no-op at first because git did not consider the files modified; a
+metadata-only `touch` scoped to tracked markdown let it run, and that addition was flagged for
+review and **accepted** in MSG-0031, with the lead noting it creates **no general authorization for
+arbitrary preparatory commands**. Residue: **150 -> 0**. DISC-0006 RESOLVED.
+
+Evidence: [`../operations/checkpoints/TASK-0003.md`](../operations/checkpoints/TASK-0003.md),
+[`../comms/MSG-0031-task-0003-complete.md`](../comms/MSG-0031-task-0003-complete.md).
 
 ### Supervisor start path — proven, with a caveat
 
@@ -176,9 +191,23 @@ Every tier reported a non-zero test count.
 
 Index: `implementation/comms/README.md` carries the full message register with links and status.
 
-**No message is OPEN.** Every communication is answered, decided, or closed; the last one, MSG-0031,
-was accepted on 2026-08-20. Every task is COMPLETE except TASK-0002, which is ABORTED because its
-premise was disproven by measurement.
+**No message is OPEN.** Every communication is answered, decided, or closed. Every task is COMPLETE
+except TASK-0002, which is ABORTED because its premise was disproven by measurement.
+
+**Two findings do await a ruling**, both raised in MSG-0032 §6 by the TASK-0011 audit. Neither is an
+OPEN *message* and neither blocks anything, so they are listed here rather than reopening a message:
+
+1. **§6.2 — the blocker register contradicts this file.** `implementation/blockers/README.md` shows
+   BLK-0001 and BLK-0004 **OPEN**; the Open Blockers section below says all are RESOLVED. The
+   evidence favours this file (MSG-0008 closed, host bootstrapped, 229 tests run on it), but the
+   README's own rule says an acceptance criterion covered by an open blocker must never be reported
+   as met — so as literally recorded, WP-0001's criteria are reported met while its index shows two
+   High blockers open. Correcting a blocker status is substantive, so TASK-0011 stopped at that
+   boundary rather than editing it. **Authorization requested to update the README.**
+2. **§6.3 — duplicate message numbering has now happened twice**, MSG-0020 and MSG-0033. The first
+   pair contradicted each other and cost three messages to resolve; the second agrees and cost
+   nothing. No allocation rule prevents a third. **A ruling is requested** on whether to add one to
+   the COMMS protocol; Claude Code proposes but does not adopt one.
 
 > **Precedent, recorded so it is not over-read.** MSG-0031 accepted a metadata-only `touch` as
 > within the scope of an authorized path-scoped `git checkout`. The architecture lead stated that
@@ -190,7 +219,15 @@ premise was disproven by measurement.
 decision. The **Execution Supervisor is ENABLED** and reconciling every ten minutes (MSG-0026). It runs
 `acceptEdits` with a version-controlled deny list and never `--dangerously-skip-permissions`.
 Testing showed the **deny list, not the permission mode, is the effective control** in headless
-mode. Its start path is unproven until a task is genuinely READY. MSG-0011 and MSG-0025 are closed.
+mode. MSG-0011 and MSG-0025 are closed.
+
+Its start path is **proven**: it ran TASK-0003 on 2026-08-20 (MSG-0029), and TASK-0011 then tested
+the whole loop on purpose — queue → Supervisor → Claude → COMMS → GitHub, no human relay — and it
+**passed** (MSG-0032). The limit worth remembering: it recovers from *behind-with-a-clean-tree*
+only. Ahead, or behind-and-dirty, it still refuses and waits for a human. That is the right
+fail-closed choice, but a silent park looks identical from outside to a dead scheduler, which is
+exactly what stalled TASK-0011's first attempts. `CYCLE_START` logging (`479dfa9`) now makes it
+visible; it does not make it self-clearing.
 
 | ID | Subject | Status |
 |---|---|---|
@@ -218,28 +255,50 @@ mode. Its start path is unproven until a task is genuinely READY. MSG-0011 and M
 | MSG-0023 | Correct TASK-0009 boundary | DECIDED — TASK-0009 terminal; no TASK-0012 |
 | MSG-0024 | Execution Supervisor enable decision | DECIDED — enablement authorized |
 | MSG-0025 | Supervisor installed, dry-run verified, NOT enabled | **CLOSED** — answered by MSG-0026 |
-| MSG-0026 | Supervisor **ENABLED**; permission mode determined and verified | **OPEN** — start path now **PROVEN** by TASK-0003 (MSG-0028 §4) |
+| MSG-0026 | Supervisor **ENABLED**; permission mode determined and verified | **CLOSED** — start path PROVEN by TASK-0003, re-proven end to end by TASK-0011 |
 | MSG-0027 | TASK-0003 authorized; line-ending normalization only | DECIDED — executed 2026-08-20 |
-| MSG-0028 | **TASK-0003 implemented, NOT complete** — refresh refused by the permission layer | **OPEN — DECISION REQUIRED** |
-| MSG-0011 | Execution Supervisor — built, tested, not installed | **OPEN** — awaiting install/enable decision |
+| MSG-0028 | TASK-0003 implemented, NOT complete — refresh refused by the permission layer | **DECIDED** — decisions 2 and 3 applied; decision 1 resolved by MSG-0030 |
+| MSG-0011 | Execution Supervisor — built, tested, not installed | **SUPERSEDED** by MSG-0024 — the supervisor is installed and ENABLED |
+| MSG-0029 | Supervisor start path — diagnosis, fixes, first successful launch | **CLOSED** |
+| MSG-0030 | Authorized refresh command was a no-op; three alternatives | **DECIDED** — Option B authorized and executed |
+| MSG-0031 | TASK-0003 COMPLETE — CRLF residue cleared | **DECIDED** — completion accepted |
+| MSG-0032 | TASK-0011 Supervisor smoke test — COMMS audit and result | **RECORD** — passed; **two findings need a ruling** (§6.2, §6.3) |
+| MSG-0033 (a) / (b) | TASK-0011 diagnosis directives — duplicate numbering, non-conflicting | **DECIDED** — both satisfied; corrected in `479dfa9`, answered by MSG-0032 |
 
 ## Repository / GitHub State
 
-**The communication channel is operational.** Verified 2026-08-20, immediately before the TASK-0003
-commit:
+**The communication channel is operational.** Verified 2026-08-20 at the start of TASK-0011:
 
 ```text
-HEAD          aaf0d34
-origin/main   aaf0d34
-ahead 0, behind 0
-working tree: .gitattributes modified (TASK-0003), TASK-0003 checkpoint untracked
+HEAD          479dfa9   fix(supervisor): fast-forward when strictly behind; log every cycle start
+origin/main   479dfa9
+git status -sb  ## main...origin/main      (clean, no ahead/behind)
 ```
 
-`aaf0d34` is not this session's commit — it is `fix(supervisor): capture runner output and make the
-start path actually work`, pushed by a **concurrent actor while TASK-0003 was running**. That is
-recorded here because it is the evidence behind MSG-0028 §3(a), not as routine housekeeping.
+**Push is now available to the unattended runner.** `git push origin main` was added to
+`implementation/operations/supervisor/runner-settings.json` under MSG-0028, narrowly scoped so the
+remote and branch are fixed and arbitrary refspecs remain unavailable. `git push --force` and
+`git push -f` stay denied. TASK-0011 delivered its own evidence to GitHub without a human relaying
+it — which is the specific thing TASK-0011 existed to prove.
 
-### The TASK-0003 commit is COMMITTED but NOT PUSHED
+**`git fetch` is still not allowlisted**, so a runner cannot independently confirm `origin/main`; it
+sees the ref as the Supervisor's own fetch/fast-forward last left it. Recorded as a real limit, not
+worked around.
+
+---
+
+### Historical — the TASK-0003 push gap, since closed
+
+> The block below records the state on 2026-08-20 *before* the push capability was granted, when
+> `93d7067` was stranded locally. It is retained because it is the evidence behind that grant. The
+> SHAs in it are history; **do not read them as current.** Both commits reached `origin/main` long
+> ago, and HEAD has since moved to `479dfa9`.
+
+`aaf0d34` was not that session's commit — it is `fix(supervisor): capture runner output and make the
+start path actually work`, pushed by a **concurrent actor while TASK-0003 was running**. It is the
+evidence behind MSG-0028 §3(a).
+
+#### The TASK-0003 commit was COMMITTED but NOT PUSHED
 
 ```text
 $ git log --oneline -2
@@ -262,32 +321,44 @@ git push origin main
 ```
 
 This is the one case `CLAUDE.md` Rule 7 exempts from repository-first communication — a fault that
-prevents pushing at all. It is recorded here so it lands the moment the channel recovers, and it is
-also reported directly. **Do not read this file's TASK-0003 records as visible to the lead until the
-push happens.**
+prevents pushing at all.
 
 `git push --force` and `git push -f` are separately and correctly denied by the governance deny list.
-The plain push is merely un-allowlisted, which is a gap in the runner's grant rather than a policy
-decision — and it means **an unattended session can complete work it cannot deliver.**
+The plain push was merely un-allowlisted, which is a gap in the runner's grant rather than a policy
+decision — and it meant **an unattended session could complete work it could not deliver.** That gap
+is what MSG-0028 closed by adding the narrowly-scoped `git push origin main`. End of historical block.
+
+---
 
 Local and remote are identical. All WP-0001 implementation and communication artifacts are on
 `origin/main`. The architecture lead can read every artifact directly; the operator is no longer
 required as a messenger.
 
-> This block records a point-in-time check and goes stale the moment anything is committed. Treat
-> the SHA as evidence that a reconciliation was performed on 2026-08-19, not as the current HEAD.
-> Verify with `git rev-parse HEAD origin/main` rather than trusting it.
+> Every SHA in this section is a point-in-time check and goes stale the moment anything is
+> committed. Treat them as evidence that a reconciliation was performed on the stated date, never as
+> the current HEAD. Verify with `git rev-parse HEAD origin/main` rather than trusting this file.
 
 ## Open Blockers
 
-| ID | Subject | Severity |
-|---|---|---|
 **None.** BLK-0001 through BLK-0005 are all RESOLVED. BLK-0005 was closed by MSG-0022 / MSG-0023,
 which ruled that the COMPLETE decision stands and that TASK-0012 is not authorized.
 
 There are no open blockers. The two defects found during verification (DISC-0007, DISC-0008) are
 recorded as discoveries with proposed tasks, not as blockers: nothing is prevented from proceeding,
 but the deployment artifacts are not yet correct.
+
+> **Unreconciled — flagged by TASK-0011, deliberately not fixed.**
+> `implementation/blockers/README.md` still lists **BLK-0001 and BLK-0004 as OPEN**, contradicting
+> the paragraph above. The evidence favours this file: MSG-0008 is CLOSED, the operator executed the
+> bootstrap on 2026-08-19, `DockerRootDir` = `/data/docker` was verified directly, and 229 tests ran
+> on the host — none of it possible with an unbootstrapped host, which is what BLK-0001 and BLK-0004
+> assert. The individual blocker files were resolved; the index was never updated with them.
+>
+> Changing a blocker status is a substantive change to the project record, not a typo fix, and it
+> lies outside TASK-0011's authorized scope — so TASK-0011 stopped at that boundary and recorded it
+> instead. **Authorization is requested in MSG-0032 §6.2.** Until it is given, a reader should treat
+> the blocker README as the stale record and this section as correct, but should not assume that
+> reading is authorized.
 
 ## Recently Closed
 
@@ -343,9 +414,15 @@ as history and now record their ratification.
 - ADR-0015 applies to the kernel only. It does not constrain future AI, ingestion, connector, or
   UI runtimes.
 - ADR-0016 excludes system-tenant governance from WP-0001.
-- ADR-0016's FORCE RLS and non-BYPASSRLS requirements remain **unverified**. They are design
-  obligations that have never been exercised against a real PostgreSQL instance. Ratification
-  does not constitute verification.
+- ADR-0016's FORCE RLS and non-BYPASSRLS requirements are **VERIFIED** as of 2026-08-19 and
+  re-verified under TASK-0007 (gate G4) against the clean-room stack. Ratification still does not
+  constitute verification — but these obligations have now been exercised against a live PostgreSQL
+  instance, not merely asserted. See the Verification Summary above and report section 11.
+
+  > Reconciled by TASK-0011. This bullet previously read "remain **unverified** … never been
+  > exercised against a real PostgreSQL instance", which was true when written and was contradicted
+  > by this same file's Verification Summary once the host runs completed. Kept visible rather than
+  > silently swapped, because the correction is the useful part of the record.
 
 ## Applied Repository Corrections — 2026-08-19
 
@@ -372,7 +449,7 @@ precedence has changed.
 | DISC-0003 | Development identity adapter boundary |
 | DISC-0004 | Compose stack predates the `/data/docker` boundary |
 | DISC-0005 | `npm test` reports success while running zero tests under POSIX shells |
-| DISC-0006 | CRLF line endings silently defeat anchored text edits | **RESOLVED** | **MOSTLY RESOLVED** — TASK-0003; residue on this workstation only |
+| DISC-0006 | CRLF line endings silently defeat anchored text edits — **RESOLVED** by TASK-0003, residue 150 -> 0 |
 | DISC-0009 | Docker CLI writes client state to `/home/claude`, outside `/data` | **OPEN** |
 | DISC-0007 | Init refuses to create a passwordless role, then creates one anyway | **RESOLVED** |
 | DISC-0008 | Compose kernel service cannot start as committed | **RESOLVED** |
@@ -392,22 +469,29 @@ precedence has changed.
 
 ## Next Action
 
-**Awaiting the architecture lead on MSG-0028. No task is READY.**
+**No task is READY. Awaiting the architecture lead.**
 
-WP-0001 is COMPLETE. TASK-0003 — the last authorized task — ran on 2026-08-20 and is IMPLEMENTED but
-NOT COMPLETE. Two decisions are open, both in MSG-0028:
+WP-0001 is COMPLETE. TASK-0003 is COMPLETE (MSG-0031). **TASK-0011 — the last authorized task —
+ran on 2026-08-20 and PASSED** (MSG-0032): the Supervisor selected the READY task, launched Claude,
+Claude read shared repository state, produced this audit, and pushed it to GitHub with no human
+relay. TASK-0011 was terminal by its own terms, so nothing follows it automatically.
 
-1. **The `*.md` working-tree refresh** — option A (operator runs one path-scoped command),
-   B (widen the runner allowlist), or C (accept a residue confined to this workstation).
-2. **Whether a supervisor session should abort when HEAD moves mid-run**, after a concurrent actor
-   committed `aaf0d34` during TASK-0003.
+Two things need the lead, neither blocking (both detailed in MSG-0032 §6):
 
-Also recorded, needing no decision unless the lead intends otherwise: **no task in the queue has a
-detail specification.** MSG-0027 directed the executor to follow TASK-0003's "existing prerequisites,
+1. **Authorize updating `implementation/blockers/README.md`**, which still shows BLK-0001 and
+   BLK-0004 OPEN against all other evidence. TASK-0011 stopped rather than edit a blocker status.
+2. **Rule on message-number allocation.** Duplicate numbering has now happened twice — MSG-0020
+   (contradictory, cost three messages to resolve) and MSG-0033 (consistent, cost nothing).
+
+Then: **authorize the next work package**, or a task, if any is intended. Nothing is in flight.
+
+Also recorded, and now partly addressed: **the queue historically had no task detail
+specifications.** MSG-0027 directed the executor to follow TASK-0003's "existing prerequisites,
 allowed/forbidden actions, verification, documentation, checkpoint, and recovery requirements", and
-none exist — `CLAUDE-TASKS.md` has only status-board rows, verified against `4d9f736` as well as the
-current file. TASK-0003 was still unambiguous because MSG-0027 and DISC-0006 together fixed its
-scope, but a future authorization leaning on those sections will find nothing there.
+none existed — `CLAUDE-TASKS.md` had only status-board rows. TASK-0011 (`2f46280`) is the **first
+task written with an explicit scope block**: allowed actions, forbidden actions, success gate, and
+stop conditions. It worked — the boundaries were unambiguous in execution, including where to stop.
+Recommended as the pattern for future authorizations.
 
 ---
 

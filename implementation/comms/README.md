@@ -10,6 +10,9 @@ a defect in the record, not a missing message.
 
 | ID | Subject | Status | File |
 |---|---|---|---|
+| MSG-0033 (b) | TASK-0011 retry — diagnose and correct the failed smoke-test path | **DECIDED** — diagnosed and corrected in `479dfa9`; TASK-0011 passed, see MSG-0032 | [MSG-0033-task-0011-retry-diagnosis.md](MSG-0033-task-0011-retry-diagnosis.md) |
+| MSG-0033 (a) | TASK-0011 smoke-test diagnosis and corrective action | **DECIDED** — diagnosed and corrected in `479dfa9`; TASK-0011 passed, see MSG-0032 | [MSG-0033-task-0011-diagnosis.md](MSG-0033-task-0011-diagnosis.md) |
+| MSG-0032 | TASK-0011 — Supervisor smoke test: COMMS audit and end-to-end result | **RECORD** — smoke test PASSED; two findings need a ruling (§6.2 blockers, §6.3 numbering) | [MSG-0032-task-0011-supervisor-smoke-test.md](MSG-0032-task-0011-supervisor-smoke-test.md) |
 | MSG-0031 | TASK-0003 COMPLETE — CRLF residue cleared (150 -> 0) | **DECIDED** — completion accepted; stat refresh accepted as in scope | [MSG-0031-task-0003-complete.md](MSG-0031-task-0003-complete.md) |
 | MSG-0030 | MSG-0028 decisions 2 and 3 applied; decision 1 command was a no-op | **DECIDED** — Option B authorized and executed | [MSG-0030-refresh-command-ineffective.md](MSG-0030-refresh-command-ineffective.md) |
 | MSG-0029 | Supervisor start path — diagnosis, fixes, first successful launch | **CLOSED** — start path PROVEN; behaviours ruled by MSG-0028 | [MSG-0029-supervisor-start-path-diagnosis.md](MSG-0029-supervisor-start-path-diagnosis.md) |
@@ -52,15 +55,29 @@ checkout run. That addition is flagged for review in MSG-0031.
 
 Detail: [`MSG-0031-task-0003-complete.md`](MSG-0031-task-0003-complete.md).
 
-## Execution Supervisor — installed and ENABLED
+## Execution Supervisor — installed, ENABLED, and smoke-tested end to end
 
 Running every ten minutes with `acceptEdits` and a version-controlled deny list; never
 `--dangerously-skip-permissions`. Its start path is **proven** — it launched and ran TASK-0003 on
-2026-08-20 (MSG-0029).
+2026-08-20 (MSG-0029), and TASK-0011 then tested the full loop deliberately: queue → Supervisor →
+Claude → COMMS → GitHub, with no human relay. **It passed** (MSG-0032).
+
+The honest limit: it recovers from *behind-with-a-clean-tree* only. Ahead, or behind-and-dirty, it
+still refuses and waits for a human — correct fail-closed behaviour, but a silent park looks the
+same from outside as a dead scheduler. `CYCLE_START` logging now makes it visible; it does not make
+it self-clearing.
 
 Detail: [`MSG-0026-supervisor-enabled.md`](MSG-0026-supervisor-enabled.md),
-[`MSG-0029-supervisor-start-path-diagnosis.md`](MSG-0029-supervisor-start-path-diagnosis.md).
+[`MSG-0029-supervisor-start-path-diagnosis.md`](MSG-0029-supervisor-start-path-diagnosis.md),
+[`MSG-0032-task-0011-supervisor-smoke-test.md`](MSG-0032-task-0011-supervisor-smoke-test.md).
 Implementation and docs: [`../operations/supervisor/`](../operations/supervisor/README.md).
+
+## Note on message numbering
+
+Two numbers now have two files each: **MSG-0020** (a)/(b) and **MSG-0033** (a)/(b). The MSG-0020
+pair contradicted each other and cost three further messages to resolve; the MSG-0033 pair agrees,
+so it cost nothing. This is recorded as an observed pattern, **not** as a protocol rule — whether to
+add a number-allocation convention is the architecture lead's decision, requested in MSG-0032 §6.3.
 
 ## Bootstrap — closed
 
