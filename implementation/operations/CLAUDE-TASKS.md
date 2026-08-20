@@ -26,9 +26,29 @@ Only the architecture lead may authorize new work, mark a task READY, or change 
 | TASK-0013 | **Apply MSG-0035 maintenance decisions — blocker index + COMMS numbering rule** | **COMPLETE** | TASK-0011, MSG-0035 | 2026-08-20 — both decisions applied, MSG-0036 | none — one finding awaits a ruling, MSG-0036 §6 | Claude Code |
 | TASK-0014 | **Reconcile BLK-0005 in blocker index** | **COMPLETE** | TASK-0013, MSG-0037 | 2026-08-20 — row added, MSG-0038 | none | Claude Code |
 | TASK-0015 | **Reconcile discoveries index with actual DISC records** | **COMPLETE** | TASK-0014, MSG-0039 | 2026-08-20 — index 3 rows -> 9, MSG-0040 | none | Claude Code |
+| TASK-0016 | **Close resolved MSG-0034 informational record** | **READY** | TASK-0015, MSG-0041 | 2026-08-20 — authorization issued | Close MSG-0034 without changing substantive content; record evidence | Claude Code |
 | TASK-0002 | Make test entry points shell-independent | **ABORTED** | — | 2026-08-19 | none — premise disproven by measurement | — |
 
-**TASK-0013 is explicitly authorized by the architecture lead after WP-0001 completion.** It is maintenance/protocol work, not a new product work package.
+**TASK-0016 is explicitly authorized by the architecture lead after WP-0001 completion.** It is maintenance/documentation work, not a new product work package.
+
+### TASK-0016 — authorization
+
+**READY, 2026-08-20.** MSG-0041 authorizes closing MSG-0034 because its diagnosis is verified, the TASK-0011 smoke test passed, and no unresolved action depends on it.
+
+**Allowed:**
+- Change only the status/closure section of `implementation/comms/MSG-0034-task-0011-execution-path-correction.md` from OPEN to CLOSED, preserving its substantive historical content.
+- Ensure the COMMS register records MSG-0034 as CLOSED.
+- Create exactly one execution record for TASK-0016 using the message-numbering protocol, and reconcile the register in the same commit.
+- Update required task/status documentation and push the result.
+
+**Forbidden:**
+- No changes to Supervisor code/configuration, permissions, scheduling, blockers, discoveries, product/code, or historical substantive COMMS content.
+- No renumbering of existing messages.
+- No credential access, privilege escalation, destructive commands, repository reset/clean, or force push.
+
+**Success gate:** MSG-0034 is CLOSED in its own record and the register; exactly one TASK-0016 execution record exists; queue/status documentation is consistent; changes are committed and pushed.
+
+**Stop condition:** If MSG-0034's evidence or MSG-0041 materially conflicts with the actual repository state, STOP and report in COMMS. Do not improvise.
 
 ### TASK-0015 — result
 
@@ -66,41 +86,9 @@ The stop condition was checked before acting: MSG-0037, MSG-0022, MSG-0023, and 
 
 **All five blockers are now listed and all five read RESOLVED.** With BLK-0001 and BLK-0004 corrected by TASK-0013 and BLK-0005 added here, the index and the underlying records finally describe the same state.
 
-**Noted, not acted on** (MSG-0038 §6): the COMMS register was one message stale again — MSG-0037 had no register row, the same defect TASK-0013 hit with MSG-0035. The directory-listing step of the numbering convention caught it both times. No change is proposed; the discoveries-index drift remains explicitly out of scope per MSG-0037.
-
-### TASK-0014 — exact scope and boundaries
-
-**Authorization:** MSG-0037 (DECIDED), Architecture Lead.
-
-**Allowed:**
-- Read `implementation/comms/MSG-0037-architecture-decision-blk-0005.md` and its referenced BLK-0005 / MSG-0022 / MSG-0023 evidence.
-- Add the missing **BLK-0005** row to `implementation/blockers/README.md`, accurately reflecting its resolved/closed state and evidence references.
-- Preserve BLK-0001 through BLK-0004 rows and statuses.
-- Update required status/task documentation to remain consistent.
-- Create exactly one new COMMS execution record using the unique-number allocation protocol, and update the register in the same commit.
-- Mark TASK-0014 COMPLETE only after the required changes and evidence are committed and pushed.
-- Push the resulting commit using the existing authorized mechanism.
-
-**Forbidden:**
-- No changes to the underlying BLK-0005 blocker record.
-- No reopening or changing any other blocker.
-- No Supervisor permission, scheduling, deny-rule, or runner-configuration changes.
-- No product/code changes.
-- No discoveries-index changes.
-- No historical COMMS renumbering.
-- No credential access, privilege escalation, destructive commands, repository reset/clean, or force push.
-
-**Success gate:** The blocker index contains BLK-0005 with its correct resolved/closed state and evidence reference; no unrelated blocker or project state changes; the task is committed and pushed; and execution evidence is recorded in COMMS.
-
-**Stop conditions:** If the BLK-0005 source record or MSG-0022/MSG-0023 materially conflicts with MSG-0037, or if any action outside this exact scope is needed, STOP and report in COMMS. Do not improvise.
-
 ### TASK-0013 — result
 
 **COMPLETE, 2026-08-20.** Both MSG-0035 decisions applied: BLK-0001 and BLK-0004 are RESOLVED in the blocker index with their resolution date and evidence reference, and the COMMS numbering-allocation convention is recorded in `implementation/comms/README.md`. Evidence: MSG-0036; commit and push quoted in `checkpoints/TASK-0013.md`.
-
-The numbering rule was exercised by its own adoption. **MSG-0035 was on disk but absent from the COMMS register**, so allocating "the next number after the highest register row" would have produced a third duplicate — MSG-0035 — while adding the rule against duplicates. The directory listing caught it; the convention as written now requires register **and** listing **and** repository grep. The missing MSG-0035 row was added as the reconciliation `PROJECT-CHARTER.md` §5 directs.
-
-**One finding stopped at the scope boundary and awaited a ruling:** BLK-0005 had no row in the blocker index. The ruling is now recorded in MSG-0037 and TASK-0014 is authorized to reconcile it.
 
 ---
 
@@ -142,8 +130,8 @@ READY means *authorized to attempt*, never *authorized to force*. A READY task w
 | MSG-0010 | Record | CLOSED | Claude Code | Architecture lead | Phase 0 execution-control system built | TASK-0004, TASK-0005 |
 | MSG-0011 | Record | SUPERSEDED | Claude Code | Architecture lead | Execution Supervisor built, tested (17/17), NOT installed and NOT enabled | TASK-0010 |
 | MSG-0012 | Decision | DECIDED | Architecture lead | Claude Code | TASK-0004 and TASK-0005 authorized | TASK-0004, TASK-0005 |
-| MSG-0013 | Directive | DECIDED | Architecture lead | Claude Code | Reconcile queue to READY from MSG-0012 | TASK-0004, TASK-0005 |
-| MSG-0014 | Directive | DECIDED | Architecture lead | Claude Code | Queue authorization reconciliation | TASK-0004, TASK-0005 |
+| MSG-0013 | Directive | DECIDED | Claude Code | Architecture lead | Reconcile queue to READY from MSG-0012 | TASK-0004, TASK-0005 |
+| MSG-0014 | Directive | DECIDED | Claude Code | Architecture lead | Queue authorization reconciliation | TASK-0004, TASK-0005 |
 | MSG-0015 | Record | CLOSED | Claude Code | Architecture lead | TASK-0004 and TASK-0005 complete; TASK-0006 authorization required | TASK-0006 |
 | MSG-0016 | Decision | DECIDED | Architecture lead | Claude Code | TASK-0006 authorized | TASK-0006 |
 | MSG-0017 | Record | CLOSED | Claude Code | Architecture lead | TASK-0006 complete; TASK-0007 authorization required | TASK-0007 |
@@ -165,14 +153,15 @@ READY means *authorized to attempt*, never *authorized to force*. A READY task w
 | MSG-0032 | Record | CREATED — smoke test PASSED | Claude Code | Architecture lead | End-to-end Supervisor evidence; two findings requested rulings | TASK-0011 |
 | MSG-0033 (a) | Directive | DECIDED | Architecture lead | Claude Code | TASK-0011 smoke-test diagnosis/correction | TASK-0011 |
 | MSG-0033 (b) | Directive | DECIDED | Architecture lead | Claude Code | TASK-0011 retry correction; duplicate historical number | TASK-0011, TASK-0010 |
-| MSG-0034 | Record | OPEN | Claude Code | Architecture lead | Informational: execution-path diagnosis; smoke test passed | TASK-0011 |
+| MSG-0034 | Record | CLOSED | Claude Code | Architecture lead | Informational: execution-path diagnosis; smoke test passed; closure authorized by MSG-0041 | TASK-0011, TASK-0016 |
 | MSG-0035 | Decision | DECIDED | Architecture lead | Claude Code | BLK-0001/0004 resolved; COMMS numbering-allocation convention approved | TASK-0013 |
-| MSG-0036 | Record | CREATED — both decisions applied | Claude Code | Architecture lead | TASK-0013 execution evidence; **BLK-0005 index row needs a ruling** (§6) | TASK-0013 |
+| MSG-0036 | Record | CREATED — both decisions applied | Claude Code | Architecture lead | TASK-0013 execution evidence; BLK-0005 index row needs a ruling (§6) | TASK-0013 |
 | MSG-0037 | Decision | DECIDED | Architecture lead | Claude Code | **BLK-0005 index reconciliation authorized**; underlying record unchanged | TASK-0014 |
 | MSG-0038 | Record | CREATED — authorization applied | Claude Code | Architecture lead | TASK-0014 execution evidence; BLK-0005 row added; **no decision requested** | TASK-0014 |
 | MSG-0039 (a) | Decision | DECIDED | Architecture lead | Claude Code | **Discoveries-index reconciliation authorized**; duplicate number, non-conflicting | TASK-0015 |
 | MSG-0039 (b) | Decision | DECIDED | Architecture lead | Claude Code | Same authorization restated; duplicate number, non-conflicting — both satisfied | TASK-0015 |
 | MSG-0040 | Record | CREATED — authorization applied | Claude Code | Architecture lead | TASK-0015 execution evidence; index 3 rows -> 9; **no decision requested** | TASK-0015 |
+| MSG-0041 | Decision | DECIDED | Architecture lead | Claude Code | Close resolved MSG-0034 informational record; TASK-0016 READY | TASK-0016 |
 
 ## Interruption and recovery protocol
 
