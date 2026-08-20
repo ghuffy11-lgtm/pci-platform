@@ -26,12 +26,39 @@ Only the architecture lead may authorize new work, mark a task READY, or change 
 | TASK-0013 | **Apply MSG-0035 maintenance decisions — blocker index + COMMS numbering rule** | **COMPLETE** | TASK-0011, MSG-0035 | 2026-08-20 — both decisions applied, MSG-0036 | none — one finding awaits a ruling, MSG-0036 §6 | Claude Code |
 | TASK-0014 | **Reconcile BLK-0005 in blocker index** | **COMPLETE** | TASK-0013, MSG-0037 | 2026-08-20 — row added, MSG-0038 | none | Claude Code |
 | TASK-0015 | **Reconcile discoveries index with actual DISC records** | **COMPLETE** | TASK-0014, MSG-0039 | 2026-08-20 — index 3 rows -> 9, MSG-0040 | none | Claude Code |
-| TASK-0016 | **Close resolved MSG-0034 informational record** | **READY** | TASK-0015, MSG-0041 | 2026-08-20 — authorization issued | Close MSG-0034 without changing substantive content; record evidence | Claude Code |
+| TASK-0016 | **Close resolved MSG-0034 informational record** | **COMPLETE** | TASK-0015, MSG-0041 | 2026-08-20 — closure verified, MSG-0042 | none | Claude Code |
 | TASK-0002 | Make test entry points shell-independent | **ABORTED** | — | 2026-08-19 | none — premise disproven by measurement | — |
 
 **TASK-0016 is explicitly authorized by the architecture lead after WP-0001 completion.** It is maintenance/documentation work, not a new product work package.
 
-### TASK-0016 — authorization
+### TASK-0016 — result
+
+**COMPLETE, 2026-08-20.** MSG-0034 is CLOSED in its own record and in the COMMS register, its
+substantive content intact. Evidence: MSG-0042; commit and push quoted in `checkpoints/TASK-0016.md`
+checkpoint 2.
+
+**Two of the four success-gate items were already satisfied when this session started.** The
+architecture lead closed the MSG-0034 record itself in `4b5965d` and the register row in `9c6244c`,
+before the Supervisor's 09:57:18Z fast-forward. **Neither was re-done** — CLAUDE.md *Checkpointing and
+Recovery* rule (f) forbids repeating an operation because a record says it is incomplete, and both
+closures were verified by direct observation of the files. This session executed only what remained:
+the execution record, the register row, this queue update, the `current.md` reconciliation, and the
+push. **MSG-0034 itself was not modified by this session**, which is the opposite of what "TASK-0016
+closed MSG-0034" would suggest, and is why it is stated here.
+
+The stop condition was checked before acting and **did not fire**. It fires on a *material conflict*
+between MSG-0034's evidence or MSG-0041 and the actual repository state; what was found instead was
+state **ahead of** the authorization in the direction the authorization points. Convergence, not
+conflict. The substantive-content check was made by reading the file, not by trusting the diffstat:
+`4b5965d` added a `## Closure` section and changed the status line, and deleted nothing.
+
+**The COMMS register lag did not recur** — the first time in four tasks. MSG-0041's register row was
+already present, added by the lead in the same commit that closed the MSG-0034 row. Recorded in
+MSG-0042 §6 as an observation; **no change proposed, no ruling requested**.
+
+**Zero messages now carry `Status: OPEN`.**
+
+### TASK-0016 — authorization (as issued)
 
 **READY, 2026-08-20.** MSG-0041 authorizes closing MSG-0034 because its diagnosis is verified, the TASK-0011 smoke test passed, and no unresolved action depends on it.
 
@@ -161,7 +188,8 @@ READY means *authorized to attempt*, never *authorized to force*. A READY task w
 | MSG-0039 (a) | Decision | DECIDED | Architecture lead | Claude Code | **Discoveries-index reconciliation authorized**; duplicate number, non-conflicting | TASK-0015 |
 | MSG-0039 (b) | Decision | DECIDED | Architecture lead | Claude Code | Same authorization restated; duplicate number, non-conflicting — both satisfied | TASK-0015 |
 | MSG-0040 | Record | CREATED — authorization applied | Claude Code | Architecture lead | TASK-0015 execution evidence; index 3 rows -> 9; **no decision requested** | TASK-0015 |
-| MSG-0041 | Decision | DECIDED | Architecture lead | Claude Code | Close resolved MSG-0034 informational record; TASK-0016 READY | TASK-0016 |
+| MSG-0041 | Decision | DECIDED | Architecture lead | Claude Code | Close resolved MSG-0034 informational record; applied by TASK-0016, see MSG-0042 | TASK-0016 |
+| MSG-0042 | Record | CREATED — closure verified | Claude Code | Architecture lead | TASK-0016 execution evidence; MSG-0034 CLOSED in record and register; **no decision requested** | TASK-0016 |
 
 ## Interruption and recovery protocol
 

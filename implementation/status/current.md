@@ -2,7 +2,7 @@
 
 **Active Work Package:** WP-0001 — PCI Kernel Foundation
 **Status:** **COMPLETE** — declared by the architecture lead 2026-08-19 (MSG-0020(b), resolved by MSG-0022 / MSG-0023, TASK-0009)
-**Last Updated:** 2026-08-20 (TASK-0015 — discoveries index reconciled, three rows to nine, MSG-0039)
+**Last Updated:** 2026-08-20 (TASK-0016 — MSG-0034 closed; **zero OPEN messages**, MSG-0041 / MSG-0042)
 
 ## Current State
 
@@ -50,14 +50,15 @@ The execution-control system (Phase 0, MSG-0010):
 Every session reads the roadmap and queue at startup and executes the highest-priority READY task,
 continuing automatically through authorized work rather than stopping after each subtask.
 
-**Current task: none is READY.** TASK-0001 and TASK-0003 through TASK-0015 are COMPLETE. TASK-0003
+**Current task: none is READY.** TASK-0001 and TASK-0003 through TASK-0016 are COMPLETE. TASK-0003
 was authorized by MSG-0027, executed on 2026-08-20 by a supervisor-started session, and completed
 later the same day once MSG-0030 authorized the refresh command — CRLF residue 150 -> 0, accepted in
 MSG-0031. TASK-0011, the Supervisor smoke test, completed 2026-08-20 (MSG-0032). TASK-0013 applied
 the MSG-0035 maintenance decisions on 2026-08-20 (MSG-0036), again unattended. TASK-0014 added the
 missing BLK-0005 row to the blocker index on 2026-08-20 under MSG-0037 (MSG-0038) — the third
 consecutive unattended delivery. TASK-0015 reconciled the discoveries index on 2026-08-20 under
-MSG-0039 (MSG-0040) — three rows to nine — making it the fourth.
+MSG-0039 (MSG-0040) — three rows to nine — making it the fourth. TASK-0016 closed the last OPEN
+message on 2026-08-20 under MSG-0041 (MSG-0042) — the fifth.
 
 | ID | Task | Status | Depends On | Owner |
 |---|---|---|---|---|
@@ -74,9 +75,10 @@ MSG-0039 (MSG-0040) — three rows to nine — making it the fourth.
 | TASK-0013 | Apply MSG-0035 maintenance decisions — blocker index + COMMS numbering rule | **COMPLETE** (2026-08-20) — MSG-0036 | TASK-0011, MSG-0035 ✅ | Claude Code |
 | TASK-0014 | Reconcile BLK-0005 in the blocker index | **COMPLETE** (2026-08-20) — MSG-0038 | TASK-0013, MSG-0037 ✅ | Claude Code |
 | TASK-0015 | Reconcile the discoveries index with the actual `DISC-*.md` records | **COMPLETE** (2026-08-20) — 3 rows -> 9, MSG-0040 | TASK-0014, MSG-0039 ✅ | Claude Code |
+| TASK-0016 | Close the resolved MSG-0034 informational record | **COMPLETE** (2026-08-20) — closure verified, MSG-0042 | TASK-0015, MSG-0041 ✅ | Claude Code |
 | TASK-0002 | Make test entry points shell-independent | **ABORTED** | — | — |
 
-**No task is currently READY.** TASK-0015 was the last authorized task; nothing follows it
+**No task is currently READY.** TASK-0016 was the last authorized task; nothing follows it
 automatically. Only the architecture lead may authorize the next one.
 
 > There is no TASK-0012. MSG-0022 and MSG-0023 ruled it out of the WP-0001 path, and the number was
@@ -202,11 +204,27 @@ Every tier reported a non-zero test count.
 
 Index: `implementation/comms/README.md` carries the full message register with links and status.
 
-**One message carries `Status: OPEN` — MSG-0034 — and it is informational, not a question.** It
-records the TASK-0011 execution-path diagnosis; the smoke test passed after the correction it
-describes, so nothing depends on it being closed. Every other communication is answered, decided, or
-closed. Every task is COMPLETE except TASK-0002, which is ABORTED because its premise was disproven
-by measurement.
+**No message carries `Status: OPEN`.** Every communication is answered, decided, closed, or a record
+requesting no decision. Every task is COMPLETE except TASK-0002, which is ABORTED because its premise
+was disproven by measurement.
+
+> **MSG-0034 was the last one, and it is now CLOSED (2026-08-20, TASK-0016, MSG-0041).** It had been
+> informational rather than a question — the TASK-0011 execution-path diagnosis, whose correction the
+> smoke test then passed on — so nothing ever depended on closing it. MSG-0041 ruled that its
+> diagnosis was verified and no unresolved action depends on the record.
+>
+> **The lead had already applied both closures before TASK-0016's session started** — the record
+> itself in `4b5965d`, the register row in `9c6244c`. Neither was re-done: CLAUDE.md *Checkpointing
+> and Recovery* rule (f) forbids repeating an operation merely because a record says it is
+> incomplete, and both were verified by reading the files. TASK-0016 executed only what remained —
+> the execution record, the register row, the queue update, this reconciliation, and the push. So
+> **MSG-0034 was not modified by TASK-0016 at all**, which is worth stating because "TASK-0016 closed
+> MSG-0034" reads otherwise. Substantive content is intact: `4b5965d` added a `## Closure` section
+> and changed the status line, and deleted nothing.
+>
+> The stop condition was checked and did not fire. It covers a *material conflict* between MSG-0034 or
+> MSG-0041 and actual state; what was found was state **ahead of** the authorization in the direction
+> it points. Evidence: MSG-0042.
 
 **The two findings raised in MSG-0032 §6 are now DECIDED and APPLIED.** The architecture lead ruled
 on both in MSG-0035; TASK-0013 executed them on 2026-08-20 and recorded the evidence in MSG-0036:
@@ -331,27 +349,29 @@ visible; it does not make it self-clearing.
 | MSG-0031 | TASK-0003 COMPLETE — CRLF residue cleared | **DECIDED** — completion accepted |
 | MSG-0032 | TASK-0011 Supervisor smoke test — COMMS audit and result | **RECORD** — passed; **two findings need a ruling** (§6.2, §6.3) |
 | MSG-0033 (a) / (b) | TASK-0011 diagnosis directives — duplicate numbering, non-conflicting | **DECIDED** — both satisfied; corrected in `479dfa9`, answered by MSG-0032 |
-| MSG-0034 | TASK-0011 execution path — diagnosis and minimal correction | **OPEN** — informational only; the smoke test passed after the fix |
+| MSG-0034 | TASK-0011 execution path — diagnosis and minimal correction | **CLOSED** 2026-08-20 by MSG-0041; informational only, the smoke test passed after the fix |
 | MSG-0035 | Architecture decisions for the MSG-0032 findings | **DECIDED** — both applied by TASK-0013, see MSG-0036 |
 | MSG-0036 | TASK-0013 execution record — MSG-0035 decisions applied | **RECORD** — its §6 finding is ruled on by MSG-0037 and applied |
 | MSG-0037 | Architecture decision: reconcile BLK-0005 in the blocker index | **DECIDED** — applied by TASK-0014, see MSG-0038 |
 | MSG-0038 | TASK-0014 execution record — BLK-0005 row added | **RECORD** — applied and verified; **no decision requested** |
 | MSG-0039 (a) / (b) | Architecture decision: reconcile the discoveries index — duplicate numbering, non-conflicting | **DECIDED** — both satisfied by TASK-0015, see MSG-0040 |
 | MSG-0040 | TASK-0015 execution record — discoveries index reconciled, 3 rows -> 9 | **RECORD** — applied and verified; **no decision requested** |
+| MSG-0041 | Architecture decision: close the resolved MSG-0034 informational record | **DECIDED** — applied by TASK-0016, see MSG-0042 |
+| MSG-0042 | TASK-0016 execution record — MSG-0034 closed in record and register | **RECORD** — applied and verified; **no decision requested** |
 
 ## Repository / GitHub State
 
-**The communication channel is operational.** Verified 2026-08-20 at the start of TASK-0015:
+**The communication channel is operational.** Verified 2026-08-20 at the start of TASK-0016:
 
 ```text
-HEAD          115eb35   ops: authorize TASK-0015 discovery index reconciliation
-origin/main   115eb35
+HEAD          9c6244c   docs(comms): register MSG-0041 and close MSG-0034
+origin/main   9c6244c
 git status -sb  ## main...origin/main      (clean, no ahead/behind)
 ```
 
 That `origin/main` value is the ref as the **Supervisor** left it after its own fast-forward at
-09:14:21Z — not a fetch by the session, which cannot perform one (see below). HEAD was re-checked
-immediately before TASK-0015's commit and had not moved.
+09:57:18Z — not a fetch by the session, which cannot perform one (see below). HEAD was re-checked
+immediately before TASK-0016's commit and had not moved.
 
 **Push is now available to the unattended runner.** `git push origin main` was added to
 `implementation/operations/supervisor/runner-settings.json` under MSG-0028, narrowly scoped so the
@@ -573,39 +593,43 @@ nine records. The record file is the source of truth; both tables index it.
 
 **No task is READY. Awaiting the architecture lead.**
 
-WP-0001 is COMPLETE. **TASK-0015 — the last authorized task — ran on 2026-08-20 and completed**
-(MSG-0040). MSG-0039 is applied: the discoveries index lists all nine `DISC-*.md` records with
-statuses transcribed from the records themselves, and no discovery record was altered. Nothing
-follows it automatically.
+WP-0001 is COMPLETE. **TASK-0016 — the last authorized task — ran on 2026-08-20 and completed**
+(MSG-0042). MSG-0041 is applied: MSG-0034 is CLOSED in its own record and in the register, its
+substantive content intact. Nothing follows it automatically.
 
-That makes **four consecutive unattended deliveries** — TASK-0011, TASK-0013, TASK-0014, TASK-0015.
-The Supervisor fast-forwarded onto the lead's push, saw the READY task, launched Claude, and the
-session did the work and pushed its own evidence — no human relay in either direction. The full chain
-for this one is in the log:
+That makes **five consecutive unattended deliveries** — TASK-0011, TASK-0013, TASK-0014, TASK-0015,
+TASK-0016. The Supervisor fast-forwarded onto the lead's push, saw the READY task, launched Claude,
+and the session did the work and pushed its own evidence — no human relay in either direction. The
+full chain for this one is in the log:
 
 ```text
-09:14:15Z CYCLE_START     :: pid=27484 enabled=True dryRun=False
-09:14:21Z FAST_FORWARDED  :: local was behind; fast-forwarded to 115eb35
-09:14:22Z RUNNER_STARTED  :: pid=24764 task=TASK-0015
+09:57:13Z CYCLE_START     :: pid=20308 enabled=True dryRun=False
+09:57:18Z FAST_FORWARDED  :: local was behind; fast-forwarded to 9c6244c
+09:57:19Z RUNNER_STARTED  :: pid=23668 task=TASK-0016
 ```
 
-The `FAST_FORWARDED` line is the MSG-0034 correction working, for the third authorization push in a
+The `FAST_FORWARDED` line is the MSG-0034 correction working, for the fourth authorization push in a
 row. Before `479dfa9`, a push by the lead left the Supervisor stuck at `NOOP :: not reconciled`
-indefinitely — it could not see the very authorization it existed to act on.
+indefinitely — it could not see the very authorization it existed to act on. There is a small
+symmetry worth noting: the task that closed MSG-0034 was itself started by the fix MSG-0034 records.
 
-**Nothing needs the lead in order to unblock anything.** No blocker is open, no message asks a
-question, and no task is in flight. **The index-drift work is finished** — blockers and discoveries
-both now agree with their records (TASK-0013, TASK-0014, TASK-0015).
+**Nothing needs the lead in order to unblock anything.** No blocker is open, **no message is OPEN**,
+and no task is in flight. **The index-drift work is finished** — blockers and discoveries both agree
+with their records (TASK-0013, TASK-0014, TASK-0015), and the communications register agrees with the
+message files (TASK-0016).
 
-Three items sit available as future work if the lead wants them, none requested by the executing
-session and none blocking anything:
+Two items sit available as future work if the lead wants them, neither requested by the executing
+session and neither blocking anything:
 
-- the **COMMS register lag** described above — now three consecutive tasks — which the numbering
-  convention catches every time at the cost of one reconciliation row per task;
-- **duplicate numbering from the authorizing side.** MSG-0039 (a)/(b) is the first collision since
+- the **COMMS register lag** — three consecutive tasks (TASK-0013, TASK-0014, TASK-0015) found the
+  authorizing message on disk with no register row. **It did not recur for TASK-0016**: the lead added
+  the MSG-0041 row himself, in the same commit that closed the MSG-0034 row. The narrow conclusion is
+  that the lag is not inherent to the protocol but a consequence of *who* commits the register row.
+  Recorded in MSG-0042 §6; no change proposed;
+- **duplicate numbering from the authorizing side.** MSG-0039 (a)/(b) was the first collision since
   the MSG-0035 rule, and the rule does not reach it: it constrains Claude's allocation only. Harmless
-  this time because the two agree; MSG-0020 (a)/(b) is what it looks like when they do not;
-- **MSG-0034**, still `Status: OPEN` and informational only. Closing it is the lead's call.
+  that time because the two agreed; MSG-0020 (a)/(b) is what it looks like when they do not. MSG-0041
+  arrived single-numbered.
 
 Then: **authorize the next work package**, or a task, if any is intended.
 

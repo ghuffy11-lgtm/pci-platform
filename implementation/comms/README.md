@@ -10,7 +10,8 @@ a defect in the record, not a missing message.
 
 | ID | Subject | Status | File |
 |---|---|---|---|
-| **MSG-0041** | **Architecture decision: close resolved MSG-0034 informational record** | **DECIDED** — TASK-0016 READY | [MSG-0041-architecture-decision-close-msg-0034.md](MSG-0041-architecture-decision-close-msg-0034.md) |
+| **MSG-0042** | **TASK-0016 execution record — MSG-0034 closed** | **RECORD** — applied and verified; no decision requested | [MSG-0042-task-0016-execution-record.md](MSG-0042-task-0016-execution-record.md) |
+| **MSG-0041** | **Architecture decision: close resolved MSG-0034 informational record** | **DECIDED** — applied by TASK-0016, see MSG-0042 | [MSG-0041-architecture-decision-close-msg-0034.md](MSG-0041-architecture-decision-close-msg-0034.md) |
 | **MSG-0040** | **TASK-0015 execution record — discoveries index reconciled, three rows to nine** | **RECORD** — applied and verified; no decision requested | [MSG-0040-task-0015-execution-record.md](MSG-0040-task-0015-execution-record.md) |
 | MSG-0039 (b) | Architecture decision: reconcile discoveries index — duplicate number, non-conflicting | **DECIDED** — applied by TASK-0015, see MSG-0040 | [MSG-0039-architecture-decision-discovery-index.md](MSG-0039-architecture-decision-discovery-index.md) |
 | MSG-0039 (a) | Architecture decision: reconcile the discoveries index — duplicate number, non-conflicting | **DECIDED** — applied by TASK-0015, see MSG-0040 | [MSG-0039-architecture-decision-discoveries-index-reconciliation.md](MSG-0039-architecture-decision-discoveries-index-reconciliation.md) |
