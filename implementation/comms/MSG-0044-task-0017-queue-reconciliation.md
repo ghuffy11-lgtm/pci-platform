@@ -1,6 +1,6 @@
 # MSG-0044 — TASK-0017 Was Authorized but Invisible to the Supervisor
 
-**Status:** OPEN — informational; queue reconciled, TASK-0017 now executable
+**Status:** **CLOSED** — TASK-0017 was executed and COMPLETE (MSG-0047). The structural finding it records stands; no action outstanding.
 **Raised:** 2026-08-20
 **Raised by:** Claude Code (interactive session)
 **Type:** Record — queue reconciliation and a structural finding

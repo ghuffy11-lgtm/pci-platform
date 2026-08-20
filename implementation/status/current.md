@@ -213,14 +213,16 @@ Every tier reported a non-zero test count.
 
 Index: `implementation/comms/README.md` carries the full message register with links and status.
 
-**Four messages carry `Status: OPEN`, all raised on 2026-08-20 by TASK-0017 and TASK-0018.**
+**No message carries `Status: OPEN`.** The four that did — MSG-0044, MSG-0045, MSG-0047, MSG-0049 —
+are all settled and closed as of 2026-08-21:
 
-| ID | Why it is open | Needs a decision? |
-|---|---|---|
-| MSG-0044 | TASK-0017 was authorized in MSG-0043 but had no queue row, so the Supervisor could never select it. The queue was reconciled and the structural finding recorded | **No** — informational |
-| MSG-0045 | TASK-0017 execution record. The heartbeat defect is corrected, but the **test suite could not be run**: no allowlist entry permits executing a PowerShell script | **Answered** — MSG-0046 chose Option A, MSG-0047 recorded 36/36. The record's own status line still reads OPEN; TASK-0018 had no authority to change another message's record and did not |
-| MSG-0047 | TASK-0017 verification result, 36 passed / 0 failed | **No** — informational; it named the live-run gap that TASK-0018 then closed |
-| MSG-0049 | TASK-0018 verification record. `RUNNER_RUNNING` **observed live**; gates 1, 2, 4, 5 MET. Gate 3, the terminal heartbeat, is structurally unobservable from inside the run it measures | **Yes** — §6 offers three options; **(B) is recommended** |
+| ID | How it closed |
+|---|---|
+| MSG-0044 | TASK-0017 was reconciled into the queue, executed, and is COMPLETE |
+| MSG-0045 | Its decision came in MSG-0046 (Option A); the suite ran 36/36 and TASK-0017 closed |
+| MSG-0047 | Gate satisfied; the live-run gap it named was closed by TASK-0018 |
+| MSG-0049 | Gate 3 met by external observation during the live run; all five gates MET |
+
 
 > The line this replaces read "**No message carries `Status: OPEN`**", which was true when TASK-0016
 > wrote it and stopped being true when TASK-0017 was authorized. It is corrected rather than quietly

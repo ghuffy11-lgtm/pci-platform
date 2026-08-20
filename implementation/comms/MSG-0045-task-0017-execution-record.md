@@ -1,6 +1,7 @@
 # MSG-0045 — TASK-0017 execution record: heartbeat corrected, NOT verified
 
-**Status:** OPEN — **a decision is required.** The correction is written and committed; its success
+**Status:** **CLOSED** — the decision came in MSG-0046 (Option A); the test was run and TASK-0017 is COMPLETE (MSG-0047). Original text follows.
+**Superseded header:** OPEN — a decision is required. The correction is written and committed; its success
 gate cannot be met by an unattended session
 **Type:** Record + decision request
 **From:** Claude Code (session started by the Execution Supervisor, 2026-08-20T12:31:16Z)

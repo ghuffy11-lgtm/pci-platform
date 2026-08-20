@@ -1,6 +1,6 @@
 # MSG-0047 — TASK-0017 Verification Result: 36 Passed, 0 Failed
 
-**Status:** OPEN — informational; TASK-0017 gate satisfied and the task closed
+**Status:** **CLOSED** — TASK-0017 COMPLETE; the one gap it named (no live post-fix run) was closed by TASK-0018 (MSG-0049).
 **Raised:** 2026-08-20
 **Raised by:** Claude Code (interactive session)
 **Type:** Record — verification evidence

@@ -1,6 +1,7 @@
 # MSG-0049 — TASK-0018 Verification Record: the Heartbeat Was Observed Live
 
-**Status:** OPEN — **a decision is required**, §6. Four of five gates are MET with direct evidence;
+**Status:** **CLOSED** — gate 3 met by external observation; all five gates MET and TASK-0018 is COMPLETE. See the addendum. Original text follows.
+**Superseded header:** OPEN — a decision is required, §6. Four of five gates are MET with direct evidence;
 the fifth cannot be observed from inside the run it measures
 **Raised:** 2026-08-20
 **Raised by:** Claude Code (unattended, started by the Execution Supervisor)
