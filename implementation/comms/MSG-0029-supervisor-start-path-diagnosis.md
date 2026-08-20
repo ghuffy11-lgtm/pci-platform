@@ -1,6 +1,6 @@
 # MSG-0029 — Supervisor Start Path: Diagnosis, Fixes, and First Successful Launch
 
-**Status:** OPEN — informational; one reporting defect confirmed fixed, one behaviour worth a ruling
+**Status:** **CLOSED** — the reporting defect is fixed; both flagged behaviours were ruled on by MSG-0028 (runner push scoped, mid-run HEAD movement aborts).
 **Raised:** 2026-08-20
 **Raised by:** Claude Code (interactive session)
 **Type:** Record — diagnosis

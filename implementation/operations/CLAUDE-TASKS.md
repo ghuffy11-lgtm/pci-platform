@@ -74,29 +74,29 @@ READY means *authorized to attempt*, never *authorized to force*. A READY task w
 | MSG-0007 | Directive | DECIDED | Architecture lead | Claude Code | Twelve non-negotiable rules; startup and pre-action checklists | all |
 | MSG-0008 | Procedure | CLOSED | Claude Code | Operator | Authorized bootstrap executed; `DockerRootDir` = `/data/docker` verified | TASK-0001 |
 | MSG-0009 | Directive | DECIDED | Architecture lead | Claude Code | Documentation is mandatory | all |
-| MSG-0010 | Record | OPEN | Claude Code | Architecture lead | Phase 0 execution-control system built | TASK-0004, TASK-0005 |
-| MSG-0011 | Record | OPEN | Claude Code | Architecture lead | Execution Supervisor built, tested (17/17), NOT installed and NOT enabled | TASK-0010 |
+| MSG-0010 | Record | CLOSED | Claude Code | Architecture lead | Phase 0 execution-control system built | TASK-0004, TASK-0005 |
+| MSG-0011 | Record | SUPERSEDED | Claude Code | Architecture lead | Execution Supervisor built, tested (17/17), NOT installed and NOT enabled | TASK-0010 |
 | MSG-0012 | Decision | DECIDED | Architecture lead | Claude Code | TASK-0004 and TASK-0005 authorized | TASK-0004, TASK-0005 |
 | MSG-0013 | Directive | DECIDED | Architecture lead | Claude Code | Reconcile queue to READY from MSG-0012 | TASK-0004, TASK-0005 |
 | MSG-0014 | Directive | DECIDED | Architecture lead | Claude Code | Queue authorization reconciliation | TASK-0004, TASK-0005 |
-| MSG-0015 | Record | OPEN | Claude Code | Architecture lead | TASK-0004 and TASK-0005 complete; TASK-0006 authorization required | TASK-0006 |
+| MSG-0015 | Record | CLOSED | Claude Code | Architecture lead | TASK-0004 and TASK-0005 complete; TASK-0006 authorization required | TASK-0006 |
 | MSG-0016 | Decision | DECIDED | Architecture lead | Claude Code | TASK-0006 authorized | TASK-0006 |
-| MSG-0017 | Record | OPEN | Claude Code | Architecture lead | TASK-0006 complete; TASK-0007 authorization required | TASK-0007 |
+| MSG-0017 | Record | CLOSED | Claude Code | Architecture lead | TASK-0006 complete; TASK-0007 authorization required | TASK-0007 |
 | MSG-0018 | Decision | DECIDED | Architecture lead | Claude Code | TASK-0007 authorized; continuation to TASK-0008 permitted | TASK-0007, TASK-0008 |
-| MSG-0019 | Record | OPEN | Claude Code | Architecture lead | TASK-0007 / TASK-0008 complete; WP-0001 ready for completion decision | TASK-0009 |
+| MSG-0019 | Record | CLOSED | Claude Code | Architecture lead | TASK-0007 / TASK-0008 complete; WP-0001 ready for completion decision | TASK-0009 |
 | MSG-0020 (a) | Decision | SUPERSEDED | Architecture lead | Claude Code | Erroneous NOT COMPLETE decision; TASK-0012 authorization superseded by MSG-0022 | TASK-0009 |
 | MSG-0020 (b) | Decision | SUPERSEDED | Architecture lead | Claude Code | Duplicate COMPLETE decision; final ruling restated by MSG-0022 | TASK-0009 |
 | MSG-0021 | Question | CLOSED | Claude Code | Architecture lead | Duplicate MSG-0020 conflict resolved by MSG-0022 | TASK-0009 |
 | MSG-0022 | Decision | DECIDED | Architecture lead | Claude Code | Duplicate MSG-0020 resolved: **WP-0001 COMPLETE**; TASK-0012 not authorized | TASK-0009 |
 | MSG-0023 | Decision | DECIDED | Architecture lead | Claude Code | TASK-0009 terminal; TASK-0012 not in the WP-0001 path | TASK-0009 |
 | MSG-0024 | Decision | DECIDED | Architecture lead | Claude Code | **Execution Supervisor enablement authorized**, fail-closed preserved | TASK-0010 |
-| MSG-0025 | Question | OPEN | Claude Code | Architecture lead | **Supervisor installed and verified in dry-run; NOT enabled.** Runner invocation and permission posture required | TASK-0010 |
-| MSG-0026 | Record | OPEN | Claude Code | Architecture lead | **Supervisor ENABLED.** acceptEdits + version-controlled deny list; no bypassPermissions. Deny rules are the effective control, not the mode. Start path unproven until a task is READY | TASK-0010 |
+| MSG-0025 | Question | CLOSED | Claude Code | Architecture lead | **Supervisor installed and verified in dry-run; NOT enabled.** Runner invocation and permission posture required | TASK-0010 |
+| MSG-0026 | Record | CLOSED | Claude Code | Architecture lead | **Supervisor ENABLED.** acceptEdits + version-controlled deny list; no bypassPermissions. Deny rules are the effective control, not the mode. Start path unproven until a task is READY | TASK-0010 |
 | MSG-0027 | Decision | DECIDED | Architecture lead | Claude Code | **TASK-0003 authorized and marked READY; line-ending normalization only** | TASK-0003 |
 | MSG-0028 | Record | **OPEN** | Claude Code | Architecture lead | **TASK-0003 implemented, NOT complete.** Attribute set, zero content changed; working-tree refresh of 152 files refused by the permission layer and not worked around. **The commit could not be pushed** — `git push` is un-allowlisted, so the runner completed work it cannot deliver. Decisions: refresh option A/B/C; mid-run HEAD move; whether a runner may push | TASK-0003, TASK-0010 |
-| MSG-0029 | Record | OPEN | Claude Code | Architecture lead | **Supervisor start path diagnosed and fixed; first launch PROVEN.** Symptom was the reconciliation gate, not the runner. Three start-path defects fixed | TASK-0010 |
+| MSG-0029 | Record | CLOSED | Claude Code | Architecture lead | **Supervisor start path diagnosed and fixed; first launch PROVEN.** Symptom was the reconciliation gate, not the runner. Three start-path defects fixed | TASK-0010 |
 | MSG-0030 | Question | DECIDED | Architecture lead | Claude Code | Option B authorized: `git checkout -- "*.md"` | TASK-0003 |
-| MSG-0031 | Record | OPEN | Claude Code | Architecture lead | **TASK-0003 COMPLETE.** CRLF residue 150 -> 0; stat-cache `touch` addition flagged for review | TASK-0003 |
+| MSG-0031 | Record | DECIDED | Claude Code | Architecture lead | **TASK-0003 COMPLETE.** CRLF residue 150 -> 0; stat-cache `touch` addition flagged for review | TASK-0003 |
 
 ## Interruption and recovery protocol
 

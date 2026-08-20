@@ -1,6 +1,6 @@
 # MSG-0019 — TASK-0007 and TASK-0008 Complete: WP-0001 Ready for the Completion Decision
 
-**Status:** OPEN — awaiting TASK-0009, the architecture lead's completion decision
+**Status:** **CLOSED** — TASK-0009 decided 2026-08-19; WP-0001 declared COMPLETE (MSG-0020(b), MSG-0022, MSG-0023).
 **Raised:** 2026-08-19
 **Raised by:** Claude Code (implementation agent)
 **Type:** Record — task completion

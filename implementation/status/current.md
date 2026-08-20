@@ -176,6 +176,16 @@ Every tier reported a non-zero test count.
 
 Index: `implementation/comms/README.md` carries the full message register with links and status.
 
+**No message is OPEN.** Every communication is answered, decided, or closed; the last one, MSG-0031,
+was accepted on 2026-08-20. Every task is COMPLETE except TASK-0002, which is ABORTED because its
+premise was disproven by measurement.
+
+> **Precedent, recorded so it is not over-read.** MSG-0031 accepted a metadata-only `touch` as
+> within the scope of an authorized path-scoped `git checkout`. The architecture lead stated that
+> this **does not create a general authorization for arbitrary preparatory commands** — each future
+> case must be judged against its own authorization boundary. Do not cite MSG-0031 as licence to add
+> preparatory steps to an authorized command.
+
 **WP-0001 is COMPLETE.** MSG-0021 and BLK-0005 are closed; MSG-0019 is answered by the completion
 decision. The **Execution Supervisor is ENABLED** and reconciling every ten minutes (MSG-0026). It runs
 `acceptEdits` with a version-controlled deny list and never `--dangerously-skip-permissions`.

@@ -10,12 +10,12 @@ a defect in the record, not a missing message.
 
 | ID | Subject | Status | File |
 |---|---|---|---|
-| **MSG-0031** | **TASK-0003 COMPLETE — CRLF residue cleared (150 -> 0)** | **OPEN** — informational; one addition flagged for review | [MSG-0031-task-0003-complete.md](MSG-0031-task-0003-complete.md) |
+| MSG-0031 | TASK-0003 COMPLETE — CRLF residue cleared (150 -> 0) | **DECIDED** — completion accepted; stat refresh accepted as in scope | [MSG-0031-task-0003-complete.md](MSG-0031-task-0003-complete.md) |
 | MSG-0030 | MSG-0028 decisions 2 and 3 applied; decision 1 command was a no-op | **DECIDED** — Option B authorized and executed | [MSG-0030-refresh-command-ineffective.md](MSG-0030-refresh-command-ineffective.md) |
-| **MSG-0029** | **Supervisor start path — diagnosis, fixes, first successful launch** | **OPEN** — informational; start path now PROVEN | [MSG-0029-supervisor-start-path-diagnosis.md](MSG-0029-supervisor-start-path-diagnosis.md) |
+| MSG-0029 | Supervisor start path — diagnosis, fixes, first successful launch | **CLOSED** — start path PROVEN; behaviours ruled by MSG-0028 | [MSG-0029-supervisor-start-path-diagnosis.md](MSG-0029-supervisor-start-path-diagnosis.md) |
 | MSG-0028 | TASK-0003 implemented but not complete — three decisions | **DECIDED** — 2 and 3 applied; 1 blocked, see MSG-0030 | [MSG-0028-task-0003-implemented-not-complete.md](MSG-0028-task-0003-implemented-not-complete.md) |
 | MSG-0027 | TASK-0003 authorization — line-ending normalization only | DECIDED — executed 2026-08-20, see MSG-0028 | [MSG-0027-task-0003-authorization.md](MSG-0027-task-0003-authorization.md) |
-| **MSG-0026** | **Execution Supervisor ENABLED — permission mode determined and verified** | **OPEN** — start path now **PROVEN** by TASK-0003; see MSG-0028 §4 | [MSG-0026-supervisor-enabled.md](MSG-0026-supervisor-enabled.md) |
+| MSG-0026 | Execution Supervisor ENABLED — permission mode determined and verified | **CLOSED** — start path PROVEN by TASK-0003 | [MSG-0026-supervisor-enabled.md](MSG-0026-supervisor-enabled.md) |
 | MSG-0025 | Execution Supervisor installed and dry-run verified — NOT enabled | **CLOSED** — answered by MSG-0026 | [MSG-0025-supervisor-enablement-status.md](MSG-0025-supervisor-enablement-status.md) |
 | MSG-0024 | Execution Supervisor enable decision | DECIDED — enablement authorized | [MSG-0024-execution-supervisor-enable-decision.md](MSG-0024-execution-supervisor-enable-decision.md) |
 | **MSG-0023** | **Correct TASK-0009 boundary — no TASK-0012 in WP-0001 path** | **DECIDED** | [MSG-0023-correct-task-0009-boundary.md](MSG-0023-correct-task-0009-boundary.md) |
@@ -23,11 +23,11 @@ a defect in the record, not a missing message.
 | MSG-0021 | Which MSG-0020 stands? Two contradictory completion decisions | **CLOSED — resolved by MSG-0022 and clarified by MSG-0023** | [MSG-0021-msg-0020-conflict.md](MSG-0021-msg-0020-conflict.md) |
 | MSG-0020 (a) | WP-0001 completion decision — NOT COMPLETE, authorizes TASK-0012 | **SUPERSEDED — MSG-0023** | [MSG-0020-wp-0001-completion-decision.md](MSG-0020-wp-0001-completion-decision.md) |
 | MSG-0020 (b) | WP-0001 completion decision — COMPLETE, no remediation | **SURVIVING COMPLETION RULING — clarified by MSG-0023** | [MSG-0020-wp0001-completion-decision.md](MSG-0020-wp0001-completion-decision.md) |
-| MSG-0019 | TASK-0007 / TASK-0008 complete — WP-0001 ready for the completion decision | OPEN | [MSG-0019-task-0007-0008-complete.md](MSG-0019-task-0007-0008-complete.md) |
+| MSG-0019 | TASK-0007 / TASK-0008 complete — WP-0001 ready for the completion decision | **CLOSED** — TASK-0009 decided | [MSG-0019-task-0007-0008-complete.md](MSG-0019-task-0007-0008-complete.md) |
 | MSG-0018 | Authorize TASK-0007 | DECIDED — executed, G4 passed | [MSG-0018-authorize-task-0007.md](MSG-0018-authorize-task-0007.md) |
-| MSG-0017 | TASK-0006 complete — WP-0001 is reproducible | OPEN | [MSG-0017-task-0006-complete.md](MSG-0017-task-0006-complete.md) |
+| MSG-0017 | TASK-0006 complete — WP-0001 is reproducible | **CLOSED** — TASK-0007 authorized and complete | [MSG-0017-task-0006-complete.md](MSG-0017-task-0006-complete.md) |
 | MSG-0016 | Authorize TASK-0006 | DECIDED — executed, G3 passed | [MSG-0016-authorize-task-0006.md](MSG-0016-authorize-task-0006.md) |
-| MSG-0015 | TASK-0004 / TASK-0005 complete; TASK-0006 authorization required | OPEN | [MSG-0015-task-0004-0005-complete.md](MSG-0015-task-0004-0005-complete.md) |
+| MSG-0015 | TASK-0004 / TASK-0005 complete; TASK-0006 authorization required | **CLOSED** — authorized by MSG-0016, executed | [MSG-0015-task-0004-0005-complete.md](MSG-0015-task-0004-0005-complete.md) |
 | MSG-0014 | Queue authorization reconciliation | DECIDED | [MSG-0014-queue-ready-authorized.md](MSG-0014-queue-ready-authorized.md) |
 | MSG-0013 | Architecture review checkpoint | DECIDED | [MSG-0013-architecture-review-checkpoint.md](MSG-0013-architecture-review-checkpoint.md) |
 | MSG-0012 | Architecture lead decisions: TASK-0004 and TASK-0005 | DECIDED | [MSG-0012-architecture-lead-decisions-task-0004-0005.md](MSG-0012-architecture-lead-decisions-task-0004-0005.md) |

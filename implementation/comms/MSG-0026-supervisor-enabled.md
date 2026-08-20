@@ -1,6 +1,6 @@
 # MSG-0026 — Execution Supervisor ENABLED: Permission Mode Determined and Verified
 
-**Status:** OPEN — informational; one residual verification cannot be done until a task is READY
+**Status:** **CLOSED** — the start path is PROVEN: the supervisor launched and ran TASK-0003 on 2026-08-20 (MSG-0029, MSG-0031).
 **Raised:** 2026-08-19
 **Raised by:** Claude Code (implementation agent)
 **Type:** Record — enablement result
