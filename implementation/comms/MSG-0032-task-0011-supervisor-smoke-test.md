@@ -249,13 +249,14 @@ pushed"):
 
 | # | Contents | Commit |
 |---|---|---|
-| 1 | MSG-0032 + register rows (MSG-0032, MSG-0033 a/b) + `current.md` reconciliation + TASK-0011 checkpoint | SHA recorded in commit 2 — see below |
-| 2 | TASK-0011 marked COMPLETE in the queue + ledger rows for MSG-0032/MSG-0033 | its own SHA is in the queue's "Last Verified" column |
+| 1 | MSG-0032 + register rows (MSG-0032, MSG-0033 a/b) + `current.md` reconciliation + TASK-0011 checkpoint | **`d16665a`** — pushed `479dfa9..d16665a` |
+| 2 | TASK-0011 marked COMPLETE in the queue + result block + ledger rows for MSG-0032/MSG-0033 | **`3b2eda5`** — pushed `d16665a..3b2eda5` |
 
-A commit cannot carry its own SHA, and this file ships **inside** commit 1. Rather than write a
-number before it exists, commit 1's SHA is recorded in commit 2 — in
-`implementation/operations/checkpoints/TASK-0011.md` (checkpoint 2) and in the queue row. Both
-commits are pushed to `origin/main` with the narrowly-scoped `git push origin main` capability.
+A commit cannot carry its own SHA, and this file shipped **inside** commit 1 — so when commit 1 was
+written this table held pointers, not numbers, rather than a SHA invented before it existed. Both
+SHAs are filled in above by a third commit, once both were real. Every one is quoted from actual
+`git push` output, not predicted. Both pushes used the narrowly-scoped `git push origin main`
+capability.
 
 Starting HEAD was `479dfa9`. It is re-checked before each commit and before each push, per the
 mid-run-movement abort rule (MSG-0028 decision 2); any movement aborts the run rather than
