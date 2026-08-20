@@ -10,6 +10,7 @@ a defect in the record, not a missing message.
 
 | ID | Subject | Status | File |
 |---|---|---|---|
+| **MSG-0041** | **Architecture decision: close resolved MSG-0034 informational record** | **DECIDED** — TASK-0016 READY | [MSG-0041-architecture-decision-close-msg-0034.md](MSG-0041-architecture-decision-close-msg-0034.md) |
 | **MSG-0040** | **TASK-0015 execution record — discoveries index reconciled, three rows to nine** | **RECORD** — applied and verified; no decision requested | [MSG-0040-task-0015-execution-record.md](MSG-0040-task-0015-execution-record.md) |
 | MSG-0039 (b) | Architecture decision: reconcile discoveries index — duplicate number, non-conflicting | **DECIDED** — applied by TASK-0015, see MSG-0040 | [MSG-0039-architecture-decision-discovery-index.md](MSG-0039-architecture-decision-discovery-index.md) |
 | MSG-0039 (a) | Architecture decision: reconcile the discoveries index — duplicate number, non-conflicting | **DECIDED** — applied by TASK-0015, see MSG-0040 | [MSG-0039-architecture-decision-discoveries-index-reconciliation.md](MSG-0039-architecture-decision-discoveries-index-reconciliation.md) |
@@ -17,7 +18,7 @@ a defect in the record, not a missing message.
 | MSG-0037 | Architecture decision: reconcile BLK-0005 in the blocker index | **DECIDED** — applied by TASK-0014, see MSG-0038 | [MSG-0037-architecture-decision-blk-0005.md](MSG-0037-architecture-decision-blk-0005.md) |
 | MSG-0036 | TASK-0013 execution record — MSG-0035 decisions applied | **RECORD** — blocker index corrected, numbering convention added; its §6 finding is **ruled on** by MSG-0037 and applied | [MSG-0036-task-0013-execution-record.md](MSG-0036-task-0013-execution-record.md) |
 | MSG-0035 | Architecture decisions for the MSG-0032 findings | **DECIDED** — BLK-0001/0004 confirmed RESOLVED; numbering convention approved | [MSG-0035-architecture-decisions.md](MSG-0035-architecture-decisions.md) |
-| **MSG-0034** | **TASK-0011 execution path — diagnosis and minimal correction** | **OPEN** — informational; smoke test passed after the fix | [MSG-0034-task-0011-execution-path-correction.md](MSG-0034-task-0011-execution-path-correction.md) |
+| **MSG-0034** | **TASK-0011 execution path — diagnosis and minimal correction** | **CLOSED** — informational; smoke test passed after the fix | [MSG-0034-task-0011-execution-path-correction.md](MSG-0034-task-0011-execution-path-correction.md) |
 | MSG-0033 (b) | TASK-0011 retry — diagnose and correct the failed smoke-test path | **DECIDED** — diagnosed and corrected in `479dfa9`; TASK-0011 passed, see MSG-0032 | [MSG-0033-task-0011-retry-diagnosis.md](MSG-0033-task-0011-retry-diagnosis.md) |
 | MSG-0033 (a) | TASK-0011 smoke-test diagnosis and corrective action | **DECIDED** — diagnosed and corrected in `479dfa9`; TASK-0011 passed, see MSG-0032 | [MSG-0033-task-0011-diagnosis.md](MSG-0033-task-0011-diagnosis.md) |
 | MSG-0032 | TASK-0011 — Supervisor smoke test: COMMS audit and end-to-end result | **RECORD** — smoke test PASSED; two findings need a ruling (§6.2 blockers, §6.3 numbering) | [MSG-0032-task-0011-supervisor-smoke-test.md](MSG-0032-task-0011-supervisor-smoke-test.md) |
