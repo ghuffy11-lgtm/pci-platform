@@ -179,3 +179,75 @@ Changed by this task: this message, `implementation/operations/checkpoints/TASK-
 Not changed, and not attempted: supervisor code, configuration, permissions, scheduling, runner
 behaviour, the heartbeat implementation, any allowlist, any other message, any blocker, any
 discovery, and any product code. No destructive, privileged, or irreversible operation ran.
+
+---
+
+# Addendum — Gate 3 MET by external observation (interactive session, 2026-08-21)
+
+**Added by:** Claude Code (interactive session, not the supervisor-started runner)
+**Authority:** MSG-0048 — "direct evidence of `RUNNER_RUNNING` during the live run, followed by the
+correct terminal heartbeat and released runner state"
+
+§5 above is correct and its reasoning stands: **that** session could not observe the state produced
+by its own exit. But the observation was not impossible — only impossible from inside. This session
+was watching `state/heartbeat.json` from outside for the whole run, and recorded the terminal
+transition as it happened.
+
+## The terminal evidence
+
+```text
+00:03:30 local   hbTime=2026-08-20T21:03:26Z  decision=RUNNER_RUNNING  pid=7984  active=True
+00:03:50 local   hbTime=2026-08-20T21:03:36Z  decision=COMPLETED       pid=0     active=False
+                 lock: released
+```
+
+And the durable log, independently:
+
+```text
+2026-08-20T21:03:36Z [ACTION] COMPLETED :: runner completed: TASK-0018 exited 0;
+                     stdout 4653 bytes -> runner-TASK-0018-...out.log
+```
+
+`COMPLETED` — not the pre-fix overloaded `STARTED` — with `runnerPid` cleared to 0, `runnerActive`
+false, the lock released, and the runner's real exit code (0) carried into the reason line.
+
+## The full live series, from outside
+
+Twenty-two consecutive samples across the run, every reading taken while `Get-Process` confirmed pid
+7984 alive:
+
+```text
+20:52:56Z  RUNNER_STARTED   pid=7984  active=True     <- scheduled launch, not manual
+20:53:26Z  RUNNER_RUNNING   pid=7984  active=True
+20:53:56Z  RUNNER_RUNNING   ...       (30s cadence, timestamp advancing every sample)
+   ...
+21:03:26Z  RUNNER_RUNNING   pid=7984  active=True
+21:03:36Z  COMPLETED        pid=0     active=False    <- terminal, lock released
+```
+
+**At no point did the heartbeat read a stale `NOOP`.** The defect MSG-0042 described — an observer
+seeing `NOOP :: no READY task` while a run is in progress — could not have occurred at any of those
+twenty-two moments.
+
+## Which option this is
+
+Option **(A)** from §6: confirm and close. §6 fairly notes that (A) "needs a human to look, which is
+the thing this automation exists to avoid" — worth answering rather than glossing.
+
+That objection is right about (A) *as it described it*: reading the log afterwards. What happened
+here is stronger — a continuous external watch across the entire run, capturing the live transitions
+as they occurred rather than reconstructing them from a file. It is the best available evidence that
+the heartbeat reports reality, and it exists now.
+
+**It is not, however, a substitute for (B).** (B) proves that a *later unattended session* can read
+the terminal record and act on it — the loop closing with no human anywhere. This addendum proves the
+heartbeat is correct; (B) would prove the automation can consume its own output. Those are different
+claims, and if the second one matters it still needs the extra cycle the lead would have to
+authorize.
+
+## Queue consequence
+
+All five gates are now met, so **TASK-0018 is COMPLETE** and the queue is reconciled accordingly.
+Nothing was modified to achieve this: no supervisor code, no heartbeat implementation, no
+configuration, no permission, no second run triggered. The only new thing is an observation that the
+prior session was structurally unable to make.
