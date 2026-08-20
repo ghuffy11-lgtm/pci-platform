@@ -12,7 +12,7 @@ a defect in the record, not a missing message.
 |---|---|---|---|
 | **MSG-0030** | **MSG-0028 decisions 2 and 3 applied; decision 1 command is a no-op here** | **OPEN — DECISION REQUIRED** | [MSG-0030-refresh-command-ineffective.md](MSG-0030-refresh-command-ineffective.md) |
 | **MSG-0029** | **Supervisor start path — diagnosis, fixes, first successful launch** | **OPEN** — informational; start path now PROVEN | [MSG-0029-supervisor-start-path-diagnosis.md](MSG-0029-supervisor-start-path-diagnosis.md) |
-| **MSG-0028** | **TASK-0003 implemented but not complete — one permission grant required** | **OPEN — DECISION REQUIRED** | [MSG-0028-task-0003-implemented-not-complete.md](MSG-0028-task-0003-implemented-not-complete.md) |
+| MSG-0028 | TASK-0003 implemented but not complete — three decisions | **DECIDED** — 2 and 3 applied; 1 blocked, see MSG-0030 | [MSG-0028-task-0003-implemented-not-complete.md](MSG-0028-task-0003-implemented-not-complete.md) |
 | MSG-0027 | TASK-0003 authorization — line-ending normalization only | DECIDED — executed 2026-08-20, see MSG-0028 | [MSG-0027-task-0003-authorization.md](MSG-0027-task-0003-authorization.md) |
 | **MSG-0026** | **Execution Supervisor ENABLED — permission mode determined and verified** | **OPEN** — start path now **PROVEN** by TASK-0003; see MSG-0028 §4 | [MSG-0026-supervisor-enabled.md](MSG-0026-supervisor-enabled.md) |
 | MSG-0025 | Execution Supervisor installed and dry-run verified — NOT enabled | **CLOSED** — answered by MSG-0026 | [MSG-0025-supervisor-enablement-status.md](MSG-0025-supervisor-enablement-status.md) |
@@ -30,7 +30,7 @@ a defect in the record, not a missing message.
 | MSG-0014 | Queue authorization reconciliation | DECIDED | [MSG-0014-queue-ready-authorized.md](MSG-0014-queue-ready-authorized.md) |
 | MSG-0013 | Architecture review checkpoint | DECIDED | [MSG-0013-architecture-review-checkpoint.md](MSG-0013-architecture-review-checkpoint.md) |
 | MSG-0012 | Architecture lead decisions: TASK-0004 and TASK-0005 | DECIDED | [MSG-0012-architecture-lead-decisions-task-0004-0005.md](MSG-0012-architecture-lead-decisions-task-0004-0005.md) |
-| MSG-0011 | Execution Supervisor — built, tested, not installed | OPEN — awaiting install/enable decision | [MSG-0011-execution-supervisor.md](MSG-0011-execution-supervisor.md) |
+| MSG-0011 | Execution Supervisor — built, tested, not installed | **SUPERSEDED** by MSG-0024; supervisor is installed and ENABLED | [MSG-0011-execution-supervisor.md](MSG-0011-execution-supervisor.md) |
 | MSG-0010 | Phase 0 — execution control, roadmap, queue, recovery | CLOSED | [MSG-0010-phase-0-execution-control.md](MSG-0010-phase-0-execution-control.md) |
 | MSG-0009 | Permanent rule added: Documentation Is Mandatory | DECIDED — applied | [MSG-0009-documentation-is-mandatory.md](MSG-0009-documentation-is-mandatory.md) |
 | MSG-0008 | Authorized one-time privileged bootstrap | CLOSED — executed and verified | [MSG-0008-authorized-bootstrap-command.md](MSG-0008-authorized-bootstrap-command.md) |
@@ -42,30 +42,31 @@ a defect in the record, not a missing message.
 | MSG-0002 | Kernel implementation stack selection | CLOSED — ADR-0015 ratified | [MSG-0002-kernel-runtime-stack.md](MSG-0002-kernel-runtime-stack.md) |
 | MSG-0001 | Authorized execution host and persistent storage boundary | ANSWERED | [MSG-0001-execution-host-and-storage-boundary.md](MSG-0001-execution-host-and-storage-boundary.md) |
 
-## ACTION REQUIRED — MSG-0028 (TASK-0003)
+## ACTION REQUIRED — MSG-0030 (TASK-0003 refresh mechanism)
 
-TASK-0003 applied its authorized change and verified it changed **zero** committed content. It stopped
-short of refreshing 152 `*.md` files already on the authoring workstation's disk, because the three
-commands that could do it were refused by the unattended runner's permission layer and Rule 2 forbids
-substituting another mechanism.
+MSG-0028's decisions 2 and 3 are applied: mid-run HEAD movement now aborts a session, and the runner
+may `git push origin main` and nothing broader.
 
-**It also could not push its own commit.** `git push` is not on the runner allowlist, so `93d7067` —
-including MSG-0028 itself — exists locally only until someone runs `git push origin main`. An
-unattended session can currently complete authorized work and be unable to deliver any record of it.
+**Decision 1 cannot be carried out as written.** The authorized command
+`git ls-files -z "*.md" | git checkout-index -f -z --stdin` changes nothing on this working tree —
+same mtime, same byte count, 151 files still CRLF — because `checkout-index` treats them as current.
+The mechanisms that would work are the "equivalent substitute" MSG-0028 forbids, so nothing was
+substituted.
 
-Three decisions: which refresh option (A — you run one command; B — widen the runner allowlist; C —
-accept the residue); whether a supervisor session should abort when HEAD moves mid-run; and whether
-an unattended runner may push at all.
+One decision needed: `git checkout -- "*.md"` (path-scoped, recommended), remove-then-restore, or
+accept the residue — which is defensible, since every index blob is already LF and only this one
+workstation carries stale bytes.
 
-Detail: [`MSG-0028-task-0003-implemented-not-complete.md`](MSG-0028-task-0003-implemented-not-complete.md).
+Detail: [`MSG-0030-refresh-command-ineffective.md`](MSG-0030-refresh-command-ineffective.md).
 
-## ACTION REQUIRED — MSG-0011 (Execution Supervisor)
+## Execution Supervisor — installed and ENABLED
 
-Built, tested (17/17), **not installed and not enabled**. Three independent settings keep it inert: `enabled: false`, `dryRun: true`, and an empty `runnerCommand`.
+Running every ten minutes with `acceptEdits` and a version-controlled deny list; never
+`--dangerously-skip-permissions`. Its start path is **proven** — it launched and ran TASK-0003 on
+2026-08-20 (MSG-0029).
 
-Enabling it means consenting to unattended sessions acting on authorized queue tasks. It remains a separate operator/architecture decision.
-
-Detail: [`MSG-0011-execution-supervisor.md`](MSG-0011-execution-supervisor.md).
+Detail: [`MSG-0026-supervisor-enabled.md`](MSG-0026-supervisor-enabled.md),
+[`MSG-0029-supervisor-start-path-diagnosis.md`](MSG-0029-supervisor-start-path-diagnosis.md).
 Implementation and docs: [`../operations/supervisor/`](../operations/supervisor/README.md).
 
 ## Bootstrap — closed
