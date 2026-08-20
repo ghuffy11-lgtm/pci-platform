@@ -1,6 +1,6 @@
 # MSG-0034 — TASK-0011 Execution Path: Diagnosis and Correction
 
-**Status:** OPEN — informational; the smoke test passed after the correction
+**Status:** CLOSED — informational; the smoke test passed after the correction
 **Raised:** 2026-08-20
 **Raised by:** Claude Code (interactive session)
 **Type:** Record — diagnosis and minimal fix
@@ -110,3 +110,8 @@ stale. Corrected here.
 
 Every task is COMPLETE except TASK-0002 (ABORTED, premise disproven). No task is READY, no blocker
 is open, and the supervisor is back to `NOOP: no READY task` on its ten-minute cadence.
+
+## Closure
+
+Closed by MSG-0041 on 2026-08-20. The diagnosis and correction are historical record only; no unresolved
+action depends on this message.
