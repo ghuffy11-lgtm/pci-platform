@@ -25,12 +25,36 @@ Only the architecture lead may authorize new work, mark a task READY, or change 
 | TASK-0011 | **Execution Supervisor smoke test — COMMS audit and end-to-end report** | **COMPLETE** | TASK-0010 | 2026-08-20 `d16665a` — PASSED | none — terminal by design | Claude Code |
 | TASK-0013 | **Apply MSG-0035 maintenance decisions — blocker index + COMMS numbering rule** | **COMPLETE** | TASK-0011, MSG-0035 | 2026-08-20 — both decisions applied, MSG-0036 | none — one finding awaits a ruling, MSG-0036 §6 | Claude Code |
 | TASK-0014 | **Reconcile BLK-0005 in blocker index** | **COMPLETE** | TASK-0013, MSG-0037 | 2026-08-20 — row added, MSG-0038 | none | Claude Code |
-| TASK-0015 | **Reconcile discoveries index with actual DISC records** | **READY** | TASK-0014, MSG-0039 | 2026-08-20 — authorized | execute reconciliation and verify index | Claude Code |
+| TASK-0015 | **Reconcile discoveries index with actual DISC records** | **COMPLETE** | TASK-0014, MSG-0039 | 2026-08-20 — index 3 rows -> 9, MSG-0040 | none | Claude Code |
 | TASK-0002 | Make test entry points shell-independent | **ABORTED** | — | 2026-08-19 | none — premise disproven by measurement | — |
 
 **TASK-0013 is explicitly authorized by the architecture lead after WP-0001 completion.** It is maintenance/protocol work, not a new product work package.
 
-### TASK-0015 — authorization
+### TASK-0015 — result
+
+**COMPLETE, 2026-08-20.** The discoveries index went from **three rows to nine**. DISC-0004 through
+DISC-0009 were missing entirely — including the two deployment-artifact defects (DISC-0007,
+DISC-0008) and the `/data` boundary finding (DISC-0009). Every status is transcribed from the
+record's own header line; **no `DISC-*.md` record was altered, deleted, or renumbered**, evidenced by
+the pre-commit `git status --porcelain` in `checkpoints/TASK-0015.md`. Zero index rows were stale and
+zero lacked a record — the drift was pure omission. Evidence: MSG-0040.
+
+No stop condition fired. All nine records carry an unambiguous status. The one apparent exception was
+checked and dismissed: `grep "Status:.*OPEN"` hits `DISC-0006` line 17, which is quoted `grep` output
+inside a fenced example block, not that file's status.
+
+**One judgment call, declared rather than folded in** (MSG-0040 §5): `implementation/status/current.md`
+keeps a second discovery table whose DISC-0009 row read **OPEN** while the record reads "CLOSED —
+ACCEPTED, NOT A VIOLATION". It was corrected under MSG-0039 (a) §4 and §7, because leaving it would
+have created a fresh contradiction the moment the discoveries index became correct. That table's
+header was also widened from two columns to three, which is what its rows already supplied — the
+renderer had been silently dropping four statuses.
+
+**The authorization was duplicate-numbered.** Two MSG-0039 files exist (`b123361`, `dc307fa`). They do
+not conflict; the task executed the stricter reading of both, registered them as MSG-0039 (a)/(b), and
+renumbered neither, per MSG-0035 decision 2. Reported in MSG-0040 §6; **no ruling requested**.
+
+### TASK-0015 — authorization (as issued)
 
 **READY, 2026-08-20.** MSG-0039 authorizes a narrowly scoped reconciliation of `implementation/discoveries/README.md` against the actual `DISC-*.md` records. The task may update only the discoveries index and required task/COMMS evidence. It must not alter discovery substance, architecture decisions, blockers, product/code, Supervisor configuration, permissions, scheduling, or repository history. It must stop for malformed records or conflicts requiring architectural judgment.
 
@@ -146,7 +170,9 @@ READY means *authorized to attempt*, never *authorized to force*. A READY task w
 | MSG-0036 | Record | CREATED — both decisions applied | Claude Code | Architecture lead | TASK-0013 execution evidence; **BLK-0005 index row needs a ruling** (§6) | TASK-0013 |
 | MSG-0037 | Decision | DECIDED | Architecture lead | Claude Code | **BLK-0005 index reconciliation authorized**; underlying record unchanged | TASK-0014 |
 | MSG-0038 | Record | CREATED — authorization applied | Claude Code | Architecture lead | TASK-0014 execution evidence; BLK-0005 row added; **no decision requested** | TASK-0014 |
-| MSG-0039 | Decision | DECIDED | Architecture lead | Claude Code | **Discovery-index reconciliation authorized**; TASK-0015 READY | TASK-0015 |
+| MSG-0039 (a) | Decision | DECIDED | Architecture lead | Claude Code | **Discoveries-index reconciliation authorized**; duplicate number, non-conflicting | TASK-0015 |
+| MSG-0039 (b) | Decision | DECIDED | Architecture lead | Claude Code | Same authorization restated; duplicate number, non-conflicting — both satisfied | TASK-0015 |
+| MSG-0040 | Record | CREATED — authorization applied | Claude Code | Architecture lead | TASK-0015 execution evidence; index 3 rows -> 9; **no decision requested** | TASK-0015 |
 
 ## Interruption and recovery protocol
 

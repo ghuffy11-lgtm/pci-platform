@@ -2,7 +2,7 @@
 
 **Active Work Package:** WP-0001 — PCI Kernel Foundation
 **Status:** **COMPLETE** — declared by the architecture lead 2026-08-19 (MSG-0020(b), resolved by MSG-0022 / MSG-0023, TASK-0009)
-**Last Updated:** 2026-08-20 (TASK-0014 — BLK-0005 reconciled in the blocker index, MSG-0037)
+**Last Updated:** 2026-08-20 (TASK-0015 — discoveries index reconciled, three rows to nine, MSG-0039)
 
 ## Current State
 
@@ -50,13 +50,14 @@ The execution-control system (Phase 0, MSG-0010):
 Every session reads the roadmap and queue at startup and executes the highest-priority READY task,
 continuing automatically through authorized work rather than stopping after each subtask.
 
-**Current task: none is READY.** TASK-0001 and TASK-0003 through TASK-0014 are COMPLETE. TASK-0003
+**Current task: none is READY.** TASK-0001 and TASK-0003 through TASK-0015 are COMPLETE. TASK-0003
 was authorized by MSG-0027, executed on 2026-08-20 by a supervisor-started session, and completed
 later the same day once MSG-0030 authorized the refresh command — CRLF residue 150 -> 0, accepted in
 MSG-0031. TASK-0011, the Supervisor smoke test, completed 2026-08-20 (MSG-0032). TASK-0013 applied
 the MSG-0035 maintenance decisions on 2026-08-20 (MSG-0036), again unattended. TASK-0014 added the
 missing BLK-0005 row to the blocker index on 2026-08-20 under MSG-0037 (MSG-0038) — the third
-consecutive unattended delivery.
+consecutive unattended delivery. TASK-0015 reconciled the discoveries index on 2026-08-20 under
+MSG-0039 (MSG-0040) — three rows to nine — making it the fourth.
 
 | ID | Task | Status | Depends On | Owner |
 |---|---|---|---|---|
@@ -72,9 +73,10 @@ consecutive unattended delivery.
 | TASK-0011 | Execution Supervisor smoke test — COMMS audit, end to end | **COMPLETE** (2026-08-20) — passed, MSG-0032 | TASK-0010 ✅ | Claude Code |
 | TASK-0013 | Apply MSG-0035 maintenance decisions — blocker index + COMMS numbering rule | **COMPLETE** (2026-08-20) — MSG-0036 | TASK-0011, MSG-0035 ✅ | Claude Code |
 | TASK-0014 | Reconcile BLK-0005 in the blocker index | **COMPLETE** (2026-08-20) — MSG-0038 | TASK-0013, MSG-0037 ✅ | Claude Code |
+| TASK-0015 | Reconcile the discoveries index with the actual `DISC-*.md` records | **COMPLETE** (2026-08-20) — 3 rows -> 9, MSG-0040 | TASK-0014, MSG-0039 ✅ | Claude Code |
 | TASK-0002 | Make test entry points shell-independent | **ABORTED** | — | — |
 
-**No task is currently READY.** TASK-0014 was the last authorized task; nothing follows it
+**No task is currently READY.** TASK-0015 was the last authorized task; nothing follows it
 automatically. Only the architecture lead may authorize the next one.
 
 > There is no TASK-0012. MSG-0022 and MSG-0023 ruled it out of the WP-0001 path, and the number was
@@ -238,10 +240,31 @@ The underlying blocker record was not altered, as MSG-0037 required.
 and BLK-0004 and TASK-0014's addition of BLK-0005, `implementation/blockers/README.md` and the blocker
 records finally describe the same state.
 
-Still noted, without a request attached and explicitly out of scope: `implementation/discoveries/README.md`
-lists three discoveries while nine `DISC-*.md` files exist. Third index, same failure mode — the
-indexes drift, not the underlying records. MSG-0037 names it *"a separate future review"*, so
-TASK-0014 did not touch it.
+**The discoveries-index drift is now FIXED.** It had read: `implementation/discoveries/README.md`
+lists three discoveries while nine `DISC-*.md` files exist — third index, same failure mode. MSG-0037
+had named it *"a separate future review"* and TASK-0014 left it alone. **MSG-0039 authorized the
+review; TASK-0015 executed it on 2026-08-20** and recorded the evidence in MSG-0040. The index now
+carries all nine rows, each status transcribed from the record's own header, with **no `DISC-*.md`
+record altered**. Zero rows were stale and zero lacked a record — the drift was pure omission, and it
+had hidden the two deployment-artifact defects (DISC-0007, DISC-0008) and the `/data` boundary finding
+(DISC-0009) from anyone reading the index alone.
+
+**All three indexes now agree with their records.** Blockers were corrected by TASK-0013 (BLK-0001,
+BLK-0004) and TASK-0014 (BLK-0005); discoveries by TASK-0015. The shared failure mode across all
+three was the same: a record is created or closed in its own file, and the table that indexes it is
+not updated in the same commit.
+
+> **The authorization arrived duplicate-numbered.** Two MSG-0039 files exist (`b123361`, `dc307fa`) —
+> the third duplicate after MSG-0020 (a)/(b) and MSG-0033 (a)/(b), and the **first since the MSG-0035
+> numbering rule was adopted**. They do not conflict: both are DECIDED, both authorize the same
+> narrowly scoped reconciliation with the same forbidden list. TASK-0015 executed the stricter reading
+> of both, registered them as MSG-0039 (a)/(b), and renumbered neither, per MSG-0035 decision 2.
+>
+> Worth stating once, plainly: the numbering rule constrains **Claude's** allocation, not the lead's,
+> which is why it did not prevent this. MSG-0020 (a)/(b) contradicted each other and cost three
+> follow-up messages; this pair agrees and cost nothing. That difference remains luck rather than
+> process. **No ruling was requested** — TASK-0015 was not authorized to propose a protocol change,
+> and did not. Recorded in MSG-0040 §6.
 
 > **A second observation, recorded because it has now happened twice** (MSG-0038 §6). The COMMS
 > register was one message stale when TASK-0014 allocated its number: **MSG-0037 was on disk and in
@@ -313,20 +336,22 @@ visible; it does not make it self-clearing.
 | MSG-0036 | TASK-0013 execution record — MSG-0035 decisions applied | **RECORD** — its §6 finding is ruled on by MSG-0037 and applied |
 | MSG-0037 | Architecture decision: reconcile BLK-0005 in the blocker index | **DECIDED** — applied by TASK-0014, see MSG-0038 |
 | MSG-0038 | TASK-0014 execution record — BLK-0005 row added | **RECORD** — applied and verified; **no decision requested** |
+| MSG-0039 (a) / (b) | Architecture decision: reconcile the discoveries index — duplicate numbering, non-conflicting | **DECIDED** — both satisfied by TASK-0015, see MSG-0040 |
+| MSG-0040 | TASK-0015 execution record — discoveries index reconciled, 3 rows -> 9 | **RECORD** — applied and verified; **no decision requested** |
 
 ## Repository / GitHub State
 
-**The communication channel is operational.** Verified 2026-08-20 at the start of TASK-0014:
+**The communication channel is operational.** Verified 2026-08-20 at the start of TASK-0015:
 
 ```text
-HEAD          f30a0f7   Authorize TASK-0014 for BLK-0005 blocker-index reconciliation
-origin/main   f30a0f7
+HEAD          115eb35   ops: authorize TASK-0015 discovery index reconciliation
+origin/main   115eb35
 git status -sb  ## main...origin/main      (clean, no ahead/behind)
 ```
 
 That `origin/main` value is the ref as the **Supervisor** left it after its own fast-forward at
-08:37:18Z — not a fetch by the session, which cannot perform one (see below). HEAD was re-checked
-immediately before TASK-0014's commit and had not moved.
+09:14:21Z — not a fetch by the session, which cannot perform one (see below). HEAD was re-checked
+immediately before TASK-0015's commit and had not moved.
 
 **Push is now available to the unattended runner.** `git push origin main` was added to
 `implementation/operations/supervisor/runner-settings.json` under MSG-0028, narrowly scoped so the
@@ -507,17 +532,29 @@ precedence has changed.
 
 ## Discoveries
 
-| ID | Subject |
-|---|---|
-| DISC-0001 | Governance documents duplicated across `knowledge/` and `docs/` |
-| DISC-0002 | In-memory adapter test-fidelity gap |
-| DISC-0003 | Development identity adapter boundary |
-| DISC-0004 | Compose stack predates the `/data/docker` boundary |
-| DISC-0005 | `npm test` reports success while running zero tests under POSIX shells |
-| DISC-0006 | CRLF line endings silently defeat anchored text edits — **RESOLVED** by TASK-0003, residue 150 -> 0 |
-| DISC-0009 | Docker CLI writes client state to `/home/claude`, outside `/data` | **OPEN** |
-| DISC-0007 | Init refuses to create a passwordless role, then creates one anyway | **RESOLVED** |
-| DISC-0008 | Compose kernel service cannot start as committed | **RESOLVED** |
+Index: `implementation/discoveries/README.md` — reconciled 2026-08-20 by TASK-0015 and now lists all
+nine records. The record file is the source of truth; both tables index it.
+
+| ID | Subject | Status |
+|---|---|---|
+| DISC-0001 | Governance documents duplicated across `knowledge/` and `docs/` | Recorded — no action taken |
+| DISC-0002 | In-memory adapter test-fidelity gap | Recorded — mitigated, not eliminated |
+| DISC-0003 | Development identity adapter boundary | Recorded |
+| DISC-0004 | Compose stack predates the `/data/docker` boundary | **RESOLVED** 2026-08-19 — pre-staged `daemon.json` answers it |
+| DISC-0005 | `npm test` reports success while running zero tests under POSIX shells | **CORRECTED** 2026-08-19 — target-platform claim disproven; confined to Git Bash / MSYS |
+| DISC-0006 | CRLF line endings silently defeat anchored text edits | **RESOLVED** 2026-08-20 by TASK-0003 — residue 150 -> 0 |
+| DISC-0007 | Init refuses to create a passwordless role, then creates one anyway | **RESOLVED** 2026-08-19 by TASK-0004 |
+| DISC-0008 | Compose kernel service cannot start as committed | **RESOLVED** 2026-08-19 by TASK-0005 |
+| DISC-0009 | Docker CLI writes client state to `/home/claude`, outside `/data` | **CLOSED — ACCEPTED, NOT A VIOLATION** 2026-08-19 by MSG-0020(b) / MSG-0022 / MSG-0023 |
+
+> **Corrected 2026-08-20 by TASK-0015.** This table had two defects. It was declared with **two**
+> columns while four rows supplied three cells, so the renderer silently dropped the status of
+> DISC-0006 through DISC-0009 — the header is now three columns, matching the data that was already
+> there. And the DISC-0009 row read **OPEN** while its record reads "CLOSED — ACCEPTED, NOT A
+> VIOLATION", ruled on 2026-08-19. Both are stale-index corrections against unambiguous records,
+> authorized by MSG-0039 (a) §4 and §7, and declared as a judgment call in MSG-0040 §5 because
+> MSG-0039 named `discoveries/README.md` specifically and this is a second file. No discovery
+> substance changed.
 
 ## Report
 
@@ -536,33 +573,39 @@ precedence has changed.
 
 **No task is READY. Awaiting the architecture lead.**
 
-WP-0001 is COMPLETE. **TASK-0014 — the last authorized task — ran on 2026-08-20 and completed**
-(MSG-0038). MSG-0037 is applied: BLK-0005 is listed in the blocker index with its resolved state and
-evidence references, and the underlying blocker record is untouched. Nothing follows it automatically.
+WP-0001 is COMPLETE. **TASK-0015 — the last authorized task — ran on 2026-08-20 and completed**
+(MSG-0040). MSG-0039 is applied: the discoveries index lists all nine `DISC-*.md` records with
+statuses transcribed from the records themselves, and no discovery record was altered. Nothing
+follows it automatically.
 
-That makes **three consecutive unattended deliveries** — TASK-0011, TASK-0013, TASK-0014. The
-Supervisor fast-forwarded onto the lead's push, saw the READY task, launched Claude, and the session
-did the work and pushed its own evidence — no human relay in either direction. The full chain for
-this one is in the log:
+That makes **four consecutive unattended deliveries** — TASK-0011, TASK-0013, TASK-0014, TASK-0015.
+The Supervisor fast-forwarded onto the lead's push, saw the READY task, launched Claude, and the
+session did the work and pushed its own evidence — no human relay in either direction. The full chain
+for this one is in the log:
 
 ```text
-08:37:13Z CYCLE_START     :: pid=22144 enabled=True dryRun=False
-08:37:18Z FAST_FORWARDED  :: local was behind; fast-forwarded to f30a0f7
-08:37:19Z RUNNER_STARTED  :: pid=18344 task=TASK-0014
+09:14:15Z CYCLE_START     :: pid=27484 enabled=True dryRun=False
+09:14:21Z FAST_FORWARDED  :: local was behind; fast-forwarded to 115eb35
+09:14:22Z RUNNER_STARTED  :: pid=24764 task=TASK-0015
 ```
 
-The `FAST_FORWARDED` line is the MSG-0034 correction working, for the second authorization push in a
+The `FAST_FORWARDED` line is the MSG-0034 correction working, for the third authorization push in a
 row. Before `479dfa9`, a push by the lead left the Supervisor stuck at `NOOP :: not reconciled`
 indefinitely — it could not see the very authorization it existed to act on.
 
 **Nothing needs the lead in order to unblock anything.** No blocker is open, no message asks a
-question, and no task is in flight. Two items sit available as future work if the lead wants them,
-neither requested by the executing session:
+question, and no task is in flight. **The index-drift work is finished** — blockers and discoveries
+both now agree with their records (TASK-0013, TASK-0014, TASK-0015).
 
-- the **discoveries-index drift** — three rows against nine `DISC-*.md` files — which MSG-0037 named
-  "a separate future review";
-- the **COMMS register lag** described above, which the numbering convention currently catches every
-  time at the cost of one reconciliation row per task.
+Three items sit available as future work if the lead wants them, none requested by the executing
+session and none blocking anything:
+
+- the **COMMS register lag** described above — now three consecutive tasks — which the numbering
+  convention catches every time at the cost of one reconciliation row per task;
+- **duplicate numbering from the authorizing side.** MSG-0039 (a)/(b) is the first collision since
+  the MSG-0035 rule, and the rule does not reach it: it constrains Claude's allocation only. Harmless
+  this time because the two agree; MSG-0020 (a)/(b) is what it looks like when they do not;
+- **MSG-0034**, still `Status: OPEN` and informational only. Closing it is the lead's call.
 
 Then: **authorize the next work package**, or a task, if any is intended.
 

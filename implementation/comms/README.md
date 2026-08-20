@@ -10,6 +10,9 @@ a defect in the record, not a missing message.
 
 | ID | Subject | Status | File |
 |---|---|---|---|
+| **MSG-0040** | **TASK-0015 execution record — discoveries index reconciled, three rows to nine** | **RECORD** — applied and verified; no decision requested | [MSG-0040-task-0015-execution-record.md](MSG-0040-task-0015-execution-record.md) |
+| MSG-0039 (b) | Architecture decision: reconcile discoveries index — duplicate number, non-conflicting | **DECIDED** — applied by TASK-0015, see MSG-0040 | [MSG-0039-architecture-decision-discovery-index.md](MSG-0039-architecture-decision-discovery-index.md) |
+| MSG-0039 (a) | Architecture decision: reconcile the discoveries index — duplicate number, non-conflicting | **DECIDED** — applied by TASK-0015, see MSG-0040 | [MSG-0039-architecture-decision-discoveries-index-reconciliation.md](MSG-0039-architecture-decision-discoveries-index-reconciliation.md) |
 | **MSG-0038** | **TASK-0014 execution record — BLK-0005 reconciled in the blocker index** | **RECORD** — applied and verified; no decision requested | [MSG-0038-task-0014-execution-record.md](MSG-0038-task-0014-execution-record.md) |
 | MSG-0037 | Architecture decision: reconcile BLK-0005 in the blocker index | **DECIDED** — applied by TASK-0014, see MSG-0038 | [MSG-0037-architecture-decision-blk-0005.md](MSG-0037-architecture-decision-blk-0005.md) |
 | MSG-0036 | TASK-0013 execution record — MSG-0035 decisions applied | **RECORD** — blocker index corrected, numbering convention added; its §6 finding is **ruled on** by MSG-0037 and applied | [MSG-0036-task-0013-execution-record.md](MSG-0036-task-0013-execution-record.md) |
@@ -92,8 +95,15 @@ Before creating a message:
    message, and do not silently pick the next number instead. A collision means two actors are
    allocating from indexes that disagree, and that is the thing worth reporting.
 
-Existing duplicate-numbered records are **not** renumbered: MSG-0020 (a)/(b) and MSG-0033 (a)/(b)
-remain dual-numbered historical records (MSG-0035 decision 2, explicit).
+Existing duplicate-numbered records are **not** renumbered: MSG-0020 (a)/(b), MSG-0033 (a)/(b), and
+MSG-0039 (a)/(b) remain dual-numbered records (MSG-0035 decision 2, explicit).
+
+**MSG-0039 (a)/(b) is the first collision since the rule was adopted, and the rule did not prevent
+it** — because it constrains *Claude's* allocation, and both MSG-0039 files were authored by the
+architecture lead. The two agree in substance, so TASK-0015 executed the stricter reading of both and
+reported the collision rather than stopping (MSG-0040 §6). Step 3 above still stands unchanged for
+Claude: never create a further duplicate. Whether anything should constrain the lead's allocation is
+not a question TASK-0015 was authorized to raise, and it does not raise one.
 
 ### Check the directory, not only this table
 
@@ -106,6 +116,11 @@ have produced **MSG-0035** — a third duplicate. The directory listing is what 
 (MSG-0038 §6). The cause is structural, not careless: the lead authorizes by committing the message
 and a queue row, and the register row is added by the executing session afterwards — so between
 authorization and execution this table is reliably one message stale. Expect it; check the directory.
+
+**And a third time, with the stakes raised.** TASK-0015 found **two** MSG-0039 files on disk, neither
+with a row here. Allocating from the highest register row would have produced MSG-0039 — a *fourth*
+file under that number. The directory listing caught it again (MSG-0040 §6). Three consecutive tasks,
+same defect, same step catching it.
 
 So step 1 above means: read this register, **and** list `MSG-*.md`, **and** grep the repository for
 the candidate number. A missing row is a record defect, not evidence that a number is free — the
