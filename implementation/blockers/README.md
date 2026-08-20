@@ -11,8 +11,14 @@ by an open blocker must never be reported as met.
 | BLK-0002 | GitHub push unavailable — communication channel down | Critical | **RESOLVED** 2026-08-19 |
 | BLK-0003 | PCI server key cannot be unlocked from the tool environment | High | **RESOLVED** 2026-08-19 |
 | BLK-0004 | No privilege to bootstrap the authorized host | High | **RESOLVED** 2026-08-19 |
+| BLK-0005 | Two contradictory MSG-0020 decisions | High | **RESOLVED** 2026-08-19 |
 
 **No blocker is open.**
+
+BLK-0005 was closed by [`../comms/MSG-0022-resolve-msg-0020-conflict.md`](../comms/MSG-0022-resolve-msg-0020-conflict.md)
+and [`../comms/MSG-0023-correct-task-0009-boundary.md`](../comms/MSG-0023-correct-task-0009-boundary.md):
+the **COMPLETE** decision stands, WP-0001 is COMPLETE, and TASK-0012 is not authorized and must not
+be created. Record: [`BLK-0005-conflicting-msg-0020-decisions.md`](BLK-0005-conflicting-msg-0020-decisions.md) §RESOLVED.
 
 ## Index correction — 2026-08-20 (TASK-0013, authorized by MSG-0035 decision 1)
 
@@ -49,9 +55,21 @@ acceptance criterion covered by an open blocker must never be reported as met �
 made WP-0001's completion look unsound on its face. Nothing was actually wrong with WP-0001. Update
 this table in the same commit that closes a blocker.
 
-### Not corrected here — BLK-0005 is missing from the table
+### BLK-0005 — was missing from the table; corrected 2026-08-20 (TASK-0014, MSG-0037)
 
-`BLK-0005-conflicting-msg-0020-decisions.md` exists on disk and is closed (MSG-0022 / MSG-0023), but
-it has **no row above**. TASK-0013's scope forbids changing any blocker other than BLK-0001 and
-BLK-0004, so it was deliberately left alone and reported instead. Authorization to add the row is
-requested in MSG-0036.
+`BLK-0005-conflicting-msg-0020-decisions.md` existed on disk and was closed (MSG-0022 / MSG-0023),
+but it had **no row above**. TASK-0013's scope forbade changing any blocker other than BLK-0001 and
+BLK-0004, so it was deliberately left alone and reported instead, in MSG-0036 §6.
+
+The architecture lead ruled in **MSG-0037**: the row is authorized, the underlying blocker record is
+not to be altered, and the row must reflect the resolved state and cite the evidence. TASK-0014
+applied exactly that. The row above is the only change to this table; BLK-0001 through BLK-0004 are
+unchanged, and `BLK-0005-conflicting-msg-0020-decisions.md` itself was **not** edited.
+
+**Read the two corrections together, because they are one failure.** BLK-0001 and BLK-0004 were shown
+OPEN when their records said RESOLVED; BLK-0005 was shown nowhere at all when its record said
+RESOLVED. Both directions of drift come from the same habit — closing a blocker in its own file and
+not in this table. The rule at the top of this file gives that habit teeth: an index that under-reports
+a closure makes sound work look unsound, and an index that over-reports one would be worse. **Update
+this table in the same commit that closes a blocker**, and add its row in the same commit that raises
+one.

@@ -2,7 +2,7 @@
 
 **Active Work Package:** WP-0001 — PCI Kernel Foundation
 **Status:** **COMPLETE** — declared by the architecture lead 2026-08-19 (MSG-0020(b), resolved by MSG-0022 / MSG-0023, TASK-0009)
-**Last Updated:** 2026-08-20 (TASK-0013 — MSG-0035 maintenance decisions applied)
+**Last Updated:** 2026-08-20 (TASK-0014 — BLK-0005 reconciled in the blocker index, MSG-0037)
 
 ## Current State
 
@@ -50,11 +50,13 @@ The execution-control system (Phase 0, MSG-0010):
 Every session reads the roadmap and queue at startup and executes the highest-priority READY task,
 continuing automatically through authorized work rather than stopping after each subtask.
 
-**Current task: none is READY.** TASK-0001 and TASK-0003 through TASK-0013 are COMPLETE. TASK-0003
+**Current task: none is READY.** TASK-0001 and TASK-0003 through TASK-0014 are COMPLETE. TASK-0003
 was authorized by MSG-0027, executed on 2026-08-20 by a supervisor-started session, and completed
 later the same day once MSG-0030 authorized the refresh command — CRLF residue 150 -> 0, accepted in
 MSG-0031. TASK-0011, the Supervisor smoke test, completed 2026-08-20 (MSG-0032). TASK-0013 applied
-the MSG-0035 maintenance decisions on 2026-08-20 (MSG-0036), again unattended.
+the MSG-0035 maintenance decisions on 2026-08-20 (MSG-0036), again unattended. TASK-0014 added the
+missing BLK-0005 row to the blocker index on 2026-08-20 under MSG-0037 (MSG-0038) — the third
+consecutive unattended delivery.
 
 | ID | Task | Status | Depends On | Owner |
 |---|---|---|---|---|
@@ -69,9 +71,10 @@ the MSG-0035 maintenance decisions on 2026-08-20 (MSG-0036), again unattended.
 | TASK-0010 | Execution Supervisor (installed and **ENABLED**) | **COMPLETE** | — | Claude Code |
 | TASK-0011 | Execution Supervisor smoke test — COMMS audit, end to end | **COMPLETE** (2026-08-20) — passed, MSG-0032 | TASK-0010 ✅ | Claude Code |
 | TASK-0013 | Apply MSG-0035 maintenance decisions — blocker index + COMMS numbering rule | **COMPLETE** (2026-08-20) — MSG-0036 | TASK-0011, MSG-0035 ✅ | Claude Code |
+| TASK-0014 | Reconcile BLK-0005 in the blocker index | **COMPLETE** (2026-08-20) — MSG-0038 | TASK-0013, MSG-0037 ✅ | Claude Code |
 | TASK-0002 | Make test entry points shell-independent | **ABORTED** | — | — |
 
-**No task is currently READY.** TASK-0013 was the last authorized task; nothing follows it
+**No task is currently READY.** TASK-0014 was the last authorized task; nothing follows it
 automatically. Only the architecture lead may authorize the next one.
 
 > There is no TASK-0012. MSG-0022 and MSG-0023 ruled it out of the WP-0001 path, and the number was
@@ -224,14 +227,31 @@ on both in MSG-0035; TASK-0013 executed them on 2026-08-20 and recorded the evid
 > `MSG-*.md` listing **and** a repository grep. A missing row is a record defect, never evidence that
 > a number is free.
 
-**One finding now awaits a ruling**, raised in MSG-0036 §6 and left unactioned at the scope boundary:
-**BLK-0005 has no row in the blocker index.** The file exists and is closed (MSG-0022 / MSG-0023), but
-TASK-0013 was forbidden from changing any blocker other than BLK-0001 and BLK-0004, so it reported
-rather than fixed. Nothing is blocked by this. Authorization is requested to add the row.
+**The MSG-0036 §6 finding is now DECIDED and APPLIED.** It had read: *BLK-0005 has no row in the
+blocker index* — the file existed and was closed (MSG-0022 / MSG-0023), but TASK-0013 was forbidden
+from changing any blocker other than BLK-0001 and BLK-0004, so it reported rather than fixed.
+**MSG-0037 authorized the row; TASK-0014 added it on 2026-08-20** and recorded the evidence in
+MSG-0038. The index now lists **BLK-0005 · High · RESOLVED 2026-08-19** with its evidence references.
+The underlying blocker record was not altered, as MSG-0037 required.
 
-Noted alongside it, without a request attached: `implementation/discoveries/README.md` lists three
-discoveries while nine `DISC-*.md` files exist. Third index, same failure mode — the indexes drift,
-not the underlying records.
+**All five blockers are listed and all five read RESOLVED.** With TASK-0013's correction of BLK-0001
+and BLK-0004 and TASK-0014's addition of BLK-0005, `implementation/blockers/README.md` and the blocker
+records finally describe the same state.
+
+Still noted, without a request attached and explicitly out of scope: `implementation/discoveries/README.md`
+lists three discoveries while nine `DISC-*.md` files exist. Third index, same failure mode — the
+indexes drift, not the underlying records. MSG-0037 names it *"a separate future review"*, so
+TASK-0014 did not touch it.
+
+> **A second observation, recorded because it has now happened twice** (MSG-0038 §6). The COMMS
+> register was one message stale when TASK-0014 allocated its number: **MSG-0037 was on disk and in
+> the `CLAUDE-TASKS.md` ledger with no row in `comms/README.md`** — precisely the defect TASK-0013 hit
+> with MSG-0035, one message later. The cause is structural rather than careless: the lead authorizes
+> by committing the message plus a queue row, and the register row is added by the *executing session*
+> afterwards, so between authorization and execution the register is reliably one behind. The
+> directory-listing step of the MSG-0035 numbering convention caught it both times, which is the
+> convention doing exactly its job. **No change is proposed and no ruling is requested** — it is
+> recorded so a third occurrence is not read as a surprise.
 
 > **Precedent, recorded so it is not over-read.** MSG-0031 accepted a metadata-only `touch` as
 > within the scope of an authorized path-scoped `git checkout`. The architecture lead stated that
@@ -290,21 +310,23 @@ visible; it does not make it self-clearing.
 | MSG-0033 (a) / (b) | TASK-0011 diagnosis directives — duplicate numbering, non-conflicting | **DECIDED** — both satisfied; corrected in `479dfa9`, answered by MSG-0032 |
 | MSG-0034 | TASK-0011 execution path — diagnosis and minimal correction | **OPEN** — informational only; the smoke test passed after the fix |
 | MSG-0035 | Architecture decisions for the MSG-0032 findings | **DECIDED** — both applied by TASK-0013, see MSG-0036 |
-| MSG-0036 | TASK-0013 execution record — MSG-0035 decisions applied | **RECORD** — **one finding needs a ruling** (§6, BLK-0005 index row) |
+| MSG-0036 | TASK-0013 execution record — MSG-0035 decisions applied | **RECORD** — its §6 finding is ruled on by MSG-0037 and applied |
+| MSG-0037 | Architecture decision: reconcile BLK-0005 in the blocker index | **DECIDED** — applied by TASK-0014, see MSG-0038 |
+| MSG-0038 | TASK-0014 execution record — BLK-0005 row added | **RECORD** — applied and verified; **no decision requested** |
 
 ## Repository / GitHub State
 
-**The communication channel is operational.** Verified 2026-08-20 at the start of TASK-0013:
+**The communication channel is operational.** Verified 2026-08-20 at the start of TASK-0014:
 
 ```text
-HEAD          fb7abfe   Authorize TASK-0013 for MSG-0035 maintenance decisions
-origin/main   fb7abfe
+HEAD          f30a0f7   Authorize TASK-0014 for BLK-0005 blocker-index reconciliation
+origin/main   f30a0f7
 git status -sb  ## main...origin/main      (clean, no ahead/behind)
 ```
 
 That `origin/main` value is the ref as the **Supervisor** left it after its own fast-forward at
-07:58:10Z — not a fetch by the session, which cannot perform one (see below). HEAD was re-checked
-immediately before TASK-0013's commit and had not moved.
+08:37:18Z — not a fetch by the session, which cannot perform one (see below). HEAD was re-checked
+immediately before TASK-0014's commit and had not moved.
 
 **Push is now available to the unattended runner.** `git push origin main` was added to
 `implementation/operations/supervisor/runner-settings.json` under MSG-0028, narrowly scoped so the
@@ -393,9 +415,15 @@ but the deployment artifacts are not yet correct.
 > none of it possible with an unbootstrapped host, which is what BLK-0001 and BLK-0004 asserted. The
 > individual blocker files were resolved on the day; only the index lagged.
 >
-> **Still unlisted: BLK-0005.** Its file exists and is closed, but the index has no row for it.
-> TASK-0013 was forbidden from touching any blocker other than BLK-0001 and BLK-0004, so it reported
-> instead — MSG-0036 §6. Authorization to add the row is requested.
+> **BLK-0005 — now listed, 2026-08-20 (TASK-0014, MSG-0037).** Its file existed and was closed, but
+> the index had no row for it. TASK-0013 was forbidden from touching any blocker other than BLK-0001
+> and BLK-0004, so it reported instead (MSG-0036 §6); MSG-0037 authorized the row and TASK-0014 added
+> it, citing MSG-0022, MSG-0023, and the blocker record. The underlying record was not altered.
+>
+> Both corrections are one failure seen from two sides: BLK-0001 and BLK-0004 were shown OPEN when
+> their records said RESOLVED, and BLK-0005 was shown nowhere at all when its record said RESOLVED.
+> A blocker gets closed in its own file and not in the table. **All five rows are now present and
+> correct.** Evidence: [`../comms/MSG-0038-task-0014-execution-record.md`](../comms/MSG-0038-task-0014-execution-record.md).
 
 ## Recently Closed
 
@@ -508,29 +536,35 @@ precedence has changed.
 
 **No task is READY. Awaiting the architecture lead.**
 
-WP-0001 is COMPLETE. **TASK-0013 — the last authorized task — ran on 2026-08-20 and completed**
-(MSG-0036). Both MSG-0035 decisions are applied: the blocker index is corrected and the COMMS
-numbering-allocation convention is recorded. Nothing follows it automatically.
+WP-0001 is COMPLETE. **TASK-0014 — the last authorized task — ran on 2026-08-20 and completed**
+(MSG-0038). MSG-0037 is applied: BLK-0005 is listed in the blocker index with its resolved state and
+evidence references, and the underlying blocker record is untouched. Nothing follows it automatically.
 
-That makes **two consecutive unattended deliveries**. The Supervisor fast-forwarded onto the lead's
-push, saw the READY task, launched Claude, and the session did the work and pushed its own evidence —
-no human relay in either direction. The full chain is in the log:
+That makes **three consecutive unattended deliveries** — TASK-0011, TASK-0013, TASK-0014. The
+Supervisor fast-forwarded onto the lead's push, saw the READY task, launched Claude, and the session
+did the work and pushed its own evidence — no human relay in either direction. The full chain for
+this one is in the log:
 
 ```text
-07:58:04Z CYCLE_START     :: pid=22168 enabled=True dryRun=False
-07:58:10Z FAST_FORWARDED  :: local was behind; fast-forwarded to fb7abfe
-07:58:11Z RUNNER_STARTED  :: pid=27520 task=TASK-0013
+08:37:13Z CYCLE_START     :: pid=22144 enabled=True dryRun=False
+08:37:18Z FAST_FORWARDED  :: local was behind; fast-forwarded to f30a0f7
+08:37:19Z RUNNER_STARTED  :: pid=18344 task=TASK-0014
 ```
 
-The `FAST_FORWARDED` line is the MSG-0034 correction working. Before `479dfa9`, a push by the lead
-left the Supervisor stuck at `NOOP :: not reconciled` indefinitely — it could not see the very
-authorization it existed to act on.
+The `FAST_FORWARDED` line is the MSG-0034 correction working, for the second authorization push in a
+row. Before `479dfa9`, a push by the lead left the Supervisor stuck at `NOOP :: not reconciled`
+indefinitely — it could not see the very authorization it existed to act on.
 
-One thing needs the lead, not blocking (MSG-0036 §6): **authorize adding the BLK-0005 row to
-`implementation/blockers/README.md`.** TASK-0013 stopped at its scope boundary rather than change a
-third blocker.
+**Nothing needs the lead in order to unblock anything.** No blocker is open, no message asks a
+question, and no task is in flight. Two items sit available as future work if the lead wants them,
+neither requested by the executing session:
 
-Then: **authorize the next work package**, or a task, if any is intended. Nothing is in flight.
+- the **discoveries-index drift** — three rows against nine `DISC-*.md` files — which MSG-0037 named
+  "a separate future review";
+- the **COMMS register lag** described above, which the numbering convention currently catches every
+  time at the cost of one reconciliation row per task.
+
+Then: **authorize the next work package**, or a task, if any is intended.
 
 Also recorded, and now partly addressed: **the queue historically had no task detail
 specifications.** MSG-0027 directed the executor to follow TASK-0003's "existing prerequisites,

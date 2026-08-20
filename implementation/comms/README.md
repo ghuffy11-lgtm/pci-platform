@@ -10,7 +10,9 @@ a defect in the record, not a missing message.
 
 | ID | Subject | Status | File |
 |---|---|---|---|
-| **MSG-0036** | **TASK-0013 execution record — MSG-0035 decisions applied** | **RECORD** — blocker index corrected, numbering convention added; one finding needs a ruling (§6) | [MSG-0036-task-0013-execution-record.md](MSG-0036-task-0013-execution-record.md) |
+| **MSG-0038** | **TASK-0014 execution record — BLK-0005 reconciled in the blocker index** | **RECORD** — applied and verified; no decision requested | [MSG-0038-task-0014-execution-record.md](MSG-0038-task-0014-execution-record.md) |
+| MSG-0037 | Architecture decision: reconcile BLK-0005 in the blocker index | **DECIDED** — applied by TASK-0014, see MSG-0038 | [MSG-0037-architecture-decision-blk-0005.md](MSG-0037-architecture-decision-blk-0005.md) |
+| MSG-0036 | TASK-0013 execution record — MSG-0035 decisions applied | **RECORD** — blocker index corrected, numbering convention added; its §6 finding is **ruled on** by MSG-0037 and applied | [MSG-0036-task-0013-execution-record.md](MSG-0036-task-0013-execution-record.md) |
 | MSG-0035 | Architecture decisions for the MSG-0032 findings | **DECIDED** — BLK-0001/0004 confirmed RESOLVED; numbering convention approved | [MSG-0035-architecture-decisions.md](MSG-0035-architecture-decisions.md) |
 | **MSG-0034** | **TASK-0011 execution path — diagnosis and minimal correction** | **OPEN** — informational; smoke test passed after the fix | [MSG-0034-task-0011-execution-path-correction.md](MSG-0034-task-0011-execution-path-correction.md) |
 | MSG-0033 (b) | TASK-0011 retry — diagnose and correct the failed smoke-test path | **DECIDED** — diagnosed and corrected in `479dfa9`; TASK-0011 passed, see MSG-0032 | [MSG-0033-task-0011-retry-diagnosis.md](MSG-0033-task-0011-retry-diagnosis.md) |
@@ -98,6 +100,12 @@ remain dual-numbered historical records (MSG-0035 decision 2, explicit).
 TASK-0013 hit the failure this rule exists to prevent, while adding the rule. **MSG-0035 was present
 on disk but had no row in this register.** Allocating "the next number after the highest row" would
 have produced **MSG-0035** — a third duplicate. The directory listing is what caught it.
+
+**It happened again one message later.** TASK-0014 found **MSG-0037** on disk and in the
+`CLAUDE-TASKS.md` ledger with no row here, and the directory listing caught it a second time
+(MSG-0038 §6). The cause is structural, not careless: the lead authorizes by committing the message
+and a queue row, and the register row is added by the executing session afterwards — so between
+authorization and execution this table is reliably one message stale. Expect it; check the directory.
 
 So step 1 above means: read this register, **and** list `MSG-*.md`, **and** grep the repository for
 the candidate number. A missing row is a record defect, not evidence that a number is free — the
