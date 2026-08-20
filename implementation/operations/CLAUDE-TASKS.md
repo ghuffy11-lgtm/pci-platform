@@ -27,6 +27,7 @@ Only the architecture lead may authorize new work, mark a task READY, or change 
 | TASK-0014 | **Reconcile BLK-0005 in blocker index** | **COMPLETE** | TASK-0013, MSG-0037 | 2026-08-20 — row added, MSG-0038 | none | Claude Code |
 | TASK-0015 | **Reconcile discoveries index with actual DISC records** | **COMPLETE** | TASK-0014, MSG-0039 | 2026-08-20 — index 3 rows -> 9, MSG-0040 | none | Claude Code |
 | TASK-0016 | **Close resolved MSG-0034 informational record** | **COMPLETE** | TASK-0015, MSG-0041 | 2026-08-20 — closure verified, MSG-0042 | none | Claude Code |
+| TASK-0017 | **Supervisor heartbeat / unattended observability** | **READY** | TASK-0016 | — | Execute (authorized by MSG-0043) | Claude Code |
 | TASK-0002 | Make test entry points shell-independent | **ABORTED** | — | 2026-08-19 | none — premise disproven by measurement | — |
 
 **TASK-0016 is explicitly authorized by the architecture lead after WP-0001 completion.** It is maintenance/documentation work, not a new product work package.
@@ -190,6 +191,8 @@ READY means *authorized to attempt*, never *authorized to force*. A READY task w
 | MSG-0040 | Record | CREATED — authorization applied | Claude Code | Architecture lead | TASK-0015 execution evidence; index 3 rows -> 9; **no decision requested** | TASK-0015 |
 | MSG-0041 | Decision | DECIDED | Architecture lead | Claude Code | Close resolved MSG-0034 informational record; applied by TASK-0016, see MSG-0042 | TASK-0016 |
 | MSG-0042 | Record | CREATED — closure verified | Claude Code | Architecture lead | TASK-0016 execution evidence; MSG-0034 CLOSED in record and register; **no decision requested** | TASK-0016 |
+| MSG-0043 | Decision | DECIDED | Architecture lead | Claude Code | **TASK-0017 AUTHORIZED** — correct the stale-heartbeat defect; schedule, gates and permissions unchanged | TASK-0017 |
+| MSG-0044 | Record | OPEN | Claude Code | Architecture lead | **TASK-0017 authorized in MSG-0043 but absent from the queue**, so the supervisor could never select it. Queue reconciled; structural finding recorded | TASK-0017 |
 
 ## Interruption and recovery protocol
 
@@ -224,3 +227,68 @@ Prefer operations that are safe to repeat, and verify-before-acting on those tha
 ## Stop boundaries
 
 Claude Code MUST stop, document, commit, push, and report when architecture approval is required; privileged operator action is required; a security boundary would be crossed; a prerequisite cannot be satisfied; documentation conflicts; actual state differs materially from recorded state; or an operation is destructive or irreversible and is not explicitly authorized.
+
+---
+
+## TASK-0017 — Supervisor heartbeat / unattended observability
+
+**Priority:** 1 | **Status:** **READY** — authorized by MSG-0043 | **Owner:** Claude Code
+**Depends on:** TASK-0016 (COMPLETE) | **Next eligible task:** none — nothing follows automatically
+**Full specification:** [`TASK-0017-supervisor-heartbeat.md`](TASK-0017-supervisor-heartbeat.md)
+
+### Objective
+
+Correct the heartbeat/state defect recorded in MSG-0042: `state/heartbeat.json` can still read
+`NOOP :: no READY task` while a supervisor-started run is actually in progress, so unattended
+execution looks idle from outside.
+
+### Prerequisites
+
+| ID | Prerequisite | State |
+|---|---|---|
+| P1 | Architecture lead authorization | **MET** — MSG-0043 |
+| P2 | TASK-0016 COMPLETE | MET |
+| P3 | Supervisor installed and enabled | MET |
+
+### Allowed actions
+
+Inspect the heartbeat/state-writing path and its tests; reproduce the stale condition with a
+harmless controlled run; correct the state updates so an observer can distinguish NOOP,
+runner-started, runner-running, completion and failure; add or update focused tests; update
+documentation and evidence; commit and push.
+
+### Forbidden actions
+
+- Changing the ten-minute schedule.
+- Weakening the reconciliation or fail-closed gates.
+- `--dangerously-skip-permissions` or any equivalent bypass; broadening deny rules.
+- Changing product architecture or PCI runtime behaviour.
+- Credentials, privilege escalation, or destructive repository/infrastructure operations.
+
+### Verification requirements
+
+A controlled test proves the heartbeat reflects a live supervisor-started run **and** its terminal
+result. The focused test suite passes. Changes are committed and pushed with no unrelated
+modifications.
+
+### Documentation requirements
+
+Update the supervisor README where behaviour changes, record the result in COMMS, and reconcile the
+queue and status.
+
+### Checkpoint requirements
+
+Checkpoint after the defect is reproduced, and after the corrected behaviour is verified — each
+recording observed state rather than intent.
+
+### Stop conditions
+
+If the fix would require changing the scheduling contract, the permissions model, or an architecture
+decision outside this scope — **STOP** and record the exact conflict in COMMS rather than
+improvising.
+
+### Recovery procedure
+
+The work is confined to the supervisor's own state-writing path and its tests. On resumption,
+inspect `state/heartbeat.json` and the log directly before assuming any earlier edit took effect,
+and re-run the suite rather than trusting a recorded pass.
