@@ -10,6 +10,8 @@ a defect in the record, not a missing message.
 
 | ID | Subject | Status | File |
 |---|---|---|---|
+| **MSG-0036** | **TASK-0013 execution record — MSG-0035 decisions applied** | **RECORD** — blocker index corrected, numbering convention added; one finding needs a ruling (§6) | [MSG-0036-task-0013-execution-record.md](MSG-0036-task-0013-execution-record.md) |
+| MSG-0035 | Architecture decisions for the MSG-0032 findings | **DECIDED** — BLK-0001/0004 confirmed RESOLVED; numbering convention approved | [MSG-0035-architecture-decisions.md](MSG-0035-architecture-decisions.md) |
 | **MSG-0034** | **TASK-0011 execution path — diagnosis and minimal correction** | **OPEN** — informational; smoke test passed after the fix | [MSG-0034-task-0011-execution-path-correction.md](MSG-0034-task-0011-execution-path-correction.md) |
 | MSG-0033 (b) | TASK-0011 retry — diagnose and correct the failed smoke-test path | **DECIDED** — diagnosed and corrected in `479dfa9`; TASK-0011 passed, see MSG-0032 | [MSG-0033-task-0011-retry-diagnosis.md](MSG-0033-task-0011-retry-diagnosis.md) |
 | MSG-0033 (a) | TASK-0011 smoke-test diagnosis and corrective action | **DECIDED** — diagnosed and corrected in `479dfa9`; TASK-0011 passed, see MSG-0032 | [MSG-0033-task-0011-diagnosis.md](MSG-0033-task-0011-diagnosis.md) |
@@ -73,12 +75,42 @@ Detail: [`MSG-0026-supervisor-enabled.md`](MSG-0026-supervisor-enabled.md),
 [`MSG-0032-task-0011-supervisor-smoke-test.md`](MSG-0032-task-0011-supervisor-smoke-test.md).
 Implementation and docs: [`../operations/supervisor/`](../operations/supervisor/README.md).
 
-## Note on message numbering
+## Message numbering — allocation convention
 
-Two numbers now have two files each: **MSG-0020** (a)/(b) and **MSG-0033** (a)/(b). The MSG-0020
-pair contradicted each other and cost three further messages to resolve; the MSG-0033 pair agrees,
-so it cost nothing. This is recorded as an observed pattern, **not** as a protocol rule — whether to
-add a number-allocation convention is the architecture lead's decision, requested in MSG-0032 §6.3.
+**This is a protocol rule.** Approved by the architecture lead in MSG-0035 decision 2 and applied by
+TASK-0013.
+
+Before creating a message:
+
+1. **Allocate the next number from this register** — the authoritative index — rather than from
+   memory, from a conversation, or from the highest number you happen to have read.
+2. **Verify the number is unused immediately before the commit**, not only when you started writing.
+   A number that was free when drafting can be taken by the time you commit.
+3. **If a collision is detected — stop and report it.** Do not create another duplicate-numbered
+   message, and do not silently pick the next number instead. A collision means two actors are
+   allocating from indexes that disagree, and that is the thing worth reporting.
+
+Existing duplicate-numbered records are **not** renumbered: MSG-0020 (a)/(b) and MSG-0033 (a)/(b)
+remain dual-numbered historical records (MSG-0035 decision 2, explicit).
+
+### Check the directory, not only this table
+
+TASK-0013 hit the failure this rule exists to prevent, while adding the rule. **MSG-0035 was present
+on disk but had no row in this register.** Allocating "the next number after the highest row" would
+have produced **MSG-0035** — a third duplicate. The directory listing is what caught it.
+
+So step 1 above means: read this register, **and** list `MSG-*.md`, **and** grep the repository for
+the candidate number. A missing row is a record defect, not evidence that a number is free — the
+charter (`../PROJECT-CHARTER.md` §5) states this directly: *"A message not represented in the
+register is a record defect and must be reconciled according to protocol; do not assume the file does
+not exist."* The MSG-0035 row was added by TASK-0013 as exactly that reconciliation.
+
+### Why the rule was asked for
+
+Duplicate numbering had happened twice before any rule existed. MSG-0020 (a)/(b) **contradicted each
+other** and cost three further messages — MSG-0021, MSG-0022, MSG-0023 — to work out which decision
+stood. MSG-0033 (a)/(b) agreed, so it cost nothing. The difference between the two was luck, not
+process, which is why MSG-0032 §6.3 requested a ruling instead of adopting one.
 
 ## Bootstrap — closed
 
@@ -86,6 +118,9 @@ add a number-allocation convention is the architecture lead's decision, requeste
 
 ## Protocol
 
+- Claude allocates the next `MSG-XXXX` number from the register above **before** creating the file,
+  and re-verifies its uniqueness immediately before committing. On a collision: stop and report. See
+  *Message numbering — allocation convention*.
 - Claude creates `MSG-XXXX-<short-name>.md` when architectural direction, clarification, or a blocking decision is required.
 - Claude sets `Status: OPEN` and records the work package, evidence, options, recommendation, and exact question.
 - Claude adds the message to the register above in the same commit that creates it.

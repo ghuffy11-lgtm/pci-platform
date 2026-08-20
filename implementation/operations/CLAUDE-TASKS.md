@@ -23,7 +23,7 @@ Only the architecture lead may authorize new work, mark a task READY, or change 
 | TASK-0003 | Normalise `*.md` line endings (DISC-0006) | **COMPLETE** | — | 2026-08-20 w/crlf 150 -> 0 | none | Claude Code |
 | TASK-0010 | Execution Supervisor (installed and **ENABLED**, 10-min) | **COMPLETE** | — | 2026-08-19 tests 21/21, enabled cycle verified | none — start path proven by TASK-0003 | Claude Code |
 | TASK-0011 | **Execution Supervisor smoke test — COMMS audit and end-to-end report** | **COMPLETE** | TASK-0010 | 2026-08-20 `d16665a` — PASSED | none — terminal by design | Claude Code |
-| TASK-0013 | **Apply MSG-0035 maintenance decisions — blocker index + COMMS numbering rule** | **READY** | TASK-0011, MSG-0035 | 2026-08-20 — authorized now | Execute automatically; produce evidence and push | Claude Code |
+| TASK-0013 | **Apply MSG-0035 maintenance decisions — blocker index + COMMS numbering rule** | **COMPLETE** | TASK-0011, MSG-0035 | 2026-08-20 — both decisions applied, MSG-0036 | none — one finding awaits a ruling, MSG-0036 §6 | Claude Code |
 | TASK-0002 | Make test entry points shell-independent | **ABORTED** | — | 2026-08-19 | none — premise disproven by measurement | — |
 
 **TASK-0013 is explicitly authorized by the architecture lead after WP-0001 completion.** It is maintenance/protocol work, not a new product work package.
@@ -51,6 +51,23 @@ Only the architecture lead may authorize new work, mark a task READY, or change 
 **Success gate:** The pushed result must show BLK-0001 and BLK-0004 RESOLVED, the COMMS numbering rule present, a unique new execution record in the register, and TASK-0013 marked COMPLETE. Evidence must identify the commit that performed the work.
 
 **Stop conditions:** If MSG-0035 cannot be reconciled with repository state, the required files contain conflicting substantive information, the next COMMS number is already used, or any action outside this exact scope is needed, STOP and report in COMMS. Do not improvise.
+
+### TASK-0013 — result
+
+**COMPLETE, 2026-08-20.** Both MSG-0035 decisions applied: BLK-0001 and BLK-0004 are RESOLVED in the
+blocker index with their resolution date and evidence reference, and the COMMS numbering-allocation
+convention is recorded in `implementation/comms/README.md`. Evidence: MSG-0036; commit and push
+quoted in `checkpoints/TASK-0013.md`.
+
+The numbering rule was exercised by its own adoption. **MSG-0035 was on disk but absent from the COMMS
+register**, so allocating "the next number after the highest register row" would have produced a
+third duplicate — MSG-0035 — while adding the rule against duplicates. The directory listing caught
+it; the convention as written now requires register **and** listing **and** repository grep. The
+missing MSG-0035 row was added as the reconciliation `PROJECT-CHARTER.md` §5 directs.
+
+**One finding stopped at the scope boundary and awaits a ruling:** BLK-0005 has no row in the blocker
+index. Adding it would change a blocker other than BLK-0001/BLK-0004, which TASK-0013 forbids, so it
+was reported in MSG-0036 §6 instead of fixed.
 
 ---
 
@@ -117,6 +134,7 @@ READY means *authorized to attempt*, never *authorized to force*. A READY task w
 | MSG-0033 (b) | Directive | DECIDED | Architecture lead | Claude Code | TASK-0011 retry correction; duplicate historical number | TASK-0011, TASK-0010 |
 | MSG-0034 | Record | OPEN | Claude Code | Architecture lead | Informational: execution-path diagnosis; smoke test passed | TASK-0011 |
 | MSG-0035 | Decision | DECIDED | Architecture lead | Claude Code | BLK-0001/0004 resolved; COMMS numbering-allocation convention approved | TASK-0013 |
+| MSG-0036 | Record | CREATED — both decisions applied | Claude Code | Architecture lead | TASK-0013 execution evidence; **BLK-0005 index row needs a ruling** (§6) | TASK-0013 |
 
 ## Interruption and recovery protocol
 

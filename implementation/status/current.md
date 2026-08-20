@@ -2,7 +2,7 @@
 
 **Active Work Package:** WP-0001 — PCI Kernel Foundation
 **Status:** **COMPLETE** — declared by the architecture lead 2026-08-19 (MSG-0020(b), resolved by MSG-0022 / MSG-0023, TASK-0009)
-**Last Updated:** 2026-08-20 (TASK-0011 — Supervisor smoke test and full record reconciliation)
+**Last Updated:** 2026-08-20 (TASK-0013 — MSG-0035 maintenance decisions applied)
 
 ## Current State
 
@@ -50,10 +50,11 @@ The execution-control system (Phase 0, MSG-0010):
 Every session reads the roadmap and queue at startup and executes the highest-priority READY task,
 continuing automatically through authorized work rather than stopping after each subtask.
 
-**Current task: none is READY.** TASK-0001 and TASK-0003 through TASK-0011 are COMPLETE. TASK-0003
+**Current task: none is READY.** TASK-0001 and TASK-0003 through TASK-0013 are COMPLETE. TASK-0003
 was authorized by MSG-0027, executed on 2026-08-20 by a supervisor-started session, and completed
 later the same day once MSG-0030 authorized the refresh command — CRLF residue 150 -> 0, accepted in
-MSG-0031. TASK-0011, the Supervisor smoke test, completed 2026-08-20 (MSG-0032).
+MSG-0031. TASK-0011, the Supervisor smoke test, completed 2026-08-20 (MSG-0032). TASK-0013 applied
+the MSG-0035 maintenance decisions on 2026-08-20 (MSG-0036), again unattended.
 
 | ID | Task | Status | Depends On | Owner |
 |---|---|---|---|---|
@@ -67,10 +68,15 @@ MSG-0031. TASK-0011, the Supervisor smoke test, completed 2026-08-20 (MSG-0032).
 | TASK-0003 | Normalise `*.md` line endings (DISC-0006) | **COMPLETE** (2026-08-20) — CRLF 150 -> 0, accepted in MSG-0031 | — | Claude Code |
 | TASK-0010 | Execution Supervisor (installed and **ENABLED**) | **COMPLETE** | — | Claude Code |
 | TASK-0011 | Execution Supervisor smoke test — COMMS audit, end to end | **COMPLETE** (2026-08-20) — passed, MSG-0032 | TASK-0010 ✅ | Claude Code |
+| TASK-0013 | Apply MSG-0035 maintenance decisions — blocker index + COMMS numbering rule | **COMPLETE** (2026-08-20) — MSG-0036 | TASK-0011, MSG-0035 ✅ | Claude Code |
 | TASK-0002 | Make test entry points shell-independent | **ABORTED** | — | — |
 
-**No task is currently READY.** TASK-0011 was terminal by its own terms: "after it completes there
-will be no READY task unless the architecture lead explicitly authorizes another one."
+**No task is currently READY.** TASK-0013 was the last authorized task; nothing follows it
+automatically. Only the architecture lead may authorize the next one.
+
+> There is no TASK-0012. MSG-0022 and MSG-0023 ruled it out of the WP-0001 path, and the number was
+> never reused. Do not infer a gap in the queue as missing work — the charter's own warning
+> (`../PROJECT-CHARTER.md` §4) is not to infer task order by skipping entries.
 
 Only the architecture lead may authorize new work or change a task's priority or scope. A PROPOSED
 task is not executable.
@@ -191,23 +197,41 @@ Every tier reported a non-zero test count.
 
 Index: `implementation/comms/README.md` carries the full message register with links and status.
 
-**No message is OPEN.** Every communication is answered, decided, or closed. Every task is COMPLETE
-except TASK-0002, which is ABORTED because its premise was disproven by measurement.
+**One message carries `Status: OPEN` — MSG-0034 — and it is informational, not a question.** It
+records the TASK-0011 execution-path diagnosis; the smoke test passed after the correction it
+describes, so nothing depends on it being closed. Every other communication is answered, decided, or
+closed. Every task is COMPLETE except TASK-0002, which is ABORTED because its premise was disproven
+by measurement.
 
-**Two findings do await a ruling**, both raised in MSG-0032 §6 by the TASK-0011 audit. Neither is an
-OPEN *message* and neither blocks anything, so they are listed here rather than reopening a message:
+**The two findings raised in MSG-0032 §6 are now DECIDED and APPLIED.** The architecture lead ruled
+on both in MSG-0035; TASK-0013 executed them on 2026-08-20 and recorded the evidence in MSG-0036:
 
-1. **§6.2 — the blocker register contradicts this file.** `implementation/blockers/README.md` shows
-   BLK-0001 and BLK-0004 **OPEN**; the Open Blockers section below says all are RESOLVED. The
-   evidence favours this file (MSG-0008 closed, host bootstrapped, 229 tests run on it), but the
-   README's own rule says an acceptance criterion covered by an open blocker must never be reported
-   as met — so as literally recorded, WP-0001's criteria are reported met while its index shows two
-   High blockers open. Correcting a blocker status is substantive, so TASK-0011 stopped at that
-   boundary rather than editing it. **Authorization requested to update the README.**
-2. **§6.3 — duplicate message numbering has now happened twice**, MSG-0020 and MSG-0033. The first
-   pair contradicted each other and cost three messages to resolve; the second agrees and cost
-   nothing. No allocation rule prevents a third. **A ruling is requested** on whether to add one to
-   the COMMS protocol; Claude Code proposes but does not adopt one.
+1. **§6.2 — the blocker index contradicted this file. FIXED.** `implementation/blockers/README.md`
+   showed BLK-0001 and BLK-0004 **OPEN** while both blocker records themselves read "RESOLVED /
+   CLOSED — 2026-08-19". Only the index was stale. MSG-0035 decision 1 authorized the correction and
+   both rows now read **RESOLVED 2026-08-19** with the evidence reference. The index and this file
+   agree.
+2. **§6.3 — duplicate message numbering. RULED ON.** MSG-0035 decision 2 approved a
+   numbering-allocation convention, now recorded in `implementation/comms/README.md`: allocate from
+   the register before creating a message, re-verify uniqueness immediately before commit, and on a
+   collision **stop and report** rather than creating another duplicate. MSG-0020 and MSG-0033 stay
+   dual-numbered; renumbering them is explicitly forbidden.
+
+> **The rule caught a live collision on the day it was adopted.** MSG-0035 existed on disk but had no
+> row in the COMMS register, so "the next number after the highest register row" would have produced
+> **MSG-0035** — a third duplicate, created in the act of adding the rule against duplicates. The
+> directory listing caught it. The convention as written therefore requires the register **and** a
+> `MSG-*.md` listing **and** a repository grep. A missing row is a record defect, never evidence that
+> a number is free.
+
+**One finding now awaits a ruling**, raised in MSG-0036 §6 and left unactioned at the scope boundary:
+**BLK-0005 has no row in the blocker index.** The file exists and is closed (MSG-0022 / MSG-0023), but
+TASK-0013 was forbidden from changing any blocker other than BLK-0001 and BLK-0004, so it reported
+rather than fixed. Nothing is blocked by this. Authorization is requested to add the row.
+
+Noted alongside it, without a request attached: `implementation/discoveries/README.md` lists three
+discoveries while nine `DISC-*.md` files exist. Third index, same failure mode — the indexes drift,
+not the underlying records.
 
 > **Precedent, recorded so it is not over-read.** MSG-0031 accepted a metadata-only `touch` as
 > within the scope of an authorized path-scoped `git checkout`. The architecture lead stated that
@@ -264,16 +288,23 @@ visible; it does not make it self-clearing.
 | MSG-0031 | TASK-0003 COMPLETE — CRLF residue cleared | **DECIDED** — completion accepted |
 | MSG-0032 | TASK-0011 Supervisor smoke test — COMMS audit and result | **RECORD** — passed; **two findings need a ruling** (§6.2, §6.3) |
 | MSG-0033 (a) / (b) | TASK-0011 diagnosis directives — duplicate numbering, non-conflicting | **DECIDED** — both satisfied; corrected in `479dfa9`, answered by MSG-0032 |
+| MSG-0034 | TASK-0011 execution path — diagnosis and minimal correction | **OPEN** — informational only; the smoke test passed after the fix |
+| MSG-0035 | Architecture decisions for the MSG-0032 findings | **DECIDED** — both applied by TASK-0013, see MSG-0036 |
+| MSG-0036 | TASK-0013 execution record — MSG-0035 decisions applied | **RECORD** — **one finding needs a ruling** (§6, BLK-0005 index row) |
 
 ## Repository / GitHub State
 
-**The communication channel is operational.** Verified 2026-08-20 at the start of TASK-0011:
+**The communication channel is operational.** Verified 2026-08-20 at the start of TASK-0013:
 
 ```text
-HEAD          479dfa9   fix(supervisor): fast-forward when strictly behind; log every cycle start
-origin/main   479dfa9
+HEAD          fb7abfe   Authorize TASK-0013 for MSG-0035 maintenance decisions
+origin/main   fb7abfe
 git status -sb  ## main...origin/main      (clean, no ahead/behind)
 ```
+
+That `origin/main` value is the ref as the **Supervisor** left it after its own fast-forward at
+07:58:10Z — not a fetch by the session, which cannot perform one (see below). HEAD was re-checked
+immediately before TASK-0013's commit and had not moved.
 
 **Push is now available to the unattended runner.** `git push origin main` was added to
 `implementation/operations/supervisor/runner-settings.json` under MSG-0028, narrowly scoped so the
@@ -347,18 +378,24 @@ There are no open blockers. The two defects found during verification (DISC-0007
 recorded as discoveries with proposed tasks, not as blockers: nothing is prevented from proceeding,
 but the deployment artifacts are not yet correct.
 
-> **Unreconciled — flagged by TASK-0011, deliberately not fixed.**
-> `implementation/blockers/README.md` still lists **BLK-0001 and BLK-0004 as OPEN**, contradicting
-> the paragraph above. The evidence favours this file: MSG-0008 is CLOSED, the operator executed the
-> bootstrap on 2026-08-19, `DockerRootDir` = `/data/docker` was verified directly, and 229 tests ran
-> on the host — none of it possible with an unbootstrapped host, which is what BLK-0001 and BLK-0004
-> assert. The individual blocker files were resolved; the index was never updated with them.
+> **Reconciled 2026-08-20 by TASK-0013.** `implementation/blockers/README.md` had listed **BLK-0001
+> and BLK-0004 as OPEN**, contradicting the paragraph above. Both now read **RESOLVED 2026-08-19**,
+> with the resolution date and evidence reference, under MSG-0035 decision 1.
 >
-> Changing a blocker status is a substantive change to the project record, not a typo fix, and it
-> lies outside TASK-0011's authorized scope — so TASK-0011 stopped at that boundary and recorded it
-> instead. **Authorization is requested in MSG-0032 §6.2.** Until it is given, a reader should treat
-> the blocker README as the stale record and this section as correct, but should not assume that
-> reading is authorized.
+> The block below is retained as the record of what was found and why it was not fixed at the time.
+> TASK-0011 was right to stop: changing a blocker status is a substantive change to the project
+> record, not a typo fix, and it lay outside that task's authorized scope. It recorded the
+> contradiction and asked (MSG-0032 §6.2); MSG-0035 answered; TASK-0013 applied it. That sequence —
+> stop, record, ask, execute on the ruling — is the intended one.
+>
+> The underlying evidence never changed: MSG-0008 is CLOSED, the operator executed the bootstrap on
+> 2026-08-19, `DockerRootDir` = `/data/docker` was verified directly, and 229 tests ran on the host —
+> none of it possible with an unbootstrapped host, which is what BLK-0001 and BLK-0004 asserted. The
+> individual blocker files were resolved on the day; only the index lagged.
+>
+> **Still unlisted: BLK-0005.** Its file exists and is closed, but the index has no row for it.
+> TASK-0013 was forbidden from touching any blocker other than BLK-0001 and BLK-0004, so it reported
+> instead — MSG-0036 §6. Authorization to add the row is requested.
 
 ## Recently Closed
 
@@ -471,17 +508,27 @@ precedence has changed.
 
 **No task is READY. Awaiting the architecture lead.**
 
-WP-0001 is COMPLETE. TASK-0003 is COMPLETE (MSG-0031). **TASK-0011 — the last authorized task —
-ran on 2026-08-20 and PASSED** (MSG-0032): the Supervisor selected the READY task, launched Claude,
-Claude read shared repository state, produced this audit, and pushed it to GitHub with no human
-relay. TASK-0011 was terminal by its own terms, so nothing follows it automatically.
+WP-0001 is COMPLETE. **TASK-0013 — the last authorized task — ran on 2026-08-20 and completed**
+(MSG-0036). Both MSG-0035 decisions are applied: the blocker index is corrected and the COMMS
+numbering-allocation convention is recorded. Nothing follows it automatically.
 
-Two things need the lead, neither blocking (both detailed in MSG-0032 §6):
+That makes **two consecutive unattended deliveries**. The Supervisor fast-forwarded onto the lead's
+push, saw the READY task, launched Claude, and the session did the work and pushed its own evidence —
+no human relay in either direction. The full chain is in the log:
 
-1. **Authorize updating `implementation/blockers/README.md`**, which still shows BLK-0001 and
-   BLK-0004 OPEN against all other evidence. TASK-0011 stopped rather than edit a blocker status.
-2. **Rule on message-number allocation.** Duplicate numbering has now happened twice — MSG-0020
-   (contradictory, cost three messages to resolve) and MSG-0033 (consistent, cost nothing).
+```text
+07:58:04Z CYCLE_START     :: pid=22168 enabled=True dryRun=False
+07:58:10Z FAST_FORWARDED  :: local was behind; fast-forwarded to fb7abfe
+07:58:11Z RUNNER_STARTED  :: pid=27520 task=TASK-0013
+```
+
+The `FAST_FORWARDED` line is the MSG-0034 correction working. Before `479dfa9`, a push by the lead
+left the Supervisor stuck at `NOOP :: not reconciled` indefinitely — it could not see the very
+authorization it existed to act on.
+
+One thing needs the lead, not blocking (MSG-0036 §6): **authorize adding the BLK-0005 row to
+`implementation/blockers/README.md`.** TASK-0013 stopped at its scope boundary rather than change a
+third blocker.
 
 Then: **authorize the next work package**, or a task, if any is intended. Nothing is in flight.
 
