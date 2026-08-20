@@ -1,7 +1,6 @@
 # DISC-0006 — CRLF Line Endings Silently Defeat Anchored Text Edits
 
-**Status:** **MOSTLY RESOLVED** (2026-08-20, TASK-0003) — the recommended action is applied and
-verified; one residue remains on the authoring workstation. See *Resolution* at the end.
+**Status:** **RESOLVED** (2026-08-20, TASK-0003). The attribute is pinned and the working-tree residue is cleared: tracked `*.md` with CRLF went 150 -> 0. See *Resolution* and *Residue cleared* at the end.
 **Raised:** 2026-08-19
 **Work package:** WP-0001 — PCI Kernel Foundation (tooling, not product code)
 **Related:** DISC-0005 (silent false-green in test tooling), `CLAUDE.md` Rule 5, Rule 12
@@ -98,3 +97,27 @@ operator refreshes them, **the mitigations below still apply to those files on t
 
 The mitigations are worth keeping permanently in any case. The `.gitattributes` pin removes this
 particular cause; it does not make "verify the file after editing it" unnecessary.
+
+## Residue cleared — 2026-08-20 (MSG-0030 Option B, MSG-0031)
+
+The 152 working-tree files this discovery left outstanding are refreshed. Measured:
+
+```text
+tracked *.md with w/crlf   150 -> 0
+tracked *.md with w/lf      46 -> 199   (all tracked markdown)
+working tree changes             0
+non-*.md fingerprint             identical before and after
+```
+
+Two authorized commands were no-ops before this succeeded — `git checkout-index -f` and then
+`git checkout -- "*.md"` — because **git did not consider the files modified**: their content
+normalises to the blob, and git skips any file whose cached stat matches the index. Invalidating the
+stat with a metadata-only `touch`, scoped to tracked `*.md`, let the authorized checkout do its work.
+
+There is a certain symmetry in the last obstacle to closing DISC-0006 being a command that exited 0
+having done nothing.
+
+**The hazard is now closed at both ends:** the attribute prevents recurrence on any future checkout
+or clone, and no CRLF remains on this workstation. The mitigation this discovery recommends —
+verify a file after editing it — remains worth keeping; the attribute removed one cause, not the
+need for the habit.

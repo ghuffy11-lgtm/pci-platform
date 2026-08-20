@@ -362,7 +362,7 @@ precedence has changed.
 | DISC-0003 | Development identity adapter boundary |
 | DISC-0004 | Compose stack predates the `/data/docker` boundary |
 | DISC-0005 | `npm test` reports success while running zero tests under POSIX shells |
-| DISC-0006 | CRLF line endings silently defeat anchored text edits | **MOSTLY RESOLVED** — TASK-0003; residue on this workstation only |
+| DISC-0006 | CRLF line endings silently defeat anchored text edits | **RESOLVED** | **MOSTLY RESOLVED** — TASK-0003; residue on this workstation only |
 | DISC-0009 | Docker CLI writes client state to `/home/claude`, outside `/data` | **OPEN** |
 | DISC-0007 | Init refuses to create a passwordless role, then creates one anyway | **RESOLVED** |
 | DISC-0008 | Compose kernel service cannot start as committed | **RESOLVED** |

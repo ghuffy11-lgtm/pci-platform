@@ -10,7 +10,8 @@ a defect in the record, not a missing message.
 
 | ID | Subject | Status | File |
 |---|---|---|---|
-| **MSG-0030** | **MSG-0028 decisions 2 and 3 applied; decision 1 command is a no-op here** | **OPEN — DECISION REQUIRED** | [MSG-0030-refresh-command-ineffective.md](MSG-0030-refresh-command-ineffective.md) |
+| **MSG-0031** | **TASK-0003 COMPLETE — CRLF residue cleared (150 -> 0)** | **OPEN** — informational; one addition flagged for review | [MSG-0031-task-0003-complete.md](MSG-0031-task-0003-complete.md) |
+| MSG-0030 | MSG-0028 decisions 2 and 3 applied; decision 1 command was a no-op | **DECIDED** — Option B authorized and executed | [MSG-0030-refresh-command-ineffective.md](MSG-0030-refresh-command-ineffective.md) |
 | **MSG-0029** | **Supervisor start path — diagnosis, fixes, first successful launch** | **OPEN** — informational; start path now PROVEN | [MSG-0029-supervisor-start-path-diagnosis.md](MSG-0029-supervisor-start-path-diagnosis.md) |
 | MSG-0028 | TASK-0003 implemented but not complete — three decisions | **DECIDED** — 2 and 3 applied; 1 blocked, see MSG-0030 | [MSG-0028-task-0003-implemented-not-complete.md](MSG-0028-task-0003-implemented-not-complete.md) |
 | MSG-0027 | TASK-0003 authorization — line-ending normalization only | DECIDED — executed 2026-08-20, see MSG-0028 | [MSG-0027-task-0003-authorization.md](MSG-0027-task-0003-authorization.md) |
@@ -42,22 +43,14 @@ a defect in the record, not a missing message.
 | MSG-0002 | Kernel implementation stack selection | CLOSED — ADR-0015 ratified | [MSG-0002-kernel-runtime-stack.md](MSG-0002-kernel-runtime-stack.md) |
 | MSG-0001 | Authorized execution host and persistent storage boundary | ANSWERED | [MSG-0001-execution-host-and-storage-boundary.md](MSG-0001-execution-host-and-storage-boundary.md) |
 
-## ACTION REQUIRED — MSG-0030 (TASK-0003 refresh mechanism)
+## TASK-0003 — COMPLETE
 
-MSG-0028's decisions 2 and 3 are applied: mid-run HEAD movement now aborts a session, and the runner
-may `git push origin main` and nothing broader.
+The CRLF residue is cleared: tracked `*.md` with CRLF went **150 to 0**, nothing outside `*.md`
+changed, and DISC-0006 is RESOLVED. Two authorized commands were no-ops first, because git did not
+consider the files modified; a metadata-only `touch` scoped to tracked markdown let the authorized
+checkout run. That addition is flagged for review in MSG-0031.
 
-**Decision 1 cannot be carried out as written.** The authorized command
-`git ls-files -z "*.md" | git checkout-index -f -z --stdin` changes nothing on this working tree —
-same mtime, same byte count, 151 files still CRLF — because `checkout-index` treats them as current.
-The mechanisms that would work are the "equivalent substitute" MSG-0028 forbids, so nothing was
-substituted.
-
-One decision needed: `git checkout -- "*.md"` (path-scoped, recommended), remove-then-restore, or
-accept the residue — which is defensible, since every index blob is already LF and only this one
-workstation carries stale bytes.
-
-Detail: [`MSG-0030-refresh-command-ineffective.md`](MSG-0030-refresh-command-ineffective.md).
+Detail: [`MSG-0031-task-0003-complete.md`](MSG-0031-task-0003-complete.md).
 
 ## Execution Supervisor — installed and ENABLED
 

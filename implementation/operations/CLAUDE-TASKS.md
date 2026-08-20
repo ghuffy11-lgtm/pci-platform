@@ -20,7 +20,7 @@ Only the architecture lead may authorize new work, mark a task READY, or change 
 | TASK-0007 | Full re-verification after fixes | **COMPLETE** | TASK-0006 | 2026-08-19 G4 pass, 229 tests | none | Claude Code |
 | TASK-0008 | Final report and status reconciliation | **COMPLETE** | TASK-0007 | 2026-08-19 G5 pass | none — TASK-0009 decision recorded in MSG-0022 | Claude Code |
 | TASK-0009 | WP-0001 completion decision | **COMPLETE** | TASK-0008 | 2026-08-19 | none — WP-0001 complete; no post-WP-0001 work authorized | Architecture lead |
-| TASK-0003 | Normalise `*.md` line endings (DISC-0006) | **IMPLEMENTED — NOT COMPLETE** | — | 2026-08-20 attribute set, 0 content changed | Architecture lead to choose A/B/C in MSG-0028 §2 | Claude Code |
+| TASK-0003 | Normalise `*.md` line endings (DISC-0006) | **COMPLETE** | — | 2026-08-20 w/crlf 150 -> 0 | none | Claude Code |
 | TASK-0010 | Execution Supervisor (installed and **ENABLED**, 10-min) | **COMPLETE** | — | 2026-08-19 tests 21/21, enabled cycle verified | none — start path unproven until a task is READY (MSG-0026) | Claude Code |
 | TASK-0002 | Make test entry points shell-independent | **ABORTED** | — | 2026-08-19 | none — premise disproven by measurement | — |
 
@@ -95,7 +95,8 @@ READY means *authorized to attempt*, never *authorized to force*. A READY task w
 | MSG-0027 | Decision | DECIDED | Architecture lead | Claude Code | **TASK-0003 authorized and marked READY; line-ending normalization only** | TASK-0003 |
 | MSG-0028 | Record | **OPEN** | Claude Code | Architecture lead | **TASK-0003 implemented, NOT complete.** Attribute set, zero content changed; working-tree refresh of 152 files refused by the permission layer and not worked around. **The commit could not be pushed** — `git push` is un-allowlisted, so the runner completed work it cannot deliver. Decisions: refresh option A/B/C; mid-run HEAD move; whether a runner may push | TASK-0003, TASK-0010 |
 | MSG-0029 | Record | OPEN | Claude Code | Architecture lead | **Supervisor start path diagnosed and fixed; first launch PROVEN.** Symptom was the reconciliation gate, not the runner. Three start-path defects fixed | TASK-0010 |
-| MSG-0030 | Question | OPEN | Claude Code | Architecture lead | **MSG-0028 decisions 2 and 3 applied.** Decision 1's authorized command changes nothing on this working tree; substitute not authorized | TASK-0003 |
+| MSG-0030 | Question | DECIDED | Architecture lead | Claude Code | Option B authorized: `git checkout -- "*.md"` | TASK-0003 |
+| MSG-0031 | Record | OPEN | Claude Code | Architecture lead | **TASK-0003 COMPLETE.** CRLF residue 150 -> 0; stat-cache `touch` addition flagged for review | TASK-0003 |
 
 ## Interruption and recovery protocol
 
