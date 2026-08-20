@@ -160,6 +160,16 @@ What was deliberately **not** touched: the `Status:` line inside
 Another message's record is outside this task's scope, and a stale status line there is a smaller
 defect than a session editing records it was not authorized to edit. Flagged for the lead.
 
+**7.4 `head` in the heartbeat is the cycle's head, not the live one.** After this session pushed
+`b618e53`, the heartbeat continued to report `head: 0c7d7b2…` — the value the supervisor read when
+its cycle began at 20:52:51Z. That is **correct behaviour**: the field records the commit the cycle
+evaluated the queue against, and a supervisor that silently re-read `HEAD` mid-run would be reporting
+a state it never acted on. It is recorded because the field's name invites the other reading, and
+because a stale-looking `head` was one of the three symptoms of the TASK-0017 defect — there it was
+stale *because nothing was being written*; here the file is being rewritten every 60s and this field
+is simply not one of the changing ones. Distinguishing those two is the whole point of the fix. No
+change proposed.
+
 ## 8. Scope statement
 
 Changed by this task: this message, `implementation/operations/checkpoints/TASK-0018.md`,
