@@ -140,6 +140,8 @@ READY means *authorized to attempt*, never *authorized to force*. A READY task w
 | MSG-0030 | Question | DECIDED | Architecture lead | Claude Code | Option B authorized: `git checkout -- "*.md"` | TASK-0003 |
 | MSG-0031 | Record | DECIDED | Claude Code | Architecture lead | **TASK-0003 COMPLETE.** CRLF residue 150 -> 0; stat-cache `touch` addition accepted as scoped to MSG-0030 Option B | TASK-0003 |
 | MSG-0032 | Record | **CREATED — smoke test PASSED** | Claude Code | Architecture lead | Execution Supervisor smoke-test result; end-to-end queue → Supervisor → Claude → COMMS → GitHub evidence. Two findings request a ruling (§6.2 blocker register, §6.3 message numbering) | TASK-0011 |
+| MSG-0033 | Directive | DECIDED | Architecture lead | Claude Code | Diagnose and correct the TASK-0011 execution path before treating it as a pass | TASK-0011 |
+| MSG-0034 | Record | OPEN | Claude Code | Architecture lead | **Cause: reconciliation gate — the clone was behind, so nothing ever pulled.** Fixed with a gated fast-forward; smoke test then PASSED | TASK-0011 |
 | MSG-0033 (a) | Directive | DECIDED | Architecture lead | Claude Code | TASK-0011 smoke-test diagnosis and corrective action; durable logging so a cycle that dies early still leaves a trace | TASK-0011 |
 | MSG-0033 (b) | Directive | DECIDED | Architecture lead | Claude Code | TASK-0011 retry: distinguish NOOP/reconciliation from runner, prompt, permission, and session failure; smallest correction only. **Duplicate number, non-conflicting** — both satisfied by `479dfa9` and answered in MSG-0032 §3 | TASK-0011, TASK-0010 |
 

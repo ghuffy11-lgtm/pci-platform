@@ -60,7 +60,7 @@ MSG-0031. TASK-0011, the Supervisor smoke test, completed 2026-08-20 (MSG-0032).
 | TASK-0001 | WP-0001 verification on the authorized host | **COMPLETE** | — | Claude Code |
 | TASK-0004 | Fix database role provisioning (DISC-0007) | **COMPLETE** — G1 passed | TASK-0001 | Claude Code |
 | TASK-0005 | Fix compose kernel service configuration (DISC-0008) | **COMPLETE** — G2 passed | TASK-0001 | Claude Code |
-| TASK-0006 | Clean-room reproducibility verification | **WAITING_FOR_ARCHITECTURE_LEAD** — deps met | TASK-0004 ✅, TASK-0005 ✅ | Architecture lead (destructive authorization) |
+| TASK-0006 | Clean-room reproducibility verification | **COMPLETE** — G3 passed | TASK-0004, TASK-0005 | Claude Code |
 | TASK-0007 | Full re-verification after fixes | **COMPLETE** — G4 passed | TASK-0006 | Claude Code |
 | TASK-0008 | Final report and status reconciliation | **COMPLETE** — G5 passed | TASK-0007 | Claude Code |
 | TASK-0009 | WP-0001 completion decision | **COMPLETE** — WP-0001 declared complete | TASK-0008 | Architecture lead |

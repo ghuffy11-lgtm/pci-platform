@@ -10,6 +10,7 @@ a defect in the record, not a missing message.
 
 | ID | Subject | Status | File |
 |---|---|---|---|
+| **MSG-0034** | **TASK-0011 execution path — diagnosis and minimal correction** | **OPEN** — informational; smoke test passed after the fix | [MSG-0034-task-0011-execution-path-correction.md](MSG-0034-task-0011-execution-path-correction.md) |
 | MSG-0033 (b) | TASK-0011 retry — diagnose and correct the failed smoke-test path | **DECIDED** — diagnosed and corrected in `479dfa9`; TASK-0011 passed, see MSG-0032 | [MSG-0033-task-0011-retry-diagnosis.md](MSG-0033-task-0011-retry-diagnosis.md) |
 | MSG-0033 (a) | TASK-0011 smoke-test diagnosis and corrective action | **DECIDED** — diagnosed and corrected in `479dfa9`; TASK-0011 passed, see MSG-0032 | [MSG-0033-task-0011-diagnosis.md](MSG-0033-task-0011-diagnosis.md) |
 | MSG-0032 | TASK-0011 — Supervisor smoke test: COMMS audit and end-to-end result | **RECORD** — smoke test PASSED; two findings need a ruling (§6.2 blockers, §6.3 numbering) | [MSG-0032-task-0011-supervisor-smoke-test.md](MSG-0032-task-0011-supervisor-smoke-test.md) |
