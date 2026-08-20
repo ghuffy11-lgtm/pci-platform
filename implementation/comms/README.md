@@ -10,6 +10,7 @@ a defect in the record, not a missing message.
 
 | ID | Subject | Status | File |
 |---|---|---|---|
+| **MSG-0030** | **MSG-0028 decisions 2 and 3 applied; decision 1 command is a no-op here** | **OPEN — DECISION REQUIRED** | [MSG-0030-refresh-command-ineffective.md](MSG-0030-refresh-command-ineffective.md) |
 | **MSG-0029** | **Supervisor start path — diagnosis, fixes, first successful launch** | **OPEN** — informational; start path now PROVEN | [MSG-0029-supervisor-start-path-diagnosis.md](MSG-0029-supervisor-start-path-diagnosis.md) |
 | **MSG-0028** | **TASK-0003 implemented but not complete — one permission grant required** | **OPEN — DECISION REQUIRED** | [MSG-0028-task-0003-implemented-not-complete.md](MSG-0028-task-0003-implemented-not-complete.md) |
 | MSG-0027 | TASK-0003 authorization — line-ending normalization only | DECIDED — executed 2026-08-20, see MSG-0028 | [MSG-0027-task-0003-authorization.md](MSG-0027-task-0003-authorization.md) |

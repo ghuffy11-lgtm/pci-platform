@@ -416,6 +416,21 @@ What a future session needs to know:
 - The supervisor is inert by default: `enabled: false`, `dryRun: true`, and no runner command.
   Installing it is a separate operator decision (MSG-0011).
 
+### Mid-run repository movement — abort
+
+If `HEAD` or `origin/main` changes unexpectedly **after a session has started**, that session must
+stop at the next safe checkpoint, document the discrepancy, and make no further changes against a
+moving repository state. This is a fail-closed recovery boundary, not a warning.
+
+A run may continue only after reconciliation confirms the repository is again consistent with the
+state the session recorded at its start.
+
+Record the starting `HEAD` in the first checkpoint, and re-check it before any commit, push, or
+irreversible operation. A session that began against one repository and finishes against another has
+produced evidence about neither.
+
+Authority: MSG-0028 decision 2.
+
 ## Continuation
 
 **Claude MUST NOT stop merely because one authorized subtask completed.**
