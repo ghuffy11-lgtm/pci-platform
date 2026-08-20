@@ -25,32 +25,24 @@ Only the architecture lead may authorize new work, mark a task READY, or change 
 | TASK-0011 | **Execution Supervisor smoke test — COMMS audit and end-to-end report** | **COMPLETE** | TASK-0010 | 2026-08-20 `d16665a` — PASSED | none — terminal by design | Claude Code |
 | TASK-0013 | **Apply MSG-0035 maintenance decisions — blocker index + COMMS numbering rule** | **COMPLETE** | TASK-0011, MSG-0035 | 2026-08-20 — both decisions applied, MSG-0036 | none — one finding awaits a ruling, MSG-0036 §6 | Claude Code |
 | TASK-0014 | **Reconcile BLK-0005 in blocker index** | **COMPLETE** | TASK-0013, MSG-0037 | 2026-08-20 — row added, MSG-0038 | none | Claude Code |
+| TASK-0015 | **Reconcile discoveries index with actual DISC records** | **READY** | TASK-0014, MSG-0039 | 2026-08-20 — authorized | execute reconciliation and verify index | Claude Code |
 | TASK-0002 | Make test entry points shell-independent | **ABORTED** | — | 2026-08-19 | none — premise disproven by measurement | — |
 
 **TASK-0013 is explicitly authorized by the architecture lead after WP-0001 completion.** It is maintenance/protocol work, not a new product work package.
 
+### TASK-0015 — authorization
+
+**READY, 2026-08-20.** MSG-0039 authorizes a narrowly scoped reconciliation of `implementation/discoveries/README.md` against the actual `DISC-*.md` records. The task may update only the discoveries index and required task/COMMS evidence. It must not alter discovery substance, architecture decisions, blockers, product/code, Supervisor configuration, permissions, scheduling, or repository history. It must stop for malformed records or conflicts requiring architectural judgment.
+
 ### TASK-0014 — result
 
-**COMPLETE, 2026-08-20.** The blocker index now lists **BLK-0005 · Two contradictory MSG-0020
-decisions · High · RESOLVED 2026-08-19**, citing MSG-0022, MSG-0023, and the blocker record. The
-underlying `BLK-0005-conflicting-msg-0020-decisions.md` was **not** altered, BLK-0001 through
-BLK-0004 are unchanged, and the discoveries index was not touched. Evidence: MSG-0038; commit and
-push quoted in `checkpoints/TASK-0014.md` checkpoint 2.
+**COMPLETE, 2026-08-20.** The blocker index now lists **BLK-0005 · Two contradictory MSG-0020 decisions · High · RESOLVED 2026-08-19**, citing MSG-0022, MSG-0023, and the blocker record. The underlying `BLK-0005-conflicting-msg-0020-decisions.md` was **not** altered, BLK-0001 through BLK-0004 are unchanged, and the discoveries index was not touched. Evidence: MSG-0038; commit and push quoted in `checkpoints/TASK-0014.md` checkpoint 2.
 
-The stop condition was checked before acting: MSG-0037, MSG-0022, MSG-0023, and the BLK-0005 record
-agree that WP-0001 is COMPLETE and BLK-0005 is closed, so it did not fire. The one nuance — MSG-0023
-retains MSG-0022 "only as the historical conflict-resolution record" — is a clarification of which
-record survives, not a disagreement about BLK-0005, and is recorded in MSG-0038 §3 so it is not
-misread later.
+The stop condition was checked before acting: MSG-0037, MSG-0022, MSG-0023, and the BLK-0005 record agree that WP-0001 is COMPLETE and BLK-0005 is closed, so it did not fire. The one nuance — MSG-0023 retains MSG-0022 "only as the historical conflict-resolution record" — is a clarification of which record survives, not a disagreement about BLK-0005, and is recorded in MSG-0038 §3 so it is not misread later.
 
-**All five blockers are now listed and all five read RESOLVED.** With BLK-0001 and BLK-0004 corrected
-by TASK-0013 and BLK-0005 added here, the index and the underlying records finally describe the same
-state.
+**All five blockers are now listed and all five read RESOLVED.** With BLK-0001 and BLK-0004 corrected by TASK-0013 and BLK-0005 added here, the index and the underlying records finally describe the same state.
 
-**Noted, not acted on** (MSG-0038 §6): the COMMS register was one message stale again — MSG-0037 had
-no register row, the same defect TASK-0013 hit with MSG-0035. The directory-listing step of the
-numbering convention caught it both times. No change is proposed; the discoveries-index drift remains
-explicitly out of scope per MSG-0037.
+**Noted, not acted on** (MSG-0038 §6): the COMMS register was one message stale again — MSG-0037 had no register row, the same defect TASK-0013 hit with MSG-0035. The directory-listing step of the numbering convention caught it both times. No change is proposed; the discoveries-index drift remains explicitly out of scope per MSG-0037.
 
 ### TASK-0014 — exact scope and boundaries
 
@@ -126,8 +118,8 @@ READY means *authorized to attempt*, never *authorized to force*. A READY task w
 | MSG-0010 | Record | CLOSED | Claude Code | Architecture lead | Phase 0 execution-control system built | TASK-0004, TASK-0005 |
 | MSG-0011 | Record | SUPERSEDED | Claude Code | Architecture lead | Execution Supervisor built, tested (17/17), NOT installed and NOT enabled | TASK-0010 |
 | MSG-0012 | Decision | DECIDED | Architecture lead | Claude Code | TASK-0004 and TASK-0005 authorized | TASK-0004, TASK-0005 |
-| MSG-0013 | Directive | DECIDED | Claude Code | Architecture lead | Reconcile queue to READY from MSG-0012 | TASK-0004, TASK-0005 |
-| MSG-0014 | Directive | DECIDED | Claude Code | Architecture lead | Queue authorization reconciliation | TASK-0004, TASK-0005 |
+| MSG-0013 | Directive | DECIDED | Architecture lead | Claude Code | Reconcile queue to READY from MSG-0012 | TASK-0004, TASK-0005 |
+| MSG-0014 | Directive | DECIDED | Architecture lead | Claude Code | Queue authorization reconciliation | TASK-0004, TASK-0005 |
 | MSG-0015 | Record | CLOSED | Claude Code | Architecture lead | TASK-0004 and TASK-0005 complete; TASK-0006 authorization required | TASK-0006 |
 | MSG-0016 | Decision | DECIDED | Architecture lead | Claude Code | TASK-0006 authorized | TASK-0006 |
 | MSG-0017 | Record | CLOSED | Claude Code | Architecture lead | TASK-0006 complete; TASK-0007 authorization required | TASK-0007 |
@@ -154,6 +146,7 @@ READY means *authorized to attempt*, never *authorized to force*. A READY task w
 | MSG-0036 | Record | CREATED — both decisions applied | Claude Code | Architecture lead | TASK-0013 execution evidence; **BLK-0005 index row needs a ruling** (§6) | TASK-0013 |
 | MSG-0037 | Decision | DECIDED | Architecture lead | Claude Code | **BLK-0005 index reconciliation authorized**; underlying record unchanged | TASK-0014 |
 | MSG-0038 | Record | CREATED — authorization applied | Claude Code | Architecture lead | TASK-0014 execution evidence; BLK-0005 row added; **no decision requested** | TASK-0014 |
+| MSG-0039 | Decision | DECIDED | Architecture lead | Claude Code | **Discovery-index reconciliation authorized**; TASK-0015 READY | TASK-0015 |
 
 ## Interruption and recovery protocol
 
