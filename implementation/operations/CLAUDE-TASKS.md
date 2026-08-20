@@ -28,12 +28,23 @@ Only the architecture lead may authorize new work, mark a task READY, or change 
 | TASK-0015 | **Reconcile discoveries index with actual DISC records** | **COMPLETE** | TASK-0014, MSG-0039 | 2026-08-20 — index 3 rows -> 9, MSG-0040 | none | Claude Code |
 | TASK-0016 | **Close resolved MSG-0034 informational record** | **COMPLETE** | TASK-0015, MSG-0041 | 2026-08-20 — closure verified, MSG-0042 | none | Claude Code |
 | TASK-0017 | **Supervisor heartbeat / unattended observability** | **COMPLETE** | TASK-0016 | 2026-08-20 tests 36/36 | none | Claude Code |
-| TASK-0018 | **Live Supervisor heartbeat validation** | **READY** | TASK-0017 | — | Execute (authorized by MSG-0048) — must be Supervisor-started | Claude Code |
+| TASK-0018 | **Live Supervisor heartbeat validation** | **IN_PROGRESS** — 4 of 5 gates MET | TASK-0017 | 2026-08-20 `RUNNER_RUNNING` observed live | none automatic — one decision, MSG-0049 §6 | Claude Code |
 | TASK-0002 | Make test entry points shell-independent | **ABORTED** | — | 2026-08-19 | none — premise disproven by measurement | — |
 
 **TASK-0016 is explicitly authorized by the architecture lead after WP-0001 completion.** It is maintenance/documentation work, not a new product work package.
 
-### TASK-0017 — result: IMPLEMENTED but NOT COMPLETE
+### TASK-0017 — result: COMPLETE (the section below is superseded history)
+
+> **Corrected 2026-08-20 by TASK-0018.** The status board above reads **COMPLETE** for TASK-0017 and
+> the narrative below reads **IMPLEMENTED but NOT COMPLETE** — a straight contradiction inside one
+> file. The board is right: MSG-0046 authorized the operator-side test run, MSG-0047 records **36
+> passed / 0 failed**, and the task closed in `1f2903d`. The block below was accurate when written,
+> before the suite could be executed, and is retained rather than rewritten because the sequence
+> — blocked, asked, authorized, verified — is the useful part of the record.
+>
+> This correction is **additive and declared** (MSG-0049 §7.3). TASK-0018's scope permits updating
+> queue documentation; it does not extend to the MSG-0045 record's own status line, which was left
+> untouched and still reads OPEN.
 
 **IN_PROGRESS, 2026-08-20.** The defect was reproduced, diagnosed and corrected, and nine focused
 tests were written. **The success gate is NOT met**: MSG-0043 requires that the relevant test suite
@@ -233,7 +244,8 @@ READY means *authorized to attempt*, never *authorized to force*. A READY task w
 | MSG-0046 | Decision | DECIDED | Architecture lead | Claude Code | Option A: operator runs the test once; no permission expansion | TASK-0017 |
 | MSG-0047 | Record | OPEN | Claude Code | Architecture lead | **TASK-0017 verification: 36 passed, 0 failed.** Gate satisfied; task COMPLETE | TASK-0017 |
 | MSG-0048 | Decision | DECIDED | Architecture lead | Claude Code | **TASK-0018 AUTHORIZED** — one real Supervisor-started run, observe RUNNER_RUNNING live; no manual trigger, no supervisor changes | TASK-0018 |
-| MSG-0045 | Record | **OPEN — decision required** | Claude Code | Architecture lead | **TASK-0017 IMPLEMENTED but NOT COMPLETE.** Defect reproduced and corrected; the test suite **could not be run** — no allowlist entry permits executing a PowerShell script. Three options in §7 | TASK-0017 |
+| MSG-0045 | Record | **OPEN — decision required** | Claude Code | Architecture lead | **TASK-0017 IMPLEMENTED but NOT COMPLETE.** Defect reproduced and corrected; the test suite **could not be run** — no allowlist entry permits executing a PowerShell script. Three options in §7. *Answered by MSG-0046 and discharged by MSG-0047; the status line in the record itself was not changed by TASK-0018, which had no authority over another message's record* | TASK-0017 |
+| MSG-0049 | Record | **OPEN — decision required** | Claude Code | Architecture lead | **TASK-0018 verification: `RUNNER_RUNNING` observed live during a supervisor-started run.** Gates 1, 2, 4 and 5 MET with quoted evidence; gate 3 (terminal heartbeat) is **structurally unobservable from inside the run it measures**. Three options in §6; (B) recommended | TASK-0018 |
 
 ## Interruption and recovery protocol
 
@@ -273,7 +285,7 @@ Claude Code MUST stop, document, commit, push, and report when architecture appr
 
 ## TASK-0017 — Supervisor heartbeat / unattended observability
 
-**Priority:** 1 | **Status:** **IN_PROGRESS** — authorized by MSG-0043; verification blocked, see MSG-0045 | **Owner:** Claude Code
+**Priority:** 1 | **Status:** **COMPLETE** — authorized by MSG-0043; verified 36/36 under MSG-0046, recorded in MSG-0047 | **Owner:** Claude Code
 **Depends on:** TASK-0016 (COMPLETE) | **Next eligible task:** none — nothing follows automatically
 **Full specification:** [`TASK-0017-supervisor-heartbeat.md`](TASK-0017-supervisor-heartbeat.md)
 **Checkpoint:** [`checkpoints/TASK-0017.md`](checkpoints/TASK-0017.md)
@@ -339,9 +351,51 @@ and re-run the suite rather than trusting a recorded pass.
 
 ## TASK-0018 — Live Supervisor heartbeat validation
 
-**Priority:** 1 | **Status:** **READY** — authorized by MSG-0048 | **Owner:** Claude Code
+**Priority:** 1 | **Status:** **IN_PROGRESS** — executed 2026-08-20; four of five gates MET, one decision outstanding (MSG-0049 §6) | **Owner:** Claude Code
 **Depends on:** TASK-0017 (COMPLETE) | **Next eligible task:** none
 **Full specification:** [`TASK-0018-live-supervisor-heartbeat-validation.md`](TASK-0018-live-supervisor-heartbeat-validation.md)
+**Checkpoint:** [`checkpoints/TASK-0018.md`](checkpoints/TASK-0018.md)
+
+### TASK-0018 — result: the heartbeat was observed live
+
+**IN_PROGRESS, 2026-08-20.** The supervisor started this task on its own ten-minute cycle at
+20:52:56Z, and while the runner was alive `state/heartbeat.json` read:
+
+```json
+{ "decision": "RUNNER_RUNNING", "reason": "TASK-0018 running for 210s",
+  "runnerActive": true, "runnerPid": 7984, "head": "0c7d7b2...", "timestamp": "2026-08-20T20:56:26Z" }
+```
+
+Three samples 30s / 90s / 210s into the run show the value being **refreshed**, not written once.
+Compare TASK-0017's own run, which reported `NOOP :: no READY task`, `runnerActive: false`, and a
+two-commit-old `head` throughout. **All three symptoms are absent. The defect does not reproduce.**
+
+| Gate | Verdict |
+|---|---|
+| 1. Launched by the enabled supervisor, not manually | **MET** — `CYCLE_START` 20:52:51Z, `RUNNER_STARTED pid=7984` 20:52:56Z; the logged prompt is verbatim this session's |
+| 2. `RUNNER_RUNNING` with live pid and fresh timestamp | **MET** — three samples; log, lock, heartbeat and prompt all name pid 7984 |
+| 3. Terminal heartbeat records the result; lock released | **NOT OBSERVED** — see below |
+| 4. No stale `NOOP` persists across the live run | **MET** |
+| 5. Evidence in COMMS; queue reconciled | **MET** — MSG-0049, this section, `checkpoints/TASK-0018.md`, `status/current.md` |
+
+**Gate 3 is structurally unobservable from inside this run.** The supervisor writes the terminal
+record *after* the runner exits (`supervisor.ps1` 468–485, 728–729), so a session cannot observe the
+state its own exit produces. Nothing was modified to compensate: no supervisor change, no second run,
+no test substituted for the observation. The evidence lands seconds after this session ends — durably
+as a `COMPLETED :: task=TASK-0018` line in `logs/supervisor-20260820.log`, transiently in the
+heartbeat, which the next cycle overwrites with `NOOP` about ten minutes later.
+
+**Left IN_PROGRESS, deliberately — not COMPLETE and not READY.** Not COMPLETE because a gate is
+unmet. Not READY because MSG-0048 authorizes **one** supervisor-started run, and a READY row would
+start a second one that no message authorizes. MSG-0049 §6 asks for one decision and recommends
+option (B): authorize a single further cycle, explicitly bounded, whose only work is reading the
+previous run's terminal line and closing the task.
+
+**One inference, flagged rather than buried.** Confirming pid 7984 with an external process listing
+was refused by the runner's permission layer and **was not routed around**; the pid's liveness is
+inferred from four agreeing artifacts and the advancing elapsed-time values. MSG-0049 §3.
+
+### TASK-0018 — authorization (as issued)
 
 ### Objective
 

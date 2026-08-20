@@ -2,7 +2,7 @@
 
 **Active Work Package:** WP-0001 — PCI Kernel Foundation
 **Status:** **COMPLETE** — declared by the architecture lead 2026-08-19 (MSG-0020(b), resolved by MSG-0022 / MSG-0023, TASK-0009)
-**Last Updated:** 2026-08-20 (TASK-0017 — heartbeat corrected but **NOT verified**; MSG-0043 / MSG-0044 / MSG-0045)
+**Last Updated:** 2026-08-20 UTC (TASK-0018 — the corrected heartbeat **observed live** during a supervisor-started run; MSG-0048 / MSG-0049)
 
 ## Current State
 
@@ -77,12 +77,18 @@ message on 2026-08-20 under MSG-0041 (MSG-0042) — the fifth.
 | TASK-0015 | Reconcile the discoveries index with the actual `DISC-*.md` records | **COMPLETE** (2026-08-20) — 3 rows -> 9, MSG-0040 | TASK-0014, MSG-0039 ✅ | Claude Code |
 | TASK-0016 | Close the resolved MSG-0034 informational record | **COMPLETE** (2026-08-20) — closure verified, MSG-0042 | TASK-0015, MSG-0041 ✅ | Claude Code |
 | TASK-0017 | Supervisor heartbeat / unattended observability | **COMPLETE** (2026-08-20) — tests 36/36, MSG-0047 | TASK-0016, MSG-0043 ✅ | Claude Code |
+| TASK-0018 | Live Supervisor heartbeat validation | **IN_PROGRESS** (2026-08-20) — 4 of 5 gates MET, MSG-0049 | TASK-0017, MSG-0048 ✅ | Claude Code |
 | TASK-0002 | Make test entry points shell-independent | **ABORTED** | — | — |
 
-**No task is currently READY. TASK-0017 is IN_PROGRESS and stopped at a permission boundary.** It is
-deliberately not left READY: the Supervisor would select it again on its next cycle and repeat the
-work indefinitely. It is deliberately not COMPLETE: its success gate is unmet. Only the architecture
-lead may authorize the next task, and MSG-0045 §7 asks for one decision to close this one out.
+**No task is currently READY. TASK-0018 is IN_PROGRESS with one gate unmet.** It is deliberately not
+left READY: MSG-0048 authorizes **one** supervisor-started run, and a READY row would start a second
+one that no message authorizes. It is deliberately not COMPLETE: gate 3, the terminal heartbeat,
+cannot be observed from inside the run it measures. MSG-0049 §6 asks for one decision to close it.
+
+> **Superseded — the position after TASK-0017's first attempt.** This paragraph previously read
+> "TASK-0017 is IN_PROGRESS and stopped at a permission boundary … MSG-0045 §7 asks for one decision".
+> That was true when written and stopped being true when MSG-0046 authorized the operator-side test
+> run and MSG-0047 recorded 36 passed / 0 failed. TASK-0017 is COMPLETE.
 
 > There is no TASK-0012. MSG-0022 and MSG-0023 ruled it out of the WP-0001 path, and the number was
 > never reused. Do not infer a gap in the queue as missing work — the charter's own warning
@@ -207,12 +213,14 @@ Every tier reported a non-zero test count.
 
 Index: `implementation/comms/README.md` carries the full message register with links and status.
 
-**Two messages carry `Status: OPEN`, both raised on 2026-08-20 by TASK-0017.**
+**Four messages carry `Status: OPEN`, all raised on 2026-08-20 by TASK-0017 and TASK-0018.**
 
 | ID | Why it is open | Needs a decision? |
 |---|---|---|
 | MSG-0044 | TASK-0017 was authorized in MSG-0043 but had no queue row, so the Supervisor could never select it. The queue was reconciled and the structural finding recorded | **No** — informational |
-| MSG-0045 | TASK-0017 execution record. The heartbeat defect is corrected, but the **test suite could not be run**: no allowlist entry permits executing a PowerShell script | **Yes** — §7 offers three options; (A) is recommended |
+| MSG-0045 | TASK-0017 execution record. The heartbeat defect is corrected, but the **test suite could not be run**: no allowlist entry permits executing a PowerShell script | **Answered** — MSG-0046 chose Option A, MSG-0047 recorded 36/36. The record's own status line still reads OPEN; TASK-0018 had no authority to change another message's record and did not |
+| MSG-0047 | TASK-0017 verification result, 36 passed / 0 failed | **No** — informational; it named the live-run gap that TASK-0018 then closed |
+| MSG-0049 | TASK-0018 verification record. `RUNNER_RUNNING` **observed live**; gates 1, 2, 4, 5 MET. Gate 3, the terminal heartbeat, is structurally unobservable from inside the run it measures | **Yes** — §6 offers three options; **(B) is recommended** |
 
 > The line this replaces read "**No message carries `Status: OPEN`**", which was true when TASK-0016
 > wrote it and stopped being true when TASK-0017 was authorized. It is corrected rather than quietly
@@ -375,7 +383,11 @@ visible; it does not make it self-clearing.
 | MSG-0042 | TASK-0016 execution record — MSG-0034 closed in record and register | **RECORD** — applied and verified; **no decision requested** |
 | MSG-0043 | Architecture decision: authorize TASK-0017 supervisor heartbeat observability | **DECIDED** — executed by TASK-0017; verification blocked, see MSG-0045 |
 | MSG-0044 | TASK-0017 authorized but absent from the queue; queue reconciled | **OPEN** — informational; no decision requested |
-| MSG-0045 | TASK-0017 execution record — heartbeat corrected, **NOT verified** | **OPEN** — **decision required**, §7 |
+| MSG-0045 | TASK-0017 execution record — heartbeat corrected, **NOT verified** | **OPEN** — answered by MSG-0046 and discharged by MSG-0047; its own status line is not yet updated |
+| MSG-0046 (a) / (b) | Architecture decision: how TASK-0017's test gate is satisfied — duplicate numbering, non-conflicting | **DECIDED** — Option A, operator runs the suite once; no permission expansion. **Neither file has a COMMS register row** |
+| MSG-0047 | TASK-0017 verification result — **36 passed, 0 failed** | **OPEN** — informational; named the live-run gap TASK-0018 closed |
+| MSG-0048 | Architecture decision: authorize TASK-0018 live heartbeat validation | **DECIDED** — executed; see MSG-0049 |
+| MSG-0049 | TASK-0018 verification record — `RUNNER_RUNNING` **observed live** | **OPEN** — **decision required**, §6; gate 3 unobservable from inside the run |
 
 ## Repository / GitHub State
 
@@ -609,8 +621,33 @@ nine records. The record file is the source of truth; both tables index it.
 
 ## Next Action
 
-**One decision is required: MSG-0045 §7.** TASK-0017 is IN_PROGRESS and stopped at a permission
-boundary.
+**One decision is required: MSG-0049 §6.** TASK-0018 is IN_PROGRESS with four of five gates MET.
+
+**The heartbeat defect is closed in production, not just in test.** The Supervisor started TASK-0018
+on its own ten-minute cycle at 20:52:56Z, and while the runner was alive `state/heartbeat.json` read
+`RUNNER_RUNNING`, `runnerActive: true`, `runnerPid: 7984`, with `head` equal to the actual `HEAD` and
+a timestamp that advanced 30s → 90s → 210s across three samples. TASK-0017's own run reported
+`NOOP :: no READY task`, `runnerActive: false`, and a two-commit-old `head` for its entire duration.
+All three symptoms are gone.
+
+**What is not proven:** gate 3, the terminal heartbeat and lock release. The Supervisor writes that
+record *after* the runner exits, so a session cannot observe the state its own exit produces. Nothing
+was modified to compensate — no supervisor change, no second run, no test substituted for the
+observation. The durable evidence appears seconds after the run ends, as a `COMPLETED :: task=TASK-0018`
+line in `implementation/operations/supervisor/logs/supervisor-20260820.log`; the heartbeat's terminal
+value is transient and the next cycle overwrites it with `NOOP` about ten minutes later.
+
+MSG-0049 §6 offers three ways to close it — (A) read the durable log line and close, (B) authorize one
+further, explicitly bounded supervisor cycle whose only work is that observation, (C) rule the gate
+satisfied by MSG-0047's test. **(B) is recommended**, because proving the loop without a human in it is
+what MSG-0048 is about; (A) is the cheaper fallback. TASK-0018 is left IN_PROGRESS rather than READY
+precisely so no unauthorized second run starts on its own.
+
+---
+
+**Historical — the position after TASK-0017's first attempt, since resolved.** MSG-0046 authorized the
+operator-side test run and MSG-0047 recorded 36 passed / 0 failed; TASK-0017 is COMPLETE. The text
+below is retained as the record of the permission boundary it hit.
 
 The heartbeat defect MSG-0043 authorized fixing is **reproduced, diagnosed, and corrected**, with
 nine focused tests written for it. It is **not verified**, and TASK-0017 is therefore reported as
