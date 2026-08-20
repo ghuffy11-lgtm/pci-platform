@@ -10,6 +10,7 @@ a defect in the record, not a missing message.
 
 | ID | Subject | Status | File |
 |---|---|---|---|
+| MSG-0048 | TASK-0018 authorization — live supervisor heartbeat validation | **DECIDED** — queue reconciled, awaiting scheduled launch | [MSG-0048-task-0018-authorization.md](MSG-0048-task-0018-authorization.md) |
 | **MSG-0047** | **TASK-0017 verification result — 36 passed, 0 failed** | **OPEN** — informational; gate satisfied | [MSG-0047-task-0017-verification-result.md](MSG-0047-task-0017-verification-result.md) |
 | **MSG-0045** | **TASK-0017 execution record — heartbeat corrected, NOT verified** | **OPEN** — **decision required**: the test suite could not be run by an unattended session | [MSG-0045-task-0017-execution-record.md](MSG-0045-task-0017-execution-record.md) |
 | **MSG-0044** | **TASK-0017 was authorized but invisible to the supervisor — queue reconciled** | **OPEN** — informational | [MSG-0044-task-0017-queue-reconciliation.md](MSG-0044-task-0017-queue-reconciliation.md) |

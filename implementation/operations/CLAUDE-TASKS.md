@@ -28,6 +28,7 @@ Only the architecture lead may authorize new work, mark a task READY, or change 
 | TASK-0015 | **Reconcile discoveries index with actual DISC records** | **COMPLETE** | TASK-0014, MSG-0039 | 2026-08-20 — index 3 rows -> 9, MSG-0040 | none | Claude Code |
 | TASK-0016 | **Close resolved MSG-0034 informational record** | **COMPLETE** | TASK-0015, MSG-0041 | 2026-08-20 — closure verified, MSG-0042 | none | Claude Code |
 | TASK-0017 | **Supervisor heartbeat / unattended observability** | **COMPLETE** | TASK-0016 | 2026-08-20 tests 36/36 | none | Claude Code |
+| TASK-0018 | **Live Supervisor heartbeat validation** | **READY** | TASK-0017 | — | Execute (authorized by MSG-0048) — must be Supervisor-started | Claude Code |
 | TASK-0002 | Make test entry points shell-independent | **ABORTED** | — | 2026-08-19 | none — premise disproven by measurement | — |
 
 **TASK-0016 is explicitly authorized by the architecture lead after WP-0001 completion.** It is maintenance/documentation work, not a new product work package.
@@ -231,6 +232,7 @@ READY means *authorized to attempt*, never *authorized to force*. A READY task w
 | MSG-0044 | Record | OPEN | Claude Code | Architecture lead | **TASK-0017 authorized in MSG-0043 but absent from the queue**, so the supervisor could never select it. Queue reconciled; structural finding recorded | TASK-0017 |
 | MSG-0046 | Decision | DECIDED | Architecture lead | Claude Code | Option A: operator runs the test once; no permission expansion | TASK-0017 |
 | MSG-0047 | Record | OPEN | Claude Code | Architecture lead | **TASK-0017 verification: 36 passed, 0 failed.** Gate satisfied; task COMPLETE | TASK-0017 |
+| MSG-0048 | Decision | DECIDED | Architecture lead | Claude Code | **TASK-0018 AUTHORIZED** — one real Supervisor-started run, observe RUNNER_RUNNING live; no manual trigger, no supervisor changes | TASK-0018 |
 | MSG-0045 | Record | **OPEN — decision required** | Claude Code | Architecture lead | **TASK-0017 IMPLEMENTED but NOT COMPLETE.** Defect reproduced and corrected; the test suite **could not be run** — no allowlist entry permits executing a PowerShell script. Three options in §7 | TASK-0017 |
 
 ## Interruption and recovery protocol
@@ -332,3 +334,69 @@ improvising.
 The work is confined to the supervisor's own state-writing path and its tests. On resumption,
 inspect `state/heartbeat.json` and the log directly before assuming any earlier edit took effect,
 and re-run the suite rather than trusting a recorded pass.
+
+---
+
+## TASK-0018 — Live Supervisor heartbeat validation
+
+**Priority:** 1 | **Status:** **READY** — authorized by MSG-0048 | **Owner:** Claude Code
+**Depends on:** TASK-0017 (COMPLETE) | **Next eligible task:** none
+**Full specification:** [`TASK-0018-live-supervisor-heartbeat-validation.md`](TASK-0018-live-supervisor-heartbeat-validation.md)
+
+### Objective
+
+Close the one gap MSG-0047 named: the corrected heartbeat is proven by test but has never been
+observed during a real supervisor-started run. Exercise it for real and record direct evidence that
+`state/heartbeat.json` reports the live runner rather than a stale `NOOP`.
+
+### Prerequisites
+
+| ID | Prerequisite | State |
+|---|---|---|
+| P1 | Architecture lead authorization | **MET** — MSG-0048 |
+| P2 | TASK-0017 COMPLETE | MET — tests 36/36, MSG-0047 |
+| P3 | Supervisor enabled on its ten-minute cadence | MET |
+
+### Allowed actions
+
+Run only the existing inspection/test commands needed for the observation; read
+`state/heartbeat.json`, the supervisor logs, and the task's own execution state while running;
+record timestamps and observed fields for the running and terminal states; create exactly one
+verification COMMS record; update queue, checkpoint and status.
+
+### Forbidden actions
+
+- Changing supervisor code, configuration, permissions, scheduling, or runner behaviour.
+- **Modifying the heartbeat implementation to make the observation pass.**
+- **Manually triggering the supervisor** — gate 1 requires a scheduled launch.
+- Broadening any allowlist or permission; creating unrelated tasks or architecture.
+- Destructive commands, credentials, privilege escalation, force-push, reset, or clean.
+
+### Verification requirements — all five gates
+
+1. Launched by the enabled ten-minute supervisor, **not** manually.
+2. While the runner is alive: `RUNNER_RUNNING`, a live `runnerPid`, and a recent timestamp.
+3. The terminal heartbeat records the real result and the lock is released.
+4. No stale `NOOP` persists across the live run.
+5. Evidence recorded in COMMS and the queue reconciled.
+
+### Documentation requirements
+
+One execution/verification COMMS message, plus queue, checkpoint and status reconciliation.
+
+### Checkpoint requirements
+
+Checkpoint after the live observation is captured, and after the terminal state is confirmed —
+recording what was observed, not what was expected.
+
+### Stop conditions
+
+STOP and report if the task was not supervisor-started, the heartbeat contradicts the live runner
+state, the lock is corrupt or stale, the repository is not at `origin/main`, or progress would
+require changing permissions, scheduling, or architecture.
+
+### Recovery procedure
+
+**If the observation fails, do not modify the supervisor to compensate.** Record the exact heartbeat
+and log evidence, leave the task IN_PROGRESS with a checkpoint, and await direction. A heartbeat
+that fails this test is information, not an inconvenience to be tuned away.
