@@ -30,12 +30,20 @@ Only the architecture lead may authorize new work, mark a task READY, or change 
 | TASK-0017 | **Supervisor heartbeat / unattended observability** | **COMPLETE** | TASK-0016 | 2026-08-20 tests 36/36 | none | Claude Code |
 | TASK-0018 | **Live Supervisor heartbeat validation** | **COMPLETE** — 5 of 5 gates MET | TASK-0017 | 2026-08-21 `COMPLETED` observed externally | none | Claude Code |
 | TASK-0019 | **Post-WP-0001 repository baseline audit** | **COMPLETE** | TASK-0018, MSG-0050 | 2026-08-21 — 6 corrections applied, 7 items referred, MSG-0051 | none | Claude Code |
-| TASK-0021 | **Employee policy assistant — architecture definition** | **READY** | WP-0001 COMPLETE, MSG-0054 | — | Execute (architecture definition only; no implementation) | Claude Code |
+| TASK-0021 | **Employee policy assistant — architecture definition** | **COMPLETE** | WP-0001 COMPLETE, MSG-0054 | 2026-08-21 — 11/11 acceptance criteria, MSG-0055 | none — **fourteen decisions await the Architecture Lead** (EPA-0003) | Claude Code |
 | TASK-0002 | Make test entry points shell-independent | **ABORTED** | — | 2026-08-19 | none — premise disproven by measurement | — |
 
 **TASK-0019 is COMPLETE (2026-08-21).** It was authorized by MSG-0050, reconciled into this queue in `39eabdb`, and executed by a supervisor-started session on its scheduled 06:37:13Z cycle. It was maintenance/audit work only, not a new product work package.
 
-**No task is READY.** TASK-0019 was the last authorized one.
+**No task is READY.**
+
+> **Corrected 2026-08-21 by TASK-0021.** This line previously read "**No task is READY.** TASK-0019
+> was the last authorized one." That was true when written and stopped being true when MSG-0054
+> authorized TASK-0021, which was reconciled into the board above in `3350cb4` and has since been
+> executed. **TASK-0021 is now COMPLETE** (MSG-0055) and no task is READY again — but for a different
+> reason: the project sits at an **architecture decision boundary**, not at an empty queue.
+> EPA-0003 lists fourteen decisions; four are marked Highest and are enough to unblock the
+> foundation. The Supervisor will correctly remain idle until the lead authorizes something.
 
 **MSG-0052 has since ruled on C1-C5** (2026-08-21). C1 is applied: the accepted work package now reads
 `Status: COMPLETE`, so the conflict TASK-0019 referred is closed. C2 and C3 are applied as documentary
@@ -261,6 +269,7 @@ READY means *authorized to attempt*, never *authorized to force*. A READY task w
 | MSG-0054 | Decision | DECIDED | Architecture lead | Claude Code | **TASK-0021 authorized — architecture definition ONLY** for the employee policy assistant; outside WP-0001; no implementation, no work package yet | TASK-0021 |
 | MSG-0053 | Decision | DECIDED | Architecture lead | Claude Code | **C6 NOT AUTHORIZED / NOT REQUIRED** (option B proof adds execution with no requirement); **C7 no new product work package** pending a concrete objective | — |
 | MSG-0052 | Decision | DECIDED | Architecture lead | Claude Code | **C1-C5 ruled.** C1 WP-0001 status COMPLETE; C2/C3 documentary supersessions; C4/C5 no action; **C6/C7 not self-authorized** | TASK-0019 |
+| MSG-0055 | Record | CREATED — definition delivered | Claude Code | Architecture lead | **TASK-0021 execution record.** Architecture definition produced as `EPA-0001` (architecture), `EPA-0002` (proposed work package, gates, sequence), `EPA-0003` (**fourteen open decisions**). All eleven acceptance criteria met. **No implementation, no work package, no ADR, no downstream task authorized.** §5 requests the rulings; §7 records three observations needing no action | TASK-0021 |
 | MSG-0051 | Record | CREATED — audit complete | Claude Code | Architecture lead | **TASK-0019 baseline audit.** Six documentary corrections applied with their authorities quoted; four record classes verified already correct; **§C refers seven items for decision**, led by the accepted WP-0001 work package still reading `Status: Ready for implementation` — the stop condition fired and that correction was **not** made | TASK-0019 |
 
 ## Interruption and recovery protocol
@@ -591,9 +600,49 @@ commits and records before repeating any operation.
 
 ## TASK-0021 — Employee policy assistant: architecture definition
 
-**Priority:** 1 | **Status:** **READY** — authorized by MSG-0054 | **Owner:** Claude Code
+**Priority:** 1 | **Status:** **COMPLETE** — executed 2026-08-21; all eleven acceptance criteria met, evidence in MSG-0055 | **Owner:** Claude Code
 **Depends on:** WP-0001 COMPLETE | **Next eligible task:** none — the work package itself is not authorized
 **Full specification:** [`TASK-0021-employee-policy-assistant-architecture-definition.md`](TASK-0021-employee-policy-assistant-architecture-definition.md)
+**Checkpoint:** [`checkpoints/TASK-0021.md`](checkpoints/TASK-0021.md)
+
+### TASK-0021 — result
+
+**COMPLETE, 2026-08-21.** Started by the Supervisor on its own cycle (`CYCLE_START` 11:05:47Z,
+`RUNNER_STARTED pid=26508 task=TASK-0021`), with the logged prompt verbatim identical to the one the
+session received. Evidence: **MSG-0055**; `checkpoints/TASK-0021.md`.
+
+**Delivered** — four PROPOSED records under [`../architecture/`](../architecture/README.md), carrying
+no architectural authority:
+
+| File | Contents |
+|---|---|
+| `EPA-0001` | Architecture definition: scope boundary, document authority and lifecycle, components and data flow, the grounded-answer contract, bilingual behaviour, four-point authorization, threat model T1–T11, frontend responsibilities, audit and retention, operational architecture, conflict check against every accepted document it touches |
+| `EPA-0002` | Proposed work package: scope/non-scope, data contracts, interfaces, gates G1–G11, prerequisites, task sequence T-A…T-I. **Written in the conditional; authorizes nothing** |
+| `EPA-0003` | **Fourteen open architecture-lead decisions**, each with options, consequences and a recommendation |
+
+**The finding in one line: the boundary is definable from existing authority, and the one genuine
+authority vacuum is bilingual policy semantics.** A search of `docs/` and the Constitution for
+language/Arabic/bilingual/localization returns a single relevant line — SPEC-0016's notification
+templates. Everything else instantiates SPEC-0011/0013/0014/0015/0031, ADR-0016 and ADR-0003 under a
+stricter contract; EPA-0001 §12 names the five things that are genuinely new so review effort lands
+in the right place.
+
+**No stop condition fired**, and all three were checked explicitly (MSG-0055 §6). Repository authority
+was sufficient; **no accepted ADR conflicts** — three areas are *stricter* than the accepted baseline,
+which under the authority hierarchy is not a contradiction, and is flagged as decision D12 anyway; and
+no decision required inventing product scope, because none was made.
+
+**Nothing was verified by execution.** This was a definition task and produced no runnable artifact,
+so there is no test count to report. Its acceptance criteria are documentary and each is mapped to its
+evidence in MSG-0055 §9.
+
+**Three observations, none requesting action** (MSG-0055 §7): the work-package registers already
+disagree about WP-0001/WP-0002 so **EPA-0002 allocates no number**; MSG-0054's proposed task order
+builds the answer path before retrieval-time authorization, which was **followed as issued** with a
+mitigation offered rather than a reordering made; and the COMMS register lag recurred — MSG-0054 had
+no register row — and was corrected in the same commit.
+
+### TASK-0021 — authorization (as issued)
 
 ### Objective
 

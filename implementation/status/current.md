@@ -2,7 +2,7 @@
 
 **Active Work Package:** WP-0001 — PCI Kernel Foundation
 **Status:** **COMPLETE** — declared by the architecture lead 2026-08-19 (MSG-0020(b), resolved by MSG-0022 / MSG-0023, TASK-0009)
-**Last Updated:** 2026-08-21 UTC (TASK-0019 — post-WP-0001 repository baseline audit; MSG-0050 / MSG-0051)
+**Last Updated:** 2026-08-21 UTC (TASK-0021 — employee policy assistant architecture definition; MSG-0054 / MSG-0055)
 
 ## Current State
 
@@ -81,11 +81,25 @@ message on 2026-08-20 under MSG-0041 (MSG-0042) — the fifth.
 | TASK-0017 | Supervisor heartbeat / unattended observability | **COMPLETE** (2026-08-20) — tests 36/36, MSG-0047 | TASK-0016, MSG-0043 ✅ | Claude Code |
 | TASK-0018 | Live Supervisor heartbeat validation | **COMPLETE** (2026-08-21) — all five gates, MSG-0049 | TASK-0017, MSG-0048 ✅ | Claude Code |
 | TASK-0019 | Post-WP-0001 repository baseline audit | **COMPLETE** (2026-08-21) — MSG-0051 | TASK-0018, MSG-0050 ✅ | Claude Code |
+| TASK-0021 | Employee policy assistant — architecture definition | **COMPLETE** (2026-08-21) — 11/11 criteria, MSG-0055 | WP-0001 COMPLETE, MSG-0054 ✅ | Claude Code |
 | TASK-0002 | Make test entry points shell-independent | **ABORTED** | — | — |
 
-**No task is READY.** TASK-0019 was the last authorized one and it is COMPLETE. What happens next is
-an architecture-lead decision: MSG-0051 §C lists the candidates, prioritized, and self-authorizes
-none of them.
+**No task is READY** — but the reason has changed. The project now sits at an **architecture decision
+boundary**, not at an empty queue.
+
+> **Superseded — corrected 2026-08-21 by TASK-0021.** This paragraph previously read "**No task is
+> READY.** TASK-0019 was the last authorized one and it is COMPLETE. What happens next is an
+> architecture-lead decision: MSG-0051 §C lists the candidates …". That was true when written and
+> stopped being true when MSG-0053 closed C6/C7 and MSG-0054 authorized TASK-0021. TASK-0021 has since
+> been executed and is COMPLETE (MSG-0055). MSG-0051 §C is fully discharged: C1–C5 by MSG-0052,
+> C6–C7 by MSG-0053.
+
+What happens next is the architecture lead's: **fourteen decisions in
+[`../architecture/EPA-0003-required-decisions.md`](../architecture/EPA-0003-required-decisions.md)**,
+of which four are marked Highest and are enough to unblock the foundation — D1 (bilingual policy
+authority), D3 (approval authority and audience assignment), D5 (grounding-gate mechanism), and D13
+(identity provider, which is an **unmet prerequisite** rather than a preference). None was
+self-authorized.
 
 > **Superseded — corrected 2026-08-21 by TASK-0019 (MSG-0050).** This paragraph previously read
 > "**No task is currently READY. TASK-0018 is IN_PROGRESS with one gate unmet** … MSG-0049 §6 asks
@@ -232,7 +246,27 @@ That checkpoint has since moved: **MSG-0054 authorizes TASK-0021**, an architect
 for an employee policy assistant — answering only from approved organizational policy, in English and
 Arabic, with authoritative citations and fail-closed abstention. It is **outside WP-0001** and
 authorizes **no implementation and no work package**; the architecture must be accepted first.
-TASK-0021 is now READY in the authoritative queue.
+
+**TASK-0021 is COMPLETE (2026-08-21, MSG-0055).** All eleven acceptance criteria are met. It produced
+four PROPOSED records under [`../architecture/`](../architecture/README.md) — none of which carries
+architectural authority:
+
+| Record | Contents |
+|---|---|
+| `EPA-0001` | The architecture definition: scope boundary, approved-document authority and lifecycle, components and answer/ingestion data flow, the grounded-answer contract, bilingual behaviour, four-point retrieval-time authorization, threat model T1–T11, frontend responsibilities, audit and retention, operational architecture, and a conflict check against every accepted document it touches |
+| `EPA-0002` | What a work package **would** look like — scope, data contracts, interfaces, gates G1–G11, prerequisites, sequence T-A…T-I. Written in the conditional; **authorizes nothing**, and deliberately allocates no WP number |
+| `EPA-0003` | **The operative record: fourteen open architecture-lead decisions**, each with options, consequences, and a recommendation |
+
+**No implementation, no work package, no ADR, and no downstream task was authorized**, and nothing was
+verified by execution — it was a definition task and produced no runnable artifact, so there is no
+test count to report. Its acceptance criteria are documentary and each is mapped to its evidence in
+MSG-0055 §9.
+
+**The one genuine authority vacuum is bilingual policy semantics.** A search of `docs/` and the
+Constitution for language, Arabic, bilingual, i18n, or localization returns a single relevant line —
+SPEC-0016's notification templates. Everything else in the definition instantiates
+SPEC-0011/0013/0014/0015/0031, ADR-0016 and ADR-0003 under a stricter contract, and EPA-0001 §12 names
+the five things that are genuinely new so review effort lands where it belongs.
 
 **MSG-0052 applied (2026-08-21).** The Architecture Lead ruled on the TASK-0019 audit referrals:
 C1 — the accepted WP-0001 work package now reads `Status: COMPLETE`, closing the last conflict
@@ -423,6 +457,10 @@ visible; it does not make it self-clearing.
 | MSG-0048 | Architecture decision: authorize TASK-0018 live heartbeat validation | **DECIDED** — executed; see MSG-0049 |
 | MSG-0049 | TASK-0018 verification record — `RUNNER_RUNNING` **observed live** | **CLOSED** — gate 3 met by external observation; all five gates MET |
 | MSG-0050 | Architecture decision: authorize TASK-0019 post-WP-0001 baseline audit | **DECIDED** — executed; see MSG-0051 |
+| MSG-0055 | TASK-0021 execution record — employee policy assistant architecture definition | **RECORD** — 11/11 criteria met; **§5 lists fourteen decisions requiring the architecture lead**; none self-authorized |
+| MSG-0054 | Employee policy assistant architecture objective | **DECIDED** — TASK-0021 authorized as architecture definition only; executed, see MSG-0055 |
+| MSG-0053 | Architecture lead decisions C6-C7 | **DECIDED** — C6 not authorized/not required; C7 no new work package pending a concrete objective |
+| MSG-0052 | Architecture lead baseline decisions C1-C5 | **DECIDED** — C1-C3 applied, C4/C5 no action; C6/C7 subsequently resolved by MSG-0053 |
 | MSG-0051 | TASK-0019 execution record — post-WP-0001 baseline audit | **RECORD** — corrections applied; **§C lists items needing an architecture-lead decision** |
 
 > **Corrected 2026-08-21 by TASK-0019 (MSG-0050).** Four rows above — MSG-0044, MSG-0045, MSG-0047
@@ -671,7 +709,44 @@ nine records. The record file is the source of truth; both tables index it.
 
 ## Next Action
 
-**Nothing is READY, and nothing is blocked. The next move is the architecture lead's.**
+**Nothing is READY, and nothing is blocked. The next move is the architecture lead's — and it is now a
+substantive architecture decision rather than a housekeeping one.**
+
+**TASK-0021 delivered the employee policy assistant architecture definition on 2026-08-21 (MSG-0055).**
+It is a definition, not a design of record: everything under `implementation/architecture/` is PROPOSED
+and carries no authority until the lead accepts it.
+
+**What is requested, in order:**
+
+1. **Accept, amend, or reject `EPA-0001`** as the architecture boundary for this objective.
+2. **Rule on the fourteen decisions in `EPA-0003`** — or on the four marked **Highest**, which are
+   enough to unblock the foundation:
+   - **D1 — bilingual policy authority.** May a translation ever be cited as policy? The repository
+     has **no accepted authority on bilingual semantics at all**, and assuming machine translation is
+     acceptable would ship an architecture in which Arabic-speaking employees act on policy text no
+     one approved. This is the highest-priority open question in the record.
+   - **D3 — approval authority**, and who assigns document audience and classification. Without it
+     "approved" is not a machine-checkable property and citation means nothing.
+   - **D5 — the grounding-gate mechanism**, the single control separating this from a chatbot that
+     cites things.
+   - **D13 — the identity provider.** This is an **unmet prerequisite, not a preference**: no IdP is
+     deployed, and every authorization control presumes an authenticated employee with roles and
+     scope.
+3. **Decide whether the work package is authorized**, and if so allocate its identifier — `EPA-0002`
+   deliberately allocates none, because `docs/program/work-packages.md` already lists a WP-0002
+   (MSG-0055 §7.1).
+4. Optionally rule on the task ordering observation (MSG-0055 §7.2) and on **D12** — whether the
+   strict grounded-answer contract should become an accepted ADR binding future PCI capabilities
+   rather than staying scoped to this one.
+
+Until 1 and 3 are answered, no task is READY and **the Supervisor will correctly remain idle**. That
+is the intended state at an architecture decision boundary, not a stall.
+
+---
+
+**Historical — the position after TASK-0019, since superseded.** MSG-0051 §C is now fully discharged:
+C1–C5 by MSG-0052, C6–C7 by MSG-0053. The text below is retained as the record of what the audit
+found and asked.
 
 TASK-0019 completed the post-WP-0001 baseline audit on 2026-08-21 (MSG-0051). Six documentary
 corrections were applied, each traceable to an existing authoritative record; seven items were

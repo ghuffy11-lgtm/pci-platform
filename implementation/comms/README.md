@@ -10,6 +10,8 @@ a defect in the record, not a missing message.
 
 | ID | Subject | Status | File |
 |---|---|---|---|
+| **MSG-0055** | **TASK-0021 execution record — employee policy assistant architecture definition** | **RECORD** — definition delivered (`EPA-0001`/`EPA-0002`/`EPA-0003`); **§5 lists fourteen decisions requiring the Architecture Lead**; none self-authorized | [MSG-0055-task-0021-architecture-definition.md](MSG-0055-task-0021-architecture-definition.md) |
+| **MSG-0054** | **Employee policy assistant architecture objective** | **DECIDED** — TASK-0021 authorized as architecture definition only; outside WP-0001; no work package, no implementation | [MSG-0054-employee-policy-assistant-architecture-objective.md](MSG-0054-employee-policy-assistant-architecture-objective.md) |
 | **MSG-0053** | **Architecture Lead decisions C6-C7** | **DECIDED** — C6 not authorized/not required; C7 no new work authorized | [MSG-0053-architecture-lead-c6-c7-decisions.md](MSG-0053-architecture-lead-c6-c7-decisions.md) |
 | **MSG-0052** | **Architecture Lead baseline decisions C1-C5** | **DECIDED** — C1-C3 applied, C4/C5 no action; C6/C7 subsequently resolved by MSG-0053 | [MSG-0052-architecture-lead-baseline-decisions.md](MSG-0052-architecture-lead-baseline-decisions.md) |
 | MSG-0051 | TASK-0019 execution record — post-WP-0001 baseline audit | **RECORD** — six corrections applied; **§C lists seven items requiring an architecture-lead decision** | [MSG-0051-task-0019-baseline-audit.md](MSG-0051-task-0019-baseline-audit.md) |
