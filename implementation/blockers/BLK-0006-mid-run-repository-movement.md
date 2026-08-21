@@ -1,6 +1,6 @@
 # BLK-0006 — `origin/main` Moved Mid-Run; TASK-0021 Closeout Commit Cannot Be Pushed
 
-**Status:** **OPEN** — requires a human reconciliation decision
+**Status:** **RESOLVED** 2026-08-21 — reconciled by interactive session via option 1 (fetch + rebase); no conflict, no force-push; all commits on `origin/main`
 **Raised:** 2026-08-21, during TASK-0021, immediately after the second `git push`
 **Severity:** Low impact, **hard boundary.** The TASK-0021 deliverable is already on `origin/main`; one follow-up commit is stranded
 **Related:** MSG-0028 decision 2 (the abort rule and the precedent), MSG-0055, TASK-0021, DISC-0010
@@ -122,3 +122,68 @@ decision an unattended session is entitled to make.
 someone already reconciled the tree, re-doing it could rewrite history that has since been built on.
 `CLAUDE.md` *Checkpointing and Recovery* rule (f) applies: never repeat an operation merely because a
 record says it was incomplete.
+
+---
+
+## RESOLVED — 2026-08-21, interactive session
+
+**Option 1 was taken, and the unknown is now known.** The mover was the architecture lead pushing
+`182698c` ("Architecture Lead: rule EPA decisions", **MSG-0056**) directly, exactly as this record
+inferred and labelled as inference. The inference was correct.
+
+### What the remote actually held
+
+```text
+$ git fetch origin
+$ git rev-list --left-right --count origin/main...HEAD
+1	2          # origin had 1 commit local lacked; local had 2 origin lacked
+```
+
+The stranded work was **two** commits, not one: `c8059eb` (DISC-0010) and `e1735a0` (this record).
+`e1735a0` did not exist when the "ahead 1" above was written — this file was committed after it.
+
+### Why a rebase was safe to perform here
+
+The overlap was checked **before** rebasing, precisely as this record specified:
+
+```text
+$ comm -12 <(git show --name-only --format='' 182698c | sort -u) \
+           <(git log --name-only --format='' c8059eb e1735a0 | sort -u | grep .)
+                                    # empty - zero shared files
+```
+
+`182698c` touched exactly one file, `implementation/comms/MSG-0056-architecture-lead-epa-decisions.md`,
+which neither stranded commit touches. A conflict was therefore impossible, and none occurred:
+
+```text
+$ git rebase origin/main
+Successfully rebased and updated refs/heads/main.
+
+2badf5b docs(blockers): BLK-0006 - origin/main moved mid-run; closeout push rejected
+56dcaab docs(records): record DISC-0010 and close out TASK-0021
+182698c Architecture Lead: rule EPA decisions
+```
+
+**No force-push, and no history was rewritten.** Both rebased commits were unpushed local commits, so
+nothing that existed on `origin/main` changed identity. The published commit `b96187b` carrying the
+TASK-0021 deliverable is untouched and remains an ancestor of `HEAD`.
+
+### Why the unattended session could not do this and an interactive one can
+
+Nothing about the *decision* changed — what changed is who is entitled to make it. The runner could
+not read the remote at all (`git fetch` off-allowlist, `git ls-remote` refused), so for it,
+reconciliation meant acting against a base it could not name. It stopped, which was correct: this
+record's own "Note for a resuming session" is the reason the resumption was cheap.
+
+The interactive session can read the remote, so the base is a fact rather than a guess. Repository
+reconciliation of this kind is delegated implementation work — the standing instruction is to resolve
+it without routing it through the operator, preserving both sides and never force-pushing. Both
+constraints were honoured.
+
+### Correction carried forward
+
+The false claim this record identified — checkpoint 3 stating the second push succeeded — remains
+corrected by checkpoint 4 in `implementation/operations/checkpoints/TASK-0021.md`, and is left
+visible rather than edited away.
+
+**Nothing is outstanding. DISC-0010, checkpoints 3-5, and this record are on `origin/main`.**

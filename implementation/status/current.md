@@ -2,7 +2,7 @@
 
 **Active Work Package:** WP-0001 — PCI Kernel Foundation
 **Status:** **COMPLETE** — declared by the architecture lead 2026-08-19 (MSG-0020(b), resolved by MSG-0022 / MSG-0023, TASK-0009)
-**Last Updated:** 2026-08-21 UTC (TASK-0021 — employee policy assistant architecture definition; MSG-0054 / MSG-0055)
+**Last Updated:** 2026-08-21 UTC (MSG-0056 — architecture lead EPA ruling; BLK-0006 resolved; TASK-0021 accepted)
 
 ## Current State
 
@@ -267,6 +267,25 @@ Constitution for language, Arabic, bilingual, i18n, or localization returns a si
 SPEC-0016's notification templates. Everything else in the definition instantiates
 SPEC-0011/0013/0014/0015/0031, ADR-0016 and ADR-0003 under a stricter contract, and EPA-0001 §12 names
 the five things that are genuinely new so review effort lands where it belongs.
+
+**MSG-0056 — the ruling on all of it (2026-08-21).** The Architecture Lead **accepted TASK-0021 as a
+complete architecture-definition task** and ruled ten of the fourteen EPA-0003 decisions: D2, D4, D5,
+D6, D8, D9, D10, D11, D12, D14. Two are worth naming here because they narrow the architecture
+sharply — **D8 prohibits external inference by default**, so the first implementation stays local
+with any exception requiring its own ADR, deployment switch, classification controls and egress
+audit; and **D9 places the assistant in a separate service outside the PCI kernel**, reusing kernel
+contracts and the `/data/docker` boundary, which means **ADR-0015's kernel stack does not
+automatically govern it**.
+
+**Four decisions were escalated rather than ruled — D1, D3, D7, D13** — on the explicit ground that
+the repository does not contain the organization's authority and the Lead must not invent it. D1
+(bilingual policy authority) is the vacuum this status file already named; D3 is approval authority
+and classification; D7 is question retention and identity-linked access, a privacy/jurisdictional
+question; D13 is the identity provider, which also needs a privileged deployment action. See
+**Next Action** for who must answer each.
+
+**Nothing became executable.** MSG-0056 authorizes no work package, no implementation task, no ADR,
+no provider selection, no document ingestion, and no change to Supervisor or security behaviour.
 
 **MSG-0052 applied (2026-08-21).** The Architecture Lead ruled on the TASK-0019 audit referrals:
 C1 — the accepted WP-0001 work package now reads `Status: COMPLETE`, closing the last conflict
@@ -558,22 +577,31 @@ required as a messenger.
 
 ## Open Blockers
 
-**One: BLK-0006, raised 2026-08-21 by TASK-0021.** `origin/main` moved mid-run — a concurrent actor
-pushed between TASK-0021's two pushes — and the second push was rejected. That is the *Mid-run
-repository movement* fail-closed boundary (MSG-0028 decision 2), and the session stopped at it: **no
-pull, fetch, merge, rebase, reset, or force push, and no second push attempt.**
+**None.** BLK-0001 through **BLK-0006** are all RESOLVED.
 
-**Impact is bounded and the deliverable is safe.** `b96187b` reached `origin/main` and carries the
-entire TASK-0021 output — EPA-0001, EPA-0002, EPA-0003, MSG-0055, and every reconciliation. Stranded
-locally in `c8059eb` and later: DISC-0010 and its index rows, and checkpoints 3 and 4.
+**BLK-0006 was resolved on 2026-08-21 by the interactive session**, the same day TASK-0021 raised it.
+The unknown that forced the stop is now a fact: the concurrent actor was the architecture lead
+pushing `182698c` — **MSG-0056**, the EPA decision ruling — directly between TASK-0021's two pushes.
+The blocker record inferred exactly that and labelled it as inference; the inference was right.
 
-**`origin/main`'s current value is UNKNOWN to that session** — `git fetch` is not allowlisted and
-`git ls-remote origin main` was refused. Neither was routed around. `git status -sb` says `[ahead 1]`,
-but that is measured against a stale local ref and **must not be read as the real divergence**.
+Reconciled by option 1, the cheapest of the three the record offered: `git fetch origin` then
+`git rebase origin/main`. The file overlap was checked first and was **empty** — `182698c` touches
+only `implementation/comms/MSG-0056-*.md`, which neither stranded commit touches — so no conflict was
+possible and none occurred. **No force-push. No published history rewritten**: both rebased commits
+were unpushed, and `b96187b` carrying the TASK-0021 deliverable remains an untouched ancestor of HEAD.
 
-A human must inspect the remote and choose among the three options in
-[`../blockers/BLK-0006-mid-run-repository-movement.md`](../blockers/BLK-0006-mid-run-repository-movement.md).
-None was taken.
+The stranded work turned out to be two commits rather than the one the record could see at the time:
+DISC-0010 with its index rows, and BLK-0006 itself. Both are now on `origin/main`.
+
+> **Why the unattended session stopped and this one did not.** The runner could not read the remote
+> at all — `git fetch` is off-allowlist and `git ls-remote` was refused — so reconciliation would
+> have meant acting against a base it could not name. Stopping was correct, and its "Note for a
+> resuming session" is why resumption cost minutes. The interactive session can read the remote, so
+> the base is observed rather than assumed. The boundary did not move; the available evidence did.
+
+> **The former text of this section, retained:** "**One: BLK-0006, raised 2026-08-21 by TASK-0021** …
+> A human must inspect the remote and choose among the three options … None was taken." That was
+> accurate while the remote was unknown. Superseded by the resolution above, not deleted.
 
 > **The former text of this section, retained:** "**None.** BLK-0001 through BLK-0005 are all
 > RESOLVED." That remains true of those five and is preserved below; it stopped being the whole
@@ -740,39 +768,64 @@ both tables index it, and both were updated in the same commit as the record.
 
 ## Next Action
 
-**Nothing is READY, and nothing is blocked. The next move is the architecture lead's — and it is now a
-substantive architecture decision rather than a housekeeping one.**
+**Nothing is READY and nothing is blocked. The next move belongs to the organization, not to the
+architecture lead and not to Claude.**
 
-**TASK-0021 delivered the employee policy assistant architecture definition on 2026-08-21 (MSG-0055).**
-It is a definition, not a design of record: everything under `implementation/architecture/` is PROPOSED
-and carries no authority until the lead accepts it.
+**MSG-0056 (2026-08-21) accepted TASK-0021 and ruled ten of the fourteen EPA-0003 decisions.**
+Settled now: **D2** hybrid retrieval with per-language acceptance bars; **D4** the safe uniform
+abstention model, side-channels included; **D5** layered structural + model-assisted entailment,
+fail closed; **D6** normalization determined empirically, with the final rule recorded in an ADR
+before production; **D8** external inference prohibited by default; **D9** a separate service outside
+the kernel reusing kernel contracts and `/data/docker`; **D10** single-shot with evidence
+re-retrieved and re-authorized every turn; **D11** historical questions out of first release;
+**D12** the grounded-answer contract promoted to an architecture decision, number allocated later;
+**D14** text-native documents only, scanned/OCR rejected rather than trusted.
 
-**What is requested, in order:**
+### The four that need the organization
 
-1. **Accept, amend, or reject `EPA-0001`** as the architecture boundary for this objective.
-2. **Rule on the fourteen decisions in `EPA-0003`** — or on the four marked **Highest**, which are
-   enough to unblock the foundation:
-   - **D1 — bilingual policy authority.** May a translation ever be cited as policy? The repository
-     has **no accepted authority on bilingual semantics at all**, and assuming machine translation is
-     acceptable would ship an architecture in which Arabic-speaking employees act on policy text no
-     one approved. This is the highest-priority open question in the record.
-   - **D3 — approval authority**, and who assigns document audience and classification. Without it
-     "approved" is not a machine-checkable property and citation means nothing.
-   - **D5 — the grounding-gate mechanism**, the single control separating this from a chatbot that
-     cites things.
-   - **D13 — the identity provider.** This is an **unmet prerequisite, not a preference**: no IdP is
-     deployed, and every authorization control presumes an authenticated employee with roles and
-     scope.
-3. **Decide whether the work package is authorized**, and if so allocate its identifier — `EPA-0002`
-   deliberately allocates none, because `docs/program/work-packages.md` already lists a WP-0002
-   (MSG-0055 §7.1).
-4. Optionally rule on the task ordering observation (MSG-0055 §7.2) and on **D12** — whether the
-   strict grounded-answer contract should become an accepted ADR binding future PCI capabilities
-   rather than staying scoped to this one.
+These are deliberately unresolved because **the repository does not contain the authority to settle
+them, and the architecture lead must not invent it.** Each needs a named human with the standing to
+decide:
 
-Until 1 and 3 are answered, no task is READY and **the Supervisor will correctly remain idle**. That
-is the intended state at an architecture decision boundary, not a stall.
+| | Decision | Who must answer |
+|---|---|---|
+| **D1** | Are English and Arabic policy texts **parallel authoritative versions**, or is one authoritative and the other a reference translation? Machine translation must not be treated as policy authority absent an explicit ruling. | Policy owner |
+| **D3** | Who may **approve and publish** policy; who assigns audience and classification; may Restricted documents enter the corpus at all? | Policy owner / information owner |
+| **D7** | **Retention of and identity-linked access to employee questions** — a jurisdictional and privacy question. | Policy owner / legal |
+| **D13** | **Which OIDC identity provider**, and its deployment. An unmet prerequisite, not a preference: every authorization control presumes an authenticated employee with roles and scope. | Operator (privileged action required) |
 
+**D13 additionally requires a privileged deployment action on the host**, so it cannot be satisfied by
+a decision alone.
+
+### What is explicitly NOT authorized meanwhile
+
+MSG-0056 is unambiguous: **no post-WP-0001 work package is authorized, and no implementation task is
+READY.** Claude must not create ADRs, implement the service, select a provider, ingest real
+documents, or change Supervisor or security behaviour under this ruling. Everything under
+`implementation/architecture/` remains **PROPOSED**.
+
+Once D1, D3, D7 and D13 are answered, the architecture lead finalizes the remaining architecture,
+creates and accepts the ADR set, authorizes the work package, and derives implementation tasks in
+dependency order.
+
+**The Supervisor will correctly remain idle until then.** That is the intended state at a decision
+boundary, not a stall — and with the Windows `Schedule` service currently stopped by the operator,
+even its ten-minute cadence is inert until that service is restarted.
+
+---
+
+**Historical — the position after TASK-0021 and before MSG-0056, retained.** The text below asked the
+architecture lead to accept EPA-0001 and rule the fourteen decisions. Items 1, 2 and 4 are now
+discharged by MSG-0056; item 3 (work package authorization) is explicitly deferred until D1/D3/D7/D13
+are resolved. Retained because it records what was asked, not deleted because it was answered.
+
+> **TASK-0021 delivered the employee policy assistant architecture definition on 2026-08-21
+> (MSG-0055).** It is a definition, not a design of record. What was requested: (1) accept, amend or
+> reject `EPA-0001`; (2) rule the fourteen `EPA-0003` decisions, or the four marked **Highest** —
+> D1 bilingual policy authority, D3 approval authority, D5 the grounding gate, D13 the identity
+> provider; (3) decide whether the work package is authorized and allocate its identifier, since
+> `docs/program/work-packages.md` already lists a WP-0002 (MSG-0055 §7.1); (4) optionally rule the
+> task-ordering observation (§7.2) and D12.
 ---
 
 **Historical — the position after TASK-0019, since superseded.** MSG-0051 §C is now fully discharged:

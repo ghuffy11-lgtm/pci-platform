@@ -12,7 +12,7 @@ by an open blocker must never be reported as met.
 | BLK-0003 | PCI server key cannot be unlocked from the tool environment | High | **RESOLVED** 2026-08-19 |
 | BLK-0004 | No privilege to bootstrap the authorized host | High | **RESOLVED** 2026-08-19 |
 | BLK-0005 | Two contradictory MSG-0020 decisions | High | **RESOLVED** 2026-08-19 |
-| [BLK-0006](BLK-0006-mid-run-repository-movement.md) | `origin/main` moved mid-run; TASK-0021 closeout commit cannot be pushed | Low impact, hard boundary | **OPEN** 2026-08-21 — needs a human reconciliation decision |
+| [BLK-0006](BLK-0006-mid-run-repository-movement.md) | `origin/main` moved mid-run; TASK-0021 closeout commit cannot be pushed | Low impact, hard boundary | **RESOLVED** 2026-08-21 — mover identified as the lead push `182698c` (MSG-0056); reconciled by fetch + rebase, zero file overlap, no conflict, no force-push |
 
 **No blocker is open.**
 
