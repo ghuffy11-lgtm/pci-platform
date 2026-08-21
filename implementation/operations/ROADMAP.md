@@ -196,6 +196,25 @@ nothing, logged and heartbeated.
 must change before anything runs unattended: `enabled`, `dryRun`, and an empty `runnerCommand`.
 Whether to run unattended sessions at all is an operator decision, recorded in MSG-0011.
 
+> **Superseded — corrected 2026-08-21 by TASK-0019 (MSG-0050).** The paragraph above was accurate on
+> 2026-08-19 and is now the single most misleading line in this roadmap for a reader who starts here:
+> the Supervisor **is installed and ENABLED**, and has been since 2026-08-19. The authorities are
+> MSG-0024 (enablement authorized) and MSG-0026 (ENABLED; `acceptEdits` with a version-controlled
+> deny list, never `--dangerously-skip-permissions`), with TASK-0010 recorded **COMPLETE** in the
+> authoritative queue.
+>
+> The test count moved too: **36/36**, not 17/17, after TASK-0017 added heartbeat coverage — run by
+> the operator under MSG-0046 and recorded in MSG-0047.
+>
+> And the start path is no longer theoretical. It ran TASK-0003 (MSG-0029), was smoke-tested end to
+> end by TASK-0011 (MSG-0032), and was observed live during TASK-0018 (MSG-0049). The original text
+> is retained rather than replaced, per MSG-0050's additive-correction rule.
+>
+> **This roadmap as a whole is WP-0001-scoped and that scope is discharged** — WP-0001 was declared
+> COMPLETE on 2026-08-19 (MSG-0020(b) / MSG-0022 / MSG-0023) and every task in section C is COMPLETE.
+> Sections A, B and I describe the pre-fix state and should be read as history. **No post-WP-0001
+> roadmap exists**; authorizing one is an architecture-lead decision, raised in MSG-0051 §C6.
+
 The supervisor cannot mark a task COMPLETE, change a status or priority, or authorize anything. **The
 repository queue remains the sole authority**, and periodic reconciliation remains authoritative — a
 webhook, if ever added, may only reduce latency, because a missed webhook is silent and silence is

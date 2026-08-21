@@ -2,7 +2,7 @@
 
 **Active Work Package:** WP-0001 — PCI Kernel Foundation
 **Status:** **COMPLETE** — declared by the architecture lead 2026-08-19 (MSG-0020(b), resolved by MSG-0022 / MSG-0023, TASK-0009)
-**Last Updated:** 2026-08-20 UTC (TASK-0018 — the corrected heartbeat **observed live** during a supervisor-started run; MSG-0048 / MSG-0049)
+**Last Updated:** 2026-08-21 UTC (TASK-0019 — post-WP-0001 repository baseline audit; MSG-0050 / MSG-0051)
 
 ## Current State
 
@@ -50,7 +50,9 @@ The execution-control system (Phase 0, MSG-0010):
 Every session reads the roadmap and queue at startup and executes the highest-priority READY task,
 continuing automatically through authorized work rather than stopping after each subtask.
 
-**Current task: none is READY.** TASK-0001 and TASK-0003 through TASK-0016 are COMPLETE. TASK-0003
+**Current task: TASK-0019 — the post-WP-0001 repository baseline audit, authorized by MSG-0050 and
+executed 2026-08-21 by a supervisor-started session.** TASK-0001 and TASK-0003 through TASK-0018 are
+COMPLETE. TASK-0003
 was authorized by MSG-0027, executed on 2026-08-20 by a supervisor-started session, and completed
 later the same day once MSG-0030 authorized the refresh command — CRLF residue 150 -> 0, accepted in
 MSG-0031. TASK-0011, the Supervisor smoke test, completed 2026-08-20 (MSG-0032). TASK-0013 applied
@@ -78,12 +80,20 @@ message on 2026-08-20 under MSG-0041 (MSG-0042) — the fifth.
 | TASK-0016 | Close the resolved MSG-0034 informational record | **COMPLETE** (2026-08-20) — closure verified, MSG-0042 | TASK-0015, MSG-0041 ✅ | Claude Code |
 | TASK-0017 | Supervisor heartbeat / unattended observability | **COMPLETE** (2026-08-20) — tests 36/36, MSG-0047 | TASK-0016, MSG-0043 ✅ | Claude Code |
 | TASK-0018 | Live Supervisor heartbeat validation | **COMPLETE** (2026-08-21) — all five gates, MSG-0049 | TASK-0017, MSG-0048 ✅ | Claude Code |
+| TASK-0019 | Post-WP-0001 repository baseline audit | **COMPLETE** (2026-08-21) — MSG-0051 | TASK-0018, MSG-0050 ✅ | Claude Code |
 | TASK-0002 | Make test entry points shell-independent | **ABORTED** | — | — |
 
-**No task is currently READY. TASK-0018 is IN_PROGRESS with one gate unmet.** It is deliberately not
-left READY: MSG-0048 authorizes **one** supervisor-started run, and a READY row would start a second
-one that no message authorizes. It is deliberately not COMPLETE: gate 3, the terminal heartbeat,
-cannot be observed from inside the run it measures. MSG-0049 §6 asks for one decision to close it.
+**No task is READY.** TASK-0019 was the last authorized one and it is COMPLETE. What happens next is
+an architecture-lead decision: MSG-0051 §C lists the candidates, prioritized, and self-authorizes
+none of them.
+
+> **Superseded — corrected 2026-08-21 by TASK-0019 (MSG-0050).** This paragraph previously read
+> "**No task is currently READY. TASK-0018 is IN_PROGRESS with one gate unmet** … MSG-0049 §6 asks
+> for one decision to close it." That was true when written and stopped being true when the MSG-0049
+> addendum recorded gate 3 met by external observation — the terminal `COMPLETED  pid=0
+> active=False` at 21:03:36Z, lock released, exit code 0. All five gates are MET and MSG-0050 opens
+> by stating "TASK-0018 is complete." The row above already said COMPLETE while this paragraph said
+> IN_PROGRESS; the row was right.
 
 > **Superseded — the position after TASK-0017's first attempt.** This paragraph previously read
 > "TASK-0017 is IN_PROGRESS and stopped at a permission boundary … MSG-0045 §7 asks for one decision".
@@ -229,9 +239,13 @@ are all settled and closed as of 2026-08-21:
 > swapped, because a status file that overstates calm is the specific failure Rule 12 exists to
 > prevent.
 
-Every other communication is answered, decided, closed, or a record requesting no decision. Every
-task is COMPLETE except TASK-0002 (ABORTED, premise disproven by measurement) and TASK-0017
-(IN_PROGRESS, stopped at a permission boundary).
+Every other communication is answered, decided, closed, or a record requesting no decision. **Every
+task is COMPLETE except TASK-0002** (ABORTED, premise disproven by measurement).
+
+> **Corrected 2026-08-21 by TASK-0019 (MSG-0050).** The sentence above previously also excepted
+> "TASK-0017 (IN_PROGRESS, stopped at a permission boundary)". TASK-0017 has been COMPLETE since
+> 2026-08-20 — the operator ran the suite under MSG-0046 and MSG-0047 records **36 passed, 0
+> failed**. The status table earlier in this file already said so; only this sentence lagged.
 
 > **MSG-0034 was the last one, and it is now CLOSED (2026-08-20, TASK-0016, MSG-0041).** It had been
 > informational rather than a question — the TASK-0011 execution-path diagnosis, whose correction the
@@ -384,12 +398,22 @@ visible; it does not make it self-clearing.
 | MSG-0041 | Architecture decision: close the resolved MSG-0034 informational record | **DECIDED** — applied by TASK-0016, see MSG-0042 |
 | MSG-0042 | TASK-0016 execution record — MSG-0034 closed in record and register | **RECORD** — applied and verified; **no decision requested** |
 | MSG-0043 | Architecture decision: authorize TASK-0017 supervisor heartbeat observability | **DECIDED** — executed by TASK-0017; verification blocked, see MSG-0045 |
-| MSG-0044 | TASK-0017 authorized but absent from the queue; queue reconciled | **OPEN** — informational; no decision requested |
-| MSG-0045 | TASK-0017 execution record — heartbeat corrected, **NOT verified** | **OPEN** — answered by MSG-0046 and discharged by MSG-0047; its own status line is not yet updated |
-| MSG-0046 (a) / (b) | Architecture decision: how TASK-0017's test gate is satisfied — duplicate numbering, non-conflicting | **DECIDED** — Option A, operator runs the suite once; no permission expansion. **Neither file has a COMMS register row** |
-| MSG-0047 | TASK-0017 verification result — **36 passed, 0 failed** | **OPEN** — informational; named the live-run gap TASK-0018 closed |
+| MSG-0044 | TASK-0017 authorized but absent from the queue; queue reconciled | **CLOSED** — informational; TASK-0017 executed and COMPLETE |
+| MSG-0045 | TASK-0017 execution record — heartbeat corrected, **NOT verified** | **CLOSED** — answered by MSG-0046 and discharged by MSG-0047 |
+| MSG-0046 (a) / (b) | Architecture decision: how TASK-0017's test gate is satisfied — duplicate numbering, non-conflicting | **DECIDED** — Option A, operator runs the suite once; no permission expansion. Both register rows added 2026-08-21 by TASK-0019 |
+| MSG-0047 | TASK-0017 verification result — **36 passed, 0 failed** | **CLOSED** — gate satisfied; the live-run gap it named was closed by TASK-0018 |
 | MSG-0048 | Architecture decision: authorize TASK-0018 live heartbeat validation | **DECIDED** — executed; see MSG-0049 |
-| MSG-0049 | TASK-0018 verification record — `RUNNER_RUNNING` **observed live** | **OPEN** — **decision required**, §6; gate 3 unobservable from inside the run |
+| MSG-0049 | TASK-0018 verification record — `RUNNER_RUNNING` **observed live** | **CLOSED** — gate 3 met by external observation; all five gates MET |
+| MSG-0050 | Architecture decision: authorize TASK-0019 post-WP-0001 baseline audit | **DECIDED** — executed; see MSG-0051 |
+| MSG-0051 | TASK-0019 execution record — post-WP-0001 baseline audit | **RECORD** — corrections applied; **§C lists items needing an architecture-lead decision** |
+
+> **Corrected 2026-08-21 by TASK-0019 (MSG-0050).** Four rows above — MSG-0044, MSG-0045, MSG-0047
+> and MSG-0049 — read **OPEN** while the message files themselves, and `comms/README.md`, both read
+> **CLOSED**. All four were closed on 2026-08-21 in commit `ef454af`; this table was the one place
+> the change did not land. The section immediately above it in this same file already said "No
+> message carries `Status: OPEN`", so the file contradicted itself within a few hundred words.
+> Every status here is now transcribed from the message file's own `**Status:**` line, read
+> directly — all 54 of them — rather than copied from another index.
 
 ## Repository / GitHub State
 
@@ -538,7 +562,13 @@ Its operative constraints:
   repository state alone, without access to any conversation.
 
 Both files were extended additively. Every original line of `CLAUDE.md` was checked for presence
-after the change: none removed. `CLAUDE.md` is now 415 lines.
+after the change: none removed. `CLAUDE.md` was 415 lines at that point.
+
+> **Corrected 2026-08-21 by TASK-0019.** The sentence read "`CLAUDE.md` is now 415 lines", in the
+> present tense, which stopped being true as soon as later rules were added. Measured this session:
+> **`CLAUDE.md` 571 lines, `AGENTS.md` 115** (`wc -l`). The tense is the defect — a measurement
+> written as a standing fact. It is now anchored to the date it describes; do not treat either
+> number as current without re-measuring.
 
 ## Accepted Decisions
 
@@ -622,6 +652,46 @@ nine records. The record file is the source of truth; both tables index it.
 - `STOP` — stop safely and record state.
 
 ## Next Action
+
+**Nothing is READY, and nothing is blocked. The next move is the architecture lead's.**
+
+TASK-0019 completed the post-WP-0001 baseline audit on 2026-08-21 (MSG-0051). Six documentary
+corrections were applied, each traceable to an existing authoritative record; seven items were
+classified as needing an architecture-lead decision and **none of them was self-authorized**.
+
+**The baseline, stated plainly.** WP-0001 is COMPLETE and verified on real infrastructure. All five
+blockers are RESOLVED. No message carries `Status: OPEN` — verified by reading all 54 message files,
+not by trusting an index. The blocker and discovery indexes agree with their records. The Supervisor
+is ENABLED, its tests pass 36/36, and its unattended loop has been proven end to end three times
+(TASK-0003, TASK-0011, TASK-0018).
+
+**What the audit found, in one sentence:** the records are substantively sound and the drift is
+entirely in the *indexes and summaries* that point at them — the same failure mode, now seen for the
+fourth, fifth and sixth time, of closing something in its own file and not in the table that lists
+it.
+
+**The items awaiting a decision**, in MSG-0051's priority order — the first is the one that matters:
+
+1. **§C1 — `docs/program/work-packages/WP-0001-kernel-foundation.md` still reads `Status: Ready for
+   implementation`** while MSG-0022 / MSG-0023 declare WP-0001 COMPLETE. This is a conflict between
+   *accepted work-package authority* and current state, which is TASK-0019's explicit stop
+   condition, so the correction was **deliberately not made**. It needs the lead's own edit or an
+   instruction authorizing it.
+2. **§C2 — `CLAUDE.md` still describes the Supervisor as inert by default**, citing MSG-0011, which
+   is SUPERSEDED. Governance file; not amended by an executing session.
+3. **§C6 — no post-WP-0001 roadmap exists.** `ROADMAP.md` is WP-0001-scoped and fully discharged.
+4. **§C3 / §C4 / §C5 / §C7** — the lead's own operating brief and the charter carry stale
+   current-state notes; the MSG-0046 duplicate is the second lead-side numbering collision since the
+   MSG-0035 rule, which by design does not constrain the lead's allocation.
+
+Then: **authorize the next work package, or a task, if any is intended.**
+
+---
+
+**Historical — the position while TASK-0018 was open, since resolved.** The text below records the
+state before the MSG-0049 addendum closed gate 3 by external observation. It is retained because the
+sequence — observed four gates, could not observe the fifth from inside the run, asked, closed it
+from outside — is the useful part of the record.
 
 **One decision is required: MSG-0049 §6.** TASK-0018 is IN_PROGRESS with four of five gates MET.
 

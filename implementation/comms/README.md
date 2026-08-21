@@ -10,9 +10,13 @@ a defect in the record, not a missing message.
 
 | ID | Subject | Status | File |
 |---|---|---|---|
+| MSG-0051 | TASK-0019 execution record — post-WP-0001 baseline audit | **RECORD** — six corrections applied; **§C lists seven items requiring an architecture-lead decision** | [MSG-0051-task-0019-baseline-audit.md](MSG-0051-task-0019-baseline-audit.md) |
+| MSG-0050 | TASK-0019 authorization — post-WP-0001 repository baseline audit | **DECIDED** — queue reconciled `39eabdb`; executed by TASK-0019, see MSG-0051 | [MSG-0050-task-0019-authorization.md](MSG-0050-task-0019-authorization.md) |
 | MSG-0049 | TASK-0018 live heartbeat verification — all five gates MET | **CLOSED** — gate 3 met by external observation (see addendum) | [MSG-0049-task-0018-live-heartbeat-verification.md](MSG-0049-task-0018-live-heartbeat-verification.md) |
 | MSG-0048 | TASK-0018 authorization — live supervisor heartbeat validation | **DECIDED** — queue reconciled, awaiting scheduled launch | [MSG-0048-task-0018-authorization.md](MSG-0048-task-0018-authorization.md) |
 | **MSG-0047** | **TASK-0017 verification result — 36 passed, 0 failed** | **CLOSED** — gate satisfied; gap closed by TASK-0018 | [MSG-0047-task-0017-verification-result.md](MSG-0047-task-0017-verification-result.md) |
+| MSG-0046 (b) | Architecture decision: TASK-0017 verification gate — duplicate number, non-conflicting | **DECIDED** — Option (A), operator runs the suite once; no permission expansion | [MSG-0046-architecture-decision-task-0017-test-gate.md](MSG-0046-architecture-decision-task-0017-test-gate.md) |
+| MSG-0046 (a) | Architecture decision: TASK-0017 verification path — duplicate number, non-conflicting | **DECIDED** — Option A, operator runs the test once; no allowlist expansion | [MSG-0046-architecture-decision-task-0017-test.md](MSG-0046-architecture-decision-task-0017-test.md) |
 | **MSG-0045** | **TASK-0017 execution record — heartbeat corrected, NOT verified** | **CLOSED** — decided by MSG-0046, verified by MSG-0047 | [MSG-0045-task-0017-execution-record.md](MSG-0045-task-0017-execution-record.md) |
 | **MSG-0044** | **TASK-0017 was authorized but invisible to the supervisor — queue reconciled** | **CLOSED** — TASK-0017 executed and COMPLETE | [MSG-0044-task-0017-queue-reconciliation.md](MSG-0044-task-0017-queue-reconciliation.md) |
 | **MSG-0043** | **Architecture decision: authorize TASK-0017 supervisor heartbeat observability** | **DECIDED** — applied by TASK-0017; verification blocked, see MSG-0045 | [MSG-0043-supervisor-heartbeat-decision.md](MSG-0043-supervisor-heartbeat-decision.md) |
@@ -129,6 +133,16 @@ authorization and execution this table is reliably one message stale. Expect it;
 with a row here. Allocating from the highest register row would have produced MSG-0039 — a *fourth*
 file under that number. The directory listing caught it again (MSG-0040 §6). Three consecutive tasks,
 same defect, same step catching it.
+
+**A fourth time, and the largest gap yet — found by the TASK-0019 audit, 2026-08-21.** Three files
+were on disk with no row here: **both MSG-0046 files** and **MSG-0050**. The MSG-0046 gap had been
+*known and written down* — `status/current.md` recorded "Neither file has a COMMS register row" when
+TASK-0018 ran — and it still survived two further tasks, because noting a defect is not the same as
+reconciling it. The MSG-0050 gap is the ordinary structural lag: the lead authorizes by committing
+the message plus a queue row, and the register row is added by the executing session afterwards.
+
+All three rows were added by TASK-0019 under MSG-0050, whose scope covers exactly this class of
+correction. Evidence: [`MSG-0051-task-0019-baseline-audit.md`](MSG-0051-task-0019-baseline-audit.md).
 
 So step 1 above means: read this register, **and** list `MSG-*.md`, **and** grep the repository for
 the candidate number. A missing row is a record defect, not evidence that a number is free — the
