@@ -1,6 +1,6 @@
 # BLK-0007 — GitHub SSH Transport Closed at Banner Exchange; Push Unavailable
 
-**Status:** **OPEN** — external transport fault; no local remedy attempted
+**Status:** **RESOLVED** 2026-08-21 — the transport recovered on its own within minutes; the pending commit pushed and a full dry run completed. Cause was never established beyond "remote or network, transient". Retained because the diagnosis is reusable and the non-workaround matters
 **Raised:** 2026-08-21, during the TASK-0023 queue reconciliation
 **Severity:** Medium. Work is complete and committed locally; it cannot reach `origin/main`
 **Related:** BLK-0002 (different cause — see below), MSG-0064, TASK-0023
@@ -131,3 +131,60 @@ first.
 **Check the actual remote before assuming this is still open.** Run `git fetch origin`; if it
 succeeds, this blocker is stale — push the pending commit, mark this RESOLVED with the evidence, and
 do not re-run any diagnosis. `CLAUDE.md` *Checkpointing and Recovery* rule (f) applies.
+
+---
+
+## RESOLVED — 2026-08-21, same session, ~10 minutes after it was raised
+
+**Option 1 — wait and retry — was correct.** No local change was made, no configuration touched, no
+credential altered. The transport simply came back:
+
+```text
+$ git push origin main
+To github-pci:ghuffy11-lgtm/pci-platform.git
+   87aded5..42426df  main -> main
+
+$ git fetch origin        # exit 0
+$ git rev-parse HEAD origin/main
+42426df... 42426df...     # identical, 0 ahead / 0 behind
+```
+
+**The verification that BLK-0007 blocked has since completed.** The supervisor dry run reached task
+selection this time:
+
+```text
+DRY_RUN: would start TASK-0023 (dryRun)
+heartbeat: decision=DRY_RUN  readyTask=TASK-0023  head=42426df
+lock: none created
+real supervisor-config.json: unmodified (diff against pre-run copy)
+```
+
+So the gap MSG-0064 named — *"supervisor selection of TASK-0023 is NOT verified"* — is now closed by
+observation rather than by assumption.
+
+### What this does and does not tell us
+
+**The cause was never established, and recovery is not evidence of one.** A transient GitHub SSH
+incident, source-IP throttling that expired, and a network device that stopped interfering all look
+identical from here: the connection failed at banner exchange, then later it did not.
+
+What the episode does confirm is the **diagnostic signature**, which is worth keeping: HTTPS to
+github.com returning 200 while SSH is closed at `kex_exchange_identification` on both port 22 and 443
+means the fault is in transport, upstream, and **not** in any key, agent, passphrase, or git
+configuration on this machine. That distinction is what stopped BLK-0002's mistake from repeating.
+
+### The decision not to work around it stands
+
+The remote was **not** switched to HTTPS during the outage, even though HTTPS demonstrably worked and
+would have made the symptom disappear. Had that been done, this record would now describe a permanent
+unauthorized change to how the repository authenticates, made to route around a fault that cleared
+itself in ten minutes.
+
+**A blocker that resolves on its own is the cheapest possible outcome. Working around it is not
+free.**
+
+### For a resuming session
+
+This is RESOLVED. If SSH fails this way again, re-read the signature above before touching anything:
+retry first, check GitHub status second, and involve the operator only if it persists. Do not
+regenerate keys and do not change the remote.

@@ -13,7 +13,7 @@ by an open blocker must never be reported as met.
 | BLK-0004 | No privilege to bootstrap the authorized host | High | **RESOLVED** 2026-08-19 |
 | BLK-0005 | Two contradictory MSG-0020 decisions | High | **RESOLVED** 2026-08-19 |
 | [BLK-0006](BLK-0006-mid-run-repository-movement.md) | `origin/main` moved mid-run; TASK-0021 closeout commit cannot be pushed | Low impact, hard boundary | **RESOLVED** 2026-08-21 — mover identified as the lead push `182698c` (MSG-0056); reconciled by fetch + rebase, zero file overlap, no conflict, no force-push |
-| [BLK-0007](BLK-0007-github-ssh-transport-closed.md) | GitHub SSH transport closed at banner exchange; push unavailable | Medium | **OPEN** 2026-08-21 — fails at `kex_exchange_identification` **before authentication**, on both port 22 and 443; HTTPS to github.com returns 200. External transport fault, **not** a credential problem and **not** BLK-0002 |
+| [BLK-0007](BLK-0007-github-ssh-transport-closed.md) | GitHub SSH transport closed at banner exchange; push unavailable | Medium | **RESOLVED** 2026-08-21 — recovered on its own in ~10 min; push landed `42426df` and the blocked dry run completed. **No workaround was applied**; cause never established beyond "transport, upstream, transient" |
 
 **No blocker is open.**
 

@@ -62,17 +62,20 @@ reconciliation as part of the authorized work.
 
 ## Verification
 
-**The dry run could not complete, and the reason is BLK-0007.** It was attempted against a copy of the
-config with `dryRun` forced true, and the supervisor failed at its reconciliation gate before reaching
-task selection:
+**The dry run was blocked, then completed.** Its first attempt failed at the supervisor's
+reconciliation gate because GitHub SSH transport was down — **BLK-0007**, raised and resolved
+within this session:
 
 ```text
-ERROR: unhandled: Connection closed by 20.233.83.145 port 22
+attempt 1  ERROR: unhandled: Connection closed by 20.233.83.145 port 22
+attempt 2  DRY_RUN: would start TASK-0023 (dryRun)
+           heartbeat: decision=DRY_RUN  readyTask=TASK-0023  head=42426df
+           lock: none created
 ```
 
-So **supervisor selection of TASK-0023 is NOT verified** — that is stated rather than glossed. The real
-`supervisor-config.json` was not modified, confirmed by diff against a copy taken before the run, and
-no lock was created.
+**Supervisor selection of TASK-0023 is therefore VERIFIED by observation**, not assumed. The real
+`supervisor-config.json` was not modified — confirmed by diff against a copy taken before each
+run — and no lock was created by either attempt.
 
 What **was** verified, offline:
 
@@ -81,8 +84,9 @@ $ (count of board rows whose status column reads READY or IN_PROGRESS)   ->  1
 $ powershell -File ./tests/supervisor.tests.ps1                                 ->  36 passed, 0 failed
 ```
 
-The queue has exactly one READY row and the parser the supervisor uses is healthy. Selection itself
-must be re-verified once BLK-0007 clears.
+The queue has exactly one READY row and the parser the supervisor uses is healthy.
+Both were also confirmed offline while BLK-0007 was open, so the queue was known good independently of
+the remote.
 
 ## Two records corrected while reconciling
 
@@ -111,6 +115,10 @@ operator-only or privileged action; and **no downstream implementation task may 
 
 ## State
 
+- **BLK-0007 was raised and resolved during this reconciliation.** GitHub SSH transport closed at
+  banner exchange, before authentication, on both port 22 and 443 while HTTPS returned 200. It
+  recovered on its own in about ten minutes. **No workaround was applied** — the remote was not
+  switched to HTTPS, no credential was touched, and no configuration changed.
 - **TASK-0023 is READY and is the single READY task.** It has not been started.
 - MSG-0062 and MSG-0063 are registered in the COMMS register and the queue ledger.
 - No implementation, ADR, provider selection, permission, or Supervisor change was made or authorized.

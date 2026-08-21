@@ -2,7 +2,7 @@
 
 **Active Work Package:** WP-0001 — PCI Kernel Foundation
 **Status:** **COMPLETE** — declared by the architecture lead 2026-08-19 (MSG-0020(b), resolved by MSG-0022 / MSG-0023, TASK-0009)
-**Last Updated:** 2026-08-21 UTC (**EPA-0004 ACCEPTED** by MSG-0062 with all seven items ruled; **MSG-0063 authorizes TASK-0023**, reconciled into the queue as the single READY task — MSG-0064; **not started**)
+**Last Updated:** 2026-08-21 UTC (**EPA-0004 ACCEPTED** by MSG-0062 with all seven items ruled; **MSG-0063 authorizes TASK-0023**, reconciled into the queue as the single READY task and **not started** — MSG-0064; BLK-0007 raised and resolved)
 
 ## Current State
 
@@ -731,25 +731,27 @@ required as a messenger.
 
 ## Open Blockers
 
-**One: BLK-0007, raised 2026-08-21** — GitHub SSH transport is closed by the remote at banner
-exchange (`kex_exchange_identification`), **before authentication begins**, on both port 22 and
-port 443, while HTTPS to github.com returns 200. Work is complete and committed locally; it
-cannot reach `origin/main`.
+**None.** BLK-0001 through **BLK-0007** are all RESOLVED.
 
-**It is not a credential fault, and it is not BLK-0002.** BLK-0002 failed *after* the key was
-accepted (passphrase, no TTY); this fails *before* any key is offered, so the state of the key or
-agent cannot be the cause. **No workaround was applied** — in particular the remote was not
-switched to HTTPS, which would substitute an unauthorized credential path to make a symptom go
-away. See [`../blockers/BLK-0007-github-ssh-transport-closed.md`](../blockers/BLK-0007-github-ssh-transport-closed.md).
+**BLK-0007 was raised and resolved within the same session on 2026-08-21.** GitHub SSH transport
+was closed by the remote at banner exchange (`kex_exchange_identification`), before authentication
+began, on both port 22 and 443, while HTTPS to github.com returned 200. **No workaround was
+applied** — in particular the remote was **not** switched to HTTPS, which would have hidden the
+symptom behind a permanent unauthorized change to how the repository authenticates. It recovered
+on its own in about ten minutes; the pending commit pushed (`42426df`) and the dry run it had
+blocked completed, verifying that the Supervisor selects TASK-0023.
 
-**Consequence for execution:** the Supervisor fetches as part of its reconciliation gate, so it
-**fails closed and will not start TASK-0023** while this persists. The READY task cannot be
-consumed by accident during the outage.
+**The cause was never established, and recovery is not evidence of one.** What is worth keeping is
+the signature: HTTPS healthy while SSH dies at banner exchange on both ports means transport and
+upstream, **not** a key, agent, passphrase, or git configuration — the distinction that kept
+BLK-0002's misdiagnosis from repeating.
 
-**BLK-0001 through BLK-0006 are all RESOLVED.**
+> **The line this replaces, retained:** "**One: BLK-0007, raised 2026-08-21** — GitHub SSH
+> transport is closed … Work is complete and committed locally; it cannot reach `origin/main`."
+> True for about ten minutes.
 
-> **The line this replaces, retained:** "**None.** BLK-0001 through **BLK-0006** are all RESOLVED."
-> True until BLK-0007 was raised the same day.
+> **The line that one replaced, retained:** "**None.** BLK-0001 through **BLK-0006** are all
+> RESOLVED." True until BLK-0007 was raised the same day.
 
 **BLK-0006 was resolved on 2026-08-21 by the interactive session**, the same day TASK-0021 raised it.
 The unknown that forced the stop is now a fact: the concurrent actor was the architecture lead
