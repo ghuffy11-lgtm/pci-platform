@@ -29,7 +29,10 @@ Only the architecture lead may authorize new work, mark a task READY, or change 
 | TASK-0016 | **Close resolved MSG-0034 informational record** | **COMPLETE** | TASK-0015, MSG-0041 | 2026-08-20 — closure verified, MSG-0042 | none | Claude Code |
 | TASK-0017 | **Supervisor heartbeat / unattended observability** | **COMPLETE** | TASK-0016 | 2026-08-20 tests 36/36 | none | Claude Code |
 | TASK-0018 | **Live Supervisor heartbeat validation** | **COMPLETE** — 5 of 5 gates MET | TASK-0017 | 2026-08-21 `COMPLETED` observed externally | none | Claude Code |
+| TASK-0019 | **Post-WP-0001 repository baseline audit** | **READY** | TASK-0018, MSG-0050 | 2026-08-21 authorization reconciled | execute via Supervisor; audit only | Claude Code |
 | TASK-0002 | Make test entry points shell-independent | **ABORTED** | — | 2026-08-19 | none — premise disproven by measurement | — |
+
+**TASK-0019 is explicitly authorized by MSG-0050 and is now reconciled into the authoritative queue.** It is maintenance/audit work only, not a new product work package. Its prerequisites are satisfied because TASK-0018 is COMPLETE. No other task is READY.
 
 **TASK-0016 is explicitly authorized by the architecture lead after WP-0001 completion.** It is maintenance/documentation work, not a new product work package.
 
@@ -246,6 +249,7 @@ READY means *authorized to attempt*, never *authorized to force*. A READY task w
 | MSG-0048 | Decision | DECIDED | Architecture lead | Claude Code | **TASK-0018 AUTHORIZED** — one real Supervisor-started run, observe RUNNER_RUNNING live; no manual trigger, no supervisor changes | TASK-0018 |
 | MSG-0045 | Record | **OPEN — decision required** | Claude Code | Architecture lead | **TASK-0017 IMPLEMENTED but NOT COMPLETE.** Defect reproduced and corrected; the test suite **could not be run** — no allowlist entry permits executing a PowerShell script. Three options in §7. *Answered by MSG-0046 and discharged by MSG-0047; the status line in the record itself was not changed by TASK-0018, which had no authority over another message's record* | TASK-0017 |
 | MSG-0049 | Record | CLOSED | Claude Code | Architecture lead | **TASK-0018 verification: `RUNNER_RUNNING` observed live during a supervisor-started run.** Gates 1, 2, 4 and 5 MET with quoted evidence; gate 3 (terminal heartbeat) is **structurally unobservable from inside the run it measures**. Three options in §6; (B) recommended | TASK-0018 |
+| MSG-0050 | Decision | DECIDED | Architecture lead | Claude Code | **TASK-0019 AUTHORIZED and READY** — post-WP-0001 repository baseline audit; maintenance/audit only; queue reconciliation required before execution | TASK-0019 |
 
 ## Interruption and recovery protocol
 
@@ -454,3 +458,64 @@ require changing permissions, scheduling, or architecture.
 **If the observation fails, do not modify the supervisor to compensate.** Record the exact heartbeat
 and log evidence, leave the task IN_PROGRESS with a checkpoint, and await direction. A heartbeat
 that fails this test is information, not an inconvenience to be tuned away.
+
+---
+
+## TASK-0019 — Post-WP-0001 repository baseline audit
+
+**Priority:** 1 | **Status:** **READY** — authorized by MSG-0050 and reconciled into the queue on 2026-08-21 | **Owner:** Claude Code
+**Depends on:** TASK-0018 (COMPLETE) | **Next eligible task:** none until TASK-0019 completes or stops
+**Full specification:** [`TASK-0019-post-wp0001-baseline-audit.md`](TASK-0019-post-wp0001-baseline-audit.md)
+
+### Authorization / scope
+
+MSG-0050 is the existing Architecture Lead authorization. No duplicate task or authorization is created.
+TASK-0019 is maintenance/audit only. It does not authorize new product architecture, implementation,
+work packages, features, Supervisor changes, permissions, scheduling, credentials, infrastructure, or
+host changes.
+
+### Prerequisites
+
+| ID | Prerequisite | State |
+|---|---|---|
+| P1 | Architecture lead authorization | **MET** — MSG-0050 |
+| P2 | TASK-0018 COMPLETE | **MET** — all five gates, MSG-0049 |
+
+### Allowed actions
+
+Read and compare the authoritative queue, ROADMAP, current status, COMMS register/messages, blocker
+index/records, discovery index/records, checkpoints, and accepted ADR/work-package records. Classify
+contradictions, stale status, missing index entries, duplicate identifiers, unresolved decision
+requests, and references to completed work. Make only documentary/index corrections whose correct value
+is directly established by existing authority and requires no architecture judgment. Create exactly one
+TASK-0019 execution/audit COMMS record using the next valid message number. Update required queue,
+status, and checkpoint documentation. Commit and push the result.
+
+### Forbidden actions
+
+- No product, database, compose, Supervisor code/configuration, scheduling, permission, credential,
+  infrastructure, or host changes.
+- No new architecture, ADR, work package, feature scope, or product task authorization.
+- No destructive commands, repository reset/clean, force push, privilege escalation, or manual Supervisor trigger.
+- Do not rewrite historical evidence merely because a later record superseded it; use additive corrections.
+- Do not resolve substantive conflicts requiring Architecture Lead judgment; report them instead.
+
+### Success gate
+
+TASK-0019 is COMPLETE only when the audit covers all specified authoritative record classes, every
+finding is classified as documentary drift/superseded history/architecture decision required, safe
+corrections are evidenced, exactly one execution/audit COMMS record gives the Architecture Lead a
+prioritized list of legitimate next actions without self-authorizing them, and the queue/result are
+pushed to `origin/main`.
+
+### Stop condition
+
+If the audit finds a material conflict between accepted architecture/work-package authority and
+current repository state, or any correction would require choosing between competing substantive
+interpretations, STOP that correction, preserve the evidence, record the conflict in COMMS, and leave
+the decision to the Architecture Lead.
+
+### Recovery
+
+Record progress in `implementation/operations/checkpoints/TASK-0019.md`. On restart, verify existing
+commits and records before repeating any operation.
