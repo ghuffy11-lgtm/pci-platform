@@ -10,7 +10,8 @@ a defect in the record, not a missing message.
 
 | ID | Subject | Status | File |
 |---|---|---|---|
-| **MSG-0052** | **Architecture Lead baseline decisions C1-C5** | **DECIDED** — C1-C3 applied, C4/C5 no action; C6/C7 remain the Lead's | [MSG-0052-architecture-lead-baseline-decisions.md](MSG-0052-architecture-lead-baseline-decisions.md) |
+| **MSG-0053** | **Architecture Lead decisions C6-C7** | **DECIDED** — C6 not authorized/not required; C7 no new work authorized | [MSG-0053-architecture-lead-c6-c7-decisions.md](MSG-0053-architecture-lead-c6-c7-decisions.md) |
+| **MSG-0052** | **Architecture Lead baseline decisions C1-C5** | **DECIDED** — C1-C3 applied, C4/C5 no action; C6/C7 subsequently resolved by MSG-0053 | [MSG-0052-architecture-lead-baseline-decisions.md](MSG-0052-architecture-lead-baseline-decisions.md) |
 | MSG-0051 | TASK-0019 execution record — post-WP-0001 baseline audit | **RECORD** — six corrections applied; **§C lists seven items requiring an architecture-lead decision** | [MSG-0051-task-0019-baseline-audit.md](MSG-0051-task-0019-baseline-audit.md) |
 | MSG-0050 | TASK-0019 authorization — post-WP-0001 repository baseline audit | **DECIDED** — queue reconciled `39eabdb`; executed by TASK-0019, see MSG-0051 | [MSG-0050-task-0019-authorization.md](MSG-0050-task-0019-authorization.md) |
 | MSG-0049 | TASK-0018 live heartbeat verification — all five gates MET | **CLOSED** — gate 3 met by external observation (see addendum) | [MSG-0049-task-0018-live-heartbeat-verification.md](MSG-0049-task-0018-live-heartbeat-verification.md) |
@@ -96,7 +97,7 @@ Implementation and docs: [`../operations/supervisor/`](../operations/supervisor/
 ## Message numbering — allocation convention
 
 **This is a protocol rule.** Approved by the architecture lead in MSG-0035 decision 2 and applied by
-TASK-0013.
+TASK-0013. Message numbers are allocated from the COMMS register, not from memory or chronology.
 
 Before creating a message:
 
@@ -117,63 +118,3 @@ architecture lead. The two agree in substance, so TASK-0015 executed the stricte
 reported the collision rather than stopping (MSG-0040 §6). Step 3 above still stands unchanged for
 Claude: never create a further duplicate. Whether anything should constrain the lead's allocation is
 not a question TASK-0015 was authorized to raise, and it does not raise one.
-
-### Check the directory, not only this table
-
-TASK-0013 hit the failure this rule exists to prevent, while adding the rule. **MSG-0035 was present
-on disk but had no row in this register.** Allocating "the next number after the highest row" would
-have produced **MSG-0035** — a third duplicate. The directory listing is what caught it.
-
-**It happened again one message later.** TASK-0014 found **MSG-0037** on disk and in the
-`CLAUDE-TASKS.md` ledger with no row here, and the directory listing caught it a second time
-(MSG-0038 §6). The cause is structural, not careless: the lead authorizes by committing the message
-and a queue row, and the register row is added by the executing session afterwards — so between
-authorization and execution this table is reliably one message stale. Expect it; check the directory.
-
-**And a third time, with the stakes raised.** TASK-0015 found **two** MSG-0039 files on disk, neither
-with a row here. Allocating from the highest register row would have produced MSG-0039 — a *fourth*
-file under that number. The directory listing caught it again (MSG-0040 §6). Three consecutive tasks,
-same defect, same step catching it.
-
-**A fourth time, and the largest gap yet — found by the TASK-0019 audit, 2026-08-21.** Three files
-were on disk with no row here: **both MSG-0046 files** and **MSG-0050**. The MSG-0046 gap had been
-*known and written down* — `status/current.md` recorded "Neither file has a COMMS register row" when
-TASK-0018 ran — and it still survived two further tasks, because noting a defect is not the same as
-reconciling it. The MSG-0050 gap is the ordinary structural lag: the lead authorizes by committing
-the message plus a queue row, and the register row is added by the executing session afterwards.
-
-All three rows were added by TASK-0019 under MSG-0050, whose scope covers exactly this class of
-correction. Evidence: [`MSG-0051-task-0019-baseline-audit.md`](MSG-0051-task-0019-baseline-audit.md).
-
-So step 1 above means: read this register, **and** list `MSG-*.md`, **and** grep the repository for
-the candidate number. A missing row is a record defect, not evidence that a number is free — the
-charter (`../PROJECT-CHARTER.md` §5) states this directly: *"A message not represented in the
-register is a record defect and must be reconciled according to protocol; do not assume the file does
-not exist."* The MSG-0035 row was added by TASK-0013 as exactly that reconciliation.
-
-### Why the rule was asked for
-
-Duplicate numbering had happened twice before any rule existed. MSG-0020 (a)/(b) **contradicted each
-other** and cost three further messages — MSG-0021, MSG-0022, MSG-0023 — to work out which decision
-stood. MSG-0033 (a)/(b) agreed, so it cost nothing. The difference between the two was luck, not
-process, which is why MSG-0032 §6.3 requested a ruling instead of adopting one.
-
-## Bootstrap — closed
-
-**MSG-0008 is CLOSED.** The operator executed the authorized bootstrap on 2026-08-19 and Claude Code verified `DockerRootDir` = `/data/docker`. WP-0001 verification followed and completed: 229 tests passing, all ten acceptance criteria met.
-
-## Protocol
-
-- Claude allocates the next `MSG-XXXX` number from the register above **before** creating the file,
-  and re-verifies its uniqueness immediately before committing. On a collision: stop and report. See
-  *Message numbering — allocation convention*.
-- Claude creates `MSG-XXXX-<short-name>.md` when architectural direction, clarification, or a blocking decision is required.
-- Claude sets `Status: OPEN` and records the work package, evidence, options, recommendation, and exact question.
-- Claude adds the message to the register above in the same commit that creates it.
-- The architecture lead reads open messages from GitHub and responds in the same file or a sequential response file.
-- Claude must read the response before continuing.
-- Accepted architectural decisions are promoted into ADRs/specifications when appropriate.
-
-## Rule
-
-The user is not a technical relay between Claude Code and the architecture lead. GitHub is the shared engineering communication channel.
