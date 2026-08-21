@@ -30,6 +30,7 @@ Only the architecture lead may authorize new work, mark a task READY, or change 
 | TASK-0017 | **Supervisor heartbeat / unattended observability** | **COMPLETE** | TASK-0016 | 2026-08-20 tests 36/36 | none | Claude Code |
 | TASK-0018 | **Live Supervisor heartbeat validation** | **COMPLETE** — 5 of 5 gates MET | TASK-0017 | 2026-08-21 `COMPLETED` observed externally | none | Claude Code |
 | TASK-0019 | **Post-WP-0001 repository baseline audit** | **COMPLETE** | TASK-0018, MSG-0050 | 2026-08-21 — 6 corrections applied, 7 items referred, MSG-0051 | none | Claude Code |
+| TASK-0021 | **Employee policy assistant — architecture definition** | **READY** | WP-0001 COMPLETE, MSG-0054 | — | Execute (architecture definition only; no implementation) | Claude Code |
 | TASK-0002 | Make test entry points shell-independent | **ABORTED** | — | 2026-08-19 | none — premise disproven by measurement | — |
 
 **TASK-0019 is COMPLETE (2026-08-21).** It was authorized by MSG-0050, reconciled into this queue in `39eabdb`, and executed by a supervisor-started session on its scheduled 06:37:13Z cycle. It was maintenance/audit work only, not a new product work package.
@@ -257,6 +258,8 @@ READY means *authorized to attempt*, never *authorized to force*. A READY task w
 | MSG-0045 | Record | **CLOSED** — corrected 2026-08-21 by TASK-0019; the record file and the COMMS register both read CLOSED | Claude Code | Architecture lead | **TASK-0017 IMPLEMENTED but NOT COMPLETE.** Defect reproduced and corrected; the test suite **could not be run** — no allowlist entry permits executing a PowerShell script. Three options in §7. *Answered by MSG-0046 and discharged by MSG-0047; the status line in the record itself was not changed by TASK-0018, which had no authority over another message's record* | TASK-0017 |
 | MSG-0049 | Record | CLOSED | Claude Code | Architecture lead | **TASK-0018 verification: `RUNNER_RUNNING` observed live during a supervisor-started run.** Gates 1, 2, 4 and 5 MET with quoted evidence; gate 3 (terminal heartbeat) is **structurally unobservable from inside the run it measures**. Three options in §6; (B) recommended | TASK-0018 |
 | MSG-0050 | Decision | DECIDED | Architecture lead | Claude Code | **TASK-0019 AUTHORIZED and READY** — post-WP-0001 repository baseline audit; maintenance/audit only; queue reconciliation required before execution | TASK-0019 |
+| MSG-0054 | Decision | DECIDED | Architecture lead | Claude Code | **TASK-0021 authorized — architecture definition ONLY** for the employee policy assistant; outside WP-0001; no implementation, no work package yet | TASK-0021 |
+| MSG-0053 | Decision | DECIDED | Architecture lead | Claude Code | **C6 NOT AUTHORIZED / NOT REQUIRED** (option B proof adds execution with no requirement); **C7 no new product work package** pending a concrete objective | — |
 | MSG-0052 | Decision | DECIDED | Architecture lead | Claude Code | **C1-C5 ruled.** C1 WP-0001 status COMPLETE; C2/C3 documentary supersessions; C4/C5 no action; **C6/C7 not self-authorized** | TASK-0019 |
 | MSG-0051 | Record | CREATED — audit complete | Claude Code | Architecture lead | **TASK-0019 baseline audit.** Six documentary corrections applied with their authorities quoted; four record classes verified already correct; **§C refers seven items for decision**, led by the accepted WP-0001 work package still reading `Status: Ready for implementation` — the stop condition fired and that correction was **not** made | TASK-0019 |
 
@@ -583,3 +586,76 @@ the decision to the Architecture Lead.
 
 Record progress in `implementation/operations/checkpoints/TASK-0019.md`. On restart, verify existing
 commits and records before repeating any operation.
+
+---
+
+## TASK-0021 — Employee policy assistant: architecture definition
+
+**Priority:** 1 | **Status:** **READY** — authorized by MSG-0054 | **Owner:** Claude Code
+**Depends on:** WP-0001 COMPLETE | **Next eligible task:** none — the work package itself is not authorized
+**Full specification:** [`TASK-0021-employee-policy-assistant-architecture-definition.md`](TASK-0021-employee-policy-assistant-architecture-definition.md)
+
+### Objective
+
+Turn the new product objective — an employee-facing assistant answering only from approved
+organizational policy, in English and Arabic, with authoritative citations and fail-closed
+abstention — into a decision-ready architecture specification. **Definition only.**
+
+### Prerequisites
+
+| ID | Prerequisite | State |
+|---|---|---|
+| P1 | Architecture lead authorization | **MET** — MSG-0054 |
+| P2 | WP-0001 COMPLETE | MET — TASK-0009, MSG-0022 / MSG-0023 |
+| P3 | This objective recognised as outside WP-0001 | MET — MSG-0054 ruling |
+
+### Allowed actions
+
+Define, at architecture level only: approved-document authority and lifecycle; ingestion,
+normalization, chunking and provenance; retrieval and grounded QA with citation, abstention and
+prompt-injection defence; English/Arabic behaviour including cross-language retrieval; authorization
+and confidentiality enforced at retrieval time; auditability and retention; frontend
+responsibilities; PCI kernel integration boundaries; required ADRs, threat decisions, data
+contracts, interfaces and acceptance gates. Produce one architecture-definition COMMS record plus
+the repository documentation that makes the next work package unambiguous.
+
+### Forbidden actions
+
+- **No product implementation** — no ingestion, retrieval, LLM, frontend, or schema migration code.
+- No credentials, no external model-service registration.
+- No supervisor configuration, scheduling, or permission changes.
+- No change to accepted WP-0001 architecture, the `/data` boundary, or existing fail-closed controls.
+- **No authorization of downstream implementation tasks** — the work package is not yet authorized.
+
+### Verification requirements
+
+All eleven acceptance criteria in the specification, notably: the objective is established as
+**outside WP-0001**; the grounded-answer contract prevents unsupported policy claims and requires
+authoritative citations; English and Arabic behaviour is explicit including cross-language
+boundaries; authorization is enforced **at retrieval time, not only at the frontend**; audit and
+retention are defined without exposing unnecessary sensitive content; prompt injection and
+exfiltration through documents are addressed; and unresolved substantive choices are **recorded as
+architecture-lead decisions rather than guessed**.
+
+### Documentation requirements
+
+One architecture-definition COMMS record; supporting repository documentation; queue, checkpoint and
+status reconciliation. Commit and push before reporting completion.
+
+### Checkpoint requirements
+
+Checkpoint after the scope boundary and document-authority model are settled, and again before the
+final record is committed — recording what was decided and what was deliberately left open.
+
+### Stop conditions
+
+Stop and record if repository authority is insufficient to define a safe boundary, if an accepted
+ADR conflicts materially with the proposed architecture, or if a decision would require **inventing
+product scope the objective did not supply**. Guessing scope is the failure mode this task most
+needs to avoid: an architecture invented to fill a silence is harder to unpick than an open question.
+
+### Recovery procedure
+
+The work is documentary. On resumption, re-read MSG-0054 and the specification before continuing,
+and check which sections already exist rather than rewriting them — a half-written architecture
+record is easy to duplicate and hard to reconcile.

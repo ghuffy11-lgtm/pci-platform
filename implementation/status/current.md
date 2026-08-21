@@ -223,6 +223,17 @@ Every tier reported a non-zero test count.
 
 Index: `implementation/comms/README.md` carries the full message register with links and status.
 
+**MSG-0053 and MSG-0054 (2026-08-21).** C6 is **NOT AUTHORIZED / NOT REQUIRED** — proving MSG-0049
+option (B) would add an unattended cycle no current requirement needs, so option (B) stays
+explicitly unproven rather than being proven for its own sake. C7 authorized **no new product work
+package**; the project sat at a completed-WP-0001 checkpoint.
+
+That checkpoint has since moved: **MSG-0054 authorizes TASK-0021**, an architecture-definition task
+for an employee policy assistant — answering only from approved organizational policy, in English and
+Arabic, with authoritative citations and fail-closed abstention. It is **outside WP-0001** and
+authorizes **no implementation and no work package**; the architecture must be accepted first.
+TASK-0021 is now READY in the authoritative queue.
+
 **MSG-0052 applied (2026-08-21).** The Architecture Lead ruled on the TASK-0019 audit referrals:
 C1 — the accepted WP-0001 work package now reads `Status: COMPLETE`, closing the last conflict
 between accepted authority and current state; C2 and C3 — `CLAUDE.md` and `ARCHITECTURE-LEAD-CONTEXT.md`
