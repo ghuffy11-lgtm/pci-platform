@@ -1,6 +1,6 @@
 # MSG-0057 — Reconciling the EPA Rulings: Three Findings and a Numbering Collision
 
-**Status:** **OPEN** — three findings require an architecture-lead decision before the work package is authorized
+**Status:** **CLOSED** 2026-08-21 — all four findings ruled by MSG-0058: F1 in scope and fail-closed (abstain, never fall back); F2 deferred from the first release; F3 bounded to the OIDC/OAuth2 boundary of ADR-0007; F4 preserve MSG-0056a/b and do not rename
 **Raised:** 2026-08-21
 **Raised by:** Claude Code (interactive session, COMMS)
 **Type:** Reconciliation record + decision request

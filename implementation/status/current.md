@@ -2,7 +2,7 @@
 
 **Active Work Package:** WP-0001 — PCI Kernel Foundation
 **Status:** **COMPLETE** — declared by the architecture lead 2026-08-19 (MSG-0020(b), resolved by MSG-0022 / MSG-0023, TASK-0009)
-**Last Updated:** 2026-08-21 UTC (MSG-0056b — the four escalated decisions answered; all fourteen EPA-0003 decisions RULED; MSG-0057 raises three reconciliation findings)
+**Last Updated:** 2026-08-21 UTC (MSG-0058 rules the MSG-0057 findings; MSG-0059 authorizes TASK-0022; TASK-0022 reconciled into the queue as the single READY task — MSG-0060)
 
 ## Current State
 
@@ -334,6 +334,49 @@ package can be gated:
 complement rather than contradict, so no stop was warranted; they are disambiguated throughout as
 **MSG-0056a** and **MSG-0056b**, and neither was renumbered.
 
+**MSG-0058 — all three findings ruled (2026-08-21), each as recommended.**
+
+- **F1 — cross-language grounding: in scope, and fail-closed.** Arabic answers may be generated from
+  authoritative English policy, but the grounding gate must establish support across the
+  English-source/Arabic-answer boundary, with the Arabic acceptance bar evaluated separately under
+  SPEC-0020. **If the Arabic gate fails, the system abstains** — it must not silently fall back to an
+  English answer, and must not present an unofficial rendering as policy. This closes the gap MSG-0057
+  identified: the failure behaviour is now specified rather than implied.
+- **F2 — unauthenticated access: deferred** from the first release. The first release requires
+  authenticated identity, and **no new unauthenticated classification or trust boundary is
+  introduced** — which also means the undefined classification value MSG-0057 flagged does not need to
+  be invented now.
+- **F3 — directory integration terminates at the ADR-0007 OIDC/OAuth2 boundary.** Entra ID, AD FS, or
+  an OIDC/OAuth2 broker may front an existing directory; **direct LDAP/Kerberos authentication
+  implementation is not authorized.** The accepted ADR is confirmed as governing rather than amended.
+- **F4 — preserve the MSG-0056a/MSG-0056b distinction and do not rename historical records.** The
+  collision is documentary and non-blocking.
+
+**Gate ruling:** with F1-F4 resolved, the architecture-definition findings are sufficiently resolved
+to proceed to a work-package authorization task. **Implementation, provider selection, and runtime
+changes remain prohibited.**
+
+**MSG-0059 — TASK-0022 authorized (2026-08-21).** The next task is the bounded **work-package
+definition** for the Employee Policy Assistant: scope, implementation gates, acceptance criteria,
+dependencies, security checkpoints, and a dependency-ordered task sequence. It authorizes no
+implementation, no provider or model selection, no runtime or deployment change, no new permissions,
+and no Supervisor change, and **no implementation task may be marked READY by it**. The Architecture
+Lead must accept its output before implementation is authorized.
+
+**MSG-0060 — TASK-0022 reconciled into the queue (2026-08-21, OPEN, informational).** MSG-0059
+required TASK-0022 to be the **single READY task** on the board before the Supervisor may execute it,
+and to remain idle until then. It was absent from `CLAUDE-TASKS.md` entirely — **the fifth recurrence
+of the MSG-0044 gap**, where an authorization exists and the queue does not reflect it, and the
+supervisor idles indefinitely reporting a healthy `no READY task`. It is now on the board as the only
+READY task, verified by a dry run that selected it without starting anything.
+
+**The collision recurred too, and this one carries more risk.** Two files specify TASK-0022. They
+agree on scope, authorization, forbidden actions and acceptance gate, but spec A carries the stop
+conditions and the recommendations-only constraint while spec B carries a finer ten-item outcome
+list. A message collision is read by humans; **a task collision is read by an unattended runner that
+cannot notice a sibling file exists**, and would report success against whichever half it read. The
+queue section therefore carries the **union** of both and links both. Neither was renamed, per F4.
+
 **MSG-0052 applied (2026-08-21).** The Architecture Lead ruled on the TASK-0019 audit referrals:
 C1 — the accepted WP-0001 work package now reads `Status: COMPLETE`, closing the last conflict
 between accepted authority and current state; C2 and C3 — `CLAUDE.md` and `ARCHITECTURE-LEAD-CONTEXT.md`
@@ -341,10 +384,14 @@ carry explicit supersession notes, with no supervisor behaviour, permission, or 
 C4 and C5 — no action, deliberately. **C6 (a bounded proof of MSG-0049 option B) and C7 (the next
 work package) remain the Lead's to decide and are not self-authorized.**
 
-**One message carries `Status: OPEN`: MSG-0057**, raised 2026-08-21 by this reconciliation. Its
-three findings (F1 cross-language grounding, F2 unauthenticated access, F3 the ADR-0007 boundary
-on Active Directory) are decisions for the architecture lead, and it is deliberately left OPEN
-until they are ruled.
+**One message carries `Status: OPEN`: MSG-0060**, the TASK-0022 queue reconciliation. It is
+informational and blocks nothing — it records that TASK-0022 is now the single READY task, and
+that a fifth number collision occurred, this time on an **executable task specification** rather
+than a message.
+
+> **The line this replaces, retained:** "**One message carries `Status: OPEN`: MSG-0057.**" That
+> was true from 2026-08-21 until MSG-0058 ruled all four of its findings the same day. MSG-0057 is
+> now **CLOSED**; its F1/F2/F3 were each decided as recommended.
 
 > **The line this replaces, retained:** "**No message carries `Status: OPEN`.**" That was true
 > from the TASK-0016 reconciliation until MSG-0057 was raised. The four that had been open —
@@ -823,48 +870,111 @@ both tables index it, and both were updated in the same commit as the record.
 
 ## Next Action
 
-**All fourteen EPA-0003 decisions are ruled. Nothing is READY, and the next move is the architecture
-lead's judgement call — explicitly reserved to them by MSG-0056b.**
+**TASK-0022 is READY and is the single READY task. Execution is authorized; the Supervisor may start
+it.** This is the first READY task since TASK-0021 completed.
 
-MSG-0056b states it directly: *"No implementation task is READY or authorized by this message. The
-next Architecture Lead action is to reconcile these rulings with EPA-0003, MSG-0055, the COMMS
-register, and the execution queue, then determine whether the remaining architecture decisions are
-sufficiently resolved to authorize the next architecture/work-package task."*
+**What changed.** MSG-0058 ruled all three MSG-0057 findings, each as recommended, and set the gate:
+the architecture-definition findings are *"sufficiently resolved to proceed to the next
+architecture/work-package authorization task."* MSG-0059 then authorized **TASK-0022** — the bounded
+work-package definition for the Employee Policy Assistant.
 
-**The reconciliation half is done** (MSG-0057): every decision is annotated inline in EPA-0003 with
-the message that ruled it, and the register, ledger and this board agree. **The determination half is
-not Claude's to make and has not been made.**
+**The precondition MSG-0059 set has been satisfied.** It required TASK-0022 to be the single READY
+task on the board before the Supervisor may execute it, and said the Supervisor must remain idle
+until then. TASK-0022 was absent from the queue entirely — the fifth recurrence of the MSG-0044
+structural gap — and is now reconciled in. Verified by a dry run against a forced-`dryRun` config:
+`DRY_RUN: would start TASK-0022`, `readyTask=TASK-0022`, no lock created (MSG-0060).
 
-### What the lead needs to decide
+### What TASK-0022 may and may not do
 
-1. **Rule F1, F2 and F3** (MSG-0057) — three consequences the rulings imply but do not state:
-   - **F1** — is cross-language grounding (Arabic answer, English source) in scope for the first
-     release, and what does an employee see when the Arabic gate fails but English would have passed?
-   - **F2** — is unauthenticated access in scope, or deferred? If in scope, which classification
-     scheme defines "safe for unauthenticated disclosure", and who assigns it? **Recommended: defer.**
-   - **F3** — confirm directory integration terminates at an OIDC/OAuth2 boundary, or amend ADR-0007
-     by ADR if a direct bind is intended.
-2. **Determine whether the architecture is now sufficiently resolved** to authorize the next task.
-3. **If it is, authorize that task and allocate the work-package identifier** — `EPA-0002`
-   deliberately allocates none, because `docs/program/work-packages.md` already lists a WP-0002
-   (MSG-0055 §7.1).
-4. **Allocate the D12 ADR number** during architecture drafting, per MSG-0056a.
+It is **architecture/work-package definition only.** It defines scope, boundaries, implementation
+gates, acceptance criteria, dependencies, security checkpoints, threat-model coverage, and a
+dependency-ordered implementation task sequence.
 
-### What remains prohibited
+It may **not** implement, select a provider or model, change accepted ADRs, change permissions,
+security boundaries, scheduling, or Supervisor behaviour, or perform privileged operations. **It may
+not mark any implementation task READY** — queue changes are recommendations only. The Architecture
+Lead must review and accept its output before any implementation task is authorized.
 
-No work package, implementation task, ADR, provider selection, or document ingestion is authorized,
-and no Supervisor or security behaviour may change. Everything under `implementation/architecture/`
-stays **PROPOSED** until the lead accepts it.
+### The binding rulings it inherits
 
-**A task becomes executable only when it appears as READY on the queue board** — the structural
-finding MSG-0044 recorded, which has now recurred five times. The Supervisor reads
-`CLAUDE-TASKS.md` and nothing else; an authorization recorded only in a message is invisible to it and
-produces a silent, indefinite idle.
+- **English is authoritative**; Arabic is an approved translation/access language.
+- **Cross-language grounding is in scope and fail-closed.** A failed Arabic grounding gate must
+  **abstain** — never silently fall back to an English answer, never present an unofficial rendering
+  as policy. The Arabic acceptance bar is evaluated separately under SPEC-0020.
+- **Unauthenticated access is deferred** from the first release; no new trust boundary is introduced.
+- **Directory integration terminates at the ADR-0007 OIDC/OAuth2 boundary.** Entra ID, AD FS, or an
+  OIDC broker may front an existing directory; **direct LDAP/Kerberos implementation is not
+  authorized.**
+- **Only approved/published documents are authoritative sources.**
+- **Session-only retention is the default**, with configurable retention support.
 
-**The Supervisor is correctly idle** at `NOOP: no READY task`. Note that the Windows `Schedule`
-service was stopped by the operator on 2026-08-21, so its ten-minute cadence is inert until that
-service is restarted; until then, cycles run only when triggered manually.
+### One thing the next session must know
 
+**Two files specify TASK-0022**, and both are authoritative. They agree on scope, authorization,
+forbidden actions and acceptance gate, but each carries content the other lacks — spec A the stop
+conditions and the recommendations-only constraint, spec B a ten-item outcome list. The queue section
+carries the **union** and links both. Neither was renamed, per MSG-0058 F4.
+
+**Read both.** A runner that reads one silently loses half its instructions and would report success
+against the half it read (MSG-0060).
+
+### Operational note
+
+The Windows `Schedule` service was stopped by the operator on 2026-08-21, so the Supervisor's
+ten-minute cadence is inert. Cycles run only when triggered manually until that service is restarted;
+the start path itself is unchanged and proven.
+
+---
+
+**Historical — the position between MSG-0057 and MSG-0058, retained.** The text below asked the
+lead to rule F1, F2 and F3 and then judge whether the architecture was sufficiently resolved.
+**All three were ruled the same day** by MSG-0058, each as recommended, and the gate was opened by
+MSG-0059 authorizing TASK-0022. Retained as the record of what was asked.
+
+> ## Next Action
+> 
+> **All fourteen EPA-0003 decisions are ruled. Nothing is READY, and the next move is the architecture
+> lead's judgement call — explicitly reserved to them by MSG-0056b.**
+> 
+> MSG-0056b states it directly: *"No implementation task is READY or authorized by this message. The
+> next Architecture Lead action is to reconcile these rulings with EPA-0003, MSG-0055, the COMMS
+> register, and the execution queue, then determine whether the remaining architecture decisions are
+> sufficiently resolved to authorize the next architecture/work-package task."*
+> 
+> **The reconciliation half is done** (MSG-0057): every decision is annotated inline in EPA-0003 with
+> the message that ruled it, and the register, ledger and this board agree. **The determination half is
+> not Claude's to make and has not been made.**
+> 
+> ### What the lead needs to decide
+> 
+> 1. **Rule F1, F2 and F3** (MSG-0057) — three consequences the rulings imply but do not state:
+>    - **F1** — is cross-language grounding (Arabic answer, English source) in scope for the first
+>      release, and what does an employee see when the Arabic gate fails but English would have passed?
+>    - **F2** — is unauthenticated access in scope, or deferred? If in scope, which classification
+>      scheme defines "safe for unauthenticated disclosure", and who assigns it? **Recommended: defer.**
+>    - **F3** — confirm directory integration terminates at an OIDC/OAuth2 boundary, or amend ADR-0007
+>      by ADR if a direct bind is intended.
+> 2. **Determine whether the architecture is now sufficiently resolved** to authorize the next task.
+> 3. **If it is, authorize that task and allocate the work-package identifier** — `EPA-0002`
+>    deliberately allocates none, because `docs/program/work-packages.md` already lists a WP-0002
+>    (MSG-0055 §7.1).
+> 4. **Allocate the D12 ADR number** during architecture drafting, per MSG-0056a.
+> 
+> ### What remains prohibited
+> 
+> No work package, implementation task, ADR, provider selection, or document ingestion is authorized,
+> and no Supervisor or security behaviour may change. Everything under `implementation/architecture/`
+> stays **PROPOSED** until the lead accepts it.
+> 
+> **A task becomes executable only when it appears as READY on the queue board** — the structural
+> finding MSG-0044 recorded, which has now recurred five times. The Supervisor reads
+> `CLAUDE-TASKS.md` and nothing else; an authorization recorded only in a message is invisible to it and
+> produces a silent, indefinite idle.
+> 
+> **The Supervisor is correctly idle** at `NOOP: no READY task`. Note that the Windows `Schedule`
+> service was stopped by the operator on 2026-08-21, so its ten-minute cadence is inert until that
+> service is restarted; until then, cycles run only when triggered manually.
+> 
 ---
 
 **Historical — the position between MSG-0056a and MSG-0056b, retained.** The text below asked the

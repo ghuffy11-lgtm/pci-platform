@@ -30,12 +30,21 @@ Only the architecture lead may authorize new work, mark a task READY, or change 
 | TASK-0017 | **Supervisor heartbeat / unattended observability** | **COMPLETE** | TASK-0016 | 2026-08-20 tests 36/36 | none | Claude Code |
 | TASK-0018 | **Live Supervisor heartbeat validation** | **COMPLETE** — 5 of 5 gates MET | TASK-0017 | 2026-08-21 `COMPLETED` observed externally | none | Claude Code |
 | TASK-0019 | **Post-WP-0001 repository baseline audit** | **COMPLETE** | TASK-0018, MSG-0050 | 2026-08-21 — 6 corrections applied, 7 items referred, MSG-0051 | none | Claude Code |
-| TASK-0021 | **Employee policy assistant — architecture definition** | **COMPLETE** | WP-0001 COMPLETE, MSG-0054 | 2026-08-21 — 11/11 acceptance criteria, MSG-0055; **accepted by the Architecture Lead (MSG-0056)** | none — ten decisions ruled; **D1, D3, D7, D13 escalated to organizational/operator authority** | Claude Code |
+| TASK-0021 | **Employee policy assistant — architecture definition** | **COMPLETE** | WP-0001 COMPLETE, MSG-0054 | 2026-08-21 — 11/11 acceptance criteria, MSG-0055; **accepted by the Architecture Lead (MSG-0056a)** | none — all fourteen EPA-0003 decisions ruled (MSG-0056a/b); three reconciliation findings resolved by MSG-0058 | Claude Code |
+| TASK-0022 | **Employee policy assistant — work-package definition** | **READY** | TASK-0021 COMPLETE, MSG-0058 DECIDED, MSG-0059 | — | none — definition only; **no implementation task may be marked READY** | Claude Code |
 | TASK-0002 | Make test entry points shell-independent | **ABORTED** | — | 2026-08-19 | none — premise disproven by measurement | — |
 
 **TASK-0019 is COMPLETE (2026-08-21).** It was authorized by MSG-0050, reconciled into this queue in `39eabdb`, and executed by a supervisor-started session on its scheduled 06:37:13Z cycle. It was maintenance/audit work only, not a new product work package.
 
-**No task is READY.**
+**TASK-0022 is READY — the single READY task**, authorized by MSG-0059 and reconciled into this
+board on 2026-08-21. It is **architecture/work-package definition only**: it may not implement,
+select a provider, change Supervisor or security behaviour, or mark any implementation task
+READY. The Architecture Lead must review and accept its output before implementation is
+authorized.
+
+> **The line this replaces, retained:** "**No task is READY.**" True from TASK-0021's completion
+> until MSG-0059 authorized TASK-0022. The note below it records the earlier correction and is
+> kept intact.
 
 > **Corrected 2026-08-21 by TASK-0021.** This line previously read "**No task is READY.** TASK-0019
 > was the last authorized one." That was true when written and stopped being true when MSG-0054
@@ -273,6 +282,9 @@ READY means *authorized to attempt*, never *authorized to force*. A READY task w
 | MSG-0056a | Decision | DECIDED | Architecture lead | Claude Code | **EPA decision ruling.** TASK-0021 accepted as a complete architecture-definition task. Ten decisions ruled: D2 hybrid retrieval, D4 uniform abstention, D5 layered grounding gate (fail closed), D6 empirical normalization with the final rule in an ADR, **D8 external inference prohibited by default**, **D9 separate service outside the kernel** (ADR-0015 does not automatically govern it), D10 single-shot, D11 no historical questions in release 1, D12 grounded-answer contract promoted to an ADR, D14 text-native only. **D1, D3, D7, D13 escalated — the repository lacks the organizational authority to settle them.** No work package, no implementation task, no ADR, no provider selection authorized | 2026-08-21 |
 | MSG-0056b | Decision | DECIDED | Architecture lead | Claude Code | **Employee policy assistant decisions — the four escalated by MSG-0056a, resolved from organizational authority supplied to the lead.** D1: English is the authoritative policy language, Arabic an approved translation; English governs on divergence and the discrepancy is flagged; citations always resolve to English. D3: only privileged users may place documents in the governed flow, upload does not confer authority, the creator must not be sole approver, only approved/published documents are authoritative. D7: session retention by default, administrator-configurable, storage minimized, retained content readable only by the asker. D13: configurable identity modes — Microsoft 365/Entra ID, existing AD/enterprise integration, and optional unauthenticated access for explicitly disclosable information. **No implementation authorized.** Shares a number with MSG-0056a; complementary, not contradictory | 2026-08-21 |
 | MSG-0057 | Record + decision request | **OPEN** | Claude Code | Architecture lead | **Reconciliation of both MSG-0056 rulings.** All fourteen EPA-0003 decisions annotated inline with their source; register, ledger and status reconciled. Three findings need a lead decision before the work package is gated: **F1** the D1 ruling permits answer-time Arabic generation that EPA-0003 recommended prohibiting, so the D5 grounding gate must do cross-language entailment — scope and fallback undefined; **F2** unauthenticated access has zero supporting authority in accepted docs and names a classification value no spec enumerates (recommend deferring); **F3** AD integration must terminate at an OIDC/OAuth2 boundary or ADR-0007 is contradicted. **F4** records a fourth number collision. No task marked READY | 2026-08-21 |
+| MSG-0058 | Decision | DECIDED | Architecture lead | Claude Code | **Rules the three MSG-0057 findings, all as recommended.** F1 cross-language grounding is **in scope and fail-closed** — if the Arabic gate fails the system **abstains**, never silently falling back to English or presenting an unofficial rendering as policy; the Arabic bar is evaluated separately under SPEC-0020. F2 unauthenticated access is **deferred** from the first release; no new trust boundary or classification is introduced. F3 enterprise directory integration **must terminate at the OIDC/OAuth2 boundary** of ADR-0007; direct LDAP/Kerberos implementation is not authorized. F4 preserve the MSG-0056a/b distinction and do not rename historical records. **Gate ruling:** findings sufficiently resolved to proceed to a work-package authorization task; implementation still prohibited | 2026-08-21 |
+| MSG-0059 | Decision | DECIDED | Architecture lead | Claude Code | **TASK-0022 authorized** as the next architecture/work-package definition task. May define scope, gates, acceptance criteria, dependencies, security checkpoints, and the implementation task sequence. **Does not authorize** implementation, provider/model selection, runtime changes, deployment, new permissions, or Supervisor changes, and **no implementation task may be marked READY**. Requires TASK-0022 to be **the single READY task on the board** before the Supervisor may execute it, and the Lead must accept its output before implementation is authorized | 2026-08-21 |
+| MSG-0060 | Record | **OPEN** | Claude Code | Architecture lead | **Queue reconciliation for TASK-0022, and a fifth collision — this time on an executable task specification.** Two TASK-0022 files were committed; they agree on scope, authorization, forbidden list and acceptance gate, so no stop fired, but they differ in content (A carries stop conditions and the recommendations-only constraint; B carries a ten-item outcome list). The queue section carries the **union** and links both; neither was renamed, per MSG-0058 F4. TASK-0022 is now the single READY task | 2026-08-21 |
 | MSG-0051 | Record | CREATED — audit complete | Claude Code | Architecture lead | **TASK-0019 baseline audit.** Six documentary corrections applied with their authorities quoted; four record classes verified already correct; **§C refers seven items for decision**, led by the accepted WP-0001 work package still reading `Status: Ready for implementation` — the stop condition fired and that correction was **not** made | TASK-0019 |
 
 ## Interruption and recovery protocol
@@ -711,3 +723,107 @@ needs to avoid: an architecture invented to fill a silence is harder to unpick t
 The work is documentary. On resumption, re-read MSG-0054 and the specification before continuing,
 and check which sections already exist rather than rewriting them — a half-written architecture
 record is easy to duplicate and hard to reconcile.
+
+---
+
+## TASK-0022 — Employee policy assistant: work-package definition
+
+**Priority:** 1 | **Status:** **READY** | **Owner:** Claude Code
+**Depends on:** TASK-0021 COMPLETE; MSG-0058 DECIDED (F1-F4); MSG-0059 (authorization)
+**Next eligible task:** none — the Architecture Lead must accept this task's output before any implementation task is authorized
+
+**Full specification — TWO files, both authoritative, read BOTH:**
+
+- [`TASK-0022-employee-policy-assistant-work-package-definition.md`](TASK-0022-employee-policy-assistant-work-package-definition.md) — referred to below as **spec A**
+- [`TASK-0022-policy-assistant-work-package-definition.md`](TASK-0022-policy-assistant-work-package-definition.md) — referred to below as **spec B**
+
+> **Why two.** Both were committed by the Architecture Lead on 2026-08-21 (`768300b`, `4fca7fe`) and
+> **they agree** — same scope, same authorization, same forbidden list, same acceptance gate — so this
+> is not a conflict and no stop condition fired. They are not identical in content: spec A carries the
+> stop conditions and the "queue changes as recommendations only" constraint; spec B carries a finer
+> ten-item outcome list. **The requirements below are the union of both.** Neither file was renamed,
+> per the MSG-0058 F4 ruling that historical records are not renamed. Recorded in MSG-0060.
+
+### Objective
+
+Define the bounded post-WP-0001 work package for the Employee Policy Assistant, using the accepted EPA
+architecture decisions (EPA-0001/0002/0003 as ruled by MSG-0056a/b) and the MSG-0058 findings.
+
+**This is architecture/work-package definition only.** It authorizes no implementation.
+
+### Required outputs — the union of both specifications
+
+1. **Work-package scope and boundaries**, covering approved-document management, versioning and
+   supersession; ingestion, normalization, provenance and retrieval contracts; grounded English/Arabic
+   answering with citation and abstention gates; retrieval-time authorization and confidentiality;
+   session-only default retention with configurable retention; authenticated identity via OIDC/OAuth2;
+   auditability and security boundaries; the employee-facing frontend contract; and superseded-policy
+   handling.
+2. **Explicit implementation gates and acceptance criteria**, derived from EPA-0001/EPA-0002/EPA-0003
+   and MSG-0056a/b and MSG-0058.
+3. **A dependency-ordered implementation task sequence**, with security and architecture checkpoints
+   and explicit architecture/operator boundaries.
+4. **Test/acceptance gates and threat-model coverage.**
+5. **Identification of any remaining genuine architecture decisions.** Do **not** invent decisions that
+   are already settled — all fourteen EPA-0003 decisions are ruled, and F1-F4 are ruled by MSG-0058.
+6. **A proposed work-package record and execution queue changes as recommendations only.**
+
+### Binding architecture rulings (MSG-0058, MSG-0059)
+
+- **English is authoritative**; Arabic is an approved translation/access language.
+- **Cross-language grounding is in scope and fail-closed.** If the Arabic grounding gate fails the
+  system must **abstain** — never silently fall back to English, never present an unofficial rendering
+  as policy. The Arabic acceptance bar is evaluated separately under SPEC-0020.
+- **Unauthenticated access is deferred** from the first release; first release requires authenticated
+  identity. No new unauthenticated classification or trust boundary is introduced.
+- **Enterprise directory integration terminates at the OIDC/OAuth2 boundary** required by ADR-0007.
+  Entra ID, AD FS, or an OIDC/OAuth2 broker may front an existing directory. **Direct LDAP/Kerberos
+  authentication implementation is not authorized.**
+- **Only approved/published documents are authoritative sources.**
+- **Session-only conversation retention is the default**, with configurable retention support.
+
+### Forbidden
+
+- No product or runtime implementation.
+- No provider/model selection or external model registration.
+- No changes to accepted ADRs.
+- No new permissions, security boundaries, Supervisor behaviour, or scheduling changes.
+- No credentials or external privileged operations.
+- **No implementation task may be marked READY by this task** — queue changes are recommendations only.
+
+### Verification
+
+The definition is complete only when scope, boundaries, acceptance criteria, dependencies, security
+gates, and the proposed implementation sequence are documented **and reconciled with the governing
+architecture records**. Unresolved decisions must be stated explicitly rather than omitted.
+
+Being documentary, this task produces no test count. Do not report a test result it cannot have; report
+each required output against its evidence instead.
+
+### Documentation
+
+Record the result in `implementation/comms/` as a numbered message, update
+`implementation/status/current.md` and this queue, and write the checkpoint. A completely new session
+must be able to resume from the repository alone.
+
+### Checkpoint
+
+`implementation/operations/checkpoints/TASK-0022.md`. Write each checkpoint **after** an operation is
+verified, never in anticipation of one — the TASK-0021 checkpoint recorded a push as successful before
+it was attempted, and the push was then rejected (BLK-0006).
+
+### Stop conditions
+
+Stop and report through COMMS if repository authority materially conflicts, if a required architecture
+decision is genuinely missing, or if completing the task would require implementation or an
+unauthorized architecture change.
+
+**Also stop if `origin/main` moves mid-run.** BLK-0006 is the precedent: the deliverable was pushed,
+the Architecture Lead pushed concurrently, and the closeout push was rejected. Stopping was correct.
+Record the starting HEAD in checkpoint 1 and re-check it before every push.
+
+### Recovery procedure
+
+The work is documentary. On resumption, re-read MSG-0058, MSG-0059, and **both** specification files
+before continuing, and check which sections already exist rather than rewriting them — a half-written
+architecture record is easy to duplicate and hard to reconcile.
