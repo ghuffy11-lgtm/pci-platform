@@ -124,6 +124,7 @@ Architecture Lead's, and both are now MET for the decisions — see §8.
 | ID | Task | Depends on | Produces | Authority |
 |---|---|---|---|---|
 | **A-ADR** | Draft the required ADR set of §7 | this reconciliation | The ADRs, with numbers allocated by repository convention at drafting time | MSG-0062 §7.2 |
+| ↳ | **EXECUTED as TASK-0024, 2026-08-21 (MSG-0068a/b → MSG-0070).** Delivered **ADR-0017…ADR-0022** as **PROPOSED** drafts in `implementation/decisions/` — one per §7 surface, all six independently judged required. **They are not accepted**; promotion to `docs/decisions/` is the Architecture Lead's. **ADR-0019 is incomplete by design** — D6's normalization rules await the empirical corpus evidence **A-SURVEY** would supply | — | — | — |
 | **A-STACK** | Evaluate and propose the assistant service's concrete implementation stack against `docs/architecture/technology-selection-principles.md` | this reconciliation | A stack proposal; **whether it is recorded as an ADR is that task's question**, not settled here | MSG-0062 §7.7 |
 | **A-SURVEY** | **Bounded, read-only corpus survey** — formats, language mix, scanned-document prevalence, classification/audience patterns, version and supersession characteristics | this reconciliation | Discovery input fixing D6's normalization rules and sizing D14's rejection exposure | MSG-0062 §7.5 |
 
@@ -170,6 +171,22 @@ would be an architecture decision beyond MSG-0062/MSG-0063.
 ---
 
 ## 7. Required ADR sequence — proposed, none created
+
+> **Superseded as current state, 2026-08-21 by TASK-0024 (MSG-0070) — the section below is retained as
+> issued.** "None created" was true when this record was written and stopped being true the same day.
+> **A-ADR has run.** The six surfaces below were each tested independently against the accepted ADR and
+> SPEC set, all six were judged required, and **ADR-0017…ADR-0022 now exist as PROPOSED drafts** in
+> `implementation/decisions/` — in the order this table sequences them.
+>
+> **The observation below was correct and was verified again rather than trusted:** the highest
+> allocated ADR was **ADR-0016**, and ADR-0017…ADR-0022 were confirmed free by a repo-wide search
+> returning only prose references before any file was written.
+>
+> **Two boundaries this record drew still hold.** The drafts are **PROPOSED and carry no architectural
+> authority** — the final call on how many to accept remains the Architecture Lead's, exactly as the
+> "stated so the lead can disagree cheaply" paragraph below intends, and MSG-0070 §4 supplies the
+> counter-argument for surface 4. **No accepted ADR was modified or duplicated.** **A-STACK and
+> A-SURVEY remain unauthorized**, and no seventh surface was added.
 
 **MSG-0062 §7.2:** create only the ADRs required to make the accepted architecture enforceable before
 production use — the grounded-answer contract, and any new service-boundary/security decisions not

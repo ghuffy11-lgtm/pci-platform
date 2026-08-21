@@ -2,7 +2,13 @@
 
 **Active Work Package:** WP-0001 — PCI Kernel Foundation
 **Status:** **COMPLETE** — declared by the architecture lead 2026-08-19 (MSG-0020(b), resolved by MSG-0022 / MSG-0023, TASK-0009)
-**Last Updated:** 2026-08-21 UTC (**TASK-0023 COMPLETE** — WP-0009 allocated, MSG-0066; **MSG-0067** rules the carried-forward items; **MSG-0068 authorizes TASK-0024 (A-ADR)**, reconciled into the queue as the single READY task — MSG-0069; Supervisor re-enabled and live)
+**Last Updated:** 2026-08-21 UTC (**TASK-0024 COMPLETE** — **ADR-0017…ADR-0022 drafted as PROPOSED**, MSG-0070; no accepted ADR modified; **no task is READY**, the boundary is the Architecture Lead's acceptance of the drafts)
+
+> **The line this replaces, retained:** "2026-08-21 UTC (**TASK-0023 COMPLETE** — WP-0009 allocated,
+> MSG-0066; **MSG-0067** rules the carried-forward items; **MSG-0068 authorizes TASK-0024 (A-ADR)**,
+> reconciled into the queue as the single READY task — MSG-0069; Supervisor re-enabled and live)."
+> True until TASK-0024 executed later the same day — started by the Supervisor's 19:27:19Z cycle, the
+> next one after that reconciliation was pushed.
 
 > **The line this replaces, retained:** "2026-08-21 UTC (**EPA-0004 ACCEPTED** by MSG-0062 with all
 > seven items ruled; **MSG-0063 authorizes TASK-0023**, reconciled into the queue as the single READY
@@ -55,7 +61,14 @@ The execution-control system (Phase 0, MSG-0010):
 Every session reads the roadmap and queue at startup and executes the highest-priority READY task,
 continuing automatically through authorized work rather than stopping after each subtask.
 
-**Current task: TASK-0019 — the post-WP-0001 repository baseline audit, authorized by MSG-0050 and
+> **Corrected 2026-08-21 by TASK-0024 — additive and declared.** The sentence below opened "**Current
+> task: TASK-0019**", which was true when written and has been stale since TASK-0021. The task table
+> immediately below already showed TASK-0021 through TASK-0024 COMPLETE, so this file contradicted
+> itself within a few hundred words — the defect Rule 12 exists to catch. **The most recent task is
+> TASK-0024 (COMPLETE, MSG-0070), and no task is READY.** The historical account of TASK-0019 is
+> retained unchanged because it is still the record of what that task did.
+
+**TASK-0019 — the post-WP-0001 repository baseline audit, authorized by MSG-0050 and
 executed 2026-08-21 by a supervisor-started session.** TASK-0001 and TASK-0003 through TASK-0018 are
 COMPLETE. TASK-0003
 was authorized by MSG-0027, executed on 2026-08-20 by a supervisor-started session, and completed
@@ -89,6 +102,7 @@ message on 2026-08-20 under MSG-0041 (MSG-0042) — the fifth.
 | TASK-0021 | Employee policy assistant — architecture definition | **COMPLETE** (2026-08-21) — 11/11 criteria, MSG-0055 | WP-0001 COMPLETE, MSG-0054 ✅ | Claude Code |
 | TASK-0022 | Employee policy assistant — work-package definition | **COMPLETE** (2026-08-21) — `EPA-0004` delivered as PROPOSED, MSG-0061 | TASK-0021, MSG-0058, MSG-0059 ✅ | Claude Code |
 | TASK-0023 | EPA work-package governance reconciliation | **COMPLETE** (2026-08-21) — 7/7 criteria, **WP-0009 allocated**, MSG-0066 | TASK-0022, MSG-0062, MSG-0063 ✅ | Claude Code |
+| TASK-0024 | A-ADR — draft the required EPA ADR set | **COMPLETE** (2026-08-21) — 8/8 criteria, **ADR-0017…ADR-0022 drafted PROPOSED**, MSG-0070 | TASK-0023, MSG-0062, MSG-0067, MSG-0068 ✅ | Claude Code |
 | TASK-0002 | Make test entry points shell-independent | **ABORTED** | — | — |
 
 **No task is READY** — but the reason has changed. The project now sits at an **architecture decision
@@ -101,7 +115,62 @@ boundary**, not at an empty queue.
 > been executed and is COMPLETE (MSG-0055). MSG-0051 §C is fully discharged: C1–C5 by MSG-0052,
 > C6–C7 by MSG-0053.
 
-**Current position, 2026-08-21 after TASK-0023: no task is READY, and the boundary is authorization —
+**Current position, 2026-08-21 after TASK-0024: no task is READY, and the boundary is acceptance —
+six ADR drafts exist and none of them carries authority yet.**
+
+TASK-0024 executed the **A-ADR** architecture task under MSG-0068a/b and delivered **six PROPOSED ADR
+drafts** in [`../decisions/`](../decisions/README.md), one for each WP-0009 §7 surface: **ADR-0017**
+Grounded Answer Contract · **ADR-0018** Approved Document Authority and Lifecycle · **ADR-0019**
+Bilingual Policy Semantics · **ADR-0020** Retrieval Projection and Index Boundary · **ADR-0021**
+Employee Question Privacy and Retention · **ADR-0022** Inference Locality and Provider Boundary. All
+eight acceptance criteria are met, each mapped to evidence in **MSG-0070** §2. Being documentary it
+produced **no test count and claims none**.
+
+**The drafts are PROPOSED and carry no architectural authority.** Claude Code does not accept
+architecture; promotion to `docs/decisions/` is the Architecture Lead's act. ADR-0015 and ADR-0016 are
+the precedent — each was drafted PROPOSED in `implementation/decisions/` and promoted with a
+`Supersedes:` line. Numbers were still allocated at drafting time, as the task required, and
+**verified collision-free against the actual repository state** before anything was written:
+`docs/decisions/` holds ADR-0001…ADR-0016 with no gaps, and a repo-wide grep for ADR-0017…ADR-0029
+returned only prose references. **No accepted ADR was modified, duplicated, renamed, or deleted** —
+evidenced by a pre-commit `git status --porcelain` carrying no path under `docs/decisions/`.
+
+**The judgment was made independently rather than inherited.** WP-0009 §7 marks all six surfaces
+REQUIRED and explicitly invites disagreement; the task treated that as a hypothesis and tested each
+surface against the accepted ADR set, read in full. All six survived for one structural reason: each
+rests on a ruling that is **stricter than, or wholly absent from, the accepted set**, and each of those
+rulings lives **only in a COMMS message** — which is not an authority tier under CLAUDE.md. The
+bilingual surface is the starkest: searching all sixteen accepted ADRs for language, Arabic, bilingual,
+i18n or localization returns two hits, and both are about programming languages.
+
+**Surface 4 was the close call, and the counter-argument is recorded rather than hidden** (MSG-0070 §4).
+SPEC-0013 already requires authorization before results enter application or AI context — but that
+wording *permits* retrieving into the application and filtering, which is exactly the shape MSG-0062
+§7.6 forbids, and no accepted specification names the timing or result-count channels. If the lead
+disagrees with any of the six, ADR-0020 is the one to reject, and the argument for doing so is written
+into the record.
+
+**Two things were deliberately not done.** **ADR-0019 does not contain the Arabic normalization rules** —
+MSG-0056a D6 requires them determined empirically against a corpus nobody has surveyed, so the draft
+records the obligation and three constraints that hold regardless (raw text immutable; ingestion and
+query normalization identical; the rule set versioned) and states plainly that it **must be amended
+before production use**. D6 is therefore partially discharged, disclosed rather than papered over.
+**No task was marked READY**, including A-STACK and A-SURVEY.
+
+**One finding, and it resolves a tension rather than raising one** (MSG-0070 §7). EPA-0001 §7.3 and
+EPA-0004 §11.6 both summarize the accepted classification standard as forbidding Restricted content in
+model context *absolutely*. The accepted text is conditional — *"unless specifically designed for that
+data class and protected accordingly"* — and reading it in full is what makes **MSG-0062 §7.6**
+consistent with accepted authority instead of in conflict with it. No stop condition arose. One
+obligation inside that carve-out is easy to lose and is recorded in ADR-0020 §6: **the prohibition on
+Restricted data in *logs* carries no authorization exception.**
+
+> **Superseded — corrected 2026-08-21 by TASK-0024.** The paragraph below was the position after
+> TASK-0023 and was true until TASK-0024 executed the same day. The authorization boundary it describes
+> has been passed: MSG-0068 named A-ADR, and A-ADR has run. **Implementation is still prohibited** —
+> that part did not change, and WP-0009 still reads `DEFINED — NOT AUTHORIZED FOR IMPLEMENTATION`.
+
+**Position after TASK-0023 (superseded, retained): no task is READY, and the boundary is authorization —
 the governance is now in place and the next bounded task is the Architecture Lead's to name.**
 
 TASK-0023 executed the MSG-0063 reconciliation and delivered
@@ -697,6 +766,7 @@ visible; it does not make it self-clearing.
 | MSG-0048 | Architecture decision: authorize TASK-0018 live heartbeat validation | **DECIDED** — executed; see MSG-0049 |
 | MSG-0049 | TASK-0018 verification record — `RUNNER_RUNNING` **observed live** | **CLOSED** — gate 3 met by external observation; all five gates MET |
 | MSG-0050 | Architecture decision: authorize TASK-0019 post-WP-0001 baseline audit | **DECIDED** — executed; see MSG-0051 |
+| MSG-0070 | TASK-0024 execution record — **the EPA ADR set is drafted** | **RECORD** — 8/8 acceptance criteria; **ADR-0017…ADR-0022 created as PROPOSED**, no accepted ADR modified, no task marked READY; **§9 asks the lead to accept, amend or reject the six drafts** and to rule on ADR-0019's normalization gap |
 | MSG-0066 | TASK-0023 execution record — EPA governance reconciled, **WP-0009** allocated | **RECORD** — 7/7 acceptance criteria; no ADR created, no task marked READY; **no decision requested** |
 | MSG-0055 | TASK-0021 execution record — employee policy assistant architecture definition | **RECORD** — 11/11 criteria met; **§5 lists fourteen decisions requiring the architecture lead**; none self-authorized |
 | MSG-0054 | Employee policy assistant architecture objective | **DECIDED** — TASK-0021 authorized as architecture definition only; executed, see MSG-0055 |
