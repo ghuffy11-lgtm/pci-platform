@@ -1,6 +1,6 @@
 # EPA-0003 — Employee Policy Assistant: Required Architecture-Lead Decisions
 
-**Status:** **OPEN — fourteen decisions required**
+**Status:** **ALL FOURTEEN RULED** 2026-08-21 — D2, D4, D5, D6, D8, D9, D10, D11, D12, D14 by MSG-0056a; D1, D3, D7, D13 by MSG-0056b (organizational authority). Each decision below carries its ruling inline. **Three reconciliation findings are open: MSG-0057 F1-F3.** No implementation, work package, or ADR is authorized.
 **Produced by:** TASK-0021 (definition only) | **Authority:** MSG-0054
 **Date:** 2026-08-21
 **Companions:** [`EPA-0001`](EPA-0001-employee-policy-assistant-architecture.md) (architecture) · [`EPA-0002`](EPA-0002-proposed-work-package-and-gates.md) (proposed work package)
@@ -51,6 +51,8 @@ others but constrain hardware and offline operation.
 
 ## D1 — Bilingual policy authority model
 
+**RULED 2026-08-21 — MSG-0056b.** English is the authoritative policy language; Arabic is an approved translation/accessibility language, never an independent authority. Where the texts differ in meaning **English governs and the discrepancy must be flagged, not silently resolved**. Employees may ask and be answered in either language, and Arabic answers may be generated from the authoritative English policy, but the cited authority remains English. This is M2 for authority — and it **permits at answer time what this record recommended prohibiting** (M3 for the answer text). The lead is entitled to rule against a recommendation; the consequence for the grounding gate is recorded in **MSG-0057 F1**.
+
 **Question.** When a policy exists in English and Arabic, which text is authoritative, and may a
 translation ever be cited as policy?
 
@@ -84,6 +86,8 @@ claims**. A translation may be shown as an aid, clearly labelled, never as the c
 
 ## D2 — Retrieval strategy and cross-language approach
 
+**RULED 2026-08-21 — MSG-0056a.** Adopt this record's recommendation provisionally: hybrid lexical + semantic retrieval, multilingual local embeddings, one projection index, separate acceptance bars per language under SPEC-0020. Final cross-language semantics remain conditioned on D1.
+
 **Question.** How does an Arabic question retrieve English-authored policy, and vice versa?
 
 **Why it cannot be inferred.** The approaches differ materially in accuracy, hardware cost, and — the
@@ -109,6 +113,8 @@ evaluation with a recorded rollback path.
 ---
 
 ## D3 — Approval authority and audience/classification assignment
+
+**RULED 2026-08-21 — MSG-0056b.** Only users with the required privilege may place documents into the governed policy-management flow, and **upload does not itself confer authority**. Authorized personnel approve/publish and assign audience and classification; **the creator must not be the sole approver of their own policy**. Only approved/published documents are authoritative sources for employee answers.
 
 **Question.** Who may move a document version to APPROVED/PUBLISHED, who assigns its audience and
 data classification, and how is that authority represented and reviewed?
@@ -146,6 +152,8 @@ retrieved and then suppressed — an exclusion cannot fail open.
 
 ## D4 — Abstention distinguishability
 
+**RULED 2026-08-21 — MSG-0056a.** Option (a), the safe uniform model: "not authorized" and "no policy" are indistinguishable, **including timing and result-count side channels**.
+
 **Question.** May an employee tell "no approved policy covers this" (A1) from "a policy covers this
 but you may not see it" (A2)?
 
@@ -175,6 +183,8 @@ for the acceptance gates.
 ---
 
 ## D5 — Grounding-gate mechanism
+
+**RULED 2026-08-21 — MSG-0056a.** Option (c), layered structural + model-assisted entailment, **fail closed**. Model selection and evaluation must use SPEC-0020 with per-language acceptance bars. Extractive-only remains an acceptable future hardening, not the current architecture requirement.
 
 **Question.** How is "every policy claim is supported by cited evidence" (EPA-0001 §5.3) actually
 verified before an answer reaches the employee?
@@ -211,6 +221,8 @@ closed** — if it cannot complete, the response is an abstention.
 
 ## D6 — Arabic text normalization rules
 
+**RULED 2026-08-21 — MSG-0056a.** Normalization rules are **not frozen now**; the work package may determine them empirically against the real corpus, with raw authoritative text immutable and ingestion/query projections identical. The final rule must be recorded in an ADR before production use.
+
 **Question.** What normalization is applied to Arabic text at ingestion and query time?
 
 **Why it cannot be inferred.** Arabic normalization choices are lossy and directly determine
@@ -234,6 +246,8 @@ during the work package with the outcome recorded in an ADR.
 ---
 
 ## D7 — Question-text retention and access to the question log
+
+**RULED 2026-08-21 — MSG-0056b.** Questions and answers are retained **for the session by default**, with an administrator-configurable retention period (session-only, or a defined period such as one week) that must not require architectural redesign. Storage is minimized and abusive or meaningless queries must not create indefinite retention. Security/audit records may carry separate retention. **Retained conversation content is readable only by the employee who asked it**; administrative and audit access is governed separately.
 
 **Question.** Is the employee's question text retained; for how long; and who may read it?
 
@@ -260,6 +274,8 @@ rather than opinionated here, because the correct answer is jurisdictional.
 
 ## D8 — External model provider
 
+**RULED 2026-08-21 — MSG-0056a.** External inference is **prohibited by default and for the initial implementation**. Any future exception requires a dedicated ADR, an explicit deployment switch, classification controls, and audit of egress.
+
 **Question.** May any deployment ever route inference to an external provider?
 
 **Why it cannot be inferred.** Constitution principle 1 (customer data ownership) and ADR-0005
@@ -277,6 +293,8 @@ and a deployment-level switch that is off unless deliberately enabled.
 ---
 
 ## D9 — Deployment shape
+
+**RULED 2026-08-21 — MSG-0056a.** A **separate policy-assistant service outside the PCI kernel**, reusing kernel contracts and the existing `/data/docker` persistence boundary. **ADR-0015's kernel stack does not automatically govern the new service.**
 
 **Question.** Is this a new service alongside the kernel, or an extension of the kernel service?
 
@@ -299,6 +317,8 @@ connectors, or UI", so this is a genuine choice rather than a settled one).
 
 ## D10 — Single-shot vs multi-turn
 
+**RULED 2026-08-21 — MSG-0056a.** First release is **single-shot**, with bounded clarification only. Evidence is re-retrieved and re-authorized for every turn and is **never inherited**.
+
 **Question.** Is each question independent, or does the assistant hold conversation?
 
 **Why it cannot be inferred.** The objective describes answering questions; it does not describe a
@@ -318,6 +338,8 @@ re-authorized from scratch on every turn** and never inherited.
 
 ## D11 — Historical and temporal questions
 
+**RULED 2026-08-21 — MSG-0056a.** Out of scope for the first release. Effective-date and supersession data must be preserved so a later capability needs no migration, and any future historical answer must be conspicuously labelled.
+
 **Question.** May an employee ask what policy applied at a past date, retrieving a SUPERSEDED version?
 
 **Why it cannot be inferred.** The objective says "approved organizational policy", which naturally
@@ -335,6 +357,8 @@ historical answer is worse than no answer, because it is correct-looking and act
 ---
 
 ## D12 — Where the strict grounded-answer contract lives
+
+**RULED 2026-08-21 — MSG-0056a.** Promotion of the strict grounded-answer contract to an architecture decision is **accepted**. The ADR number is allocated during architecture drafting; **no ADR was created by that message**.
 
 **Question.** EPA-0001 §5 is **stricter** than SPEC-0015. Should it become an accepted ADR binding
 future PCI capabilities, or remain scoped to this one?
@@ -354,6 +378,8 @@ retrieved content faces the same failure mode.
 ---
 
 ## D13 — Identity provider: an unmet prerequisite
+
+**RULED 2026-08-21 — MSG-0056b.** Configurable identity modes: Microsoft 365 / Microsoft Entra ID; existing Active Directory / enterprise identity integration; and **optional unauthenticated access**, permitted only for information explicitly classified safe for unauthenticated disclosure. Authentication is required whenever access depends on identity, role, department, or permissions. Identity integration is a configurable deployment capability rather than a separate product architecture. **This introduces an access mode and a classification value that no accepted document defines** — see **MSG-0057 F2**, and **F3** for the ADR-0007 constraint on Active Directory integration.
 
 **Question.** Which OIDC identity provider serves employee authentication, and when is it deployed?
 
@@ -378,6 +404,8 @@ package or its first task.
 ---
 
 ## D14 — Supported document classes and OCR
+
+**RULED 2026-08-21 — MSG-0056a.** **Text-native documents only** for the first release; scanned and OCR-dependent documents are **rejected rather than treated as authoritative**. OCR is revisited only with corpus evidence and a separate architecture decision.
 
 **Question.** Which document formats are ingested, and is OCR of scanned documents in scope?
 
@@ -423,14 +451,23 @@ D13's deployment prerequisite rather than to any change in the decision itself.
 
 ## What is blocked until these are answered
 
-**All of it.** EPA-0002 proposes a work package; MSG-0053 C7 and MSG-0054 are both explicit that no
-work package is authorized. Beyond that formal position, the substantive dependencies are real:
+**Superseded 2026-08-21 — all fourteen are now answered.** The dependency analysis below is
+retained because it still describes what each decision unblocks, but no decision in it remains
+open. What blocks the work package now is not a decision: MSG-0056b states that **no
+implementation task is READY or authorized**, and that the next Architecture Lead action is to
+reconcile these rulings and then judge whether the architecture is sufficiently resolved to
+authorize the next task. Three reconciliation findings (MSG-0057 F1-F3) belong to that judgement.
 
-- **D1, D3, D13** block essentially everything — without them there is no defined notion of an
-  approved document, an authorized subject, or an authoritative language.
-- **D5** blocks the answer path, which is the capability itself.
-- **D2, D6, D14** block ingestion and index design, and constrain hardware sizing.
-- **D4, D7, D10, D11, D12** shape surfaces and contracts but do not block the foundation, and could be
-  answered after the work package starts if the lead prefers to sequence them that way.
+> **The original text, retained:**
 
-A definition task can go no further than this. The next move is the architecture lead's.
+> **All of it.** EPA-0002 proposes a work package; MSG-0053 C7 and MSG-0054 are both explicit that no
+> work package is authorized. Beyond that formal position, the substantive dependencies are real:
+
+> - **D1, D3, D13** block essentially everything — without them there is no defined notion of an
+>   approved document, an authorized subject, or an authoritative language.
+> - **D5** blocks the answer path, which is the capability itself.
+> - **D2, D6, D14** block ingestion and index design, and constrain hardware sizing.
+> - **D4, D7, D10, D11, D12** shape surfaces and contracts but do not block the foundation, and could be
+>   answered after the work package starts if the lead prefers to sequence them that way.
+
+> A definition task can go no further than this. The next move is the architecture lead's.

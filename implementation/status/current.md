@@ -2,7 +2,7 @@
 
 **Active Work Package:** WP-0001 — PCI Kernel Foundation
 **Status:** **COMPLETE** — declared by the architecture lead 2026-08-19 (MSG-0020(b), resolved by MSG-0022 / MSG-0023, TASK-0009)
-**Last Updated:** 2026-08-21 UTC (MSG-0056 — architecture lead EPA ruling; BLK-0006 resolved; TASK-0021 accepted)
+**Last Updated:** 2026-08-21 UTC (MSG-0056b — the four escalated decisions answered; all fourteen EPA-0003 decisions RULED; MSG-0057 raises three reconciliation findings)
 
 ## Current State
 
@@ -268,7 +268,7 @@ SPEC-0016's notification templates. Everything else in the definition instantiat
 SPEC-0011/0013/0014/0015/0031, ADR-0016 and ADR-0003 under a stricter contract, and EPA-0001 §12 names
 the five things that are genuinely new so review effort lands where it belongs.
 
-**MSG-0056 — the ruling on all of it (2026-08-21).** The Architecture Lead **accepted TASK-0021 as a
+**MSG-0056a — the first ruling (2026-08-21).** The Architecture Lead **accepted TASK-0021 as a
 complete architecture-definition task** and ruled ten of the fourteen EPA-0003 decisions: D2, D4, D5,
 D6, D8, D9, D10, D11, D12, D14. Two are worth naming here because they narrow the architecture
 sharply — **D8 prohibits external inference by default**, so the first implementation stays local
@@ -284,8 +284,55 @@ and classification; D7 is question retention and identity-linked access, a priva
 question; D13 is the identity provider, which also needs a privileged deployment action. See
 **Next Action** for who must answer each.
 
-**Nothing became executable.** MSG-0056 authorizes no work package, no implementation task, no ADR,
+**Nothing became executable under MSG-0056a.** It authorizes no work package, no implementation task, no ADR,
 no provider selection, no document ingestion, and no change to Supervisor or security behaviour.
+
+**MSG-0056b — the four escalated decisions, answered (2026-08-21).** The organization supplied the
+authority and the Architecture Lead ruled all four the same day:
+
+- **D1 — bilingual authority.** **English is the authoritative policy language**; Arabic is an
+  approved translation and accessibility language, never an independent authority. Where the two
+  differ in meaning, **English governs and the discrepancy must be flagged rather than silently
+  resolved**. Employees may ask and be answered in either language; citations always resolve to the
+  English text.
+- **D3 — approval authority.** Only privileged users may place documents into the governed flow, and
+  **upload does not itself confer authority**. Authorized personnel approve/publish and assign
+  audience and classification, and **the creator must not be the sole approver of their own policy**.
+- **D7 — question retention.** Session retention by default, administrator-configurable (session-only
+  or a defined period), storage minimized, and **retained conversation content readable only by the
+  employee who asked it**. Security and audit records are governed separately.
+- **D13 — identity.** Configurable modes rather than a single product choice: Microsoft 365 / Entra
+  ID, existing Active Directory / enterprise integration, and **optional unauthenticated access**
+  limited to information explicitly classified safe for unauthenticated disclosure.
+
+**All fourteen EPA-0003 decisions are now RULED**, each annotated inline in the record with the
+message that ruled it. **Nothing became executable**: MSG-0056b is explicit that no implementation
+task is READY or authorized.
+
+**MSG-0057 — the reconciliation, and three findings (2026-08-21, OPEN).** Reconciling the rulings
+against the accepted documents surfaced three consequences the rulings imply but do not state. None
+contradicts accepted authority; none is a stop condition; all three need an answer before the work
+package can be gated:
+
+- **F1 — cross-language grounding.** The D1 ruling permits generating Arabic answers from English
+  policy, which is what EPA-0003 recommended prohibiting for policy claims. That is the lead's call —
+  a recommendation is not authority — but the D5 grounding gate must now judge whether an **Arabic
+  answer is entailed by an English source**, and the structural layer largely stops working across a
+  translation boundary. Scope and failure behaviour are undefined.
+- **F2 — unauthenticated access.** Verified by search: **zero** occurrences of "unauthenticated" or
+  "anonymous" anywhere in `docs/decisions/`, `docs/specifications/`, or `docs/architecture/`. EPA-0001
+  presumes an authenticated subject throughout, and the classification value the ruling names is not
+  enumerated by any accepted spec, though SPEC-0013/0015 both require classification to be enforced.
+  **Recommended: defer it** — it is the one part of D13 that adds a trust boundary rather than
+  configuring an existing one.
+- **F3 — Active Directory and ADR-0007.** Accepted ADR-0007 requires OIDC/OAuth2 flows and forbids
+  PCI implementing authentication. AD integration is compatible **through an OIDC boundary** (AD FS,
+  Entra, a broker) and incompatible as a direct LDAP/Kerberos bind. The compatible reading is almost
+  certainly intended; it needs confirming rather than assuming.
+
+**F4** records a fourth message-number collision: two different files both claim MSG-0056. They
+complement rather than contradict, so no stop was warranted; they are disambiguated throughout as
+**MSG-0056a** and **MSG-0056b**, and neither was renumbered.
 
 **MSG-0052 applied (2026-08-21).** The Architecture Lead ruled on the TASK-0019 audit referrals:
 C1 — the accepted WP-0001 work package now reads `Status: COMPLETE`, closing the last conflict
@@ -294,8 +341,16 @@ carry explicit supersession notes, with no supervisor behaviour, permission, or 
 C4 and C5 — no action, deliberately. **C6 (a bounded proof of MSG-0049 option B) and C7 (the next
 work package) remain the Lead's to decide and are not self-authorized.**
 
-**No message carries `Status: OPEN`.** The four that did — MSG-0044, MSG-0045, MSG-0047, MSG-0049 —
-are all settled and closed as of 2026-08-21:
+**One message carries `Status: OPEN`: MSG-0057**, raised 2026-08-21 by this reconciliation. Its
+three findings (F1 cross-language grounding, F2 unauthenticated access, F3 the ADR-0007 boundary
+on Active Directory) are decisions for the architecture lead, and it is deliberately left OPEN
+until they are ruled.
+
+> **The line this replaces, retained:** "**No message carries `Status: OPEN`.**" That was true
+> from the TASK-0016 reconciliation until MSG-0057 was raised. The four that had been open —
+> MSG-0044, MSG-0045, MSG-0047, MSG-0049 — remain closed, as the table below records.
+
+**Those four are all settled and closed as of 2026-08-21:**
 
 | ID | How it closed |
 |---|---|
@@ -768,56 +823,68 @@ both tables index it, and both were updated in the same commit as the record.
 
 ## Next Action
 
-**Nothing is READY and nothing is blocked. The next move belongs to the organization, not to the
-architecture lead and not to Claude.**
+**All fourteen EPA-0003 decisions are ruled. Nothing is READY, and the next move is the architecture
+lead's judgement call — explicitly reserved to them by MSG-0056b.**
 
-**MSG-0056 (2026-08-21) accepted TASK-0021 and ruled ten of the fourteen EPA-0003 decisions.**
-Settled now: **D2** hybrid retrieval with per-language acceptance bars; **D4** the safe uniform
-abstention model, side-channels included; **D5** layered structural + model-assisted entailment,
-fail closed; **D6** normalization determined empirically, with the final rule recorded in an ADR
-before production; **D8** external inference prohibited by default; **D9** a separate service outside
-the kernel reusing kernel contracts and `/data/docker`; **D10** single-shot with evidence
-re-retrieved and re-authorized every turn; **D11** historical questions out of first release;
-**D12** the grounded-answer contract promoted to an architecture decision, number allocated later;
-**D14** text-native documents only, scanned/OCR rejected rather than trusted.
+MSG-0056b states it directly: *"No implementation task is READY or authorized by this message. The
+next Architecture Lead action is to reconcile these rulings with EPA-0003, MSG-0055, the COMMS
+register, and the execution queue, then determine whether the remaining architecture decisions are
+sufficiently resolved to authorize the next architecture/work-package task."*
 
-### The four that need the organization
+**The reconciliation half is done** (MSG-0057): every decision is annotated inline in EPA-0003 with
+the message that ruled it, and the register, ledger and this board agree. **The determination half is
+not Claude's to make and has not been made.**
 
-These are deliberately unresolved because **the repository does not contain the authority to settle
-them, and the architecture lead must not invent it.** Each needs a named human with the standing to
-decide:
+### What the lead needs to decide
 
-| | Decision | Who must answer |
-|---|---|---|
-| **D1** | Are English and Arabic policy texts **parallel authoritative versions**, or is one authoritative and the other a reference translation? Machine translation must not be treated as policy authority absent an explicit ruling. | Policy owner |
-| **D3** | Who may **approve and publish** policy; who assigns audience and classification; may Restricted documents enter the corpus at all? | Policy owner / information owner |
-| **D7** | **Retention of and identity-linked access to employee questions** — a jurisdictional and privacy question. | Policy owner / legal |
-| **D13** | **Which OIDC identity provider**, and its deployment. An unmet prerequisite, not a preference: every authorization control presumes an authenticated employee with roles and scope. | Operator (privileged action required) |
+1. **Rule F1, F2 and F3** (MSG-0057) — three consequences the rulings imply but do not state:
+   - **F1** — is cross-language grounding (Arabic answer, English source) in scope for the first
+     release, and what does an employee see when the Arabic gate fails but English would have passed?
+   - **F2** — is unauthenticated access in scope, or deferred? If in scope, which classification
+     scheme defines "safe for unauthenticated disclosure", and who assigns it? **Recommended: defer.**
+   - **F3** — confirm directory integration terminates at an OIDC/OAuth2 boundary, or amend ADR-0007
+     by ADR if a direct bind is intended.
+2. **Determine whether the architecture is now sufficiently resolved** to authorize the next task.
+3. **If it is, authorize that task and allocate the work-package identifier** — `EPA-0002`
+   deliberately allocates none, because `docs/program/work-packages.md` already lists a WP-0002
+   (MSG-0055 §7.1).
+4. **Allocate the D12 ADR number** during architecture drafting, per MSG-0056a.
 
-**D13 additionally requires a privileged deployment action on the host**, so it cannot be satisfied by
-a decision alone.
+### What remains prohibited
 
-### What is explicitly NOT authorized meanwhile
+No work package, implementation task, ADR, provider selection, or document ingestion is authorized,
+and no Supervisor or security behaviour may change. Everything under `implementation/architecture/`
+stays **PROPOSED** until the lead accepts it.
 
-MSG-0056 is unambiguous: **no post-WP-0001 work package is authorized, and no implementation task is
-READY.** Claude must not create ADRs, implement the service, select a provider, ingest real
-documents, or change Supervisor or security behaviour under this ruling. Everything under
-`implementation/architecture/` remains **PROPOSED**.
+**A task becomes executable only when it appears as READY on the queue board** — the structural
+finding MSG-0044 recorded, which has now recurred five times. The Supervisor reads
+`CLAUDE-TASKS.md` and nothing else; an authorization recorded only in a message is invisible to it and
+produces a silent, indefinite idle.
 
-Once D1, D3, D7 and D13 are answered, the architecture lead finalizes the remaining architecture,
-creates and accepts the ADR set, authorizes the work package, and derives implementation tasks in
-dependency order.
-
-**The Supervisor will correctly remain idle until then.** That is the intended state at a decision
-boundary, not a stall — and with the Windows `Schedule` service currently stopped by the operator,
-even its ten-minute cadence is inert until that service is restarted.
+**The Supervisor is correctly idle** at `NOOP: no READY task`. Note that the Windows `Schedule`
+service was stopped by the operator on 2026-08-21, so its ten-minute cadence is inert until that
+service is restarted; until then, cycles run only when triggered manually.
 
 ---
 
-**Historical — the position after TASK-0021 and before MSG-0056, retained.** The text below asked the
+**Historical — the position between MSG-0056a and MSG-0056b, retained.** The text below asked the
+organization to answer D1, D3, D7 and D13. **All four were answered the same day** by MSG-0056b and
+the table is kept as the record of what was asked and of whom.
+
+> **The four that needed the organization.** D1 — are English and Arabic parallel authoritative
+> versions, or is one a reference translation? (policy owner). D3 — who approves and publishes policy,
+> and who assigns audience and classification? (policy/information owner). D7 — retention of and
+> identity-linked access to employee questions (policy owner / legal). D13 — which OIDC identity
+> provider, plus the privileged deployment action (operator). D13 was noted as the only one that could
+> not be satisfied by a decision alone.
+
+---
+
+**Historical — the position after TASK-0021 and before MSG-0056a, retained.** The text below asked the
 architecture lead to accept EPA-0001 and rule the fourteen decisions. Items 1, 2 and 4 are now
-discharged by MSG-0056; item 3 (work package authorization) is explicitly deferred until D1/D3/D7/D13
-are resolved. Retained because it records what was asked, not deleted because it was answered.
+discharged by MSG-0056a; item 3 (work package authorization) was deferred until D1/D3/D7/D13 were
+resolved, which MSG-0056b then did. Retained because it records what was asked, not deleted because
+it was answered.
 
 > **TASK-0021 delivered the employee policy assistant architecture definition on 2026-08-21
 > (MSG-0055).** It is a definition, not a design of record. What was requested: (1) accept, amend or
