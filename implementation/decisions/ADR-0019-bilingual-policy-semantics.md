@@ -1,7 +1,8 @@
 # ADR-0019 — Bilingual Policy Semantics (English / Arabic)
 
-**Status:** **PROPOSED** — carries no architectural authority until the Architecture Lead promotes it to
-`docs/decisions/`
+**Status:** **ACCEPTED** by MSG-0071 (2026-08-21) — **awaiting promotion** to `docs/decisions/`.
+The decision is made; this copy carries no architectural authority until the promoted record exists.
+**MSG-0071 accepts this as a bounded decision: the Arabic normalization rules remain deliberately incomplete and must be established from empirical corpus evidence before production use. No invented normalization rules are authorized.**
 **Date:** 2026-08-21
 **Proposed by:** Claude Code — TASK-0024 (A-ADR), under MSG-0068a and MSG-0068b
 **Work package:** WP-0009 — Employee Policy Assistant

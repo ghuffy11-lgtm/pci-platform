@@ -2,7 +2,7 @@
 
 **Active Work Package:** WP-0001 — PCI Kernel Foundation
 **Status:** **COMPLETE** — declared by the architecture lead 2026-08-19 (MSG-0020(b), resolved by MSG-0022 / MSG-0023, TASK-0009)
-**Last Updated:** 2026-08-21 UTC (**TASK-0024 COMPLETE** — **ADR-0017…ADR-0022 drafted as PROPOSED**, MSG-0070; no accepted ADR modified; **no task is READY**, the boundary is the Architecture Lead's acceptance of the drafts)
+**Last Updated:** 2026-08-21 UTC (**TASK-0024 COMPLETE** — ADR-0017…0022 drafted, MSG-0070; **MSG-0071 accepts all six**; **five await promotion to `docs/decisions/` — MSG-0072, decision required**; no task READY)
 
 > **The line this replaces, retained:** "2026-08-21 UTC (**TASK-0023 COMPLETE** — WP-0009 allocated,
 > MSG-0066; **MSG-0067** rules the carried-forward items; **MSG-0068 authorizes TASK-0024 (A-ADR)**,
@@ -552,11 +552,21 @@ carry explicit supersession notes, with no supervisor behaviour, permission, or 
 C4 and C5 — no action, deliberately. **C6 (a bounded proof of MSG-0049 option B) and C7 (the next
 work package) remain the Lead's to decide and are not self-authorized.**
 
-**Four messages carry `Status: OPEN`, all informational and none blocking — verified 2026-08-21 by
-reading each file's own status line: MSG-0060** (the TASK-0022 queue reconciliation, whose
-observation about task-specification collisions the lead has not yet addressed), **MSG-0064** (the
-TASK-0023 queue reconciliation), **MSG-0065**, and **MSG-0069** (the TASK-0024 queue
-reconciliation, which records a doubled collision and the seventh recurrence).
+**Five messages carry `Status: OPEN`. Four are informational; one requires a decision.**
+
+**MSG-0072 is the one needing an answer:** MSG-0071 accepted ADR-0017 through ADR-0022, but only
+**ADR-0017 is in `docs/decisions/`**. Five accepted architecture decisions therefore have no
+authoritative record. The promotion was **not** performed here — it is the act that confers
+authority, no READY task authorizes it, and the lead promoted ADR-0017 personally. One decision:
+finish it, or authorize a bounded task.
+
+The informational four: **MSG-0060** (task-specification collisions, still unaddressed),
+**MSG-0064** (TASK-0023 queue reconciliation), **MSG-0065** (the schedule-state correction, whose
+operator action has since been taken), and **MSG-0069** (TASK-0024 reconciliation — a doubled
+collision and the seventh recurrence).
+
+> **The line this replaces, retained:** "**Four messages carry `Status: OPEN`, all informational
+> and none blocking** …" True until MSG-0072 was raised the same day.
 
 **MSG-0065's operator action has been taken.** It reported the scheduled task
 `PCI-Execution-Supervisor` as **Disabled** while the `Schedule` service ran, and said the remedy
@@ -1080,53 +1090,111 @@ both tables index it, and both were updated in the same commit as the record.
 
 ## Next Action
 
-**TASK-0024 (A-ADR) is READY and is the single READY task. The Supervisor will start it on its next
-cycle — no manual trigger is needed.**
+**No task is READY. One decision is required from the architecture lead: finish promoting the accepted
+ADR set, or authorize a bounded task to do it (MSG-0072).**
 
-The scheduled task `PCI-Execution-Supervisor` is enabled again and cycling every ten minutes. It was
-observed idling at `NOOP: no READY task` at 19:07:18Z and 19:17:18Z **while TASK-0024 sat authorized
-and unreconciled** — the seventh recurrence of that gap, and the first one visible in the log rather
-than argued from principle (MSG-0069).
+**TASK-0024 (A-ADR) is COMPLETE.** It was executed unattended by a supervisor-started session and
+drafted six ADRs — **ADR-0017 … ADR-0022** — covering the grounded answer contract, approved-document
+authority and lifecycle, bilingual policy semantics, the retrieval projection and index boundary,
+employee question privacy and retention, and inference locality and the provider boundary. Execution
+record: **MSG-0070**.
 
-**What TASK-0024 does.** Draft the **minimal** set of new ADRs that makes the accepted WP-0009
-architecture enforceable before implementation, evaluating the six candidate surfaces in WP-0009 §7
-against the accepted ADRs and creating only what is genuinely required. ADR numbers are allocated **at
-drafting time** from the repository's actual state, never pre-assigned.
+**MSG-0071 accepted all six**, with three bounded conditions worth carrying forward:
 
-**What it may not do.** No implementation; no provider, model, embedding, framework or runtime
-selection; **no production corpus ingestion**; no permission, security-boundary, Supervisor or
-scheduling change; no operator-only action; **no modification or duplication of accepted ADRs**; and
-**it may not mark T-A through T-E or any other implementation task READY.**
+- **ADR-0017** — the fail-closed, citation-bound answer contract is approved, but **the entailment
+  model and numeric thresholds remain explicitly undecided** under SPEC-0020.
+- **ADR-0019** — accepted as a **bounded** decision: **Arabic normalization rules stay deliberately
+  incomplete** and must come from empirical corpus evidence before production use. **No invented
+  normalization rules are authorized.**
+- **ADR-0020** — the **no-retrieve-then-suppress** confidentiality boundary and fail-closed handling
+  are approved.
 
-### Four documents govern it, and all four must be read
+### The open item
 
-Two specification files and two authorization messages were committed for this one task. **All four
-agree**, so no stop condition fired — but each pair carries safety-relevant content the other lacks:
-spec A and MSG-0068a hold the **stop-rather-than-improvise** condition; spec B and MSG-0068b hold the
-**ten constraints to preserve**, including MSG-0067's limit that **T-D may be tested only against
-synthetic or non-confidential documents** until T-E is implemented and verified. The queue section
-carries the union of all four. Nothing was renamed, per MSG-0058 F4.
+**Only ADR-0017 has been promoted to `docs/decisions/`.** ADR-0018 through ADR-0022 exist solely as
+drafts under `implementation/decisions/`, so five accepted decisions currently have no authoritative
+record — including the confidentiality, retrieval and inference-locality boundaries that later
+implementation work is meant to be gated on.
 
-### What MSG-0067 settled, and what it deliberately did not
+**The promotion was deliberately not performed.** It is the act that confers architectural authority;
+no READY task authorizes it; and the lead promoted ADR-0017 personally, which reads as the lead doing
+this work rather than delegating it. Everything that did not depend on that answer **was** done: the
+ADR index and all six draft headers now record the acceptance, the ADR-0017 draft is marked RATIFIED
+per the ADR-0015 precedent, and MSG-0071 is registered in both the COMMS register and the queue
+ledger. **No ADR text was altered.**
 
-- **T-D/T-E interim exposure — DECIDED.** No real or confidential corpus enters the T-D path until
-  T-E retrieval-time authorization is implemented **and verified**.
-- **PR3 identity — DECIDED.** Use the organization's existing Microsoft/Active Directory
-  infrastructure **through the established ADR-0007 OIDC/OAuth2 boundary**. PCI builds no identity
-  provider and does not bypass that boundary with LDAP or Kerberos.
-- **WP-0009's relationship to PLAN-WP-0001 — DECIDED.** WP-0009 **sits beside** the planning entries.
-  It does not satisfy, supersede, rename, or renumber them; the planning list stays forward-looking,
-  and WP-0009 is the canonical delivered identity for this capability. This also closes DISC-0010.
+### What remains explicitly unauthorized
 
-**Left as organizational scheduling data, not architecture:** the IdP owner and deployment date. **T-0
-remains an operator prerequisite** for identity-dependent work and cannot be satisfied by a decision.
+**A-SURVEY and A-STACK remain unauthorized.** No implementation task is authorized or READY, and
+nothing in MSG-0071 permits provider, model, framework, or runtime selection. MSG-0071 is explicit
+that the next bounded architecture task may only be considered **after** the ADR set is reconciled and
+promoted.
 
-### After TASK-0024
+**T-0 remains an operator prerequisite** — the identity provider needs a privileged deployment and
+cannot be satisfied by a decision alone.
 
-Implementation remains prohibited. **T-A is not authorized**, and TASK-0024 may not authorize it — the
-lead authorizes the next bounded task after reviewing the ADR set. When that happens, its board row
-must be added in the same breath, or it becomes the eighth recurrence.
+### Operational note
 
+The Supervisor is enabled and cycling every ten minutes; it fast-forwarded to `d9c4524` at 20:07:24Z
+and is idling correctly at `NOOP: no READY task`. **When the next task is authorized, its board row
+must be added in the same commit** — that gap has now recurred seven times (MSG-0069).
+
+---
+
+**Historical — the position while TASK-0024 was READY, retained.** The text below described the
+queue with TASK-0024 armed and the Supervisor about to start it. **It did start it**, unattended,
+and TASK-0024 is now COMPLETE with its ADR set accepted by MSG-0071. Retained as the record of
+the position it described.
+
+> ## Next Action
+> 
+> **TASK-0024 (A-ADR) is READY and is the single READY task. The Supervisor will start it on its next
+> cycle — no manual trigger is needed.**
+> 
+> The scheduled task `PCI-Execution-Supervisor` is enabled again and cycling every ten minutes. It was
+> observed idling at `NOOP: no READY task` at 19:07:18Z and 19:17:18Z **while TASK-0024 sat authorized
+> and unreconciled** — the seventh recurrence of that gap, and the first one visible in the log rather
+> than argued from principle (MSG-0069).
+> 
+> **What TASK-0024 does.** Draft the **minimal** set of new ADRs that makes the accepted WP-0009
+> architecture enforceable before implementation, evaluating the six candidate surfaces in WP-0009 §7
+> against the accepted ADRs and creating only what is genuinely required. ADR numbers are allocated **at
+> drafting time** from the repository's actual state, never pre-assigned.
+> 
+> **What it may not do.** No implementation; no provider, model, embedding, framework or runtime
+> selection; **no production corpus ingestion**; no permission, security-boundary, Supervisor or
+> scheduling change; no operator-only action; **no modification or duplication of accepted ADRs**; and
+> **it may not mark T-A through T-E or any other implementation task READY.**
+> 
+> ### Four documents govern it, and all four must be read
+> 
+> Two specification files and two authorization messages were committed for this one task. **All four
+> agree**, so no stop condition fired — but each pair carries safety-relevant content the other lacks:
+> spec A and MSG-0068a hold the **stop-rather-than-improvise** condition; spec B and MSG-0068b hold the
+> **ten constraints to preserve**, including MSG-0067's limit that **T-D may be tested only against
+> synthetic or non-confidential documents** until T-E is implemented and verified. The queue section
+> carries the union of all four. Nothing was renamed, per MSG-0058 F4.
+> 
+> ### What MSG-0067 settled, and what it deliberately did not
+> 
+> - **T-D/T-E interim exposure — DECIDED.** No real or confidential corpus enters the T-D path until
+>   T-E retrieval-time authorization is implemented **and verified**.
+> - **PR3 identity — DECIDED.** Use the organization's existing Microsoft/Active Directory
+>   infrastructure **through the established ADR-0007 OIDC/OAuth2 boundary**. PCI builds no identity
+>   provider and does not bypass that boundary with LDAP or Kerberos.
+> - **WP-0009's relationship to PLAN-WP-0001 — DECIDED.** WP-0009 **sits beside** the planning entries.
+>   It does not satisfy, supersede, rename, or renumber them; the planning list stays forward-looking,
+>   and WP-0009 is the canonical delivered identity for this capability. This also closes DISC-0010.
+> 
+> **Left as organizational scheduling data, not architecture:** the IdP owner and deployment date. **T-0
+> remains an operator prerequisite** for identity-dependent work and cannot be satisfied by a decision.
+> 
+> ### After TASK-0024
+> 
+> Implementation remains prohibited. **T-A is not authorized**, and TASK-0024 may not authorize it — the
+> lead authorizes the next bounded task after reviewing the ADR set. When that happens, its board row
+> must be added in the same breath, or it becomes the eighth recurrence.
+> 
 ---
 
 **Historical — the position after TASK-0023 and before MSG-0068, retained.** The text below

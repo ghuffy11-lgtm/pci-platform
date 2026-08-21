@@ -1,7 +1,9 @@
 # ADR-0017 — Grounded Answer Contract
 
-**Status:** **PROPOSED** — carries no architectural authority until the Architecture Lead promotes it to
-`docs/decisions/`
+**Status:** **RATIFIED** 2026-08-21 — accepted by MSG-0071 and promoted to
+`docs/decisions/ADR-0017-grounded-answer-contract.md`, which is the authoritative copy. The proposed
+text below is retained unchanged as the historical record. **MSG-0071 leaves the entailment model and
+numeric thresholds explicitly undecided under SPEC-0020.**
 **Date:** 2026-08-21
 **Proposed by:** Claude Code — TASK-0024 (A-ADR), under MSG-0068a and MSG-0068b
 **Work package:** WP-0009 — Employee Policy Assistant

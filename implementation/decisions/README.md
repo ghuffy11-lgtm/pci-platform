@@ -13,12 +13,12 @@ modify accepted architecture.
 |---|---|---|---|---|
 | ADR-0015 | Kernel Implementation Stack | PROPOSED — **promoted**; accepted at `docs/decisions/ADR-0015-kernel-implementation-stack.md` | WP-0001 | — |
 | ADR-0016 | Tenant Isolation Enforcement Strategy | PROPOSED — **promoted**; accepted at `docs/decisions/ADR-0016-tenant-isolation-enforcement.md` | WP-0001 | — |
-| ADR-0017 | Grounded Answer Contract | **PROPOSED** — awaiting the Architecture Lead | WP-0009 | TASK-0024 |
-| ADR-0018 | Approved Document Authority and Lifecycle | **PROPOSED** — awaiting the Architecture Lead | WP-0009 | TASK-0024 |
-| ADR-0019 | Bilingual Policy Semantics (English/Arabic) | **PROPOSED** — awaiting the Architecture Lead; **incomplete for production by design**, see its §6 | WP-0009 | TASK-0024 |
-| ADR-0020 | Retrieval Projection and Index Boundary | **PROPOSED** — awaiting the Architecture Lead | WP-0009 | TASK-0024 |
-| ADR-0021 | Employee Question Privacy and Retention | **PROPOSED** — awaiting the Architecture Lead | WP-0009 | TASK-0024 |
-| ADR-0022 | Inference Locality and Provider Boundary | **PROPOSED** — awaiting the Architecture Lead | WP-0009 | TASK-0024 |
+| ADR-0017 | Grounded Answer Contract | **ACCEPTED** by MSG-0071 — **promoted**; accepted at `docs/decisions/ADR-0017-grounded-answer-contract.md` | WP-0009 | TASK-0024 |
+| ADR-0018 | Approved Document Authority and Lifecycle | **ACCEPTED** by MSG-0071 — **awaiting promotion** to `docs/decisions/` | WP-0009 | TASK-0024 |
+| ADR-0019 | Bilingual Policy Semantics (English/Arabic) | **ACCEPTED** by MSG-0071 as a bounded decision — **awaiting promotion**; Arabic normalization rules **deliberately incomplete** and must come from empirical corpus evidence before production use, with no invented rules authorized | WP-0009 | TASK-0024 |
+| ADR-0020 | Retrieval Projection and Index Boundary | **ACCEPTED** by MSG-0071 — **awaiting promotion**; the no-retrieve-then-suppress boundary and fail-closed handling are approved | WP-0009 | TASK-0024 |
+| ADR-0021 | Employee Question Privacy and Retention | **ACCEPTED** by MSG-0071 — **awaiting promotion** to `docs/decisions/` | WP-0009 | TASK-0024 |
+| ADR-0022 | Inference Locality and Provider Boundary | **ACCEPTED** by MSG-0071 — **awaiting promotion** to `docs/decisions/` | WP-0009 | TASK-0024 |
 
 ## The WP-0009 set — ADR-0017 … ADR-0022
 
