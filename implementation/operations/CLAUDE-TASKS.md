@@ -31,18 +31,35 @@ Only the architecture lead may authorize new work, mark a task READY, or change 
 | TASK-0018 | **Live Supervisor heartbeat validation** | **COMPLETE** — 5 of 5 gates MET | TASK-0017 | 2026-08-21 `COMPLETED` observed externally | none | Claude Code |
 | TASK-0019 | **Post-WP-0001 repository baseline audit** | **COMPLETE** | TASK-0018, MSG-0050 | 2026-08-21 — 6 corrections applied, 7 items referred, MSG-0051 | none | Claude Code |
 | TASK-0021 | **Employee policy assistant — architecture definition** | **COMPLETE** | WP-0001 COMPLETE, MSG-0054 | 2026-08-21 — 11/11 acceptance criteria, MSG-0055; **accepted by the Architecture Lead (MSG-0056a)** | none — all fourteen EPA-0003 decisions ruled (MSG-0056a/b); three reconciliation findings resolved by MSG-0058 | Claude Code |
-| TASK-0022 | **Employee policy assistant — work-package definition** | **READY** | TASK-0021 COMPLETE, MSG-0058 DECIDED, MSG-0059 | — | none — definition only; **no implementation task may be marked READY** | Claude Code |
+| TASK-0022 | **Employee policy assistant — work-package definition** | **COMPLETE** — output PROPOSED, awaiting acceptance | TASK-0021 COMPLETE, MSG-0058 DECIDED, MSG-0059 | 2026-08-21 — `EPA-0004` delivered, MSG-0061 | none by Claude Code — **the Architecture Lead must accept EPA-0004 and rule on its seven open items** (MSG-0061 §7) | Claude Code |
 | TASK-0002 | Make test entry points shell-independent | **ABORTED** | — | 2026-08-19 | none — premise disproven by measurement | — |
 
 **TASK-0019 is COMPLETE (2026-08-21).** It was authorized by MSG-0050, reconciled into this queue in `39eabdb`, and executed by a supervisor-started session on its scheduled 06:37:13Z cycle. It was maintenance/audit work only, not a new product work package.
 
-**TASK-0022 is READY — the single READY task**, authorized by MSG-0059 and reconciled into this
-board on 2026-08-21. It is **architecture/work-package definition only**: it may not implement,
-select a provider, change Supervisor or security behaviour, or mark any implementation task
-READY. The Architecture Lead must review and accept its output before implementation is
-authorized.
+**TASK-0022 is COMPLETE (2026-08-21) and no task is READY.** It was executed by a supervisor-started
+session, which delivered
+[`EPA-0004`](../architecture/EPA-0004-employee-policy-assistant-work-package-definition.md) — the
+work-package definition, **PROPOSED**, with thirteen gates, ten dependency-ordered tasks, and all
+fourteen EPA-0003 rulings plus MSG-0058 F1–F4 folded in. Execution record: **MSG-0061**.
 
-> **The line this replaces, retained:** "**No task is READY.**" True from TASK-0021's completion
+**No task is READY, and that is the correct state.** MSG-0059 makes the Architecture Lead's acceptance
+of EPA-0004 the precondition for authorizing any implementation task, so the queue is at an
+**acceptance boundary**, not an empty queue. The next actions are the lead's: accept or amend EPA-0004,
+rule on the **seven open items** in MSG-0061 §7 (work-package number; the ADR set; the T-D/T-E
+ordering; PR3 IdP ownership; PR5 corpus survey; whether policy may be Restricted; the service's
+implementation stack), allocate the work-package number, and authorize **T-0 (identity provider) as an
+operator task** before T-A.
+
+> **Reconciliation warning, from MSG-0060.** Five times now an authorization has existed while this
+> queue did not reflect it, leaving the Supervisor idling on a healthy-looking "no READY task". When
+> T-A is authorized, it must be **reconciled into this board as the single READY task** or it will be
+> the sixth.
+
+> **The line this replaces, retained:** "**TASK-0022 is READY — the single READY task**, authorized by
+> MSG-0059 and reconciled into this board on 2026-08-21. It is architecture/work-package definition
+> only …" True from the MSG-0060 reconciliation until TASK-0022 executed on the same day.
+
+> **The line that replaced, retained:** "**No task is READY.**" True from TASK-0021's completion
 > until MSG-0059 authorized TASK-0022. The note below it records the earlier correction and is
 > kept intact.
 
@@ -285,6 +302,7 @@ READY means *authorized to attempt*, never *authorized to force*. A READY task w
 | MSG-0058 | Decision | DECIDED | Architecture lead | Claude Code | **Rules the three MSG-0057 findings, all as recommended.** F1 cross-language grounding is **in scope and fail-closed** — if the Arabic gate fails the system **abstains**, never silently falling back to English or presenting an unofficial rendering as policy; the Arabic bar is evaluated separately under SPEC-0020. F2 unauthenticated access is **deferred** from the first release; no new trust boundary or classification is introduced. F3 enterprise directory integration **must terminate at the OIDC/OAuth2 boundary** of ADR-0007; direct LDAP/Kerberos implementation is not authorized. F4 preserve the MSG-0056a/b distinction and do not rename historical records. **Gate ruling:** findings sufficiently resolved to proceed to a work-package authorization task; implementation still prohibited | 2026-08-21 |
 | MSG-0059 | Decision | DECIDED | Architecture lead | Claude Code | **TASK-0022 authorized** as the next architecture/work-package definition task. May define scope, gates, acceptance criteria, dependencies, security checkpoints, and the implementation task sequence. **Does not authorize** implementation, provider/model selection, runtime changes, deployment, new permissions, or Supervisor changes, and **no implementation task may be marked READY**. Requires TASK-0022 to be **the single READY task on the board** before the Supervisor may execute it, and the Lead must accept its output before implementation is authorized | 2026-08-21 |
 | MSG-0060 | Record | **OPEN** | Claude Code | Architecture lead | **Queue reconciliation for TASK-0022, and a fifth collision — this time on an executable task specification.** Two TASK-0022 files were committed; they agree on scope, authorization, forbidden list and acceptance gate, so no stop fired, but they differ in content (A carries stop conditions and the recommendations-only constraint; B carries a ten-item outcome list). The queue section carries the **union** and links both; neither was renamed, per MSG-0058 F4. TASK-0022 is now the single READY task | 2026-08-21 |
+| MSG-0061 | Record | CREATED — awaiting acceptance | Claude Code | Architecture lead | **TASK-0022 execution record.** `EPA-0004` delivered as a **PROPOSED** work-package definition: thirteen gates (G1–G13; G12 identity and G13 retention/privacy are new), ten dependency-ordered tasks (T-0 IdP as an **operator** task, then T-A…T-I), five test tiers, T1–T11 threat coverage, and every required field of the work-package standard. All fourteen rulings and F1–F4 folded in; **F1's cross-language gate is made a protocol-level contract rule** so a failed Arabic gate abstains rather than falling back to English. **No implementation, no ADR created, no provider or stack selected, no work-package number allocated, no task marked READY.** §7 refers **seven decisions** to the Architecture Lead, led by *may a policy document be Restricted?* — the one D3 sub-question MSG-0056b does not reach | 2026-08-21 |
 | MSG-0051 | Record | CREATED — audit complete | Claude Code | Architecture lead | **TASK-0019 baseline audit.** Six documentary corrections applied with their authorities quoted; four record classes verified already correct; **§C refers seven items for decision**, led by the accepted WP-0001 work package still reading `Status: Ready for implementation` — the stop condition fired and that correction was **not** made | TASK-0019 |
 
 ## Interruption and recovery protocol
@@ -728,9 +746,16 @@ record is easy to duplicate and hard to reconcile.
 
 ## TASK-0022 — Employee policy assistant: work-package definition
 
-**Priority:** 1 | **Status:** **READY** | **Owner:** Claude Code
+**Priority:** 1 | **Status:** **COMPLETE** (2026-08-21) — the deliverable is **PROPOSED** and awaits the Architecture Lead's acceptance | **Owner:** Claude Code
 **Depends on:** TASK-0021 COMPLETE; MSG-0058 DECIDED (F1-F4); MSG-0059 (authorization)
+**Delivered:** [`EPA-0004`](../architecture/EPA-0004-employee-policy-assistant-work-package-definition.md) | **Execution record:** [`MSG-0061`](../comms/MSG-0061-task-0022-execution-record.md)
 **Next eligible task:** none — the Architecture Lead must accept this task's output before any implementation task is authorized
+
+> **Executed 2026-08-21 by a supervisor-started session.** Both specification files were read; the
+> requirements below are the union and every one is mapped to its evidence in MSG-0061 §2. The task
+> produced **no test count**, as its verification section requires, and none is claimed. **No task was
+> marked READY**, and seven decisions are referred to the lead in MSG-0061 §7. The requirements below
+> are retained unchanged as the specification that was executed against.
 
 **Full specification — TWO files, both authoritative, read BOTH:**
 

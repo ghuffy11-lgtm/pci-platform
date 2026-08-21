@@ -7,6 +7,15 @@ created "only after the architecture boundary is accepted."
 **Date:** 2026-08-21
 **Companions:** [`EPA-0001`](EPA-0001-employee-policy-assistant-architecture.md) · [`EPA-0003`](EPA-0003-required-decisions.md) (**fourteen open decisions — this document is not executable until they are answered**)
 
+> **Superseded in substance 2026-08-21 by [`EPA-0004`](EPA-0004-employee-policy-assistant-work-package-definition.md) (TASK-0022, MSG-0059).**
+> All fourteen decisions have since been ruled (MSG-0056a/b) and the four reconciliation findings with
+> them (MSG-0058). This record was written **before** any of that and is conditional throughout; it is
+> retained **unchanged** as the pre-ruling proposal. Where the two differ, EPA-0004 is the later record
+> and its §12 tabulates the six differences with the ruling behind each — most consequentially G7,
+> which here tested bilingual *parity* and there tests *cross-language grounding*, fail-closed.
+> **Do not read this document as current.** Its own §5 ordering observation (T-D before T-E) remains
+> unruled and is carried forward in EPA-0004 §11.3 rather than dropped.
+
 ---
 
 ## 0. Standing of this document

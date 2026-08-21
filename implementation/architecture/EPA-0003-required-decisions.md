@@ -1,6 +1,8 @@
 # EPA-0003 — Employee Policy Assistant: Required Architecture-Lead Decisions
 
-**Status:** **ALL FOURTEEN RULED** 2026-08-21 — D2, D4, D5, D6, D8, D9, D10, D11, D12, D14 by MSG-0056a; D1, D3, D7, D13 by MSG-0056b (organizational authority). Each decision below carries its ruling inline. **Three reconciliation findings are open: MSG-0057 F1-F3.** No implementation, work package, or ADR is authorized.
+**Status:** **ALL FOURTEEN RULED** 2026-08-21 — D2, D4, D5, D6, D8, D9, D10, D11, D12, D14 by MSG-0056a; D1, D3, D7, D13 by MSG-0056b (organizational authority). Each decision below carries its ruling inline. **All four reconciliation findings are now ruled by MSG-0058** (F1 cross-language grounding in scope and fail-closed; F2 unauthenticated access deferred; F3 directory integration terminates at the ADR-0007 OIDC/OAuth2 boundary; F4 preserve MSG-0056a/b and rename nothing), and MSG-0057 is CLOSED. No implementation, work package, or ADR is authorized.
+
+> **Corrected 2026-08-21 by TASK-0022.** The line above previously read "**Three reconciliation findings are open: MSG-0057 F1-F3.**" That was true when written and stopped being true the same day. The work-package definition that consumes these rulings is [`EPA-0004`](EPA-0004-employee-policy-assistant-work-package-definition.md); **seven items remain open there**, none of them a decision below.
 **Produced by:** TASK-0021 (definition only) | **Authority:** MSG-0054
 **Date:** 2026-08-21
 **Companions:** [`EPA-0001`](EPA-0001-employee-policy-assistant-architecture.md) (architecture) · [`EPA-0002`](EPA-0002-proposed-work-package-and-gates.md) (proposed work package)

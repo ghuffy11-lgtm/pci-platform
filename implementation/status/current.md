@@ -2,7 +2,7 @@
 
 **Active Work Package:** WP-0001 — PCI Kernel Foundation
 **Status:** **COMPLETE** — declared by the architecture lead 2026-08-19 (MSG-0020(b), resolved by MSG-0022 / MSG-0023, TASK-0009)
-**Last Updated:** 2026-08-21 UTC (MSG-0058 rules the MSG-0057 findings; MSG-0059 authorizes TASK-0022; TASK-0022 reconciled into the queue as the single READY task — MSG-0060)
+**Last Updated:** 2026-08-21 UTC (**TASK-0022 executed and COMPLETE** — `EPA-0004` work-package definition delivered as PROPOSED, MSG-0061; **no task is READY**, and the queue now sits at an architecture-acceptance boundary)
 
 ## Current State
 
@@ -82,6 +82,7 @@ message on 2026-08-20 under MSG-0041 (MSG-0042) — the fifth.
 | TASK-0018 | Live Supervisor heartbeat validation | **COMPLETE** (2026-08-21) — all five gates, MSG-0049 | TASK-0017, MSG-0048 ✅ | Claude Code |
 | TASK-0019 | Post-WP-0001 repository baseline audit | **COMPLETE** (2026-08-21) — MSG-0051 | TASK-0018, MSG-0050 ✅ | Claude Code |
 | TASK-0021 | Employee policy assistant — architecture definition | **COMPLETE** (2026-08-21) — 11/11 criteria, MSG-0055 | WP-0001 COMPLETE, MSG-0054 ✅ | Claude Code |
+| TASK-0022 | Employee policy assistant — work-package definition | **COMPLETE** (2026-08-21) — `EPA-0004` delivered as PROPOSED, MSG-0061 | TASK-0021, MSG-0058, MSG-0059 ✅ | Claude Code |
 | TASK-0002 | Make test entry points shell-independent | **ABORTED** | — | — |
 
 **No task is READY** — but the reason has changed. The project now sits at an **architecture decision
@@ -94,12 +95,26 @@ boundary**, not at an empty queue.
 > been executed and is COMPLETE (MSG-0055). MSG-0051 §C is fully discharged: C1–C5 by MSG-0052,
 > C6–C7 by MSG-0053.
 
-What happens next is the architecture lead's: **fourteen decisions in
-[`../architecture/EPA-0003-required-decisions.md`](../architecture/EPA-0003-required-decisions.md)**,
-of which four are marked Highest and are enough to unblock the foundation — D1 (bilingual policy
-authority), D3 (approval authority and audience assignment), D5 (grounding-gate mechanism), and D13
-(identity provider, which is an **unmet prerequisite** rather than a preference). None was
-self-authorized.
+**Current position, 2026-08-21 after TASK-0022: no task is READY, and the boundary is acceptance
+rather than decision.** TASK-0022 delivered
+[`EPA-0004`](../architecture/EPA-0004-employee-policy-assistant-work-package-definition.md) — the
+Employee Policy Assistant work-package definition, **PROPOSED**: thirteen acceptance gates, ten
+dependency-ordered tasks, five test tiers, T1–T11 threat coverage, and every required field of
+`docs/engineering/implementation-work-package-standard.md`. It **allocates no work-package number,
+creates no ADR, selects no provider or stack, and marks no task READY.** Execution record: MSG-0061.
+
+The next moves are the architecture lead's: accept or amend EPA-0004, and rule on the **seven open
+items** in MSG-0061 §7 — the work-package number; the ADR set; the T-D/T-E ordering; PR3 (which IdP,
+whose deployment); PR5 (may the real corpus be surveyed); **whether a policy document may be
+classified Restricted**; and the assistant service's implementation stack. None was self-authorized.
+
+> **Superseded — corrected 2026-08-21 by TASK-0022.** This paragraph previously read "What happens
+> next is the architecture lead's: **fourteen decisions in EPA-0003**, of which four are marked
+> Highest … D1, D3, D5, D13. None was self-authorized." That was true when written and stopped being
+> true the same day: **all fourteen were ruled** by MSG-0056a and MSG-0056b, and the three
+> reconciliation findings they raised were ruled by MSG-0058. The sections below already recorded
+> those rulings while this paragraph still described the decisions as open — the same
+> file-contradicts-itself defect Rule 12 exists to catch.
 
 > **Superseded — corrected 2026-08-21 by TASK-0019 (MSG-0050).** This paragraph previously read
 > "**No task is currently READY. TASK-0018 is IN_PROGRESS with one gate unmet** … MSG-0049 §6 asks
@@ -376,6 +391,40 @@ conditions and the recommendations-only constraint while spec B carries a finer 
 list. A message collision is read by humans; **a task collision is read by an unattended runner that
 cannot notice a sibling file exists**, and would report success against whichever half it read. The
 queue section therefore carries the **union** of both and links both. Neither was renamed, per F4.
+
+**MSG-0061 — TASK-0022 executed; the work-package definition exists and is PROPOSED (2026-08-21).**
+A supervisor-started session executed TASK-0022 and delivered **EPA-0004**. Every required output of
+both TASK-0022 specification files is mapped to its evidence in MSG-0061 §2. Being documentary, the
+task produced **no test count, and none is claimed** — its own verification section forbids reporting
+one.
+
+**What EPA-0004 adds over EPA-0002**, which was written before any decision was ruled and is retained
+unchanged: thirteen gates rather than eleven (**G12 identity**, **G13 retention and question privacy**,
+both of which had no ruling to rest on when EPA-0002 was written); ten tasks rather than nine, with
+**T-0 — deploy an identity provider — made explicit as an operator task**, because PR3 was named a
+critical-path prerequisite in EPA-0002 and then never appeared in the sequence; and the rulings folded
+in concretely rather than conditionally.
+
+**The consequential change is F1's cross-language gate.** MSG-0058 ruled that Arabic answers may be
+generated from authoritative English policy, provided a grounding gate establishes support across the
+language boundary and **abstains** when it cannot. EPA-0004 makes that a **protocol-level contract
+rule** — when the answer language differs from the source language, a passing gate result must be
+present, and its absence or failure forces an abstention. Stated plainly in the record because it is
+the easiest thing to get wrong: **if that gate is ever built as "fall back to English", the ruling has
+been inverted rather than implemented.**
+
+**Seven decisions are referred to the architecture lead (MSG-0061 §7), none self-authorized.** Two
+deserve naming here. **Whether a policy document may be classified Restricted** is the one D3
+sub-question MSG-0056b does not reach — and it matters because Restricted content may not enter model
+context at all, so the answer decides whether such documents are excluded from the corpus (an exclusion
+cannot fail open) or retrieved and then suppressed (which can). **The T-D-before-T-E ordering** was
+raised in EPA-0002 §5, no ruling has addressed it — verified by reading MSG-0056a, MSG-0056b, MSG-0058
+and MSG-0059 — and it is repeated rather than quietly dropped.
+
+**One index defect was found and corrected.** `implementation/architecture/README.md` still described
+EPA-0003 as carrying "three reconciliation findings open (MSG-0057)" after MSG-0058 had ruled all four
+and MSG-0057 had closed. That is the fourth index to lag its own records, after the blocker index
+(TASK-0013, TASK-0014) and the discoveries index (TASK-0015).
 
 **MSG-0052 applied (2026-08-21).** The Architecture Lead ruled on the TASK-0019 audit referrals:
 C1 — the accepted WP-0001 work package now reads `Status: COMPLETE`, closing the last conflict
@@ -870,32 +919,38 @@ both tables index it, and both were updated in the same commit as the record.
 
 ## Next Action
 
-**TASK-0022 is READY and is the single READY task. Execution is authorized; the Supervisor may start
-it.** This is the first READY task since TASK-0021 completed.
+**TASK-0022 is COMPLETE. No task is READY, and the next action belongs to the architecture lead.**
 
-**What changed.** MSG-0058 ruled all three MSG-0057 findings, each as recommended, and set the gate:
-the architecture-definition findings are *"sufficiently resolved to proceed to the next
-architecture/work-package authorization task."* MSG-0059 then authorized **TASK-0022** — the bounded
-work-package definition for the Employee Policy Assistant.
+The queue is at an **acceptance boundary**, not an empty queue and not a decision boundary. Every
+EPA-0003 decision is ruled and every MSG-0057 finding is ruled; what is missing is the lead's
+acceptance of the definition those rulings produced.
 
-**The precondition MSG-0059 set has been satisfied.** It required TASK-0022 to be the single READY
-task on the board before the Supervisor may execute it, and said the Supervisor must remain idle
-until then. TASK-0022 was absent from the queue entirely — the fifth recurrence of the MSG-0044
-structural gap — and is now reconciled in. Verified by a dry run against a forced-`dryRun` config:
-`DRY_RUN: would start TASK-0022`, `readyTask=TASK-0022`, no lock created (MSG-0060).
+**What TASK-0022 delivered.** `EPA-0004` — the Employee Policy Assistant work-package definition, as
+a **PROPOSED** record carrying no architectural authority: thirteen acceptance gates, ten
+dependency-ordered tasks, five test tiers, T1–T11 threat coverage, and every required field of the
+work-package standard. It allocates **no work-package number**, creates **no ADR**, selects **no
+provider, model, or runtime stack**, and marks **no task READY**. Execution record: **MSG-0061**.
 
-### What TASK-0022 may and may not do
+**What the lead is asked to do, in order** (EPA-0004 §13, restated in MSG-0061 §8):
 
-It is **architecture/work-package definition only.** It defines scope, boundaries, implementation
-gates, acceptance criteria, dependencies, security checkpoints, threat-model coverage, and a
-dependency-ordered implementation task sequence.
+1. Accept, amend, or reject EPA-0004 — until then prerequisite PR2 is unmet and no implementation
+   task can be authorized.
+2. Rule on the **seven open items** in MSG-0061 §7. Three block the earliest tasks: the work-package
+   number, **whether a policy document may be classified Restricted**, and who owns the identity
+   provider (PR3).
+3. Allocate the work-package number, recording its relationship to the PLAN-WP-0001 register — which
+   already disagrees with the delivered work-package directory about what WP-0001 is.
+4. Create whichever of the six proposed ADRs are wanted, or rule that the rulings themselves suffice.
+   **Claude Code creates no ADR without an explicit instruction.**
+5. Authorize **T-0, the identity provider, as an operator task** — it needs a privileged deployment
+   action no Claude session may perform, and every authorization control depends on it.
+6. **Then** authorize T-A and reconcile it into `CLAUDE-TASKS.md` as the single READY task.
 
-It may **not** implement, select a provider or model, change accepted ADRs, change permissions,
-security boundaries, scheduling, or Supervisor behaviour, or perform privileged operations. **It may
-not mark any implementation task READY** — queue changes are recommendations only. The Architecture
-Lead must review and accept its output before any implementation task is authorized.
+> **Step 6 is not a formality.** MSG-0060 recorded the **fifth** occasion on which an authorization
+> existed while the queue did not reflect it, leaving the Supervisor idling on a healthy-looking
+> "no READY task". An authorization that stops at a message is invisible to the runner.
 
-### The binding rulings it inherits
+### The binding rulings TASK-0022 inherited, and EPA-0004 now carries
 
 - **English is authoritative**; Arabic is an approved translation/access language.
 - **Cross-language grounding is in scope and fail-closed.** A failed Arabic grounding gate must
@@ -917,6 +972,15 @@ carries the **union** and links both. Neither was renamed, per MSG-0058 F4.
 
 **Read both.** A runner that reads one silently loses half its instructions and would report success
 against the half it read (MSG-0060).
+
+> **Both were read by the executing session**, and MSG-0061 §2 maps the union — all sixteen required
+> outputs — to the section of EPA-0004 that satisfies each. The warning above is retained because it
+> applies to anyone re-reading the TASK-0022 specification, not only to the session that executed it.
+
+**The other thing to know: EPA-0004 supersedes EPA-0002 in substance, and EPA-0002 is retained
+unchanged.** EPA-0002 was written before any decision was ruled and is conditional throughout; where
+they differ, EPA-0004 is the later record and its §12 tabulates the six differences with the ruling
+behind each. Do not read EPA-0002 as current.
 
 ### Operational note
 
