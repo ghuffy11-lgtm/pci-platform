@@ -223,6 +223,13 @@ Every tier reported a non-zero test count.
 
 Index: `implementation/comms/README.md` carries the full message register with links and status.
 
+**MSG-0052 applied (2026-08-21).** The Architecture Lead ruled on the TASK-0019 audit referrals:
+C1 — the accepted WP-0001 work package now reads `Status: COMPLETE`, closing the last conflict
+between accepted authority and current state; C2 and C3 — `CLAUDE.md` and `ARCHITECTURE-LEAD-CONTEXT.md`
+carry explicit supersession notes, with no supervisor behaviour, permission, or schedule changed;
+C4 and C5 — no action, deliberately. **C6 (a bounded proof of MSG-0049 option B) and C7 (the next
+work package) remain the Lead's to decide and are not self-authorized.**
+
 **No message carries `Status: OPEN`.** The four that did — MSG-0044, MSG-0045, MSG-0047, MSG-0049 —
 are all settled and closed as of 2026-08-21:
 

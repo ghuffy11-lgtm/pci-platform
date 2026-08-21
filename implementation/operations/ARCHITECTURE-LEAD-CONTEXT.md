@@ -67,7 +67,19 @@ The Execution Supervisor is an independent execution-control mechanism. Its inte
 - preserve checkpoints and COMMS;
 - release the lock after completion/failure.
 
-The current enablement record (MSG-0026) says the Supervisor is enabled, uses Claude `acceptEdits` rather than `--dangerously-skip-permissions`, and has a version-controlled deny list. It also explicitly says the real unattended start path remains unverified until a genuinely READY task is available. Therefore do not report "end-to-end autonomous execution verified" merely because the Supervisor is enabled.
+The current enablement record (MSG-0026) says the Supervisor is enabled, uses Claude `acceptEdits` rather than `--dangerously-skip-permissions`, and has a version-controlled deny list.
+
+**Updated 2026-08-21 (MSG-0052 C3).** MSG-0026 also said the real unattended start path remained unverified. **That is no longer true, and the caution it carried has been discharged by evidence:**
+
+- **MSG-0029** — the Supervisor launched a real runner for the first time (TASK-0003).
+- **MSG-0032** — the end-to-end smoke test passed (TASK-0011), with the runner pushing its own evidence.
+- **MSG-0049** — a live run was watched from outside: `RUNNER_STARTED`, twenty-two `RUNNER_RUNNING` samples on a 30-second cadence with the pid confirmed alive, then `COMPLETED` with the lock released (TASK-0018).
+
+Unattended execution is therefore **proven**, and several tasks (TASK-0013 through TASK-0019) have been delivered by it end to end.
+
+**One thing remains genuinely unproven**, and the distinction is worth keeping precisely: MSG-0049 option **(B)** — a *later* unattended session reading the previous run's terminal record and acting on it, closing the loop with no human anywhere. What is proven is that the heartbeat reports reality; what is not is that the automation can consume its own output. C6 in MSG-0052 leaves authorizing that proof to the Architecture Lead.
+
+So rule 14 above still stands in spirit: do not treat *enablement* as proof. Treat the three records above as the proof, and do not extend them to claim (B).
 
 ## 6. Decision hierarchy
 

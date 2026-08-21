@@ -10,6 +10,7 @@ a defect in the record, not a missing message.
 
 | ID | Subject | Status | File |
 |---|---|---|---|
+| **MSG-0052** | **Architecture Lead baseline decisions C1-C5** | **DECIDED** — C1-C3 applied, C4/C5 no action; C6/C7 remain the Lead's | [MSG-0052-architecture-lead-baseline-decisions.md](MSG-0052-architecture-lead-baseline-decisions.md) |
 | MSG-0051 | TASK-0019 execution record — post-WP-0001 baseline audit | **RECORD** — six corrections applied; **§C lists seven items requiring an architecture-lead decision** | [MSG-0051-task-0019-baseline-audit.md](MSG-0051-task-0019-baseline-audit.md) |
 | MSG-0050 | TASK-0019 authorization — post-WP-0001 repository baseline audit | **DECIDED** — queue reconciled `39eabdb`; executed by TASK-0019, see MSG-0051 | [MSG-0050-task-0019-authorization.md](MSG-0050-task-0019-authorization.md) |
 | MSG-0049 | TASK-0018 live heartbeat verification — all five gates MET | **CLOSED** — gate 3 met by external observation (see addendum) | [MSG-0049-task-0018-live-heartbeat-verification.md](MSG-0049-task-0018-live-heartbeat-verification.md) |

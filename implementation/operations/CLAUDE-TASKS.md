@@ -34,7 +34,12 @@ Only the architecture lead may authorize new work, mark a task READY, or change 
 
 **TASK-0019 is COMPLETE (2026-08-21).** It was authorized by MSG-0050, reconciled into this queue in `39eabdb`, and executed by a supervisor-started session on its scheduled 06:37:13Z cycle. It was maintenance/audit work only, not a new product work package.
 
-**No task is READY.** TASK-0019 was the last authorized one. What follows is an architecture-lead decision: MSG-0051 §C lists seven items, prioritized, and self-authorizes none of them. §C1 is the one that matters — the accepted WP-0001 work package still reads `Status: Ready for implementation` while every other record says COMPLETE, and TASK-0019's stop condition required that correction to be referred rather than made.
+**No task is READY.** TASK-0019 was the last authorized one.
+
+**MSG-0052 has since ruled on C1-C5** (2026-08-21). C1 is applied: the accepted work package now reads
+`Status: COMPLETE`, so the conflict TASK-0019 referred is closed. C2 and C3 are applied as documentary
+supersessions; C4 and C5 required no action. **C6 (a bounded proof of MSG-0049 option B) and C7 (the
+next work package) remain architecture-lead decisions and are not self-authorized.**
 
 **TASK-0016 is explicitly authorized by the architecture lead after WP-0001 completion.** It is maintenance/documentation work, not a new product work package.
 
@@ -252,6 +257,7 @@ READY means *authorized to attempt*, never *authorized to force*. A READY task w
 | MSG-0045 | Record | **CLOSED** — corrected 2026-08-21 by TASK-0019; the record file and the COMMS register both read CLOSED | Claude Code | Architecture lead | **TASK-0017 IMPLEMENTED but NOT COMPLETE.** Defect reproduced and corrected; the test suite **could not be run** — no allowlist entry permits executing a PowerShell script. Three options in §7. *Answered by MSG-0046 and discharged by MSG-0047; the status line in the record itself was not changed by TASK-0018, which had no authority over another message's record* | TASK-0017 |
 | MSG-0049 | Record | CLOSED | Claude Code | Architecture lead | **TASK-0018 verification: `RUNNER_RUNNING` observed live during a supervisor-started run.** Gates 1, 2, 4 and 5 MET with quoted evidence; gate 3 (terminal heartbeat) is **structurally unobservable from inside the run it measures**. Three options in §6; (B) recommended | TASK-0018 |
 | MSG-0050 | Decision | DECIDED | Architecture lead | Claude Code | **TASK-0019 AUTHORIZED and READY** — post-WP-0001 repository baseline audit; maintenance/audit only; queue reconciliation required before execution | TASK-0019 |
+| MSG-0052 | Decision | DECIDED | Architecture lead | Claude Code | **C1-C5 ruled.** C1 WP-0001 status COMPLETE; C2/C3 documentary supersessions; C4/C5 no action; **C6/C7 not self-authorized** | TASK-0019 |
 | MSG-0051 | Record | CREATED — audit complete | Claude Code | Architecture lead | **TASK-0019 baseline audit.** Six documentary corrections applied with their authorities quoted; four record classes verified already correct; **§C refers seven items for decision**, led by the accepted WP-0001 work package still reading `Status: Ready for implementation` — the stop condition fired and that correction was **not** made | TASK-0019 |
 
 ## Interruption and recovery protocol
@@ -512,8 +518,10 @@ the superseded text was worth keeping:
 discovery index (9/9), the ADR set, and the message files' own statuses — **zero OPEN**, confirmed by
 reading all 54 rather than trusting any index.
 
-**The stop condition fired once, and was obeyed.** `docs/program/work-packages/WP-0001-kernel-foundation.md`
-still reads `**Status:** Ready for implementation` while MSG-0022 / MSG-0023 declare WP-0001 COMPLETE.
+**The stop condition fired once, and was obeyed.** At the time of the audit,
+`docs/program/work-packages/WP-0001-kernel-foundation.md`
+still read `**Status:** Ready for implementation` while MSG-0022 / MSG-0023 declared WP-0001 COMPLETE.
+**Resolved 2026-08-21 by MSG-0052 C1** — the work package now reads `Status: COMPLETE`.
 That is a conflict between accepted work-package authority and current state, so the correction was
 **deliberately not made** and is referred to the architecture lead as MSG-0051 §C1. Two further
 governance files (`CLAUDE.md`, `ARCHITECTURE-LEAD-CONTEXT.md`) carry stale current-state claims and

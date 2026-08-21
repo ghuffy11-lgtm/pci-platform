@@ -415,6 +415,11 @@ What a future session needs to know:
   cycle — a missed webhook is silent, and silence is indistinguishable from "nothing to do".
 - The supervisor is inert by default: `enabled: false`, `dryRun: true`, and no runner command.
   Installing it is a separate operator decision (MSG-0011).
+  **Superseded as current state (MSG-0052 C2):** those are the *defaults*, and they still describe a
+  fresh checkout — but on this machine the supervisor is **installed and ENABLED**, running on its
+  ten-minute cadence. Its start path is **proven**, not theoretical: MSG-0029 (first launch),
+  MSG-0032 (smoke test), MSG-0049 (live heartbeat observed through a real run). Read the paragraph
+  above as the shipped default and this note as the operating reality.
 
 ### Mid-run repository movement — abort
 
