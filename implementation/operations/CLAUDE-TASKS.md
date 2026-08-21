@@ -32,15 +32,45 @@ Only the architecture lead may authorize new work, mark a task READY, or change 
 | TASK-0019 | **Post-WP-0001 repository baseline audit** | **COMPLETE** | TASK-0018, MSG-0050 | 2026-08-21 — 6 corrections applied, 7 items referred, MSG-0051 | none | Claude Code |
 | TASK-0021 | **Employee policy assistant — architecture definition** | **COMPLETE** | WP-0001 COMPLETE, MSG-0054 | 2026-08-21 — 11/11 acceptance criteria, MSG-0055; **accepted by the Architecture Lead (MSG-0056a)** | none — all fourteen EPA-0003 decisions ruled (MSG-0056a/b); three reconciliation findings resolved by MSG-0058 | Claude Code |
 | TASK-0022 | **Employee policy assistant — work-package definition** | **COMPLETE** — output **ACCEPTED** by MSG-0062 | TASK-0021 COMPLETE, MSG-0058 DECIDED, MSG-0059 | 2026-08-21 — `EPA-0004` delivered, MSG-0061; accepted MSG-0062 with all seven open items ruled | none — the seven items in MSG-0061 §7 are ruled by MSG-0062 | Claude Code |
-| TASK-0023 | **EPA work-package governance reconciliation** | **READY** | TASK-0022 COMPLETE, MSG-0062 DECIDED, MSG-0063 AUTHORIZED | — | none — architecture/governance reconciliation only; **no implementation task may be marked READY** | Claude Code |
+| TASK-0023 | **EPA work-package governance reconciliation** | **COMPLETE** | TASK-0022 COMPLETE, MSG-0062 DECIDED, MSG-0063 AUTHORIZED | 2026-08-21 — 7/7 acceptance criteria, **WP-0009** allocated, MSG-0066 | none — awaiting the Architecture Lead's next authorization; **no task is READY** | Claude Code |
 | TASK-0002 | Make test entry points shell-independent | **ABORTED** | — | 2026-08-19 | none — premise disproven by measurement | — |
 
 **TASK-0019 is COMPLETE (2026-08-21).** It was authorized by MSG-0050, reconciled into this queue in `39eabdb`, and executed by a supervisor-started session on its scheduled 06:37:13Z cycle. It was maintenance/audit work only, not a new product work package.
 
-**TASK-0023 is READY — the single READY task.** Authorized by **MSG-0063** and reconciled into this
-board on 2026-08-21 after its prerequisites were verified individually, not assumed: TASK-0022
-COMPLETE, MSG-0062 DECIDED, MSG-0063 AUTHORIZED, no OPEN blocker, no runner lock held, and exactly
-one TASK-0023 specification file on disk.
+**TASK-0023 is COMPLETE (2026-08-21), and no task is READY.** It was executed by a supervisor-started
+session (`runner.lock` pid 27400, acquired 18:04:59Z) and delivered
+[`WP-0009 — Employee Policy Assistant`](../../docs/program/work-packages/WP-0009-employee-policy-assistant.md),
+the formal work-package record. All seven MSG-0063 acceptance criteria are met, each mapped to evidence
+in **MSG-0066** §3. Being documentary, it produced **no test count and claims none**.
+
+**The identifier is WP-0009** — the next number unused in *either* register, verified by `grep` before
+allocation. **Historical WP-0001 is untouched** and all eight `PLAN-WP-0001` planning entries are
+retained verbatim; the two registers are reconciled in `docs/program/work-packages.md` §0 with a
+standing allocation rule, which also closes **DISC-0010**. WP-0002 looked free from the delivered
+directory alone and was **not** taken: the planning list has held it since it was written.
+
+**Three MSG-0062 rulings shaped the sequence.** §7.3 fixes **T-D before T-E** and closes an item open
+since EPA-0002. §7.6 makes "retrieve then filter" a **gate failure** rather than a style preference —
+Restricted documents are eligible for the corpus, but a Restricted document is never retrieved unless
+the subject satisfies its policy, and denial fails closed with no existence, content, timing, or
+result-count side channel. §7.7 means **ADR-0015 is not inherited** and no stack is selected.
+
+**Two things were deliberately not done, and both would have looked helpful.** **ADR numbers were not
+allocated** — MSG-0062 §7.2 and this queue section both place allocation in the ADR-drafting task, so
+the six surfaces are sequenced and justified but unnumbered, with "next free is ADR-0017" recorded as an
+observation only. **No task was marked READY**, including the three architecture tasks the record itself
+defines. That is the boundary MSG-0063 draws, not an omission.
+
+> **The line this replaces, retained:** "**TASK-0023 is READY — the single READY task.** Authorized by
+> **MSG-0063** and reconciled into this board on 2026-08-21 after its prerequisites were verified
+> individually, not assumed: TASK-0022 COMPLETE, MSG-0062 DECIDED, MSG-0063 AUTHORIZED, no OPEN blocker,
+> no runner lock held, and exactly one TASK-0023 specification file on disk." True from the MSG-0064
+> reconciliation until the task executed on the same day. Every prerequisite was re-verified at the start
+> of the executing session rather than inherited from this paragraph — checkpoint 1 records each.
+
+**What the Architecture Lead does next:** authorize one bounded architecture task from `WP-0009` §6.2 —
+**A-ADR**, **A-STACK**, or **A-SURVEY** — and reconcile it into this board as the single READY task.
+The reconciliation warning below applies to it in full; the count stands at six.
 
 It is **architecture/governance reconciliation only.** It may not implement, select any provider,
 model, embedding, framework or runtime, change permissions, security boundaries, Supervisor behaviour
@@ -331,6 +361,7 @@ READY means *authorized to attempt*, never *authorized to force*. A READY task w
 | MSG-0063 | Decision | AUTHORIZED | Architecture lead | Claude Code | **TASK-0023 authorized** — reconcile EPA-0004 and the MSG-0062 rulings into the governed work-package records, resolve the WP numbering/register discrepancy, allocate the formal work-package identity, and define the dependency-ordered architecture tasks and ADR allocation. Seven acceptance criteria. **Forbidden:** implementation, provider/model/runtime selection, permission or security-boundary changes, Supervisor changes, and **marking any implementation task READY**. Must reconcile rather than duplicate existing records | 2026-08-21 |
 | MSG-0064 | Record | **OPEN** | Claude Code | Architecture lead | **TASK-0023 queue reconciliation.** MSG-0063 authorized TASK-0023 and the queue did not contain it — the **sixth** recurrence of the MSG-0044 gap. Reconciled as the single READY task after verifying prerequisites individually: TASK-0022 COMPLETE, MSG-0062 DECIDED, MSG-0063 AUTHORIZED, no OPEN blocker, no runner lock, one specification file. Verified by dry run. **TASK-0023 was not executed in this session**, per the operator instruction | 2026-08-21 |
 | MSG-0065 | Record | **OPEN** | Claude Code | Architecture lead | **State/record correction.** Today's records said the Windows `Schedule` service was stopped by the operator. **Verified this session: the service is Running (Automatic); the scheduled task `PCI-Execution-Supervisor` is Disabled.** `LastRun` 10:47:47Z matches the final scheduled cycle in the supervisor log; every cycle after it is at an irregular time and was manual. The functional conclusion held — no cycle fires unattended — but **the remedy differs: enable the task, do not restart the service.** The task was **not** enabled: that is a Supervisor scheduling change, forbidden by MSG-0063 and an operator decision. MSG-0064 corrected in place | 2026-08-21 |
+| MSG-0066 | Record | CREATED — reconciliation applied | Claude Code | Architecture lead | **TASK-0023 execution record.** All seven MSG-0063 acceptance criteria met with evidence. **WP-0009 — Employee Policy Assistant** allocated as the next number unused in either register (`grep` verified before allocation); **historical WP-0001 and all eight planning entries untouched**; the planning list and the canonical directory reconciled in `work-packages.md` §0 with a standing allocation rule, closing **DISC-0010**. Six ADR surfaces converted into a dependency-ordered sequence but **deliberately unnumbered — no ADR created**. **T-0 separated as operator-only** (organizational choice plus a privileged deployment). T-D precedes T-E per §7.3; §7.6's no-retrieve-then-suppress rule bound into gates G3/G6; ADR-0015 not inherited per §7.7. **No implementation, no provider selection, no permission or Supervisor change, and no task marked READY** — the queue has zero READY tasks. §6 carries three open items, none blocking; §7.3 discloses one process error caught before it reached a commit | TASK-0023 |
 | MSG-0051 | Record | CREATED — audit complete | Claude Code | Architecture lead | **TASK-0019 baseline audit.** Six documentary corrections applied with their authorities quoted; four record classes verified already correct; **§C refers seven items for decision**, led by the accepted WP-0001 work package still reading `Status: Ready for implementation` — the stop condition fired and that correction was **not** made | TASK-0019 |
 
 ## Interruption and recovery protocol
@@ -885,11 +916,55 @@ architecture record is easy to duplicate and hard to reconcile.
 
 ## TASK-0023 — EPA work-package governance reconciliation
 
-**Priority:** 1 | **Status:** **READY** | **Owner:** Claude Code
+**Priority:** 1 | **Status:** **COMPLETE** — executed 2026-08-21; 7/7 acceptance criteria, evidence in MSG-0066 | **Owner:** Claude Code
 **Depends on:** TASK-0022 COMPLETE; MSG-0062 DECIDED (EPA-0004 accepted, seven items ruled); MSG-0063 AUTHORIZED
+**Delivered:** [`WP-0009 — Employee Policy Assistant`](../../docs/program/work-packages/WP-0009-employee-policy-assistant.md) | **Execution record:** [`MSG-0066`](../comms/MSG-0066-task-0023-execution-record.md)
 **Next eligible task:** none — MSG-0063 reserves the next authorization to the Architecture Lead after this task is accepted
 **Full specification:** [`TASK-0023-epa-work-package-reconciliation.md`](TASK-0023-epa-work-package-reconciliation.md)
-**Checkpoint:** `implementation/operations/checkpoints/TASK-0023.md`
+**Checkpoint:** [`checkpoints/TASK-0023.md`](checkpoints/TASK-0023.md)
+
+### TASK-0023 — result
+
+**COMPLETE, 2026-08-21.** Executed by a supervisor-started session; `state/runner.lock` named
+`TASK-0023`, pid 27400, acquired 18:04:59Z. Starting HEAD `ad3df56`, re-checked before the commit and
+unmoved. Evidence: **MSG-0066**; `checkpoints/TASK-0023.md`.
+
+**The finding in one line: the identifier was the whole difficulty, and it was a trap rather than a
+gap.** `WP-0002` has no record in the canonical directory and looks free from a directory listing —
+but the planning register has held it as "Repository and Engineering Platform" since it was written.
+Allocating it would have produced two different work packages with one number. **WP-0009** is the next
+number unused in *either* register, verified by `grep -rn "WP-0009\|WP-0010"` returning nothing before
+allocation.
+
+| Criterion (MSG-0063) | Verdict | Where |
+|---|---|---|
+| 1. EPA-0004 remains the accepted definition | **MET** | `WP-0009` header; EPA-0004 itself unmodified |
+| 2. Register discrepancy reconciled, WP-0001 not repurposed | **MET** | `work-packages.md` §0; all eight planning entries verbatim |
+| 3. Identifier recorded consistently | **MET** | Record file, register table, DISC-0010 resolution — three places agreeing |
+| 4. Six ADRs → explicit sequence, no duplicates, no accepted ADR modified | **MET** | `WP-0009` §7; `docs/decisions/` still ends at ADR-0016 |
+| 5. T-0 operator prerequisites separated | **MET** | `WP-0009` §6.1 |
+| 6. Dependency ordered; only the next authorized task eligible for READY | **MET** | `WP-0009` §6.2/§6.3; **nothing marked READY** |
+| 7. No implementation authorization implied | **MET** | `WP-0009` §9; status line reads NOT AUTHORIZED FOR IMPLEMENTATION |
+
+**No test count is reported. The task is documentary and produces none** — its verification section
+forbids claiming one.
+
+**Two deliberate omissions.** **ADR numbers were not allocated**: MSG-0062 §7.2 and this queue section
+both place allocation in the drafting task, so the six surfaces are ordered and justified but
+unnumbered, with "next free is ADR-0017" recorded as an observation explicitly *not* an allocation.
+**No task was marked READY**, including the three architecture tasks the deliverable defines.
+
+**No stop condition fired, and all three were checked.** The authoritative records did not materially
+conflict — the register disagreement is a *known, recorded* discrepancy this task was authorized to
+reconcile, not a new one. The identifier was allocable without repurposing anything. And no decision
+beyond MSG-0062/MSG-0063 was required: where one would have been — the T-D/T-E mitigation, PR3's owner,
+which planning entries WP-0009 relates to — it was **carried forward as open rather than decided**
+(MSG-0066 §6).
+
+**One process error is disclosed in MSG-0066 §7.3**: the first write of the checkpoint file contained
+checkpoints 2 and 3 in anticipation, including a fabricated commit SHA. It was corrected to checkpoint 1
+only before anything was staged, so no fabricated value reached a commit. Recorded because the rule it
+broke is one this queue has cited against a previous task.
 
 > **One specification file this time**, and MSG-0062/MSG-0063 carry distinct numbers — verified on
 > reconciliation. The TASK-0022 union treatment was needed because two files existed; it is not needed

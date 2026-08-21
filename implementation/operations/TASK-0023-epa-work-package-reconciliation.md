@@ -1,6 +1,15 @@
 # TASK-0023 — EPA Work-Package Governance Reconciliation
 
-**Status:** **READY** — reconciled into the authoritative queue 2026-08-21 as the single READY task, after prerequisites were verified (MSG-0064). The transition is the one this file's *Allowed* clause anticipates: "queue reconciliation so TASK-0023 is the single READY task when prerequisites are verified." Previously read "AUTHORIZED — not yet READY".
+**Status:** **COMPLETE** — executed 2026-08-21; all seven acceptance criteria met, evidence in **MSG-0066**. Delivered `WP-0009 — Employee Policy Assistant`. No implementation was authorized and **no task is READY**.
+
+> **The line this replaces, retained:** "**READY** — reconciled into the authoritative queue 2026-08-21
+> as the single READY task, after prerequisites were verified (MSG-0064). The transition is the one this
+> file's *Allowed* clause anticipates: 'queue reconciliation so TASK-0023 is the single READY task when
+> prerequisites are verified.' Previously read 'AUTHORIZED — not yet READY'." True from the MSG-0064
+> reconciliation until the task executed later the same day. **This is the lead's record**, edited only
+> because leaving it READY would have the Supervisor select a completed task on its next cycle — the
+> same reason MSG-0064 gave for the previous transition, and with the superseded text quoted rather
+> than erased.
 **Authority:** MSG-0063
 **Owner:** Claude Code / Execution Agent
 

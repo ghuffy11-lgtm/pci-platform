@@ -2,7 +2,12 @@
 
 **Active Work Package:** WP-0001 — PCI Kernel Foundation
 **Status:** **COMPLETE** — declared by the architecture lead 2026-08-19 (MSG-0020(b), resolved by MSG-0022 / MSG-0023, TASK-0009)
-**Last Updated:** 2026-08-21 UTC (**EPA-0004 ACCEPTED** by MSG-0062 with all seven items ruled; **MSG-0063 authorizes TASK-0023**, reconciled into the queue as the single READY task and **not started** — MSG-0064; BLK-0007 raised and resolved)
+**Last Updated:** 2026-08-21 UTC (**TASK-0023 COMPLETE** — the EPA governance reconciliation is applied and **`WP-0009 — Employee Policy Assistant` is allocated**, MSG-0066. **No task is READY**; implementation remains prohibited)
+
+> **The line this replaces, retained:** "2026-08-21 UTC (**EPA-0004 ACCEPTED** by MSG-0062 with all
+> seven items ruled; **MSG-0063 authorizes TASK-0023**, reconciled into the queue as the single READY
+> task and **not started** — MSG-0064; BLK-0007 raised and resolved)." True until TASK-0023 executed
+> later the same day.
 
 ## Current State
 
@@ -83,6 +88,7 @@ message on 2026-08-20 under MSG-0041 (MSG-0042) — the fifth.
 | TASK-0019 | Post-WP-0001 repository baseline audit | **COMPLETE** (2026-08-21) — MSG-0051 | TASK-0018, MSG-0050 ✅ | Claude Code |
 | TASK-0021 | Employee policy assistant — architecture definition | **COMPLETE** (2026-08-21) — 11/11 criteria, MSG-0055 | WP-0001 COMPLETE, MSG-0054 ✅ | Claude Code |
 | TASK-0022 | Employee policy assistant — work-package definition | **COMPLETE** (2026-08-21) — `EPA-0004` delivered as PROPOSED, MSG-0061 | TASK-0021, MSG-0058, MSG-0059 ✅ | Claude Code |
+| TASK-0023 | EPA work-package governance reconciliation | **COMPLETE** (2026-08-21) — 7/7 criteria, **WP-0009 allocated**, MSG-0066 | TASK-0022, MSG-0062, MSG-0063 ✅ | Claude Code |
 | TASK-0002 | Make test entry points shell-independent | **ABORTED** | — | — |
 
 **No task is READY** — but the reason has changed. The project now sits at an **architecture decision
@@ -95,7 +101,51 @@ boundary**, not at an empty queue.
 > been executed and is COMPLETE (MSG-0055). MSG-0051 §C is fully discharged: C1–C5 by MSG-0052,
 > C6–C7 by MSG-0053.
 
-**Current position, 2026-08-21 after TASK-0022: no task is READY, and the boundary is acceptance
+**Current position, 2026-08-21 after TASK-0023: no task is READY, and the boundary is authorization —
+the governance is now in place and the next bounded task is the Architecture Lead's to name.**
+
+TASK-0023 executed the MSG-0063 reconciliation and delivered
+[`WP-0009 — Employee Policy Assistant`](../../docs/program/work-packages/WP-0009-employee-policy-assistant.md),
+the formal work-package record in the canonical directory. All seven MSG-0063 acceptance criteria are
+met, each mapped to evidence in **MSG-0066** §3. Being documentary it produced **no test count and
+claims none**.
+
+**The identifier was the hard part, and it was a trap rather than a gap.** `WP-0002` has no record in
+`docs/program/work-packages/` and looks free from a directory listing — but `PLAN-WP-0001` has held it
+as "Repository and Engineering Platform" since it was written. **WP-0009** is the next number unused in
+*either* register, verified by `grep` returning nothing before allocation. **Historical WP-0001 —
+PCI Kernel Foundation — is untouched**, and all eight planning entries are retained verbatim. The two
+registers are now reconciled in `docs/program/work-packages.md` §0, which states plainly that the
+planning list is a plan, that MSG-0005 makes the directory canonical, and that a new work package takes
+the next number unused in either. That closes **DISC-0010**, whose own trigger — "the moment a second
+work package is created" — arrived the same day it was written.
+
+**Three MSG-0062 rulings shaped the sequence.** §7.3 fixes **T-D (grounded QA) before T-E
+(retrieval-time authorization)**, closing an item open since EPA-0002 — and the interim exposure it
+creates is carried forward as an open item rather than quietly resolved, because §7.3 rules the order
+and is silent on the mitigation. §7.6 makes **"retrieve then filter" a gate failure**: Restricted
+documents are eligible for the corpus, but one is never retrieved unless the subject satisfies its
+policy, and denial fails closed with no existence, content, timing, or result-count side channel.
+§7.7 means **ADR-0015 is not inherited** and no stack is selected.
+
+**Two things were deliberately not done.** **ADR numbers were not allocated** — MSG-0062 §7.2 places
+allocation in the drafting task, so the six surfaces are sequenced and justified but unnumbered, with
+"next free is ADR-0017" recorded as an observation and explicitly not an allocation. **No task was
+marked READY**, including the three architecture tasks WP-0009 §6.2 itself defines: **A-ADR** (draft the
+required ADRs), **A-STACK** (propose the service stack, §7.7), **A-SURVEY** (the bounded corpus survey
+§7.5 authorized in principle). Authorizing one of them is the next action, and it is the lead's.
+
+**Three items remain genuinely open, none blocking:** the T-D/T-E mitigation; PR3's owner and date for
+the identity provider; and which `PLAN-WP-0001` entries WP-0009 satisfies, supersedes, or sits beside —
+a program-structure judgment §7.1 does not reach. MSG-0066 §6.
+
+> **Superseded — corrected 2026-08-21 by TASK-0023.** The paragraph below was the position after
+> TASK-0022 and remained true until TASK-0023 executed. The acceptance boundary it describes has been
+> passed: MSG-0062 accepted EPA-0004 and ruled all seven of its open items, and those rulings are now
+> reconciled into the governance records. **Implementation is still prohibited** — that part did not
+> change.
+
+**Position after TASK-0022 (superseded, retained): no task is READY, and the boundary is acceptance
 rather than decision.** TASK-0022 delivered
 [`EPA-0004`](../architecture/EPA-0004-employee-policy-assistant-work-package-definition.md) — the
 Employee Policy Assistant work-package definition, **PROPOSED**: thirteen acceptance gates, ten
@@ -433,9 +483,20 @@ carry explicit supersession notes, with no supervisor behaviour, permission, or 
 C4 and C5 — no action, deliberately. **C6 (a bounded proof of MSG-0049 option B) and C7 (the next
 work package) remain the Lead's to decide and are not self-authorized.**
 
-**Two messages carry `Status: OPEN`, both informational and neither blocking: MSG-0060** (the
-TASK-0022 queue reconciliation, whose observation about task-specification collisions the lead has
-not yet addressed) **and MSG-0064** (the TASK-0023 queue reconciliation).
+**Three messages carry `Status: OPEN`, all informational and none blocking — verified 2026-08-21 by
+reading each file's own status line: MSG-0060** (the TASK-0022 queue reconciliation, whose observation
+about task-specification collisions the lead has not yet addressed), **MSG-0064** (the TASK-0023 queue
+reconciliation) **and MSG-0065**.
+
+**MSG-0065 is the one with an operator action attached.** It corrects an earlier record: the Windows
+`Schedule` service is **Running**, and the scheduled task `PCI-Execution-Supervisor` is **Disabled**.
+The functional effect is the one previously reported — no supervisor cycle fires on its own — but the
+remedy is to **enable the task**, not restart the service. **It was not enabled by TASK-0023**: that is
+a Supervisor scheduling change, forbidden by MSG-0063, and an operator decision.
+
+> **The line this replaces, retained:** "**Two messages carry `Status: OPEN`, both informational and
+> neither blocking: MSG-0060** … **and MSG-0064** (the TASK-0023 queue reconciliation)." True until
+> MSG-0065 was raised later the same day.
 
 > **The line this replaces, retained:** "**One message carries `Status: OPEN`: MSG-0060**, the
 > TASK-0022 queue reconciliation … that a fifth number collision occurred, this time on an
@@ -630,6 +691,7 @@ visible; it does not make it self-clearing.
 | MSG-0048 | Architecture decision: authorize TASK-0018 live heartbeat validation | **DECIDED** — executed; see MSG-0049 |
 | MSG-0049 | TASK-0018 verification record — `RUNNER_RUNNING` **observed live** | **CLOSED** — gate 3 met by external observation; all five gates MET |
 | MSG-0050 | Architecture decision: authorize TASK-0019 post-WP-0001 baseline audit | **DECIDED** — executed; see MSG-0051 |
+| MSG-0066 | TASK-0023 execution record — EPA governance reconciled, **WP-0009** allocated | **RECORD** — 7/7 acceptance criteria; no ADR created, no task marked READY; **no decision requested** |
 | MSG-0055 | TASK-0021 execution record — employee policy assistant architecture definition | **RECORD** — 11/11 criteria met; **§5 lists fourteen decisions requiring the architecture lead**; none self-authorized |
 | MSG-0054 | Employee policy assistant architecture objective | **DECIDED** — TASK-0021 authorized as architecture definition only; executed, see MSG-0055 |
 | MSG-0053 | Architecture lead decisions C6-C7 | **DECIDED** — C6 not authorized/not required; C7 no new work package pending a concrete objective |
