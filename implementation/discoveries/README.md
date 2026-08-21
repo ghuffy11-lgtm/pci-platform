@@ -20,6 +20,7 @@ record, not a missing discovery.
 | [DISC-0007](DISC-0007-initdb-role-provisioning-defect.md) | Database init refuses to create a passwordless role, then creates one anyway | **RESOLVED** 2026-08-19 by TASK-0004 (MSG-0012) — fix verified against a clean initialisation |
 | [DISC-0008](DISC-0008-compose-kernel-service-incomplete.md) | Compose kernel service cannot start as committed | **RESOLVED** 2026-08-19 by TASK-0005 (MSG-0012, option 1) — guard verified intact |
 | [DISC-0009](DISC-0009-docker-client-state-outside-data.md) | Docker CLI writes client state to `/home/claude`, outside the `/data` boundary | **CLOSED — ACCEPTED, NOT A VIOLATION** 2026-08-19 by MSG-0020(b) / MSG-0022 / MSG-0023 — account-level tool state is not a PCI project artifact under contract v0.2 |
+| [DISC-0010](DISC-0010-work-package-register-disagreement.md) | The two work-package registers disagree about what WP-0001 is; `docs/program/work-packages.md` already lists a WP-0002 | **RECORDED** 2026-08-21 (TASK-0021, MSG-0055 §7.1) — no action taken and none proposed; blocks nothing until a second work package is allocated a number |
 
 ## Reconciled 2026-08-20 — TASK-0015
 

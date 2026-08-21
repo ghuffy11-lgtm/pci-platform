@@ -670,8 +670,9 @@ precedence has changed.
 
 ## Discoveries
 
-Index: `implementation/discoveries/README.md` — reconciled 2026-08-20 by TASK-0015 and now lists all
-nine records. The record file is the source of truth; both tables index it.
+Index: `implementation/discoveries/README.md` — reconciled 2026-08-20 by TASK-0015, and extended to
+**ten** records on 2026-08-21 when TASK-0021 added DISC-0010. The record file is the source of truth;
+both tables index it, and both were updated in the same commit as the record.
 
 | ID | Subject | Status |
 |---|---|---|
@@ -684,6 +685,7 @@ nine records. The record file is the source of truth; both tables index it.
 | DISC-0007 | Init refuses to create a passwordless role, then creates one anyway | **RESOLVED** 2026-08-19 by TASK-0004 |
 | DISC-0008 | Compose kernel service cannot start as committed | **RESOLVED** 2026-08-19 by TASK-0005 |
 | DISC-0009 | Docker CLI writes client state to `/home/claude`, outside `/data` | **CLOSED — ACCEPTED, NOT A VIOLATION** 2026-08-19 by MSG-0020(b) / MSG-0022 / MSG-0023 |
+| DISC-0010 | The two work-package registers disagree about what WP-0001 is | **RECORDED** 2026-08-21 (TASK-0021, MSG-0055 §7.1) — no action taken, none proposed |
 
 > **Corrected 2026-08-20 by TASK-0015.** This table had two defects. It was declared with **two**
 > columns while four rows supplied three cells, so the renderer silently dropped the status of

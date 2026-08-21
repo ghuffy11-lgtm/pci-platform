@@ -140,7 +140,15 @@ the delivered `docs/program/work-packages/WP-0001-kernel-foundation.md` is "PCI 
 Allocating "WP-0002" to the assistant would therefore collide with an existing planning entry.
 **EPA-0002 allocates no number** and refers to "the assistant work package" throughout. This is the
 same index-versus-record drift pattern TASK-0019 found six times, seen a seventh time in a register
-that audit did not cover.
+that audit did not cover — it examined the queue, ROADMAP, status, COMMS, blockers, discoveries,
+checkpoints, ADRs and the work-package *file*, but not the work-package *list*.
+
+Recorded as [`DISC-0010`](../discoveries/DISC-0010-work-package-register-disagreement.md) with four
+options and **no recommendation**, because reconciling the two registers means deciding whether the
+planning list is superseded history, a valid forward plan with stale numbering, or something to
+renumber — a judgment about program structure rather than documentary drift with one obvious correct
+value. That is precisely what TASK-0021's stop condition reserves to the lead, so no correction was
+attempted.
 
 **7.2 — The proposed task order builds the answer path before retrieval-time authorization.**
 MSG-0054's dependency order places grounded QA before authorization/confidentiality. **EPA-0002 §5
