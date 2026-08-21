@@ -2,7 +2,7 @@
 
 **Active Work Package:** WP-0001 — PCI Kernel Foundation
 **Status:** **COMPLETE** — declared by the architecture lead 2026-08-19 (MSG-0020(b), resolved by MSG-0022 / MSG-0023, TASK-0009)
-**Last Updated:** 2026-08-21 UTC (**TASK-0024 COMPLETE** — ADR-0017…0022 drafted, MSG-0070; **MSG-0071 accepts all six**; **five await promotion to `docs/decisions/` — MSG-0072, decision required**; no task READY)
+**Last Updated:** 2026-08-21 UTC (**TASK-0024 COMPLETE** — ADR-0017…0022 drafted, MSG-0070; **MSG-0071 accepts all six**; **five await promotion — MSG-0072, decision required**; pre-promotion verification passed; no task READY)
 
 > **The line this replaces, retained:** "2026-08-21 UTC (**TASK-0023 COMPLETE** — WP-0009 allocated,
 > MSG-0066; **MSG-0067** rules the carried-forward items; **MSG-0068 authorizes TASK-0024 (A-ADR)**,
@@ -1122,6 +1122,23 @@ this work rather than delegating it. Everything that did not depend on that answ
 ADR index and all six draft headers now record the acceptance, the ADR-0017 draft is marked RATIFIED
 per the ADR-0015 precedent, and MSG-0071 is registered in both the COMMS register and the queue
 ledger. **No ADR text was altered.**
+
+**A pre-promotion verification pass was run, read-only, and it passed** (MSG-0072). MSG-0071
+attached conditions to its own acceptance, and the moment to check them is before the drafts
+become authoritative:
+
+- **No provider, model, runtime, or framework is selected.** The only substantive technology
+  mention is **Ollama, twice in ADR-0022** — a *citation* of ADR-0003, with that ADR stating
+  twice that it selects nothing. Verified at source: ADR-0003 line 17 reads verbatim as quoted.
+- **ADR-0019 invents no normalization rules.** It fixes the obligation — raw text immutable,
+  ingestion and query normalization identical, rule set versioned — and defers the rules to
+  corpus evidence, stating it must be amended before production use.
+- **ADR numbering is collision-free.** The three ids in both directories are promoted pairs with
+  identical filenames; no id is claimed by two titles.
+
+This establishes that promoting ADR-0018 … ADR-0022 **as written** would not violate MSG-0071's
+conditions or close a question the lead left open. **It does not authorize the promotion**, and
+none was performed.
 
 ### What remains explicitly unauthorized
 

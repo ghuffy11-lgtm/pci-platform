@@ -90,3 +90,72 @@ That is the same shape as the queue-reconciliation gap now at seven recurrences,
 - MSG-0071 registered in the COMMS register and the queue ledger.
 - **No task is READY.** A-SURVEY and A-STACK remain unauthorized; no implementation task is authorized.
 - No OPEN blocker.
+
+---
+
+## Pre-promotion verification — performed 2026-08-21, nothing promoted
+
+MSG-0071's acceptance carries conditions, and the moment to check them is **before** the drafts become
+authoritative, not after. This is a read-only pass; **no ADR was promoted, and no ADR text was
+altered.**
+
+### 1. No provider, model, runtime, or framework is selected
+
+MSG-0071 requires the accepted records to "not introduce provider, model, runtime, framework, or
+implementation selections that were deliberately left open."
+
+A scan of all six drafts for concrete technology names returned only three kinds of hit: `Claude` in
+"Proposed by: Claude Code" bylines, `CLAUDE` in `CLAUDE.md` path references, and `express` as an
+ordinary English verb in ADR-0018 ("must be able to express 'authorized approver'…").
+
+The one substantive hit is **Ollama, twice in ADR-0022** — the inference-locality ADR, where a runtime
+selection would matter most. **It is a citation, not a selection**, and the ADR is explicit both times:
+
+> **No model, runtime, embedding model, or serving technology is selected by this ADR.** … ADR-0003
+> notes Ollama as a practical initial local runtime and is explicit that this is "an implementation
+> decision, not a platform identity" — this ADR does not elevate it.
+
+**The citation was verified against the source rather than trusted.** `docs/decisions/ADR-0003` line 17
+reads verbatim: *"The first local inference environment may use Ollama because it is practical for the
+target hardware and familiar operational environment. This is an implementation decision, not a
+platform identity."* ADR-0022's quotation is accurate and its use of it is correct.
+
+**Verdict: MET.** Nothing left open has been closed by these drafts.
+
+### 2. ADR-0019 invents no normalization rules
+
+MSG-0071 accepted ADR-0019 on condition that "no invented normalization rules are authorized."
+
+The draft records the **obligation** and defers the **rule set**: raw authoritative text immutable;
+ingestion-time and query-time normalization identical, with divergence named as a defect; the rule set
+versioned so a change is a reindex. It states plainly that it "must be amended before production use"
+with the empirical rule set, and lists the rule set under *Deliberately not decided here*, traced to
+MSG-0056a D6.
+
+**Verdict: MET.** The obligation is fixed; no rule was invented.
+
+### 3. ADR numbering is collision-free
+
+```text
+docs/decisions/            ADR-0001 … ADR-0017   (contiguous)
+implementation/decisions/  ADR-0015 … ADR-0022
+```
+
+The three overlapping ids — 0015, 0016, 0017 — carry **identical filenames** in both directories, so
+they are promoted pairs rather than collisions. **No id is claimed by two different titles.** Given
+that four message numbers and two task specifications have collided in this project, the check was
+worth running rather than assuming; TASK-0024's numbering claim holds.
+
+### 4. A quoted control was verified at source
+
+ADR-0022 quotes `docs/security/data-classification.md`: *"A model being local does not make data
+automatically safe. Authorization, classification, minimization, and audit controls apply equally to
+local and remote model runtimes."* That is line 31 of that file, verbatim.
+
+### What this does and does not establish
+
+**It establishes** that promoting ADR-0018 … ADR-0022 as written would not violate the conditions
+MSG-0071 attached to its own acceptance, and would not silently close a question the lead left open.
+
+**It does not** authorize the promotion, and none was performed. The decision in this message stands
+unchanged: finish it yourself, or authorize a bounded task.
