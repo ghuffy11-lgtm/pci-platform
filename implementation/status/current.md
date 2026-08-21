@@ -2,7 +2,7 @@
 
 **Active Work Package:** WP-0001 — PCI Kernel Foundation
 **Status:** **COMPLETE** — declared by the architecture lead 2026-08-19 (MSG-0020(b), resolved by MSG-0022 / MSG-0023, TASK-0009)
-**Last Updated:** 2026-08-21 UTC (**TASK-0023 COMPLETE** — the EPA governance reconciliation is applied and **`WP-0009 — Employee Policy Assistant` is allocated**, MSG-0066. **No task is READY**; implementation remains prohibited)
+**Last Updated:** 2026-08-21 UTC (**TASK-0023 COMPLETE** — WP-0009 allocated, MSG-0066; **MSG-0067** rules the carried-forward items; **MSG-0068 authorizes TASK-0024 (A-ADR)**, reconciled into the queue as the single READY task — MSG-0069; Supervisor re-enabled and live)
 
 > **The line this replaces, retained:** "2026-08-21 UTC (**EPA-0004 ACCEPTED** by MSG-0062 with all
 > seven items ruled; **MSG-0063 authorizes TASK-0023**, reconciled into the queue as the single READY
@@ -483,16 +483,22 @@ carry explicit supersession notes, with no supervisor behaviour, permission, or 
 C4 and C5 — no action, deliberately. **C6 (a bounded proof of MSG-0049 option B) and C7 (the next
 work package) remain the Lead's to decide and are not self-authorized.**
 
-**Three messages carry `Status: OPEN`, all informational and none blocking — verified 2026-08-21 by
-reading each file's own status line: MSG-0060** (the TASK-0022 queue reconciliation, whose observation
-about task-specification collisions the lead has not yet addressed), **MSG-0064** (the TASK-0023 queue
-reconciliation) **and MSG-0065**.
+**Four messages carry `Status: OPEN`, all informational and none blocking — verified 2026-08-21 by
+reading each file's own status line: MSG-0060** (the TASK-0022 queue reconciliation, whose
+observation about task-specification collisions the lead has not yet addressed), **MSG-0064** (the
+TASK-0023 queue reconciliation), **MSG-0065**, and **MSG-0069** (the TASK-0024 queue
+reconciliation, which records a doubled collision and the seventh recurrence).
 
-**MSG-0065 is the one with an operator action attached.** It corrects an earlier record: the Windows
-`Schedule` service is **Running**, and the scheduled task `PCI-Execution-Supervisor` is **Disabled**.
-The functional effect is the one previously reported — no supervisor cycle fires on its own — but the
-remedy is to **enable the task**, not restart the service. **It was not enabled by TASK-0023**: that is
-a Supervisor scheduling change, forbidden by MSG-0063, and an operator decision.
+**MSG-0065's operator action has been taken.** It reported the scheduled task
+`PCI-Execution-Supervisor` as **Disabled** while the `Schedule` service ran, and said the remedy
+was to enable the task rather than restart the service. **The operator enabled it.** Verified
+2026-08-21: task state **Ready**, cycling every ten minutes, `LastRunTime` 19:07 local. TASK-0023
+was executed by a supervisor-started session as a direct result.
+
+> **The lines this replaces, retained:** "**Three messages carry `Status: OPEN`** … **MSG-0065 is
+> the one with an operator action attached** … the remedy is to **enable the task**, not restart
+> the service. **It was not enabled by TASK-0023**: that is a Supervisor scheduling change,
+> forbidden by MSG-0063, and an operator decision." Accurate until the operator enabled it.
 
 > **The line this replaces, retained:** "**Two messages carry `Status: OPEN`, both informational and
 > neither blocking: MSG-0060** … **and MSG-0064** (the TASK-0023 queue reconciliation)." True until
@@ -1004,64 +1010,120 @@ both tables index it, and both were updated in the same commit as the record.
 
 ## Next Action
 
-**TASK-0023 is READY and is the single READY task. It has NOT been started.**
-The queue is armed and nothing has consumed it. **Starting it requires enabling the scheduled task
-or an explicit manual trigger** — see the corrected operational note below. The reconciliation and
-the execution were deliberately separated by operator instruction (MSG-0064).
+**TASK-0024 (A-ADR) is READY and is the single READY task. The Supervisor will start it on its next
+cycle — no manual trigger is needed.**
 
-> **Corrected 2026-08-21 (MSG-0065).** This paragraph previously said starting TASK-0023 required
-> "restarting the Windows `Schedule` service — stopped by the operator". **That was wrong.** The
-> `Schedule` service is **Running (Automatic)**; what is **Disabled** is the scheduled task
-> `PCI-Execution-Supervisor`. Restarting the service would therefore have done nothing. The
-> functional consequence was right — no cycle fires on its own — but the remedy was not.
+The scheduled task `PCI-Execution-Supervisor` is enabled again and cycling every ten minutes. It was
+observed idling at `NOOP: no READY task` at 19:07:18Z and 19:17:18Z **while TASK-0024 sat authorized
+and unreconciled** — the seventh recurrence of that gap, and the first one visible in the log rather
+than argued from principle (MSG-0069).
 
-**What changed.** **MSG-0062 ACCEPTED EPA-0004** as the bounded work-package definition and ruled all
-seven of the open items MSG-0061 §7 raised. **MSG-0063** then authorized **TASK-0023**, the governance
-reconciliation that turns the accepted definition into authoritative work-package records.
+**What TASK-0024 does.** Draft the **minimal** set of new ADRs that makes the accepted WP-0009
+architecture enforceable before implementation, evaluating the six candidate surfaces in WP-0009 §7
+against the accepted ADRs and creating only what is genuinely required. ADR numbers are allocated **at
+drafting time** from the repository's actual state, never pre-assigned.
 
-### The three rulings that most change what happens next
+**What it may not do.** No implementation; no provider, model, embedding, framework or runtime
+selection; **no production corpus ingestion**; no permission, security-boundary, Supervisor or
+scheduling change; no operator-only action; **no modification or duplication of accepted ADRs**; and
+**it may not mark T-A through T-E or any other implementation task READY.**
 
-- **7.6 — Restricted documents are eligible for the governed corpus, but no retrieve-then-suppress
-  design is permitted.** A Restricted document is never retrieved into an employee request unless the
-  authenticated subject satisfies its authorization policy, and denial must **fail closed without
-  revealing existence, content, timing, or result-count**. This settles the item MSG-0061 flagged as
-  deserving attention first: an exclusion cannot fail open, and the ruling forbids the path that can.
-- **7.3 — T-D (grounded QA) must precede T-E (retrieval-time authorization).** Authorization controls
-  must not be validated against an unproven answer path. Security review remains a gate on the
-  complete path before release.
-- **7.7 — ADR-0015 is not inherited** as the service stack. The service stays outside the kernel
-  boundary and uses accepted platform contracts; a dedicated architecture task must propose the
-  concrete stack. Nothing — provider, framework, model, embedding technology, runtime — is selected.
+### Four documents govern it, and all four must be read
 
-The remaining four: **7.1** allocate a **new** work package with no existing WP number repurposed;
-**7.2** create only the ADRs needed to make the architecture enforceable before production, numbered
-by repository convention in the next architecture task; **7.4** integrate an OIDC/OAuth2 provider and
-never implement one, with selection and privileged deployment remaining operator actions; **7.5** a
-**bounded corpus survey is authorized before T-B** as a discovery input only, with no production
-ingestion and no bypass of approval controls.
+Two specification files and two authorization messages were committed for this one task. **All four
+agree**, so no stop condition fired — but each pair carries safety-relevant content the other lacks:
+spec A and MSG-0068a hold the **stop-rather-than-improvise** condition; spec B and MSG-0068b hold the
+**ten constraints to preserve**, including MSG-0067's limit that **T-D may be tested only against
+synthetic or non-confidential documents** until T-E is implemented and verified. The queue section
+carries the union of all four. Nothing was renamed, per MSG-0058 F4.
 
-### What TASK-0023 may and may not do
+### What MSG-0067 settled, and what it deliberately did not
 
-It reconciles EPA-0004 and the MSG-0062 rulings into the governed records: resolve the WP
-numbering/register discrepancy **preserving historical WP-0001**, allocate the formal work-package
-identity by repository convention, turn the six ADR surfaces into an explicit sequence **without
-creating any ADR**, record **T-0 as operator-only**, and produce the dependency-ordered gate sequence
-with the next task **identified but not implicitly authorized**.
+- **T-D/T-E interim exposure — DECIDED.** No real or confidential corpus enters the T-D path until
+  T-E retrieval-time authorization is implemented **and verified**.
+- **PR3 identity — DECIDED.** Use the organization's existing Microsoft/Active Directory
+  infrastructure **through the established ADR-0007 OIDC/OAuth2 boundary**. PCI builds no identity
+  provider and does not bypass that boundary with LDAP or Kerberos.
+- **WP-0009's relationship to PLAN-WP-0001 — DECIDED.** WP-0009 **sits beside** the planning entries.
+  It does not satisfy, supersede, rename, or renumber them; the planning list stays forward-looking,
+  and WP-0009 is the canonical delivered identity for this capability. This also closes DISC-0010.
 
-It may **not** implement, select any provider/model/embedding/framework/runtime, change permissions or
-security boundaries, change Supervisor behaviour or scheduling, create or modify accepted ADRs,
-perform any operator-only or privileged action, or **mark any downstream implementation task READY**.
+**Left as organizational scheduling data, not architecture:** the IdP owner and deployment date. **T-0
+remains an operator prerequisite** for identity-dependent work and cannot be satisfied by a decision.
 
-### Still the lead's, after TASK-0023
+### After TASK-0024
 
-MSG-0063 reserves the next authorization: after TASK-0023 is completed **and accepted**, the lead
-authorizes the next bounded task. **Implementation remains prohibited** until every architecture gate
-and prerequisite is satisfied — including **T-0**, which needs a privileged operator deployment of the
-selected identity provider and cannot be satisfied by a decision alone.
+Implementation remains prohibited. **T-A is not authorized**, and TASK-0024 may not authorize it — the
+lead authorizes the next bounded task after reviewing the ADR set. When that happens, its board row
+must be added in the same breath, or it becomes the eighth recurrence.
 
-**MSG-0060 remains open and unaddressed**: whether a task-specification collision warrants more than
-the union treatment applied to TASK-0022. It blocks nothing.
+---
 
+**Historical — the position after TASK-0023 and before MSG-0068, retained.** The text below
+described the queue at a post-reconciliation pause: WP-0009 allocated, no task READY. **MSG-0067**
+then ruled the three carried-forward items and **MSG-0068 authorized TASK-0024**, which is now
+READY. Retained as the record of the position it described.
+
+> ## Next Action
+> 
+> **TASK-0023 is READY and is the single READY task. It has NOT been started.**
+> The queue is armed and nothing has consumed it. **Starting it requires enabling the scheduled task
+> or an explicit manual trigger** — see the corrected operational note below. The reconciliation and
+> the execution were deliberately separated by operator instruction (MSG-0064).
+> 
+> > **Corrected 2026-08-21 (MSG-0065).** This paragraph previously said starting TASK-0023 required
+> > "restarting the Windows `Schedule` service — stopped by the operator". **That was wrong.** The
+> > `Schedule` service is **Running (Automatic)**; what is **Disabled** is the scheduled task
+> > `PCI-Execution-Supervisor`. Restarting the service would therefore have done nothing. The
+> > functional consequence was right — no cycle fires on its own — but the remedy was not.
+> 
+> **What changed.** **MSG-0062 ACCEPTED EPA-0004** as the bounded work-package definition and ruled all
+> seven of the open items MSG-0061 §7 raised. **MSG-0063** then authorized **TASK-0023**, the governance
+> reconciliation that turns the accepted definition into authoritative work-package records.
+> 
+> ### The three rulings that most change what happens next
+> 
+> - **7.6 — Restricted documents are eligible for the governed corpus, but no retrieve-then-suppress
+>   design is permitted.** A Restricted document is never retrieved into an employee request unless the
+>   authenticated subject satisfies its authorization policy, and denial must **fail closed without
+>   revealing existence, content, timing, or result-count**. This settles the item MSG-0061 flagged as
+>   deserving attention first: an exclusion cannot fail open, and the ruling forbids the path that can.
+> - **7.3 — T-D (grounded QA) must precede T-E (retrieval-time authorization).** Authorization controls
+>   must not be validated against an unproven answer path. Security review remains a gate on the
+>   complete path before release.
+> - **7.7 — ADR-0015 is not inherited** as the service stack. The service stays outside the kernel
+>   boundary and uses accepted platform contracts; a dedicated architecture task must propose the
+>   concrete stack. Nothing — provider, framework, model, embedding technology, runtime — is selected.
+> 
+> The remaining four: **7.1** allocate a **new** work package with no existing WP number repurposed;
+> **7.2** create only the ADRs needed to make the architecture enforceable before production, numbered
+> by repository convention in the next architecture task; **7.4** integrate an OIDC/OAuth2 provider and
+> never implement one, with selection and privileged deployment remaining operator actions; **7.5** a
+> **bounded corpus survey is authorized before T-B** as a discovery input only, with no production
+> ingestion and no bypass of approval controls.
+> 
+> ### What TASK-0023 may and may not do
+> 
+> It reconciles EPA-0004 and the MSG-0062 rulings into the governed records: resolve the WP
+> numbering/register discrepancy **preserving historical WP-0001**, allocate the formal work-package
+> identity by repository convention, turn the six ADR surfaces into an explicit sequence **without
+> creating any ADR**, record **T-0 as operator-only**, and produce the dependency-ordered gate sequence
+> with the next task **identified but not implicitly authorized**.
+> 
+> It may **not** implement, select any provider/model/embedding/framework/runtime, change permissions or
+> security boundaries, change Supervisor behaviour or scheduling, create or modify accepted ADRs,
+> perform any operator-only or privileged action, or **mark any downstream implementation task READY**.
+> 
+> ### Still the lead's, after TASK-0023
+> 
+> MSG-0063 reserves the next authorization: after TASK-0023 is completed **and accepted**, the lead
+> authorizes the next bounded task. **Implementation remains prohibited** until every architecture gate
+> and prerequisite is satisfied — including **T-0**, which needs a privileged operator deployment of the
+> selected identity provider and cannot be satisfied by a decision alone.
+> 
+> **MSG-0060 remains open and unaddressed**: whether a task-specification collision warrants more than
+> the union treatment applied to TASK-0022. It blocks nothing.
+> 
 ---
 
 **Historical — the position after TASK-0022 and before MSG-0062, retained.** The text below

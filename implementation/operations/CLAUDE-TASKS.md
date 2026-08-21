@@ -33,11 +33,46 @@ Only the architecture lead may authorize new work, mark a task READY, or change 
 | TASK-0021 | **Employee policy assistant — architecture definition** | **COMPLETE** | WP-0001 COMPLETE, MSG-0054 | 2026-08-21 — 11/11 acceptance criteria, MSG-0055; **accepted by the Architecture Lead (MSG-0056a)** | none — all fourteen EPA-0003 decisions ruled (MSG-0056a/b); three reconciliation findings resolved by MSG-0058 | Claude Code |
 | TASK-0022 | **Employee policy assistant — work-package definition** | **COMPLETE** — output **ACCEPTED** by MSG-0062 | TASK-0021 COMPLETE, MSG-0058 DECIDED, MSG-0059 | 2026-08-21 — `EPA-0004` delivered, MSG-0061; accepted MSG-0062 with all seven open items ruled | none — the seven items in MSG-0061 §7 are ruled by MSG-0062 | Claude Code |
 | TASK-0023 | **EPA work-package governance reconciliation** | **COMPLETE** | TASK-0022 COMPLETE, MSG-0062 DECIDED, MSG-0063 AUTHORIZED | 2026-08-21 — 7/7 acceptance criteria, **WP-0009** allocated, MSG-0066 | none — awaiting the Architecture Lead's next authorization; **no task is READY** | Claude Code |
+| TASK-0024 | **A-ADR — draft the required EPA ADR set** | **READY** | TASK-0023 COMPLETE, MSG-0062 DECIDED, MSG-0067 DECIDED, MSG-0068 AUTHORIZED, WP-0009 defined | — | none — architecture/documentation only; **no implementation task may be marked READY** | Claude Code |
 | TASK-0002 | Make test entry points shell-independent | **ABORTED** | — | 2026-08-19 | none — premise disproven by measurement | — |
 
 **TASK-0019 is COMPLETE (2026-08-21).** It was authorized by MSG-0050, reconciled into this queue in `39eabdb`, and executed by a supervisor-started session on its scheduled 06:37:13Z cycle. It was maintenance/audit work only, not a new product work package.
 
-**TASK-0023 is COMPLETE (2026-08-21), and no task is READY.** It was executed by a supervisor-started
+**TASK-0024 is READY — the single READY task.** Authorized by **MSG-0068** and reconciled into this
+board on 2026-08-21 after its prerequisites were verified individually: TASK-0023 COMPLETE, MSG-0062
+DECIDED, MSG-0067 DECIDED, WP-0009 defined and not implementation-authorized, no OPEN blocker, and no
+runner lock held.
+
+It is **architecture and documentation only**: draft the minimal set of new ADRs that makes the
+accepted WP-0009 architecture enforceable before implementation. It may not implement, select any
+provider, model, embedding, framework or runtime, ingest a production corpus, change permissions,
+security boundaries, Supervisor behaviour or scheduling, **modify or duplicate accepted ADRs**, or take
+any operator-only action. **It may not mark T-A, T-B, T-C, T-D, T-E or any other implementation task
+READY.**
+
+**The Supervisor is live again.** The scheduled task `PCI-Execution-Supervisor` was re-enabled by the
+operator and has been cycling every ten minutes; it was idling at `NOOP: no READY task` at 19:17:18Z
+while TASK-0024 sat authorized. With this reconciliation pushed, **the next cycle will start it** — no
+manual trigger is needed.
+
+> **Two specification files, and two authorization messages.** `TASK-0024-epa-adr-drafting.md` and
+> `TASK-0024-a-adr.md` both specify this task; `MSG-0068-task-0024-authorization-epa-adr-drafting.md`
+> and `MSG-0068-task-0024-a-adr-authorization.md` both authorize it. **All four agree** — same
+> objective, same six surfaces, same forbidden list, same requirement that ADR numbers be allocated at
+> drafting time from the repository's actual state — so no stop condition fired. They are not
+> identical, so **the section below carries the union of all four.** Nothing was renamed, per MSG-0058
+> F4. Recorded in MSG-0069.
+
+> **Reconciliation warning, from MSG-0060 and MSG-0064 — now seven.** TASK-0024 was authorized and
+> `grep -c "TASK-0024"` on this file returned **0**, with the Supervisor idling on a healthy-looking
+> "no READY task" at the time. This is the **seventh** occurrence, and the first where the cost was
+> visible in the log rather than hypothetical.
+
+> **The line this replaces, retained:** "**TASK-0023 is COMPLETE (2026-08-21), and no task is READY.**"
+> True from TASK-0023's completion until MSG-0068 authorized TASK-0024 the same day.
+
+
+**TASK-0023 is COMPLETE (2026-08-21).** It was executed by a supervisor-started
 session (`runner.lock` pid 27400, acquired 18:04:59Z) and delivered
 [`WP-0009 — Employee Policy Assistant`](../../docs/program/work-packages/WP-0009-employee-policy-assistant.md),
 the formal work-package record. All seven MSG-0063 acceptance criteria are met, each mapped to evidence
@@ -362,6 +397,10 @@ READY means *authorized to attempt*, never *authorized to force*. A READY task w
 | MSG-0064 | Record | **OPEN** | Claude Code | Architecture lead | **TASK-0023 queue reconciliation.** MSG-0063 authorized TASK-0023 and the queue did not contain it — the **sixth** recurrence of the MSG-0044 gap. Reconciled as the single READY task after verifying prerequisites individually: TASK-0022 COMPLETE, MSG-0062 DECIDED, MSG-0063 AUTHORIZED, no OPEN blocker, no runner lock, one specification file. Verified by dry run. **TASK-0023 was not executed in this session**, per the operator instruction | 2026-08-21 |
 | MSG-0065 | Record | **OPEN** | Claude Code | Architecture lead | **State/record correction.** Today's records said the Windows `Schedule` service was stopped by the operator. **Verified this session: the service is Running (Automatic); the scheduled task `PCI-Execution-Supervisor` is Disabled.** `LastRun` 10:47:47Z matches the final scheduled cycle in the supervisor log; every cycle after it is at an irregular time and was manual. The functional conclusion held — no cycle fires unattended — but **the remedy differs: enable the task, do not restart the service.** The task was **not** enabled: that is a Supervisor scheduling change, forbidden by MSG-0063 and an operator decision. MSG-0064 corrected in place | 2026-08-21 |
 | MSG-0066 | Record | CREATED — reconciliation applied | Claude Code | Architecture lead | **TASK-0023 execution record.** All seven MSG-0063 acceptance criteria met with evidence. **WP-0009 — Employee Policy Assistant** allocated as the next number unused in either register (`grep` verified before allocation); **historical WP-0001 and all eight planning entries untouched**; the planning list and the canonical directory reconciled in `work-packages.md` §0 with a standing allocation rule, closing **DISC-0010**. Six ADR surfaces converted into a dependency-ordered sequence but **deliberately unnumbered — no ADR created**. **T-0 separated as operator-only** (organizational choice plus a privileged deployment). T-D precedes T-E per §7.3; §7.6's no-retrieve-then-suppress rule bound into gates G3/G6; ADR-0015 not inherited per §7.7. **No implementation, no provider selection, no permission or Supervisor change, and no task marked READY** — the queue has zero READY tasks. §6 carries three open items, none blocking; §7.3 discloses one process error caught before it reached a commit | TASK-0023 |
+| MSG-0067 | Decision | DECIDED | Architecture lead | Claude Code | **Rules the three carried-forward MSG-0066 items.** (1) **T-D testing is authorized only against synthetic or otherwise non-confidential documents** — no real or confidential corpus may enter the T-D path until T-E retrieval-time authorization is implemented **and verified**. (2) PR3: use the organization's existing Microsoft/AD identity infrastructure **through the established OIDC/OAuth2 boundary**; PCI builds no IdP and does not bypass ADR-0007 with LDAP/Kerberos; owner and date remain organizational scheduling data, and T-0 stays an operator prerequisite. (3) **WP-0009 sits beside the PLAN-WP-0001 planning entries** — it does not satisfy, supersede, rename, or renumber them; the planning list stays forward-looking and WP-0009 is the canonical delivered identity. No implementation authorized; no task marked READY | 2026-08-21 |
+| MSG-0068a | Decision | AUTHORIZED | Architecture lead | Claude Code | **TASK-0024 (A-ADR) authorized** — `-task-0024-authorization-epa-adr-drafting.md`. Evaluate the six WP-0009 §7 ADR surfaces against accepted ADRs, create only the required new ADRs, preserve accepted ADRs, report evidence through COMMS. **If an unresolved architecture conflict is found, stop at that boundary rather than improvising.** Architecture/documentation only; ADR numbers allocated only if and when drafting requires them. **Queue gate: TASK-0024 must be the single READY task before execution** | 2026-08-21 |
+| MSG-0068b | Decision | AUTHORIZED | Architecture lead | Claude Code | **TASK-0024 (A-ADR) authorized** — `-task-0024-a-adr-authorization.md`. Same authorization, with a ten-item constraint list to preserve — ADR-0007/OIDC identity boundary, T-D before T-E plus the synthetic/non-confidential interim limit, no retrieve-then-suppress, English authority with Arabic approved translation and cross-language fail-closed grounding, session-default retention with employee-only access, inference-locality boundary — and six acceptance criteria. **May not mark T-A or any implementation task READY.** Shares a number with MSG-0068a; complementary, not contradictory | 2026-08-21 |
+| MSG-0069 | Record | **OPEN** | Claude Code | Architecture lead | **TASK-0024 queue reconciliation, and a doubled collision.** MSG-0068 authorized TASK-0024 and the queue did not contain it — the **seventh** recurrence, and the first observed live: the Supervisor logged `NOOP: no READY task` at 19:07:18Z and 19:17:18Z while the task sat authorized. Reconciled as the single READY task after verifying prerequisites. **Two specification files and two authorization messages** exist for this one task; all four agree, so no stop fired, and the queue section carries the **union** of all four. Nothing renamed, per MSG-0058 F4 | 2026-08-21 |
 | MSG-0051 | Record | CREATED — audit complete | Claude Code | Architecture lead | **TASK-0019 baseline audit.** Six documentary corrections applied with their authorities quoted; four record classes verified already correct; **§C refers seven items for decision**, led by the accepted WP-0001 work package still reading `Status: Ready for implementation` — the stop condition fired and that correction was **not** made | TASK-0019 |
 
 ## Interruption and recovery protocol
@@ -1079,3 +1118,133 @@ re-check it before every push.
 The work is documentary. On resumption, re-read MSG-0062, MSG-0063, EPA-0004 and the specification,
 and check which records already exist rather than rewriting them — governance records are easy to
 duplicate and hard to reconcile, which is the exact failure this task exists to fix.
+
+---
+
+## TASK-0024 — A-ADR: draft the required Employee Policy Assistant ADR set
+
+**Priority:** 1 | **Status:** **READY** | **Owner:** Claude Code
+**Depends on:** TASK-0023 COMPLETE; MSG-0062 DECIDED; MSG-0067 DECIDED; WP-0009 defined and not implementation-authorized
+**Next eligible task:** none — T-A remains unauthorized and this task may not authorize it
+**Work package:** WP-0009 — Employee Policy Assistant | **Architecture task:** A-ADR
+
+**Specification — FOUR documents, all authoritative, read ALL of them:**
+
+- [`TASK-0024-epa-adr-drafting.md`](TASK-0024-epa-adr-drafting.md) — **spec A**
+- [`TASK-0024-a-adr.md`](TASK-0024-a-adr.md) — **spec B**
+- [`MSG-0068-task-0024-authorization-epa-adr-drafting.md`](../comms/MSG-0068-task-0024-authorization-epa-adr-drafting.md) — **MSG-0068a**
+- [`MSG-0068-task-0024-a-adr-authorization.md`](../comms/MSG-0068-task-0024-a-adr-authorization.md) — **MSG-0068b**
+
+> **Why four.** Two specification files and two authorization messages were committed for this one
+> task. **They agree** — same objective, same six surfaces, same forbidden list, same rule that ADR
+> numbers are allocated at drafting time from the repository's actual state — so no stop condition
+> fired. They differ in content, so **everything below is the union.** Nothing was renamed, per
+> MSG-0058 F4. See MSG-0069.
+
+### Objective
+
+Draft the **minimal** set of new ADRs required to make the accepted WP-0009 architecture enforceable
+before implementation, **without duplicating or modifying accepted ADRs**.
+
+### Required inputs
+
+WP-0009; EPA-0004 as accepted by MSG-0062; the MSG-0067 rulings; the existing accepted ADR register;
+and the repository's ADR numbering convention.
+
+### Required work
+
+1. **Identify accepted ADRs that already govern the relevant boundaries** — reuse before creating.
+2. Determine the minimal required new ADR surfaces from **WP-0009 §7.2**, judged against MSG-0062 §7.2.
+3. **Decide, per surface, whether a new ADR is genuinely required, and document the rationale either
+   way.** Evidence must identify every ADR created **or explicitly explain why a surface needs none**.
+4. Draft the required ADRs, allocating numbers **at drafting time** by repository convention, verified
+   collision-free against the actual ADR state.
+5. **Trace every new decision to accepted authority.**
+6. **Record any genuine unresolved architecture issue rather than inventing a ruling.**
+7. Create one execution COMMS record and reconcile the queue and status evidence.
+
+### The six candidate surfaces (WP-0009 §7)
+
+Grounded Answer Contract · Approved Document Authority and Lifecycle · Bilingual Policy Semantics
+(English/Arabic) · Retrieval Projection and Index Boundary · Employee Question Privacy and Retention ·
+Inference Locality and Provider Boundary.
+
+**These are proposed surfaces, not pre-authorized ADR numbers.** The final allocation comes from the
+repository's actual ADR state.
+
+### Boundaries that must be preserved (MSG-0068b, MSG-0067, MSG-0062)
+
+- **ADR-0007 / OIDC-OAuth2 identity boundary** — PCI integrates an identity provider and never builds
+  one; **no direct LDAP/Kerberos**, per MSG-0067 §2.
+- **T-D precedes T-E**, and the MSG-0067 §1 interim constraint holds: **T-D testing only against
+  synthetic or otherwise non-confidential documents.** No real or confidential corpus may enter the
+  T-D path until T-E retrieval-time authorization is implemented **and verified**.
+- **No retrieve-then-suppress.** A Restricted document is never retrieved into a request unless the
+  authenticated subject satisfies its policy; denial fails closed without revealing existence,
+  content, timing, or result-count.
+- **English authority, Arabic approved translation**, with cross-language grounding **fail-closed** —
+  a failed Arabic gate abstains.
+- **Session-default question retention, employee-only conversation access.**
+- **Inference locality / provider boundary** — external inference prohibited by default.
+
+### Forbidden
+
+- No implementation, and no product or runtime work of any kind.
+- No provider, model, embedding, framework, runtime, or stack selection.
+- **No production corpus ingestion.**
+- No permission or security-boundary changes.
+- No Supervisor behaviour or scheduling changes.
+- No operator-only or privileged action.
+- **Do not modify accepted ADRs. Do not create duplicate ADRs.**
+- **Do not mark T-A, T-B, T-C, T-D, T-E, or any other implementation task READY.**
+
+### Acceptance criteria (union of spec A, spec B, MSG-0068b)
+
+1. Existing accepted ADRs are identified, verified, and **neither duplicated nor modified**.
+2. The minimal new ADR set is **justified against WP-0009 §7.2**.
+3. New ADR numbers follow repository convention and are **collision-free** against existing ADRs.
+4. Each drafted ADR is **traceable to accepted authority** (EPA-0004 / WP-0009 / MSG-0062 / MSG-0067).
+5. Draft ADRs are internally consistent with MSG-0062, MSG-0067, EPA-0004, and WP-0009.
+6. **No implementation is authorized or performed**, and none is implied.
+7. Evidence identifies **every ADR created, or explains why a surface needs no new ADR**.
+8. The resulting ADR set is committed and recorded in COMMS.
+
+### Verification
+
+Being documentary, this task produces **no test count**. Do not report a test result it cannot have —
+map each acceptance criterion to re-readable evidence instead.
+
+**Check ADR number collisions against the actual repository state**, not against a remembered list.
+Four message numbers and two task specifications have collided in this project already; an ADR
+collision would be worse, because ADRs are cited as authority.
+
+### Documentation
+
+Record the result in `implementation/comms/` as a numbered message, update
+`implementation/status/current.md`, this queue, and WP-0009's architecture-task status, and write the
+checkpoint. A completely new session must be able to resume from the repository alone.
+
+### Checkpoint
+
+`implementation/operations/checkpoints/TASK-0024.md`. Write each checkpoint **after** an operation is
+verified, never in anticipation of one.
+
+### Stop conditions
+
+**Stop and report through COMMS if an architecture conflict is discovered that cannot be resolved from
+existing authority. Do not improvise** (spec A; MSG-0068a). Stop also if a required decision is
+genuinely missing, or if completing the task would require implementation or an unauthorized
+architecture change.
+
+**Also stop if `origin/main` moves mid-run.** BLK-0006 is the precedent and the Architecture Lead has
+pushed concurrently during several recent tasks. Record the starting HEAD in checkpoint 1 and re-check
+it before every push.
+
+> **Known runner limit.** `git fetch` is off the runner allowlist, so a mid-run move is detectable only
+> when a push is rejected. Record it and stop; do not route around it.
+
+### Recovery procedure
+
+The work is documentary. On resumption, re-read MSG-0067, **both** MSG-0068 files, **both**
+specification files, and WP-0009 §7, then check which ADRs already exist before drafting anything —
+a half-written ADR set is easy to duplicate and hard to reconcile.
