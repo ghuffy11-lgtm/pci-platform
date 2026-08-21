@@ -14,11 +14,11 @@ modify accepted architecture.
 | ADR-0015 | Kernel Implementation Stack | PROPOSED — **promoted**; accepted at `docs/decisions/ADR-0015-kernel-implementation-stack.md` | WP-0001 | — |
 | ADR-0016 | Tenant Isolation Enforcement Strategy | PROPOSED — **promoted**; accepted at `docs/decisions/ADR-0016-tenant-isolation-enforcement.md` | WP-0001 | — |
 | ADR-0017 | Grounded Answer Contract | **ACCEPTED** by MSG-0071 — **promoted**; accepted at `docs/decisions/ADR-0017-grounded-answer-contract.md` | WP-0009 | TASK-0024 |
-| ADR-0018 | Approved Document Authority and Lifecycle | **ACCEPTED** by MSG-0071 — **awaiting promotion** to `docs/decisions/` | WP-0009 | TASK-0024 |
-| ADR-0019 | Bilingual Policy Semantics (English/Arabic) | **ACCEPTED** by MSG-0071 as a bounded decision — **awaiting promotion**; Arabic normalization rules **deliberately incomplete** and must come from empirical corpus evidence before production use, with no invented rules authorized | WP-0009 | TASK-0024 |
-| ADR-0020 | Retrieval Projection and Index Boundary | **ACCEPTED** by MSG-0071 — **awaiting promotion**; the no-retrieve-then-suppress boundary and fail-closed handling are approved | WP-0009 | TASK-0024 |
-| ADR-0021 | Employee Question Privacy and Retention | **ACCEPTED** by MSG-0071 — **awaiting promotion** to `docs/decisions/` | WP-0009 | TASK-0024 |
-| ADR-0022 | Inference Locality and Provider Boundary | **ACCEPTED** by MSG-0071 — **awaiting promotion** to `docs/decisions/` | WP-0009 | TASK-0024 |
+| ADR-0018 | Approved Document Authority and Lifecycle | **ACCEPTED** by MSG-0071 — **promoted**; accepted at `docs/decisions/ADR-0018-approved-document-authority-and-lifecycle.md` | WP-0009 | TASK-0024 |
+| ADR-0019 | Bilingual Policy Semantics (English/Arabic) | **ACCEPTED** by MSG-0071 as a bounded decision — **promoted**; accepted at `docs/decisions/ADR-0019-bilingual-policy-semantics.md`. Arabic normalization rules remain **deliberately incomplete** and must come from empirical corpus evidence before production use, with no invented rules authorized | WP-0009 | TASK-0024 |
+| ADR-0020 | Retrieval Projection and Index Boundary | **ACCEPTED** by MSG-0071 — **promoted**; accepted at `docs/decisions/ADR-0020-retrieval-projection-and-index-boundary.md`. The no-retrieve-then-suppress boundary and fail-closed handling are approved | WP-0009 | TASK-0024 |
+| ADR-0021 | Employee Question Privacy and Retention | **ACCEPTED** by MSG-0071 — **promoted**; accepted at `docs/decisions/ADR-0021-employee-question-privacy-and-retention.md` | WP-0009 | TASK-0024 |
+| ADR-0022 | Inference Locality and Provider Boundary | **ACCEPTED** by MSG-0071 — **promoted**; accepted at `docs/decisions/ADR-0022-inference-locality-and-provider-boundary.md` | WP-0009 | TASK-0024 |
 
 ## The WP-0009 set — ADR-0017 … ADR-0022
 
@@ -38,3 +38,22 @@ tool surface and performs no mutation; engaging either later is itself an ADR.
 
 **These drafts authorize nothing.** No implementation task is READY, no provider, model, embedding,
 framework, index technology or runtime is selected, and none may be inferred from them.
+
+## Promotion — completed 2026-08-21 by TASK-0025
+
+**All six are now promoted.** ADR-0017 was promoted by the Architecture Lead in `d9c4524`;
+**ADR-0018 … ADR-0022 were promoted by TASK-0025** under MSG-0073, which answers the MSG-0072
+promotion gap. The copies in `docs/decisions/` are the authoritative records; the copies here are
+**RATIFIED** historical drafts retained unchanged.
+
+**Promotion changed headers only.** Each promoted file was produced by copying its draft byte for byte
+and editing exactly two things — the `Status` block, and an added `Accepted by: Architecture Lead —
+MSG-0071` line. A `diff` of each pair shows those two changes and nothing else; **zero body
+differences**. Evidence: MSG-0075 §3 and `implementation/operations/checkpoints/TASK-0025.md`
+checkpoint 2.
+
+**The sentence above still holds after promotion, and that was checked rather than assumed.** The three
+conditions MSG-0071 attached were re-verified in the promoted copies: no provider, model, runtime or
+framework is selected (ADR-0022 still cites ADR-0003's note on Ollama and explicitly declines to elevate
+it); ADR-0019 still states it is incomplete for production by design; ADR-0017's entailment model and
+numeric thresholds remain open under SPEC-0020. **A-SURVEY, A-STACK and T-0 remain unauthorized.**

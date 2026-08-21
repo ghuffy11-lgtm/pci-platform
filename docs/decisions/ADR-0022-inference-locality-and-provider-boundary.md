@@ -1,10 +1,9 @@
 # ADR-0022 — Inference Locality and Provider Boundary
 
-**Status:** **RATIFIED** 2026-08-21 — accepted by MSG-0071 and promoted to
-`docs/decisions/ADR-0022-inference-locality-and-provider-boundary.md`, which is the authoritative copy.
-The proposed text below is retained unchanged as the historical record.
+**Status:** **ACCEPTED** — promoted from `implementation/decisions/ADR-0022-inference-locality-and-provider-boundary.md` (PROPOSED) by MSG-0071
 **Date:** 2026-08-21
 **Proposed by:** Claude Code — TASK-0024 (A-ADR), under MSG-0068a and MSG-0068b
+**Accepted by:** Architecture Lead — MSG-0071
 **Work package:** WP-0009 — Employee Policy Assistant
 **Surface:** WP-0009 §7, surface 6 (`REQUIRED`)
 **Settles:** MSG-0056a **D8** (external model provider)

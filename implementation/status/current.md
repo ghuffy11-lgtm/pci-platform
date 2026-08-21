@@ -2,7 +2,12 @@
 
 **Active Work Package:** WP-0001 — PCI Kernel Foundation
 **Status:** **COMPLETE** — declared by the architecture lead 2026-08-19 (MSG-0020(b), resolved by MSG-0022 / MSG-0023, TASK-0009)
-**Last Updated:** 2026-08-21 UTC (**MSG-0073 answers MSG-0072** — **TASK-0025 authorized** to promote ADR-0018…ADR-0022 and reconciled into the queue as the single READY task, MSG-0074; not started)
+**Last Updated:** 2026-08-21 UTC (**TASK-0025 COMPLETE** — **ADR-0018…ADR-0022 promoted** into `docs/decisions/`, completing the WP-0009 ADR set; 5/5 acceptance criteria, zero body differences in the per-ADR diffs, MSG-0075. **No task is READY**)
+
+> **The line this replaces, retained:** "2026-08-21 UTC (**MSG-0073 answers MSG-0072** — **TASK-0025
+> authorized** to promote ADR-0018…ADR-0022 and reconciled into the queue as the single READY task,
+> MSG-0074; not started)." True until the Supervisor's 20:47:18Z cycle started the task, the next one
+> after that reconciliation was pushed.
 
 > **The line this replaces, retained:** "2026-08-21 UTC (**TASK-0023 COMPLETE** — WP-0009 allocated,
 > MSG-0066; **MSG-0067** rules the carried-forward items; **MSG-0068 authorizes TASK-0024 (A-ADR)**,
@@ -103,6 +108,7 @@ message on 2026-08-20 under MSG-0041 (MSG-0042) — the fifth.
 | TASK-0022 | Employee policy assistant — work-package definition | **COMPLETE** (2026-08-21) — `EPA-0004` delivered as PROPOSED, MSG-0061 | TASK-0021, MSG-0058, MSG-0059 ✅ | Claude Code |
 | TASK-0023 | EPA work-package governance reconciliation | **COMPLETE** (2026-08-21) — 7/7 criteria, **WP-0009 allocated**, MSG-0066 | TASK-0022, MSG-0062, MSG-0063 ✅ | Claude Code |
 | TASK-0024 | A-ADR — draft the required EPA ADR set | **COMPLETE** (2026-08-21) — 8/8 criteria, **ADR-0017…ADR-0022 drafted PROPOSED**, MSG-0070 | TASK-0023, MSG-0062, MSG-0067, MSG-0068 ✅ | Claude Code |
+| TASK-0025 | Promote ADR-0018…ADR-0022 into the accepted decision register | **COMPLETE** (2026-08-21) — 5/5 criteria, **five ADRs promoted, zero body differences**, MSG-0075 | TASK-0024, MSG-0071, MSG-0073 ✅ | Claude Code |
 | TASK-0002 | Make test entry points shell-independent | **ABORTED** | — | — |
 
 **No task is READY** — but the reason has changed. The project now sits at an **architecture decision
@@ -115,7 +121,53 @@ boundary**, not at an empty queue.
 > been executed and is COMPLETE (MSG-0055). MSG-0051 §C is fully discharged: C1–C5 by MSG-0052,
 > C6–C7 by MSG-0053.
 
-**Current position, 2026-08-21 after TASK-0024: no task is READY, and the boundary is acceptance —
+**Current position, 2026-08-21 after TASK-0025: no task is READY, and for the first time in this
+sequence the boundary is neither acceptance nor authorization of a record — it is simply that the
+Architecture Lead has not yet named the next task.**
+
+TASK-0025 executed the MSG-0073 promotion authorization and **promoted ADR-0018, ADR-0019, ADR-0020,
+ADR-0021 and ADR-0022 into [`docs/decisions/`](../../docs/decisions/)**, the authoritative register.
+With ADR-0017, which the lead promoted in `d9c4524`, **the WP-0009 ADR set is complete and carries
+architectural authority** — tier 2 in the CLAUDE.md authority order, above the COMMS messages that
+previously held these rulings. All five acceptance criteria are met, each mapped to evidence in
+**MSG-0075** §2. Being documentary it produced **no test count and claims none**.
+
+**The verification is worth stating precisely, because "promoted" is easy to claim and hard to check.**
+Each promoted file was produced by copying its draft **byte for byte** and then editing exactly two
+things: the `Status` block, and an added `**Accepted by:** Architecture Lead — MSG-0071` line. A `diff`
+of each pair therefore shows those two header hunks and **nothing else — zero body differences across
+all five**. The body was never retyped, so it could not drift. **No accepted ADR was modified**:
+`git status --porcelain` before the commit showed five *new* paths under `docs/decisions/` and no
+modified path there, so ADR-0001…ADR-0017 are untouched.
+
+**The three conditions MSG-0071 attached were re-checked in the promoted copies rather than inherited.**
+MSG-0072's pre-promotion pass verified them in the *drafts*; promotion is the step where they could be
+lost, so verifying the source is not verifying the copy. All three hold: **no provider, model, framework
+or runtime is selected** — ADR-0022's citation of ADR-0003's note on Ollama survived intact and still
+says *"this ADR does not select it or anything else"*; **ADR-0019 still declares itself incomplete for
+production by design**, with its Arabic normalization rules deferred to empirical corpus evidence and
+**no rule invented**; **ADR-0017's entailment model and numeric thresholds remain open** under SPEC-0020.
+
+**Promotion conferred authority and authorized nothing else.** **A-SURVEY, A-STACK and T-0 remain
+unauthorized**, no implementation task is READY, and the literal string `READY` occurs in none of the
+promoted records. WP-0009 still reads `DEFINED — NOT AUTHORIZED FOR IMPLEMENTATION`, and the three open
+items in its §8 — the T-D/T-E interim mitigation, PR3's owner and date, and the planning relationship —
+are all still open; promotion touched none of them.
+
+**The next action is the Architecture Lead's**, and MSG-0071 already names the shape of it: its *Next
+architecture boundary* made promotion the precondition for authorizing **A-SURVEY** or **A-STACK** from
+WP-0009 §6.2. **That precondition is now met.** Whichever is authorized must be reconciled into
+`CLAUDE-TASKS.md` as the single READY task, **in the same commit as the authorization**. The MSG-0044
+queue gap recurred for the **eighth** time with MSG-0073 and was repaired by MSG-0074 before the next
+Supervisor cycle — which is why this run started on time. Repaired in time is not prevented.
+
+> **Superseded — corrected 2026-08-21 by TASK-0025.** The paragraph below was the position after
+> TASK-0024 and was true until MSG-0071 accepted all six drafts and TASK-0025 promoted five of them the
+> same day. **The acceptance boundary it describes has been passed**: the drafts do now carry authority,
+> because they are no longer only drafts. Everything it says about *implementation* is unchanged — that
+> boundary was not crossed.
+
+**Position after TASK-0024 (superseded, retained): no task is READY, and the boundary is acceptance —
 six ADR drafts exist and none of them carries authority yet.**
 
 TASK-0024 executed the **A-ADR** architecture task under MSG-0068a/b and delivered **six PROPOSED ADR
@@ -552,10 +604,20 @@ carry explicit supersession notes, with no supervisor behaviour, permission, or 
 C4 and C5 — no action, deliberately. **C6 (a bounded proof of MSG-0049 option B) and C7 (the next
 work package) remain the Lead's to decide and are not self-authorized.**
 
-**Two messages carry `Status: OPEN`** — **MSG-0060** and **MSG-0074**. Verified across all three
-views (message file, COMMS register, queue ledger).
+**One message carries `Status: OPEN`** — **MSG-0060**. Verified across all three views (message file,
+COMMS register, queue ledger).
 
-**MSG-0074** is the TASK-0025 queue reconciliation: informational, blocking nothing.
+**MSG-0074 was closed** 2026-08-21 by execution, not by tidying: TASK-0025 ran against its
+reconciliation and is COMPLETE (MSG-0075). The reconciliation did its job — it repaired the **eighth**
+recurrence of the MSG-0044 queue gap before the Supervisor's next cycle, so the task was already the
+single READY task when the run started and nothing idled. The gap recurred; it was caught in time.
+**What did not recur was the sibling-file collision** — MSG-0073 arrived alone.
+
+**MSG-0075 is the TASK-0025 execution record** — a RECORD requesting no decision.
+
+> **The lines this replace, retained:** "**Two messages carry `Status: OPEN`** — **MSG-0060** and
+> **MSG-0074**. Verified across all three views … **MSG-0074** is the TASK-0025 queue reconciliation:
+> informational, blocking nothing." True until TASK-0025 executed the same day.
 
 **MSG-0060 carries the one unaddressed observation** — whether colliding *task specifications*
 warrant more than the union treatment. It did **not** recur with MSG-0073, which arrived alone:
@@ -1106,45 +1168,94 @@ both tables index it, and both were updated in the same commit as the record.
 
 ## Next Action
 
-**TASK-0025 is READY and is the single READY task. The Supervisor will start it on its next cycle — no
-manual trigger is needed.**
+**No task is READY. The next move is the Architecture Lead's: authorize A-SURVEY or A-STACK, or neither.**
 
-**MSG-0073 answers MSG-0072.** It authorizes TASK-0025 to promote **ADR-0018 … ADR-0022** into
-`docs/decisions/`, the authoritative register, and states plainly: *"Claude may execute TASK-0025 when
-it is reconciled as READY."* ADR-0017 was already promoted by the lead and must not be touched.
+**TASK-0025 is COMPLETE (2026-08-21, MSG-0075).** The Supervisor started it on its 20:47:18Z cycle — the
+next one after MSG-0074 was pushed, exactly as predicted — and it promoted **ADR-0018 … ADR-0022** into
+`docs/decisions/`. **The WP-0009 ADR set is complete and authoritative**, ADR-0017 … ADR-0022.
 
-### What TASK-0025 must preserve
+**MSG-0071's own gate is what opens next.** Its *Next architecture boundary* says the Lead may consider
+authorizing the next bounded architecture task **only after** the accepted set is reconciled and
+promoted. That is now done, so both candidates in WP-0009 §6.2 are eligible to be authorized:
 
-- **No change to the substance** of the accepted decisions. A `diff` between each promoted copy and its
-  draft should show only the `Status` line and an added `Accepted by` line; **any body difference is a
-  defect**, since these records are cited as authority.
-- **No provider, model, framework, or runtime selection** that was deliberately left open. ADR-0022's
-  wording — citing Ollama from ADR-0003 while explicitly declining to select it — is load-bearing and
-  must survive promotion intact.
-- **ADR-0019's normalization rules stay deferred** to empirical corpus evidence. It must still read as
-  incomplete for production by design.
-- **No implementation authorization**, and **A-SURVEY, A-STACK and T-0 stay unauthorized**.
-- **Completion is reported only after repository verification** — MSG-0073 is explicit about that
-  ordering.
+- **A-SURVEY** — the bounded, read-only corpus survey. It is the one that unblocks something already
+  known to be incomplete: **ADR-0019's Arabic normalization rules are deferred to empirical corpus
+  evidence**, and that evidence does not exist. Until it does, ADR-0019 remains incomplete for
+  production **by design**. MSG-0062 §7.5 authorizes it *in principle* before T-B; that is not the same
+  as marking it READY, which remains the Lead's act.
+- **A-STACK** — propose the assistant service's concrete implementation stack. ADR-0015 is **not**
+  inherited (MSG-0062 §7.7), and no promoted ADR selects a provider, model, framework or runtime.
 
-### Two things worth knowing before it runs
+**Neither is authorized, and this record does not recommend one over the other** — that judgment is the
+Lead's, and nothing in the repository forces the order.
 
-**There is no `TASK-0025-*.md` specification file.** Every task since TASK-0017 has had one; this one
-does not. MSG-0073 plus the queue section are the specification. Recorded so a runner neither hunts for
-a missing file nor improvises one to fill the gap.
+### What is still true after promotion
 
-**The promotion convention was verified rather than remembered**, from the ADR-0015 precedent and the
-lead's own ADR-0017 promotion three commits ago. The queue section states it exactly.
+- **Implementation remains prohibited.** WP-0009 reads `DEFINED — NOT AUTHORIZED FOR IMPLEMENTATION`.
+- **T-0 remains an operator prerequisite** — the identity provider needs a privileged deployment that no
+  decision can substitute for.
+- **WP-0009 §8's three open items are untouched**: the T-D/T-E interim mitigation, PR3's owner and date,
+  and which PLAN-WP-0001 entries WP-0009 sits beside.
+- **ADR-0017's entailment model and numeric thresholds stay open** under SPEC-0020.
 
-### After TASK-0025
+### When the next task is authorized
 
-Implementation remains prohibited. **A-SURVEY and A-STACK are unauthorized**, and **T-0 remains an
-operator prerequisite** — the identity provider needs a privileged deployment that no decision can
-substitute for. The lead authorizes the next bounded task after reviewing the promoted register.
+**Its board row must be added in the same commit as the authorization.** The queue gap reached its
+**eighth** occurrence with MSG-0073 and was repaired by MSG-0074 before the Supervisor's next cycle —
+which is why TASK-0025 started on time. It is the one failure in this project that has never been
+prevented, only repaired, and repairing it in time is luck about timing rather than a control.
 
-**When that happens, its board row must be added in the same commit.** The queue gap has now recurred
-eight times (MSG-0074); it is the one failure in this project that has never yet been prevented, only
-repaired.
+---
+
+> **Historical — the position while TASK-0025 was READY and unstarted, retained.** The text below
+> described what TASK-0025 had to preserve and what a runner needed to know before it ran. It is kept
+> because the preservation constraints are the checklist the promotion was verified against, and
+> MSG-0075 §3–§4 report the result against exactly these points.
+
+> **TASK-0025 is READY and is the single READY task. The Supervisor will start it on its next cycle — no
+> manual trigger is needed.**
+
+> **MSG-0073 answers MSG-0072.** It authorizes TASK-0025 to promote **ADR-0018 … ADR-0022** into
+> `docs/decisions/`, the authoritative register, and states plainly: *"Claude may execute TASK-0025 when
+> it is reconciled as READY."* ADR-0017 was already promoted by the lead and must not be touched.
+>
+> ### What TASK-0025 must preserve
+>
+> - **No change to the substance** of the accepted decisions. A `diff` between each promoted copy and its
+>   draft should show only the `Status` line and an added `Accepted by` line; **any body difference is a
+>   defect**, since these records are cited as authority.
+> - **No provider, model, framework, or runtime selection** that was deliberately left open. ADR-0022's
+>   wording — citing Ollama from ADR-0003 while explicitly declining to select it — is load-bearing and
+>   must survive promotion intact.
+> - **ADR-0019's normalization rules stay deferred** to empirical corpus evidence. It must still read as
+>   incomplete for production by design.
+> - **No implementation authorization**, and **A-SURVEY, A-STACK and T-0 stay unauthorized**.
+> - **Completion is reported only after repository verification** — MSG-0073 is explicit about that
+>   ordering.
+>
+> ### Two things worth knowing before it runs
+>
+> **There is no `TASK-0025-*.md` specification file.** Every task since TASK-0017 has had one; this one
+> does not. MSG-0073 plus the queue section are the specification. Recorded so a runner neither hunts for
+> a missing file nor improvises one to fill the gap.
+>
+> **The promotion convention was verified rather than remembered**, from the ADR-0015 precedent and the
+> lead's own ADR-0017 promotion three commits ago. The queue section states it exactly.
+>
+> ### After TASK-0025
+>
+> Implementation remains prohibited. **A-SURVEY and A-STACK are unauthorized**, and **T-0 remains an
+> operator prerequisite** — the identity provider needs a privileged deployment that no decision can
+> substitute for. The lead authorizes the next bounded task after reviewing the promoted register.
+>
+> **When that happens, its board row must be added in the same commit.** The queue gap has now recurred
+> eight times (MSG-0074); it is the one failure in this project that has never yet been prevented, only
+> repaired.
+
+**Every preservation constraint above was checked against the result, and all five hold.** Evidence:
+MSG-0075 §3 (the per-ADR diffs — zero body differences) and §4 (the three MSG-0071 conditions
+re-verified in the promoted copies, including ADR-0022's load-bearing Ollama wording). Completion was
+reported only after that verification ran against the files on disk, and after the commit was pushed.
 
 ---
 

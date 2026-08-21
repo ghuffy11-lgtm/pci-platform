@@ -125,6 +125,7 @@ Architecture Lead's, and both are now MET for the decisions — see §8.
 |---|---|---|---|---|
 | **A-ADR** | Draft the required ADR set of §7 | this reconciliation | The ADRs, with numbers allocated by repository convention at drafting time | MSG-0062 §7.2 |
 | ↳ | **EXECUTED as TASK-0024, 2026-08-21 (MSG-0068a/b → MSG-0070).** Delivered **ADR-0017…ADR-0022** as **PROPOSED** drafts in `implementation/decisions/` — one per §7 surface, all six independently judged required. **They are not accepted**; promotion to `docs/decisions/` is the Architecture Lead's. **ADR-0019 is incomplete by design** — D6's normalization rules await the empirical corpus evidence **A-SURVEY** would supply | — | — | — |
+| ↳ | **ACCEPTED and PROMOTED, 2026-08-21.** **MSG-0071 accepts all six** — ADR-0019 as a *bounded* decision with its normalization rules still deferred, ADR-0017 with the entailment model and thresholds still open under SPEC-0020. **ADR-0017 was promoted by the Architecture Lead** (`d9c4524`); **ADR-0018…ADR-0022 were promoted by TASK-0025** under MSG-0073 (record → MSG-0075). All six now live in `docs/decisions/` and are **accepted architecture**; the `implementation/decisions/` copies are RATIFIED historical drafts. **A-STACK and A-SURVEY remain unauthorized and no implementation task is READY** | — | — | — |
 | **A-STACK** | Evaluate and propose the assistant service's concrete implementation stack against `docs/architecture/technology-selection-principles.md` | this reconciliation | A stack proposal; **whether it is recorded as an ADR is that task's question**, not settled here | MSG-0062 §7.7 |
 | **A-SURVEY** | **Bounded, read-only corpus survey** — formats, language mix, scanned-document prevalence, classification/audience patterns, version and supersession characteristics | this reconciliation | Discovery input fixing D6's normalization rules and sizing D14's rejection exposure | MSG-0062 §7.5 |
 
@@ -187,6 +188,23 @@ would be an architecture decision beyond MSG-0062/MSG-0063.
 > "stated so the lead can disagree cheaply" paragraph below intends, and MSG-0070 §4 supplies the
 > counter-argument for surface 4. **No accepted ADR was modified or duplicated.** **A-STACK and
 > A-SURVEY remain unauthorized**, and no seventh surface was added.
+>
+> **Superseded again, later the same day — the six are now ACCEPTED and PROMOTED.** The paragraph
+> immediately above says the drafts carry no authority and that acceptance is the lead's. **The lead
+> exercised it: MSG-0071 accepts ADR-0017 … ADR-0022**, all six surfaces, none rejected — including
+> surface 4, whose counter-argument was on the table when the decision was made. ADR-0017 was promoted
+> by the lead in `d9c4524`; **ADR-0018 … ADR-0022 were promoted into `docs/decisions/` by TASK-0025**
+> under MSG-0073, which answers the MSG-0072 promotion gap. Record: **MSG-0075**.
+>
+> **Two acceptances are bounded, and the bound is part of the accepted decision rather than a caveat on
+> it.** ADR-0019's Arabic normalization rules stay deferred to empirical corpus evidence — the record
+> still says it is incomplete for production by design, and **no invented rule is authorized**, so the
+> D6 obligation that **A-SURVEY** would feed is unchanged. ADR-0017's entailment model and numeric
+> thresholds stay open under SPEC-0020.
+>
+> **Promotion conferred authority; it authorized nothing else.** No provider, model, framework, index
+> technology or runtime is selected by any promoted record. **A-SURVEY, A-STACK and T-0 remain
+> unauthorized, and no implementation task is READY.**
 
 **MSG-0062 §7.2:** create only the ADRs required to make the accepted architecture enforceable before
 production use — the grounded-answer contract, and any new service-boundary/security decisions not
@@ -259,6 +277,17 @@ not itself resolve.**
 **EPA-0001 and EPA-0002 remain PROPOSED; EPA-0004 is ACCEPTED**. PR2 **MET as to the definition**
 (MSG-0062 accepts it) and **NOT MET as to implementation** — MSG-0062 states plainly that acceptance
 "does not authorize implementation". PR3, PR4 **NOT MET**. PR5, PR6 **UNKNOWN**.
+
+> **Updated later on 2026-08-21, after the ADR set was accepted and promoted (TASK-0025, MSG-0075).**
+> The line above is unchanged and still accurate; what follows is what the promotion adds to it.
+> **The §7 ADR dependency is now discharged: ADR-0017 … ADR-0022 are accepted architecture in
+> `docs/decisions/`.** Under the CLAUDE.md authority order they now sit at tier 2, above the COMMS
+> messages that previously carried these rulings — which was the whole point of drafting them.
+>
+> **Nothing else moved.** PR2 is still NOT MET as to implementation; PR3 and PR4 are still NOT MET;
+> PR5 and PR6 are still UNKNOWN. The three open items above are all still open — promotion touched
+> none of them. **A-SURVEY, A-STACK and T-0 remain unauthorized**, so ADR-0019's deferred normalization
+> rules and D14's unmeasured rejection exposure stay exactly where they were.
 
 ---
 

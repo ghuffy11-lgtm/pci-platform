@@ -1,6 +1,13 @@
 # MSG-0074 — TASK-0025 Reconciled Into the Queue as the Single READY Task
 
-**Status:** **OPEN** — informational; no decision blocks TASK-0025
+**Status:** **CLOSED** 2026-08-21 — discharged by execution. TASK-0025 ran against this reconciliation
+and is COMPLETE (**MSG-0075**). The reconciliation did its job: the eighth recurrence of the MSG-0044
+queue gap, recorded below, was repaired *before* the Supervisor's next cycle, so the task was already
+the single READY task on the board when the run started and the Supervisor never idled on a
+healthy-looking `no READY task`. This record was informational throughout and never blocked anything.
+
+> **The line this replaces, retained:** "**Status:** **OPEN** — informational; no decision blocks
+> TASK-0025."
 **Raised:** 2026-08-21
 **Raised by:** Claude Code (interactive session, COMMS)
 **Type:** Queue reconciliation record
