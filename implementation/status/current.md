@@ -2,7 +2,7 @@
 
 **Active Work Package:** WP-0001 — PCI Kernel Foundation
 **Status:** **COMPLETE** — declared by the architecture lead 2026-08-19 (MSG-0020(b), resolved by MSG-0022 / MSG-0023, TASK-0009)
-**Last Updated:** 2026-08-21 UTC (**TASK-0022 executed and COMPLETE** — `EPA-0004` work-package definition delivered as PROPOSED, MSG-0061; **no task is READY**, and the queue now sits at an architecture-acceptance boundary)
+**Last Updated:** 2026-08-21 UTC (**EPA-0004 ACCEPTED** by MSG-0062 with all seven items ruled; **MSG-0063 authorizes TASK-0023**, reconciled into the queue as the single READY task — MSG-0064; **not started**)
 
 ## Current State
 
@@ -433,10 +433,13 @@ carry explicit supersession notes, with no supervisor behaviour, permission, or 
 C4 and C5 — no action, deliberately. **C6 (a bounded proof of MSG-0049 option B) and C7 (the next
 work package) remain the Lead's to decide and are not self-authorized.**
 
-**One message carries `Status: OPEN`: MSG-0060**, the TASK-0022 queue reconciliation. It is
-informational and blocks nothing — it records that TASK-0022 is now the single READY task, and
-that a fifth number collision occurred, this time on an **executable task specification** rather
-than a message.
+**Two messages carry `Status: OPEN`, both informational and neither blocking: MSG-0060** (the
+TASK-0022 queue reconciliation, whose observation about task-specification collisions the lead has
+not yet addressed) **and MSG-0064** (the TASK-0023 queue reconciliation).
+
+> **The line this replaces, retained:** "**One message carries `Status: OPEN`: MSG-0060**, the
+> TASK-0022 queue reconciliation … that a fifth number collision occurred, this time on an
+> **executable task specification** rather than a message." True until MSG-0064 was raised.
 
 > **The line this replaces, retained:** "**One message carries `Status: OPEN`: MSG-0057.**" That
 > was true from 2026-08-21 until MSG-0058 ruled all four of its findings the same day. MSG-0057 is
@@ -728,7 +731,25 @@ required as a messenger.
 
 ## Open Blockers
 
-**None.** BLK-0001 through **BLK-0006** are all RESOLVED.
+**One: BLK-0007, raised 2026-08-21** — GitHub SSH transport is closed by the remote at banner
+exchange (`kex_exchange_identification`), **before authentication begins**, on both port 22 and
+port 443, while HTTPS to github.com returns 200. Work is complete and committed locally; it
+cannot reach `origin/main`.
+
+**It is not a credential fault, and it is not BLK-0002.** BLK-0002 failed *after* the key was
+accepted (passphrase, no TTY); this fails *before* any key is offered, so the state of the key or
+agent cannot be the cause. **No workaround was applied** — in particular the remote was not
+switched to HTTPS, which would substitute an unauthorized credential path to make a symptom go
+away. See [`../blockers/BLK-0007-github-ssh-transport-closed.md`](../blockers/BLK-0007-github-ssh-transport-closed.md).
+
+**Consequence for execution:** the Supervisor fetches as part of its reconciliation gate, so it
+**fails closed and will not start TASK-0023** while this persists. The READY task cannot be
+consumed by accident during the outage.
+
+**BLK-0001 through BLK-0006 are all RESOLVED.**
+
+> **The line this replaces, retained:** "**None.** BLK-0001 through **BLK-0006** are all RESOLVED."
+> True until BLK-0007 was raised the same day.
 
 **BLK-0006 was resolved on 2026-08-21 by the interactive session**, the same day TASK-0021 raised it.
 The unknown that forced the stop is now a fact: the concurrent actor was the architecture lead
@@ -919,75 +940,138 @@ both tables index it, and both were updated in the same commit as the record.
 
 ## Next Action
 
-**TASK-0022 is COMPLETE. No task is READY, and the next action belongs to the architecture lead.**
+**TASK-0023 is READY and is the single READY task. It has NOT been started.**
 
-The queue is at an **acceptance boundary**, not an empty queue and not a decision boundary. Every
-EPA-0003 decision is ruled and every MSG-0057 finding is ruled; what is missing is the lead's
-acceptance of the definition those rulings produced.
+The queue is armed and nothing has consumed it. Starting it requires either restarting the Windows
+`Schedule` service — stopped by the operator on 2026-08-21, so no cycle fires on its own — or an
+explicit manual trigger. The reconciliation and the execution were deliberately separated by operator
+instruction (MSG-0064).
 
-**What TASK-0022 delivered.** `EPA-0004` — the Employee Policy Assistant work-package definition, as
-a **PROPOSED** record carrying no architectural authority: thirteen acceptance gates, ten
-dependency-ordered tasks, five test tiers, T1–T11 threat coverage, and every required field of the
-work-package standard. It allocates **no work-package number**, creates **no ADR**, selects **no
-provider, model, or runtime stack**, and marks **no task READY**. Execution record: **MSG-0061**.
+**What changed.** **MSG-0062 ACCEPTED EPA-0004** as the bounded work-package definition and ruled all
+seven of the open items MSG-0061 §7 raised. **MSG-0063** then authorized **TASK-0023**, the governance
+reconciliation that turns the accepted definition into authoritative work-package records.
 
-**What the lead is asked to do, in order** (EPA-0004 §13, restated in MSG-0061 §8):
+### The three rulings that most change what happens next
 
-1. Accept, amend, or reject EPA-0004 — until then prerequisite PR2 is unmet and no implementation
-   task can be authorized.
-2. Rule on the **seven open items** in MSG-0061 §7. Three block the earliest tasks: the work-package
-   number, **whether a policy document may be classified Restricted**, and who owns the identity
-   provider (PR3).
-3. Allocate the work-package number, recording its relationship to the PLAN-WP-0001 register — which
-   already disagrees with the delivered work-package directory about what WP-0001 is.
-4. Create whichever of the six proposed ADRs are wanted, or rule that the rulings themselves suffice.
-   **Claude Code creates no ADR without an explicit instruction.**
-5. Authorize **T-0, the identity provider, as an operator task** — it needs a privileged deployment
-   action no Claude session may perform, and every authorization control depends on it.
-6. **Then** authorize T-A and reconcile it into `CLAUDE-TASKS.md` as the single READY task.
+- **7.6 — Restricted documents are eligible for the governed corpus, but no retrieve-then-suppress
+  design is permitted.** A Restricted document is never retrieved into an employee request unless the
+  authenticated subject satisfies its authorization policy, and denial must **fail closed without
+  revealing existence, content, timing, or result-count**. This settles the item MSG-0061 flagged as
+  deserving attention first: an exclusion cannot fail open, and the ruling forbids the path that can.
+- **7.3 — T-D (grounded QA) must precede T-E (retrieval-time authorization).** Authorization controls
+  must not be validated against an unproven answer path. Security review remains a gate on the
+  complete path before release.
+- **7.7 — ADR-0015 is not inherited** as the service stack. The service stays outside the kernel
+  boundary and uses accepted platform contracts; a dedicated architecture task must propose the
+  concrete stack. Nothing — provider, framework, model, embedding technology, runtime — is selected.
 
-> **Step 6 is not a formality.** MSG-0060 recorded the **fifth** occasion on which an authorization
-> existed while the queue did not reflect it, leaving the Supervisor idling on a healthy-looking
-> "no READY task". An authorization that stops at a message is invisible to the runner.
+The remaining four: **7.1** allocate a **new** work package with no existing WP number repurposed;
+**7.2** create only the ADRs needed to make the architecture enforceable before production, numbered
+by repository convention in the next architecture task; **7.4** integrate an OIDC/OAuth2 provider and
+never implement one, with selection and privileged deployment remaining operator actions; **7.5** a
+**bounded corpus survey is authorized before T-B** as a discovery input only, with no production
+ingestion and no bypass of approval controls.
 
-### The binding rulings TASK-0022 inherited, and EPA-0004 now carries
+### What TASK-0023 may and may not do
 
-- **English is authoritative**; Arabic is an approved translation/access language.
-- **Cross-language grounding is in scope and fail-closed.** A failed Arabic grounding gate must
-  **abstain** — never silently fall back to an English answer, never present an unofficial rendering
-  as policy. The Arabic acceptance bar is evaluated separately under SPEC-0020.
-- **Unauthenticated access is deferred** from the first release; no new trust boundary is introduced.
-- **Directory integration terminates at the ADR-0007 OIDC/OAuth2 boundary.** Entra ID, AD FS, or an
-  OIDC broker may front an existing directory; **direct LDAP/Kerberos implementation is not
-  authorized.**
-- **Only approved/published documents are authoritative sources.**
-- **Session-only retention is the default**, with configurable retention support.
+It reconciles EPA-0004 and the MSG-0062 rulings into the governed records: resolve the WP
+numbering/register discrepancy **preserving historical WP-0001**, allocate the formal work-package
+identity by repository convention, turn the six ADR surfaces into an explicit sequence **without
+creating any ADR**, record **T-0 as operator-only**, and produce the dependency-ordered gate sequence
+with the next task **identified but not implicitly authorized**.
 
-### One thing the next session must know
+It may **not** implement, select any provider/model/embedding/framework/runtime, change permissions or
+security boundaries, change Supervisor behaviour or scheduling, create or modify accepted ADRs,
+perform any operator-only or privileged action, or **mark any downstream implementation task READY**.
 
-**Two files specify TASK-0022**, and both are authoritative. They agree on scope, authorization,
-forbidden actions and acceptance gate, but each carries content the other lacks — spec A the stop
-conditions and the recommendations-only constraint, spec B a ten-item outcome list. The queue section
-carries the **union** and links both. Neither was renamed, per MSG-0058 F4.
+### Still the lead's, after TASK-0023
 
-**Read both.** A runner that reads one silently loses half its instructions and would report success
-against the half it read (MSG-0060).
+MSG-0063 reserves the next authorization: after TASK-0023 is completed **and accepted**, the lead
+authorizes the next bounded task. **Implementation remains prohibited** until every architecture gate
+and prerequisite is satisfied — including **T-0**, which needs a privileged operator deployment of the
+selected identity provider and cannot be satisfied by a decision alone.
 
-> **Both were read by the executing session**, and MSG-0061 §2 maps the union — all sixteen required
-> outputs — to the section of EPA-0004 that satisfies each. The warning above is retained because it
-> applies to anyone re-reading the TASK-0022 specification, not only to the session that executed it.
+**MSG-0060 remains open and unaddressed**: whether a task-specification collision warrants more than
+the union treatment applied to TASK-0022. It blocks nothing.
 
-**The other thing to know: EPA-0004 supersedes EPA-0002 in substance, and EPA-0002 is retained
-unchanged.** EPA-0002 was written before any decision was ruled and is conditional throughout; where
-they differ, EPA-0004 is the later record and its §12 tabulates the six differences with the ruling
-behind each. Do not read EPA-0002 as current.
+---
 
-### Operational note
+**Historical — the position after TASK-0022 and before MSG-0062, retained.** The text below
+described an **acceptance boundary**: EPA-0004 delivered as PROPOSED, seven items awaiting a
+ruling. **MSG-0062 accepted EPA-0004 and ruled all seven on the same day**, and MSG-0063
+authorized TASK-0023. The boundary was passed, not removed — implementation is still prohibited.
 
-The Windows `Schedule` service was stopped by the operator on 2026-08-21, so the Supervisor's
-ten-minute cadence is inert. Cycles run only when triggered manually until that service is restarted;
-the start path itself is unchanged and proven.
-
+> ## Next Action
+> 
+> **TASK-0022 is COMPLETE. No task is READY, and the next action belongs to the architecture lead.**
+> 
+> The queue is at an **acceptance boundary**, not an empty queue and not a decision boundary. Every
+> EPA-0003 decision is ruled and every MSG-0057 finding is ruled; what is missing is the lead's
+> acceptance of the definition those rulings produced.
+> 
+> **What TASK-0022 delivered.** `EPA-0004` — the Employee Policy Assistant work-package definition, as
+> a **PROPOSED** record carrying no architectural authority: thirteen acceptance gates, ten
+> dependency-ordered tasks, five test tiers, T1–T11 threat coverage, and every required field of the
+> work-package standard. It allocates **no work-package number**, creates **no ADR**, selects **no
+> provider, model, or runtime stack**, and marks **no task READY**. Execution record: **MSG-0061**.
+> 
+> **What the lead is asked to do, in order** (EPA-0004 §13, restated in MSG-0061 §8):
+> 
+> 1. Accept, amend, or reject EPA-0004 — until then prerequisite PR2 is unmet and no implementation
+>    task can be authorized.
+> 2. Rule on the **seven open items** in MSG-0061 §7. Three block the earliest tasks: the work-package
+>    number, **whether a policy document may be classified Restricted**, and who owns the identity
+>    provider (PR3).
+> 3. Allocate the work-package number, recording its relationship to the PLAN-WP-0001 register — which
+>    already disagrees with the delivered work-package directory about what WP-0001 is.
+> 4. Create whichever of the six proposed ADRs are wanted, or rule that the rulings themselves suffice.
+>    **Claude Code creates no ADR without an explicit instruction.**
+> 5. Authorize **T-0, the identity provider, as an operator task** — it needs a privileged deployment
+>    action no Claude session may perform, and every authorization control depends on it.
+> 6. **Then** authorize T-A and reconcile it into `CLAUDE-TASKS.md` as the single READY task.
+> 
+> > **Step 6 is not a formality.** MSG-0060 recorded the **fifth** occasion on which an authorization
+> > existed while the queue did not reflect it, leaving the Supervisor idling on a healthy-looking
+> > "no READY task". An authorization that stops at a message is invisible to the runner.
+> 
+> ### The binding rulings TASK-0022 inherited, and EPA-0004 now carries
+> 
+> - **English is authoritative**; Arabic is an approved translation/access language.
+> - **Cross-language grounding is in scope and fail-closed.** A failed Arabic grounding gate must
+>   **abstain** — never silently fall back to an English answer, never present an unofficial rendering
+>   as policy. The Arabic acceptance bar is evaluated separately under SPEC-0020.
+> - **Unauthenticated access is deferred** from the first release; no new trust boundary is introduced.
+> - **Directory integration terminates at the ADR-0007 OIDC/OAuth2 boundary.** Entra ID, AD FS, or an
+>   OIDC broker may front an existing directory; **direct LDAP/Kerberos implementation is not
+>   authorized.**
+> - **Only approved/published documents are authoritative sources.**
+> - **Session-only retention is the default**, with configurable retention support.
+> 
+> ### One thing the next session must know
+> 
+> **Two files specify TASK-0022**, and both are authoritative. They agree on scope, authorization,
+> forbidden actions and acceptance gate, but each carries content the other lacks — spec A the stop
+> conditions and the recommendations-only constraint, spec B a ten-item outcome list. The queue section
+> carries the **union** and links both. Neither was renamed, per MSG-0058 F4.
+> 
+> **Read both.** A runner that reads one silently loses half its instructions and would report success
+> against the half it read (MSG-0060).
+> 
+> > **Both were read by the executing session**, and MSG-0061 §2 maps the union — all sixteen required
+> > outputs — to the section of EPA-0004 that satisfies each. The warning above is retained because it
+> > applies to anyone re-reading the TASK-0022 specification, not only to the session that executed it.
+> 
+> **The other thing to know: EPA-0004 supersedes EPA-0002 in substance, and EPA-0002 is retained
+> unchanged.** EPA-0002 was written before any decision was ruled and is conditional throughout; where
+> they differ, EPA-0004 is the later record and its §12 tabulates the six differences with the ruling
+> behind each. Do not read EPA-0002 as current.
+> 
+> ### Operational note
+> 
+> The Windows `Schedule` service was stopped by the operator on 2026-08-21, so the Supervisor's
+> ten-minute cadence is inert. Cycles run only when triggered manually until that service is restarted;
+> the start path itself is unchanged and proven.
+> 
 ---
 
 **Historical — the position between MSG-0057 and MSG-0058, retained.** The text below asked the

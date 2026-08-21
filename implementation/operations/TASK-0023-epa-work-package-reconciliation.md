@@ -1,6 +1,6 @@
 # TASK-0023 — EPA Work-Package Governance Reconciliation
 
-**Status:** AUTHORIZED — not yet READY
+**Status:** **READY** — reconciled into the authoritative queue 2026-08-21 as the single READY task, after prerequisites were verified (MSG-0064). The transition is the one this file's *Allowed* clause anticipates: "queue reconciliation so TASK-0023 is the single READY task when prerequisites are verified." Previously read "AUTHORIZED — not yet READY".
 **Authority:** MSG-0063
 **Owner:** Claude Code / Execution Agent
 

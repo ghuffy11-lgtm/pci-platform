@@ -31,24 +31,48 @@ Only the architecture lead may authorize new work, mark a task READY, or change 
 | TASK-0018 | **Live Supervisor heartbeat validation** | **COMPLETE** — 5 of 5 gates MET | TASK-0017 | 2026-08-21 `COMPLETED` observed externally | none | Claude Code |
 | TASK-0019 | **Post-WP-0001 repository baseline audit** | **COMPLETE** | TASK-0018, MSG-0050 | 2026-08-21 — 6 corrections applied, 7 items referred, MSG-0051 | none | Claude Code |
 | TASK-0021 | **Employee policy assistant — architecture definition** | **COMPLETE** | WP-0001 COMPLETE, MSG-0054 | 2026-08-21 — 11/11 acceptance criteria, MSG-0055; **accepted by the Architecture Lead (MSG-0056a)** | none — all fourteen EPA-0003 decisions ruled (MSG-0056a/b); three reconciliation findings resolved by MSG-0058 | Claude Code |
-| TASK-0022 | **Employee policy assistant — work-package definition** | **COMPLETE** — output PROPOSED, awaiting acceptance | TASK-0021 COMPLETE, MSG-0058 DECIDED, MSG-0059 | 2026-08-21 — `EPA-0004` delivered, MSG-0061 | none by Claude Code — **the Architecture Lead must accept EPA-0004 and rule on its seven open items** (MSG-0061 §7) | Claude Code |
+| TASK-0022 | **Employee policy assistant — work-package definition** | **COMPLETE** — output **ACCEPTED** by MSG-0062 | TASK-0021 COMPLETE, MSG-0058 DECIDED, MSG-0059 | 2026-08-21 — `EPA-0004` delivered, MSG-0061; accepted MSG-0062 with all seven open items ruled | none — the seven items in MSG-0061 §7 are ruled by MSG-0062 | Claude Code |
+| TASK-0023 | **EPA work-package governance reconciliation** | **READY** | TASK-0022 COMPLETE, MSG-0062 DECIDED, MSG-0063 AUTHORIZED | — | none — architecture/governance reconciliation only; **no implementation task may be marked READY** | Claude Code |
 | TASK-0002 | Make test entry points shell-independent | **ABORTED** | — | 2026-08-19 | none — premise disproven by measurement | — |
 
 **TASK-0019 is COMPLETE (2026-08-21).** It was authorized by MSG-0050, reconciled into this queue in `39eabdb`, and executed by a supervisor-started session on its scheduled 06:37:13Z cycle. It was maintenance/audit work only, not a new product work package.
 
-**TASK-0022 is COMPLETE (2026-08-21) and no task is READY.** It was executed by a supervisor-started
-session, which delivered
-[`EPA-0004`](../architecture/EPA-0004-employee-policy-assistant-work-package-definition.md) — the
-work-package definition, **PROPOSED**, with thirteen gates, ten dependency-ordered tasks, and all
-fourteen EPA-0003 rulings plus MSG-0058 F1–F4 folded in. Execution record: **MSG-0061**.
+**TASK-0023 is READY — the single READY task.** Authorized by **MSG-0063** and reconciled into this
+board on 2026-08-21 after its prerequisites were verified individually, not assumed: TASK-0022
+COMPLETE, MSG-0062 DECIDED, MSG-0063 AUTHORIZED, no OPEN blocker, no runner lock held, and exactly
+one TASK-0023 specification file on disk.
 
-**No task is READY, and that is the correct state.** MSG-0059 makes the Architecture Lead's acceptance
-of EPA-0004 the precondition for authorizing any implementation task, so the queue is at an
-**acceptance boundary**, not an empty queue. The next actions are the lead's: accept or amend EPA-0004,
-rule on the **seven open items** in MSG-0061 §7 (work-package number; the ADR set; the T-D/T-E
-ordering; PR3 IdP ownership; PR5 corpus survey; whether policy may be Restricted; the service's
-implementation stack), allocate the work-package number, and authorize **T-0 (identity provider) as an
-operator task** before T-A.
+It is **architecture/governance reconciliation only.** It may not implement, select any provider,
+model, embedding, framework or runtime, change permissions, security boundaries, Supervisor behaviour
+or scheduling, create or modify accepted ADRs, or perform any operator-only or privileged action.
+**It may not mark any downstream implementation task READY.**
+
+**EPA-0004 was ACCEPTED by MSG-0062**, which also ruled all seven of the open items MSG-0061 §7
+raised. Three of those rulings change what the next task must do:
+
+- **7.3** — **T-D (grounded QA) must precede T-E (retrieval-time authorization).** Authorization
+  controls must not be validated against an unproven answer path.
+- **7.6** — Restricted documents **are** eligible for the governed corpus, but **no retrieve-then-suppress
+  design is permitted**: a Restricted document is never retrieved into a request unless the
+  authenticated subject satisfies its policy, and denial must fail closed without revealing existence,
+  content, timing, or result-count.
+- **7.7** — **ADR-0015 is not inherited** as the service stack. A dedicated architecture task must
+  propose the concrete stack; nothing is selected by that ruling.
+
+**7.1 leaves the work-package identifier deliberately unallocated** — no existing WP number is
+repurposed — and allocating it through the register reconciliation is TASK-0023's job.
+
+> **Reconciliation warning, from MSG-0060 — still live.** Five times an authorization has existed while
+> this queue did not reflect it, leaving the Supervisor idling on a healthy-looking "no READY task".
+> TASK-0023 was the sixth occurrence: MSG-0063 authorized it and `grep -c "TASK-0023"` on this file
+> returned **0**. It is reconciled now. When the next task is authorized, the same step is required
+> again, or it becomes the seventh.
+
+> **The line this replaces, retained:** "**TASK-0022 is COMPLETE (2026-08-21) and no task is READY.** …
+> **No task is READY, and that is the correct state.** MSG-0059 makes the Architecture Lead's
+> acceptance of EPA-0004 the precondition …" True from TASK-0022's completion until MSG-0062 accepted
+> EPA-0004 and MSG-0063 authorized TASK-0023 on the same day. The acceptance boundary it described has
+> been passed, not removed: implementation remains prohibited.
 
 > **Reconciliation warning, from MSG-0060.** Five times now an authorization has existed while this
 > queue did not reflect it, leaving the Supervisor idling on a healthy-looking "no READY task". When
@@ -303,6 +327,9 @@ READY means *authorized to attempt*, never *authorized to force*. A READY task w
 | MSG-0059 | Decision | DECIDED | Architecture lead | Claude Code | **TASK-0022 authorized** as the next architecture/work-package definition task. May define scope, gates, acceptance criteria, dependencies, security checkpoints, and the implementation task sequence. **Does not authorize** implementation, provider/model selection, runtime changes, deployment, new permissions, or Supervisor changes, and **no implementation task may be marked READY**. Requires TASK-0022 to be **the single READY task on the board** before the Supervisor may execute it, and the Lead must accept its output before implementation is authorized | 2026-08-21 |
 | MSG-0060 | Record | **OPEN** | Claude Code | Architecture lead | **Queue reconciliation for TASK-0022, and a fifth collision — this time on an executable task specification.** Two TASK-0022 files were committed; they agree on scope, authorization, forbidden list and acceptance gate, so no stop fired, but they differ in content (A carries stop conditions and the recommendations-only constraint; B carries a ten-item outcome list). The queue section carries the **union** and links both; neither was renamed, per MSG-0058 F4. TASK-0022 is now the single READY task | 2026-08-21 |
 | MSG-0061 | Record | CREATED — awaiting acceptance | Claude Code | Architecture lead | **TASK-0022 execution record.** `EPA-0004` delivered as a **PROPOSED** work-package definition: thirteen gates (G1–G13; G12 identity and G13 retention/privacy are new), ten dependency-ordered tasks (T-0 IdP as an **operator** task, then T-A…T-I), five test tiers, T1–T11 threat coverage, and every required field of the work-package standard. All fourteen rulings and F1–F4 folded in; **F1's cross-language gate is made a protocol-level contract rule** so a failed Arabic gate abstains rather than falling back to English. **No implementation, no ADR created, no provider or stack selected, no work-package number allocated, no task marked READY.** §7 refers **seven decisions** to the Architecture Lead, led by *may a policy document be Restricted?* — the one D3 sub-question MSG-0056b does not reach | 2026-08-21 |
+| MSG-0062 | Decision | DECIDED | Architecture lead | Claude Code | **EPA-0004 ACCEPTED** as the bounded work-package definition, and **all seven MSG-0061 §7 items ruled.** 7.1 allocate a **new** work package, no existing WP number repurposed, identifier allocated by register reconciliation. 7.2 create only the ADRs needed to make the architecture enforceable before production; numbers allocated by convention in the next architecture task. **7.3 T-D (grounded QA) precedes T-E (retrieval-time authorization)** — authorization must not be validated against an unproven answer path. 7.4 integrate an OIDC/OAuth2 provider, never implement one; selection and deployment stay operator actions. 7.5 **a bounded corpus survey is authorized before T-B**, discovery input only, no production ingestion. **7.6 Restricted documents are eligible for the corpus but NO retrieve-then-suppress design is permitted** — never retrieved unless the subject satisfies policy; denial fails closed without revealing existence, content, timing, or result-count. **7.7 ADR-0015 is not inherited** as the service stack; a dedicated task proposes it. **Acceptance does not authorize implementation** | 2026-08-21 |
+| MSG-0063 | Decision | AUTHORIZED | Architecture lead | Claude Code | **TASK-0023 authorized** — reconcile EPA-0004 and the MSG-0062 rulings into the governed work-package records, resolve the WP numbering/register discrepancy, allocate the formal work-package identity, and define the dependency-ordered architecture tasks and ADR allocation. Seven acceptance criteria. **Forbidden:** implementation, provider/model/runtime selection, permission or security-boundary changes, Supervisor changes, and **marking any implementation task READY**. Must reconcile rather than duplicate existing records | 2026-08-21 |
+| MSG-0064 | Record | **OPEN** | Claude Code | Architecture lead | **TASK-0023 queue reconciliation.** MSG-0063 authorized TASK-0023 and the queue did not contain it — the **sixth** recurrence of the MSG-0044 gap. Reconciled as the single READY task after verifying prerequisites individually: TASK-0022 COMPLETE, MSG-0062 DECIDED, MSG-0063 AUTHORIZED, no OPEN blocker, no runner lock, one specification file. Verified by dry run. **TASK-0023 was not executed in this session**, per the operator instruction | 2026-08-21 |
 | MSG-0051 | Record | CREATED — audit complete | Claude Code | Architecture lead | **TASK-0019 baseline audit.** Six documentary corrections applied with their authorities quoted; four record classes verified already correct; **§C refers seven items for decision**, led by the accepted WP-0001 work package still reading `Status: Ready for implementation` — the stop condition fired and that correction was **not** made | TASK-0019 |
 
 ## Interruption and recovery protocol
@@ -852,3 +879,127 @@ Record the starting HEAD in checkpoint 1 and re-check it before every push.
 The work is documentary. On resumption, re-read MSG-0058, MSG-0059, and **both** specification files
 before continuing, and check which sections already exist rather than rewriting them — a half-written
 architecture record is easy to duplicate and hard to reconcile.
+
+---
+
+## TASK-0023 — EPA work-package governance reconciliation
+
+**Priority:** 1 | **Status:** **READY** | **Owner:** Claude Code
+**Depends on:** TASK-0022 COMPLETE; MSG-0062 DECIDED (EPA-0004 accepted, seven items ruled); MSG-0063 AUTHORIZED
+**Next eligible task:** none — MSG-0063 reserves the next authorization to the Architecture Lead after this task is accepted
+**Full specification:** [`TASK-0023-epa-work-package-reconciliation.md`](TASK-0023-epa-work-package-reconciliation.md)
+**Checkpoint:** `implementation/operations/checkpoints/TASK-0023.md`
+
+> **One specification file this time**, and MSG-0062/MSG-0063 carry distinct numbers — verified on
+> reconciliation. The TASK-0022 union treatment was needed because two files existed; it is not needed
+> here. Read the specification **and** MSG-0062 and MSG-0063: the acceptance criteria below come from
+> MSG-0063, and the rulings the task must apply come from MSG-0062.
+
+### Objective
+
+Reconcile the **accepted** EPA-0004 work-package definition and the MSG-0062 rulings into the
+authoritative governance records. **Architecture and governance only — no implementation.**
+
+### Required work (TASK-0023 specification)
+
+1. Re-read MSG-0062, MSG-0063, EPA-0004, the work-package register, and the existing work-package
+   records.
+2. **Resolve the WP numbering/register discrepancy explicitly, preserving historical WP-0001** and the
+   existing records.
+3. Allocate and record the formal work-package identity using the repository's established convention,
+   **without inventing or repurposing an existing identifier**.
+4. Reconcile the six proposed ADR surfaces into an explicit architecture sequence, **creating no ADRs**
+   unless separately authorized.
+5. Record **T-0 as an operator-only prerequisite**, kept distinct from Claude-executable work.
+6. Produce the dependency-ordered architecture/implementation gate sequence, with the next task
+   **identified but not implicitly authorized**.
+7. Reconcile COMMS, queue, status, and work-package records consistently.
+
+### Acceptance criteria (MSG-0063)
+
+1. EPA-0004 remains the accepted architecture/work-package definition.
+2. The register/directory discrepancy is explicitly reconciled **without repurposing historical WP-0001**.
+3. The formal work-package identifier is recorded consistently in the authoritative work-package records.
+4. The six ADR recommendations become an explicit proposed/required ADR sequence, **no duplicates and
+   no modification of accepted ADRs**.
+5. T-0 operator prerequisites, including authenticated IdP deployment, are clearly separated from
+   Claude-executable work.
+6. The resulting sequence is dependency ordered, with **only the next authorized architecture task
+   eligible for READY after queue reconciliation**.
+7. **No implementation authorization is implied.**
+
+### Rulings this task must apply (MSG-0062)
+
+- **7.1** — allocate as a **new** work package; **no existing WP number is repurposed**. The identifier
+  is allocated by the register reconciliation before implementation authorization.
+- **7.2** — create only the ADRs needed to make the accepted architecture enforceable before production:
+  the grounded-answer contract, and any new service-boundary/security decisions not already covered.
+  **Numbers allocated by repository convention during the next architecture task** — this task defines
+  the sequence, it does not create the ADRs.
+- **7.3** — **T-D (grounded QA) precedes T-E (retrieval-time authorization).** Authorization controls
+  must not be validated against an unproven answer path. Security review remains a gate on the complete
+  path before release.
+- **7.4** — first release requires an authenticated OIDC/OAuth2 provider; **the platform integrates,
+  it does not implement one**. Provider selection and privileged deployment are operator/organization
+  actions that must be established before the identity-dependent gates.
+- **7.5** — a **bounded corpus survey is authorized before T-B**, as a discovery/architecture input
+  only: formats, language mix, scanned-document prevalence, classification/audience patterns,
+  version and supersession characteristics. It **must not ingest production content or bypass approval
+  controls**.
+- **7.6** — Restricted documents **are eligible** for the governed corpus, but **no retrieve-then-suppress
+  design is permitted**. A Restricted document is never retrieved into an employee request unless the
+  authenticated subject satisfies its authorization policy, and denial must **fail closed without
+  revealing existence, content, timing, or result-count**.
+- **7.7** — **ADR-0015 is not inherited** as the service stack. The service stays outside the kernel
+  boundary and uses accepted platform contracts; a dedicated architecture task proposes the concrete
+  stack. **No provider, framework, model, embedding technology, or runtime is selected.**
+
+### Forbidden
+
+- No product or runtime implementation.
+- No provider, model, embedding, framework, or runtime selection.
+- No permission or security-boundary changes.
+- No Supervisor behaviour or scheduling changes.
+- **No creation or modification of accepted ADRs.**
+- No operator-only action, credential access, or privileged host operation.
+- **Do not mark any downstream implementation task READY.**
+
+### Verification
+
+Complete only when the authoritative work-package records, COMMS, queue, and status **agree**; the
+formal work-package identity is established **without historical collision**; the ADR sequence is
+explicit; T-0 is identified as operator-only; and no implementation authorization has been implied.
+
+Being documentary, this task produces **no test count**. Do not report a test result it cannot have —
+map each acceptance criterion to re-readable evidence instead.
+
+### Documentation
+
+Record the result in `implementation/comms/` as a numbered message, update
+`implementation/status/current.md`, this queue, and the work-package records, and write the checkpoint.
+A completely new session must be able to resume from the repository alone.
+
+### Checkpoint
+
+`implementation/operations/checkpoints/TASK-0023.md`. Write each checkpoint **after** an operation is
+verified, never in anticipation of one.
+
+### Stop conditions
+
+Stop and record COMMS if the authoritative records materially conflict, if a work-package identifier
+**cannot be allocated without repurposing an existing identifier**, or if completing the task would
+require an architecture decision beyond MSG-0062/MSG-0063.
+
+**Also stop if `origin/main` moves mid-run.** BLK-0006 is the precedent, and the Architecture Lead has
+pushed concurrently during three of the last four tasks. Record the starting HEAD in checkpoint 1 and
+re-check it before every push.
+
+> **Known runner limit, not a defect to route around.** `git fetch` is off the runner allowlist, so a
+> mid-run move by the lead is detectable only when a push is rejected. Both TASK-0022 and BLK-0006
+> record this. Do not attempt to work around it; record it and stop if a push is rejected.
+
+### Recovery procedure
+
+The work is documentary. On resumption, re-read MSG-0062, MSG-0063, EPA-0004 and the specification,
+and check which records already exist rather than rewriting them — governance records are easy to
+duplicate and hard to reconcile, which is the exact failure this task exists to fix.
