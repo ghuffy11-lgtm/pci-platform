@@ -2,7 +2,7 @@
 
 **Active Work Package:** WP-0001 — PCI Kernel Foundation
 **Status:** **COMPLETE** — declared by the architecture lead 2026-08-19 (MSG-0020(b), resolved by MSG-0022 / MSG-0023, TASK-0009)
-**Last Updated:** 2026-08-21 UTC (**TASK-0025 COMPLETE** — **ADR-0018…ADR-0022 promoted** into `docs/decisions/`, completing the WP-0009 ADR set; 5/5 acceptance criteria, zero body differences in the per-ADR diffs, MSG-0075. **No task is READY**)
+**Last Updated:** 2026-08-22 UTC (independent post-promotion verification passed; no change required) · 2026-08-21 UTC (**TASK-0025 COMPLETE** — **ADR-0018…ADR-0022 promoted** into `docs/decisions/`, completing the WP-0009 ADR set; 5/5 acceptance criteria, zero body differences in the per-ADR diffs, MSG-0075. **No task is READY**)
 
 > **The line this replaces, retained:** "2026-08-21 UTC (**MSG-0073 answers MSG-0072** — **TASK-0025
 > authorized** to promote ADR-0018…ADR-0022 and reconciled into the queue as the single READY task,
@@ -139,6 +139,21 @@ of each pair therefore shows those two header hunks and **nothing else — zero 
 all five**. The body was never retyped, so it could not drift. **No accepted ADR was modified**:
 `git status --porcelain` before the commit showed five *new* paths under `docs/decisions/` and no
 modified path there, so ADR-0001…ADR-0017 are untouched.
+
+**Independently re-verified 2026-08-22 by a separate interactive session**, since these are the
+most authority-bearing files in the repository and a self-reported verification is weaker evidence
+than an independent one. The method was deliberately different from the runner's: rather than
+reading `diff` hunks, each promoted body was extracted from its first section heading onward,
+whitespace-collapsed, and compared whole against its draft — a check that also catches silent
+reflowing, which hunk-reading can miss.
+
+**All five bodies compared IDENTICAL.** The only differences anywhere are the `Status` block and
+the added `Accepted by` line. The three MSG-0071 conditions were re-checked in the promoted copies
+as well: ADR-0022's non-selection statement is intact at line 72 with the Ollama citation in the
+same two positions, and ADR-0019 still declares itself "not complete for production use,
+deliberately" with normalization deferred at §6.
+
+This corroborates MSG-0075 §3 and §4 rather than replacing them; it found nothing to correct.
 
 **The three conditions MSG-0071 attached were re-checked in the promoted copies rather than inherited.**
 MSG-0072's pre-promotion pass verified them in the *drafts*; promotion is the step where they could be
