@@ -473,6 +473,14 @@ visible; it does not make it self-clearing.
 
 ## Repository / GitHub State
 
+> **Current as of 2026-08-21, TASK-0021 — read this before the block below.** The channel is
+> **partially** operational. TASK-0021's first push succeeded (`3350cb4..b96187b`) and delivered the
+> entire architecture definition. Its second push was **rejected** because a concurrent actor moved
+> `origin/main` mid-run. The session stopped at the fail-closed boundary and attempted no
+> reconciliation. `origin/main`'s current value is **UNKNOWN** — `git fetch` is not allowlisted and
+> `git ls-remote` was refused. See **BLK-0006**. The 2026-08-20 verification quoted below is history,
+> and its SHAs were already stale before this note was written.
+
 **The communication channel is operational.** Verified 2026-08-20 at the start of TASK-0016:
 
 ```text
@@ -550,7 +558,28 @@ required as a messenger.
 
 ## Open Blockers
 
-**None.** BLK-0001 through BLK-0005 are all RESOLVED. BLK-0005 was closed by MSG-0022 / MSG-0023,
+**One: BLK-0006, raised 2026-08-21 by TASK-0021.** `origin/main` moved mid-run — a concurrent actor
+pushed between TASK-0021's two pushes — and the second push was rejected. That is the *Mid-run
+repository movement* fail-closed boundary (MSG-0028 decision 2), and the session stopped at it: **no
+pull, fetch, merge, rebase, reset, or force push, and no second push attempt.**
+
+**Impact is bounded and the deliverable is safe.** `b96187b` reached `origin/main` and carries the
+entire TASK-0021 output — EPA-0001, EPA-0002, EPA-0003, MSG-0055, and every reconciliation. Stranded
+locally in `c8059eb` and later: DISC-0010 and its index rows, and checkpoints 3 and 4.
+
+**`origin/main`'s current value is UNKNOWN to that session** — `git fetch` is not allowlisted and
+`git ls-remote origin main` was refused. Neither was routed around. `git status -sb` says `[ahead 1]`,
+but that is measured against a stale local ref and **must not be read as the real divergence**.
+
+A human must inspect the remote and choose among the three options in
+[`../blockers/BLK-0006-mid-run-repository-movement.md`](../blockers/BLK-0006-mid-run-repository-movement.md).
+None was taken.
+
+> **The former text of this section, retained:** "**None.** BLK-0001 through BLK-0005 are all
+> RESOLVED." That remains true of those five and is preserved below; it stopped being the whole
+> picture when BLK-0006 was raised.
+
+**BLK-0001 through BLK-0005 are all RESOLVED.** BLK-0005 was closed by MSG-0022 / MSG-0023,
 which ruled that the COMPLETE decision stands and that TASK-0012 is not authorized.
 
 There are no open blockers. The two defects found during verification (DISC-0007, DISC-0008) are
