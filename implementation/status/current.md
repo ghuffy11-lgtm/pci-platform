@@ -943,11 +943,15 @@ both tables index it, and both were updated in the same commit as the record.
 ## Next Action
 
 **TASK-0023 is READY and is the single READY task. It has NOT been started.**
+The queue is armed and nothing has consumed it. **Starting it requires enabling the scheduled task
+or an explicit manual trigger** — see the corrected operational note below. The reconciliation and
+the execution were deliberately separated by operator instruction (MSG-0064).
 
-The queue is armed and nothing has consumed it. Starting it requires either restarting the Windows
-`Schedule` service — stopped by the operator on 2026-08-21, so no cycle fires on its own — or an
-explicit manual trigger. The reconciliation and the execution were deliberately separated by operator
-instruction (MSG-0064).
+> **Corrected 2026-08-21 (MSG-0065).** This paragraph previously said starting TASK-0023 required
+> "restarting the Windows `Schedule` service — stopped by the operator". **That was wrong.** The
+> `Schedule` service is **Running (Automatic)**; what is **Disabled** is the scheduled task
+> `PCI-Execution-Supervisor`. Restarting the service would therefore have done nothing. The
+> functional consequence was right — no cycle fires on its own — but the remedy was not.
 
 **What changed.** **MSG-0062 ACCEPTED EPA-0004** as the bounded work-package definition and ruled all
 seven of the open items MSG-0061 §7 raised. **MSG-0063** then authorized **TASK-0023**, the governance

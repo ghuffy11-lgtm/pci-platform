@@ -122,5 +122,10 @@ operator-only or privileged action; and **no downstream implementation task may 
 - **TASK-0023 is READY and is the single READY task.** It has not been started.
 - MSG-0062 and MSG-0063 are registered in the COMMS register and the queue ledger.
 - No implementation, ADR, provider selection, permission, or Supervisor change was made or authorized.
-- The Windows `Schedule` service remains stopped, so no cycle will fire on its own. Starting TASK-0023
-  requires either restarting that service or an explicit manual trigger.
+- ~~The Windows `Schedule` service remains stopped, so no cycle will fire on its own. Starting
+  TASK-0023 requires either restarting that service or an explicit manual trigger.~~
+  **Corrected by MSG-0065:** the `Schedule` service is **Running**; the scheduled task
+  `PCI-Execution-Supervisor` is **Disabled**. No cycle fires on its own — that part held — but
+  resuming automation means **enabling the task**, not restarting the service. The original
+  wording is struck through rather than deleted, because the error is part of what this record
+  recorded.
