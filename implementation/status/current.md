@@ -2,7 +2,7 @@
 
 **Active Work Package:** WP-0001 — PCI Kernel Foundation
 **Status:** **COMPLETE** — declared by the architecture lead 2026-08-19 (MSG-0020(b), resolved by MSG-0022 / MSG-0023, TASK-0009)
-**Last Updated:** 2026-08-21 UTC (**MSG-0072 awaits a decision** — five accepted ADRs unpromoted, pre-promotion verification passed; three discharged records closed; **two OPEN messages**, no task READY)
+**Last Updated:** 2026-08-21 UTC (**MSG-0073 answers MSG-0072** — **TASK-0025 authorized** to promote ADR-0018…ADR-0022 and reconciled into the queue as the single READY task, MSG-0074; not started)
 
 > **The line this replaces, retained:** "2026-08-21 UTC (**TASK-0023 COMPLETE** — WP-0009 allocated,
 > MSG-0066; **MSG-0067** rules the carried-forward items; **MSG-0068 authorizes TASK-0024 (A-ADR)**,
@@ -552,20 +552,22 @@ carry explicit supersession notes, with no supervisor behaviour, permission, or 
 C4 and C5 — no action, deliberately. **C6 (a bounded proof of MSG-0049 option B) and C7 (the next
 work package) remain the Lead's to decide and are not self-authorized.**
 
-**Two messages carry `Status: OPEN`** — verified 2026-08-21 across all three views (each message
-file, the COMMS register, and the queue ledger), which agree exactly.
+**Two messages carry `Status: OPEN`** — **MSG-0060** and **MSG-0074**. Verified across all three
+views (message file, COMMS register, queue ledger).
 
-**MSG-0072 needs an answer.** MSG-0071 accepted ADR-0017 through ADR-0022, but only **ADR-0017 is
-in `docs/decisions/`**, so five accepted architecture decisions have no authoritative record. The
-promotion was **not** performed here — it is the act that confers authority, no READY task
-authorizes it, and the lead promoted ADR-0017 personally. A pre-promotion verification pass has
-since confirmed the five are safe to promote **as written**. One decision: finish it, or authorize
-a bounded task.
+**MSG-0074** is the TASK-0025 queue reconciliation: informational, blocking nothing.
 
-**MSG-0060 carries an unaddressed observation** — whether colliding *task specifications* warrant
-more than the union treatment. Three instances now (TASK-0022, TASK-0024 doubled). It blocks
-nothing.
+**MSG-0060 carries the one unaddressed observation** — whether colliding *task specifications*
+warrant more than the union treatment. It did **not** recur with MSG-0073, which arrived alone:
+the first clean authorization in four.
 
+**MSG-0072 was closed** by **MSG-0073**, which answers it. Its pre-promotion verification — no
+provider/model/runtime selection, ADR-0019 invents no normalization rules, numbering
+collision-free — stands as evidence for TASK-0025 rather than being discarded with the message.
+
+> **The line this replaces, retained:** "**Two messages carry `Status: OPEN`** … **MSG-0072 needs
+> an answer** … **MSG-0060 carries an unaddressed observation**." True until MSG-0073 answered
+> MSG-0072 the same day.
 **Three were closed on 2026-08-21 because they were discharged, not because they were tidied
 away:** **MSG-0064** (TASK-0023 executed and COMPLETE, delivering WP-0009), **MSG-0065** (the
 operator enabled the scheduled task; verified **Ready** and cycling), and **MSG-0069** (TASK-0024
@@ -1104,72 +1106,120 @@ both tables index it, and both were updated in the same commit as the record.
 
 ## Next Action
 
-**No task is READY. One decision is required from the architecture lead: finish promoting the accepted
-ADR set, or authorize a bounded task to do it (MSG-0072).**
+**TASK-0025 is READY and is the single READY task. The Supervisor will start it on its next cycle — no
+manual trigger is needed.**
 
-**TASK-0024 (A-ADR) is COMPLETE.** It was executed unattended by a supervisor-started session and
-drafted six ADRs — **ADR-0017 … ADR-0022** — covering the grounded answer contract, approved-document
-authority and lifecycle, bilingual policy semantics, the retrieval projection and index boundary,
-employee question privacy and retention, and inference locality and the provider boundary. Execution
-record: **MSG-0070**.
+**MSG-0073 answers MSG-0072.** It authorizes TASK-0025 to promote **ADR-0018 … ADR-0022** into
+`docs/decisions/`, the authoritative register, and states plainly: *"Claude may execute TASK-0025 when
+it is reconciled as READY."* ADR-0017 was already promoted by the lead and must not be touched.
 
-**MSG-0071 accepted all six**, with three bounded conditions worth carrying forward:
+### What TASK-0025 must preserve
 
-- **ADR-0017** — the fail-closed, citation-bound answer contract is approved, but **the entailment
-  model and numeric thresholds remain explicitly undecided** under SPEC-0020.
-- **ADR-0019** — accepted as a **bounded** decision: **Arabic normalization rules stay deliberately
-  incomplete** and must come from empirical corpus evidence before production use. **No invented
-  normalization rules are authorized.**
-- **ADR-0020** — the **no-retrieve-then-suppress** confidentiality boundary and fail-closed handling
-  are approved.
+- **No change to the substance** of the accepted decisions. A `diff` between each promoted copy and its
+  draft should show only the `Status` line and an added `Accepted by` line; **any body difference is a
+  defect**, since these records are cited as authority.
+- **No provider, model, framework, or runtime selection** that was deliberately left open. ADR-0022's
+  wording — citing Ollama from ADR-0003 while explicitly declining to select it — is load-bearing and
+  must survive promotion intact.
+- **ADR-0019's normalization rules stay deferred** to empirical corpus evidence. It must still read as
+  incomplete for production by design.
+- **No implementation authorization**, and **A-SURVEY, A-STACK and T-0 stay unauthorized**.
+- **Completion is reported only after repository verification** — MSG-0073 is explicit about that
+  ordering.
 
-### The open item
+### Two things worth knowing before it runs
 
-**Only ADR-0017 has been promoted to `docs/decisions/`.** ADR-0018 through ADR-0022 exist solely as
-drafts under `implementation/decisions/`, so five accepted decisions currently have no authoritative
-record — including the confidentiality, retrieval and inference-locality boundaries that later
-implementation work is meant to be gated on.
+**There is no `TASK-0025-*.md` specification file.** Every task since TASK-0017 has had one; this one
+does not. MSG-0073 plus the queue section are the specification. Recorded so a runner neither hunts for
+a missing file nor improvises one to fill the gap.
 
-**The promotion was deliberately not performed.** It is the act that confers architectural authority;
-no READY task authorizes it; and the lead promoted ADR-0017 personally, which reads as the lead doing
-this work rather than delegating it. Everything that did not depend on that answer **was** done: the
-ADR index and all six draft headers now record the acceptance, the ADR-0017 draft is marked RATIFIED
-per the ADR-0015 precedent, and MSG-0071 is registered in both the COMMS register and the queue
-ledger. **No ADR text was altered.**
+**The promotion convention was verified rather than remembered**, from the ADR-0015 precedent and the
+lead's own ADR-0017 promotion three commits ago. The queue section states it exactly.
 
-**A pre-promotion verification pass was run, read-only, and it passed** (MSG-0072). MSG-0071
-attached conditions to its own acceptance, and the moment to check them is before the drafts
-become authoritative:
+### After TASK-0025
 
-- **No provider, model, runtime, or framework is selected.** The only substantive technology
-  mention is **Ollama, twice in ADR-0022** — a *citation* of ADR-0003, with that ADR stating
-  twice that it selects nothing. Verified at source: ADR-0003 line 17 reads verbatim as quoted.
-- **ADR-0019 invents no normalization rules.** It fixes the obligation — raw text immutable,
-  ingestion and query normalization identical, rule set versioned — and defers the rules to
-  corpus evidence, stating it must be amended before production use.
-- **ADR numbering is collision-free.** The three ids in both directories are promoted pairs with
-  identical filenames; no id is claimed by two titles.
+Implementation remains prohibited. **A-SURVEY and A-STACK are unauthorized**, and **T-0 remains an
+operator prerequisite** — the identity provider needs a privileged deployment that no decision can
+substitute for. The lead authorizes the next bounded task after reviewing the promoted register.
 
-This establishes that promoting ADR-0018 … ADR-0022 **as written** would not violate MSG-0071's
-conditions or close a question the lead left open. **It does not authorize the promotion**, and
-none was performed.
+**When that happens, its board row must be added in the same commit.** The queue gap has now recurred
+eight times (MSG-0074); it is the one failure in this project that has never yet been prevented, only
+repaired.
 
-### What remains explicitly unauthorized
+---
 
-**A-SURVEY and A-STACK remain unauthorized.** No implementation task is authorized or READY, and
-nothing in MSG-0071 permits provider, model, framework, or runtime selection. MSG-0071 is explicit
-that the next bounded architecture task may only be considered **after** the ADR set is reconciled and
-promoted.
+**Historical — the position while MSG-0072 awaited a decision, retained.** The text below asked
+the lead to finish the ADR promotion or authorize a task for it. **MSG-0073 chose the second**,
+authorizing TASK-0025. Retained as the record of what was asked.
 
-**T-0 remains an operator prerequisite** — the identity provider needs a privileged deployment and
-cannot be satisfied by a decision alone.
-
-### Operational note
-
-The Supervisor is enabled and cycling every ten minutes; it fast-forwarded to `d9c4524` at 20:07:24Z
-and is idling correctly at `NOOP: no READY task`. **When the next task is authorized, its board row
-must be added in the same commit** — that gap has now recurred seven times (MSG-0069).
-
+> ## Next Action
+> 
+> **No task is READY. One decision is required from the architecture lead: finish promoting the accepted
+> ADR set, or authorize a bounded task to do it (MSG-0072).**
+> 
+> **TASK-0024 (A-ADR) is COMPLETE.** It was executed unattended by a supervisor-started session and
+> drafted six ADRs — **ADR-0017 … ADR-0022** — covering the grounded answer contract, approved-document
+> authority and lifecycle, bilingual policy semantics, the retrieval projection and index boundary,
+> employee question privacy and retention, and inference locality and the provider boundary. Execution
+> record: **MSG-0070**.
+> 
+> **MSG-0071 accepted all six**, with three bounded conditions worth carrying forward:
+> 
+> - **ADR-0017** — the fail-closed, citation-bound answer contract is approved, but **the entailment
+>   model and numeric thresholds remain explicitly undecided** under SPEC-0020.
+> - **ADR-0019** — accepted as a **bounded** decision: **Arabic normalization rules stay deliberately
+>   incomplete** and must come from empirical corpus evidence before production use. **No invented
+>   normalization rules are authorized.**
+> - **ADR-0020** — the **no-retrieve-then-suppress** confidentiality boundary and fail-closed handling
+>   are approved.
+> 
+> ### The open item
+> 
+> **Only ADR-0017 has been promoted to `docs/decisions/`.** ADR-0018 through ADR-0022 exist solely as
+> drafts under `implementation/decisions/`, so five accepted decisions currently have no authoritative
+> record — including the confidentiality, retrieval and inference-locality boundaries that later
+> implementation work is meant to be gated on.
+> 
+> **The promotion was deliberately not performed.** It is the act that confers architectural authority;
+> no READY task authorizes it; and the lead promoted ADR-0017 personally, which reads as the lead doing
+> this work rather than delegating it. Everything that did not depend on that answer **was** done: the
+> ADR index and all six draft headers now record the acceptance, the ADR-0017 draft is marked RATIFIED
+> per the ADR-0015 precedent, and MSG-0071 is registered in both the COMMS register and the queue
+> ledger. **No ADR text was altered.**
+> 
+> **A pre-promotion verification pass was run, read-only, and it passed** (MSG-0072). MSG-0071
+> attached conditions to its own acceptance, and the moment to check them is before the drafts
+> become authoritative:
+> 
+> - **No provider, model, runtime, or framework is selected.** The only substantive technology
+>   mention is **Ollama, twice in ADR-0022** — a *citation* of ADR-0003, with that ADR stating
+>   twice that it selects nothing. Verified at source: ADR-0003 line 17 reads verbatim as quoted.
+> - **ADR-0019 invents no normalization rules.** It fixes the obligation — raw text immutable,
+>   ingestion and query normalization identical, rule set versioned — and defers the rules to
+>   corpus evidence, stating it must be amended before production use.
+> - **ADR numbering is collision-free.** The three ids in both directories are promoted pairs with
+>   identical filenames; no id is claimed by two titles.
+> 
+> This establishes that promoting ADR-0018 … ADR-0022 **as written** would not violate MSG-0071's
+> conditions or close a question the lead left open. **It does not authorize the promotion**, and
+> none was performed.
+> 
+> ### What remains explicitly unauthorized
+> 
+> **A-SURVEY and A-STACK remain unauthorized.** No implementation task is authorized or READY, and
+> nothing in MSG-0071 permits provider, model, framework, or runtime selection. MSG-0071 is explicit
+> that the next bounded architecture task may only be considered **after** the ADR set is reconciled and
+> promoted.
+> 
+> **T-0 remains an operator prerequisite** — the identity provider needs a privileged deployment and
+> cannot be satisfied by a decision alone.
+> 
+> ### Operational note
+> 
+> The Supervisor is enabled and cycling every ten minutes; it fast-forwarded to `d9c4524` at 20:07:24Z
+> and is idling correctly at `NOOP: no READY task`. **When the next task is authorized, its board row
+> must be added in the same commit** — that gap has now recurred seven times (MSG-0069).
+> 
 ---
 
 **Historical — the position while TASK-0024 was READY, retained.** The text below described the

@@ -1,6 +1,6 @@
 # MSG-0072 — Five of Six Accepted ADRs Are Not Yet Promoted
 
-**Status:** **OPEN** — one decision required
+**Status:** **CLOSED** 2026-08-21 — answered by **MSG-0073**, which authorizes **TASK-0025** to promote ADR-0018…ADR-0022 into `docs/decisions/`. The decision this record requested has been made; the promotion itself is now queue-authorized work.
 **Raised:** 2026-08-21
 **Raised by:** Claude Code (interactive session, COMMS)
 **Type:** Reconciliation record + decision request
