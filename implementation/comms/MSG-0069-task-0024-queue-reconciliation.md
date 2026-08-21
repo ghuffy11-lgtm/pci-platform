@@ -1,6 +1,6 @@
 # MSG-0069 — TASK-0024 Reconciled Into the Queue; the Seventh Recurrence, Observed Live
 
-**Status:** **OPEN** — informational; no decision blocks TASK-0024
+**Status:** **CLOSED** 2026-08-21 — the reconciliation is discharged: TASK-0024 was executed by a supervisor-started session and is **COMPLETE** (MSG-0070), its ADR set accepted by MSG-0071. **The collision observation it records is NOT closed by this** — it is the same question MSG-0060 carries, which remains OPEN rather than being duplicated here.
 **Raised:** 2026-08-21
 **Raised by:** Claude Code (interactive session, COMMS)
 **Type:** Queue reconciliation record

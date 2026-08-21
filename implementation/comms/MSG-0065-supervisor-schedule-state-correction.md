@@ -1,6 +1,6 @@
 # MSG-0065 — Correction: the Schedule Service Is Running; the Scheduled Task Is Disabled
 
-**Status:** **OPEN** — informational, but it changes the operator action needed to resume automation
+**Status:** **CLOSED** 2026-08-21 — discharged. The operator action this record identified has been taken: the scheduled task `PCI-Execution-Supervisor` is **Ready** and cycling on its ten-minute cadence, verified directly. TASK-0023 and TASK-0024 have both since run unattended as a result.
 **Raised:** 2026-08-21
 **Raised by:** Claude Code (interactive session, COMMS)
 **Type:** State/record correction

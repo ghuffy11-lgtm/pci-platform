@@ -2,7 +2,7 @@
 
 **Active Work Package:** WP-0001 — PCI Kernel Foundation
 **Status:** **COMPLETE** — declared by the architecture lead 2026-08-19 (MSG-0020(b), resolved by MSG-0022 / MSG-0023, TASK-0009)
-**Last Updated:** 2026-08-21 UTC (**TASK-0024 COMPLETE** — ADR-0017…0022 drafted, MSG-0070; **MSG-0071 accepts all six**; **five await promotion — MSG-0072, decision required**; pre-promotion verification passed; no task READY)
+**Last Updated:** 2026-08-21 UTC (**MSG-0072 awaits a decision** — five accepted ADRs unpromoted, pre-promotion verification passed; three discharged records closed; **two OPEN messages**, no task READY)
 
 > **The line this replaces, retained:** "2026-08-21 UTC (**TASK-0023 COMPLETE** — WP-0009 allocated,
 > MSG-0066; **MSG-0067** rules the carried-forward items; **MSG-0068 authorizes TASK-0024 (A-ADR)**,
@@ -552,18 +552,32 @@ carry explicit supersession notes, with no supervisor behaviour, permission, or 
 C4 and C5 — no action, deliberately. **C6 (a bounded proof of MSG-0049 option B) and C7 (the next
 work package) remain the Lead's to decide and are not self-authorized.**
 
-**Five messages carry `Status: OPEN`. Four are informational; one requires a decision.**
+**Two messages carry `Status: OPEN`** — verified 2026-08-21 across all three views (each message
+file, the COMMS register, and the queue ledger), which agree exactly.
 
-**MSG-0072 is the one needing an answer:** MSG-0071 accepted ADR-0017 through ADR-0022, but only
-**ADR-0017 is in `docs/decisions/`**. Five accepted architecture decisions therefore have no
-authoritative record. The promotion was **not** performed here — it is the act that confers
-authority, no READY task authorizes it, and the lead promoted ADR-0017 personally. One decision:
-finish it, or authorize a bounded task.
+**MSG-0072 needs an answer.** MSG-0071 accepted ADR-0017 through ADR-0022, but only **ADR-0017 is
+in `docs/decisions/`**, so five accepted architecture decisions have no authoritative record. The
+promotion was **not** performed here — it is the act that confers authority, no READY task
+authorizes it, and the lead promoted ADR-0017 personally. A pre-promotion verification pass has
+since confirmed the five are safe to promote **as written**. One decision: finish it, or authorize
+a bounded task.
 
-The informational four: **MSG-0060** (task-specification collisions, still unaddressed),
-**MSG-0064** (TASK-0023 queue reconciliation), **MSG-0065** (the schedule-state correction, whose
-operator action has since been taken), and **MSG-0069** (TASK-0024 reconciliation — a doubled
-collision and the seventh recurrence).
+**MSG-0060 carries an unaddressed observation** — whether colliding *task specifications* warrant
+more than the union treatment. Three instances now (TASK-0022, TASK-0024 doubled). It blocks
+nothing.
+
+**Three were closed on 2026-08-21 because they were discharged, not because they were tidied
+away:** **MSG-0064** (TASK-0023 executed and COMPLETE, delivering WP-0009), **MSG-0065** (the
+operator enabled the scheduled task; verified **Ready** and cycling), and **MSG-0069** (TASK-0024
+executed and COMPLETE). MSG-0069's collision observation was **not** closed with it — it is the
+same question MSG-0060 carries, and duplicating it across two records would have meant two
+records waiting on one answer.
+
+> **Also corrected:** the ledger row for **MSG-0057** read OPEN while the message file has read
+> CLOSED since MSG-0058 ruled its four findings. The three views now agree for every message.
+
+> **The line this replaces, retained:** "**Five messages carry `Status: OPEN`. Four are
+> informational; one requires a decision.**" True until the three discharged records were closed.
 
 > **The line this replaces, retained:** "**Four messages carry `Status: OPEN`, all informational
 > and none blocking** …" True until MSG-0072 was raised the same day.
