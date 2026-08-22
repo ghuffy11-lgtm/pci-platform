@@ -1,6 +1,6 @@
 # BLK-0008 — The Designated A-SURVEY Corpus Is Not Reachable
 
-**Status:** **OPEN** — operator action required. **Corrected 2026-08-22: the path is NFS, not SMB.** Two independent blockers: the NFS export is unreachable (2049 and 111 both closed) **and** Client for NFS is not installed on this workstation. No local remedy was attempted; installing the feature is a privileged change nothing authorizes
+**Status:** **RESOLVED** 2026-08-22 — neither transport problem had to be solved. The corpus was supplied directly at `D:\Work\pci-corpus\plan.pdf` and is readable; nothing was mounted and no Windows feature was installed. Retained for the diagnosis (SMB tested first, corrected to NFS) and for the near-miss where the file first landed inside the repository
 **Raised:** 2026-08-22, on the operator's designation of a corpus path
 **Severity:** Medium. A-SURVEY stays unexecutable; A-STACK is delivered and unaffected
 **Related:** MSG-0077 (PR5 unmet), MSG-0078 §3 (A-SURVEY stopped), MSG-0076, MSG-0062 §7.5, BLK-0007 (same diagnostic shape)
@@ -184,3 +184,42 @@ with 2049 closed, installing the client would change nothing yet.
 NFS client installed.** Whether the export exists, is exported to this address, or is firewalled cannot
 be determined from here — `showmount -e` would answer it, and that tool is part of the uninstalled
 feature.
+
+---
+
+## RESOLVED — 2026-08-22, by supplying the file locally
+
+**Neither transport problem had to be solved.** The operator placed the corpus directly on this
+machine:
+
+```text
+D:\Work\pci-corpus\plan.pdf        626.8 KB      header %PDF-1.7      readable
+```
+
+So the NFS export being unreachable and Client for NFS being uninstalled are both **moot**. Nothing was
+mounted, no feature was installed, and no privileged change was made — which is the outcome the
+"place the file somewhere already reachable" option was offered for.
+
+### One thing worth recording: it first landed in the wrong place
+
+The file initially arrived at `D:\Work\pci-platform\plan.pdf` — **inside the Git working tree**,
+untracked and not covered by `.gitignore`.
+
+```text
+$ git status --porcelain
+?? plan.pdf
+$ git check-ignore -v plan.pdf     -> no match
+```
+
+**Every COMMS cycle and every unattended runner executes `git add -A`.** The next commit would have put
+627 KB of corpus into permanent repository history, removable only by rewriting published history.
+
+It was moved to `D:\Work\pci-corpus\` before anything staged it, and `git status` was verified clean
+afterwards. **Nothing was ever committed.** MSG-0080 subsequently made the external location a standing
+constraint, and the TASK-0027 queue section carries the warning so a runner does not copy it back in.
+
+### State
+
+**A-SURVEY is unblocked.** MSG-0080 authorizes the bounded follow-up, reconciled as **TASK-0027**.
+The earlier SMB and NFS findings are retained above as the record of what was tested and why the
+diagnosis changed; neither describes a live problem.

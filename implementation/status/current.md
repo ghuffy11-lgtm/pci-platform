@@ -2,7 +2,7 @@
 
 **Active Work Package:** WP-0001 — PCI Kernel Foundation
 **Status:** **COMPLETE** — declared by the architecture lead 2026-08-19 (MSG-0020(b), resolved by MSG-0022 / MSG-0023, TASK-0009)
-**Last Updated:** 2026-08-22 UTC — operator designated an A-SURVEY corpus; **verified NOT reachable**. Corrected: the path is an **NFS export, not SMB** — NFS 2049 and portmapper 111 closed, **and** Client for NFS is not installed here. Two independent blockers (**BLK-0008**, MSG-0079). A-SURVEY still unexecutable; **A-STACK delivered as `EPA-0005`** (PROPOSED, selecting nothing); TASK-0026 **COMPLETE (PARTIAL)**, 5/6 criteria met (MSG-0078). **No task is READY.**
+**Last Updated:** 2026-08-22 UTC — **TASK-0027 is READY in the committed queue** (A-SURVEY, n=1) and not yet run. **BLK-0008 and BLK-0009 both RESOLVED**: the corpus arrived locally, and a runner correctly refused to execute against an uncommitted READY marking while this session was mid-edit. **MSG-0082 raises a decision** — the corpus sits outside the repo by MSG-0080, and the runner may not read outside it. `EPA-0005` (A-STACK) still PROPOSED. **No implementation authorized.**
 
 > **The line this replaces, retained:** "2026-08-21 UTC (**MSG-0073 answers MSG-0072** — **TASK-0025
 > authorized** to promote ADR-0018…ADR-0022 and reconciled into the queue as the single READY task,
@@ -690,30 +690,46 @@ carry explicit supersession notes, with no supervisor behaviour, permission, or 
 C4 and C5 — no action, deliberately. **C6 (a bounded proof of MSG-0049 option B) and C7 (the next
 work package) remain the Lead's to decide and are not self-authorized.**
 
-**Four messages carry `Status: OPEN`** — **MSG-0060**, **MSG-0077**, **MSG-0078**, and
-**MSG-0079**. Verified across all three views (message file, COMMS register, queue ledger).
+**Three messages carry `Status: OPEN`** — **MSG-0060**, **MSG-0081**, and **MSG-0082**. Verified across all three views (message file, COMMS register, queue ledger).
 
-**MSG-0079 records the operator's corpus designation and the verification that followed.** The
-organization named `\\10.1.27.220\LXBackup\plan.pdf` as the approved/synthetic A-SURVEY corpus,
-explicitly **not** production or confidential — **which resolves the authority half of PR5.** The
-path is **not reachable** (BLK-0008), so A-SURVEY remains unexecutable for a different reason than
-before: no longer "nobody has supplied material", now "the supplied material cannot be read".
+**MSG-0082 is the one needing a decision.** MSG-0080 requires the corpus **outside** the repository; the unattended runner's permission boundary **is** the repository. A real runner session recorded its read of `D:Workpci-corpus` being **denied and not routed around** (BLK-0009). Options: **(A)** a narrow read permission for that path, **(B)** run TASK-0027 interactively, **(C)** supply an extraction. **Undecided is safe** — the run stops and records, costing one cycle.
 
-> **The line this replaces, retained:** "**Three messages carry `Status: OPEN`** — **MSG-0060**,
+**MSG-0081 is the TASK-0027 reconciliation**: informational, blocking nothing.
+
+**MSG-0060 carries the one unaddressed observation** — whether colliding *task specifications* warrant
+more than the union treatment. It blocks nothing.
+
+**Three were closed on 2026-08-22 because the organizational action they waited on has been taken**, not
+because they were tidied away: **MSG-0077** and **MSG-0078** (the corpus was supplied, and A-SURVEY is
+authorized as TASK-0027 — MSG-0078's PARTIAL result stands unchanged and correct), and **MSG-0079**
+(superseded by local delivery; the unreachable NFS path is moot, and its n=1 observation was adopted
+into MSG-0080).
+
+> **The line this replaces, retained:** "**Four messages carry `Status: OPEN`** — **MSG-0060**,
+> **MSG-0077**, **MSG-0078**, and **MSG-0079**." True until the corpus was supplied on 2026-08-22.
+
+> **An older retained line, kept:** "**Three messages carry `Status: OPEN`** — **MSG-0060**,
 > **MSG-0077**, and **MSG-0078**." True until MSG-0079 was raised on 2026-08-22.
 
-**MSG-0078 is the TASK-0026 execution record**, and it is OPEN rather than a closed RECORD for one
-reason: **the organizational action MSG-0077 asked for has not been taken.** TASK-0026 re-verified
-that by inspection rather than assuming it, and could not discharge it — supplying a corpus is not
-Claude's to do. **MSG-0077 therefore stays OPEN alongside it**; the two describe the same outstanding
-action from before and after an execution attempt, and closing either would hide it.
+**MSG-0078's PARTIAL result stands and is worth keeping in view.** TASK-0026 delivered A-STACK and
+**correctly did not perform A-SURVEY** — it re-verified the missing corpus by inspection rather than
+assuming it, and produced no figures. That is the behaviour working: an unattended session asked for a
+corpus survey with no corpus declined to invent one. The corpus has since been supplied, and A-SURVEY
+is authorized separately as **TASK-0027** rather than by reopening the closed task.
 
-**The Architecture Lead now holds three things, only the first of which blocks anything:** (1) the
-**corpus action** — supply representative approved policy material for a **read-only** survey, or rule
-A-SURVEY **deferred** until it exists, remembering that a survey **reads and does not ingest** and may
-not bypass approval controls; (2) **accept, amend, or reject EPA-0005**, including its §9.3
-recommendation that no stack ADR be created yet; (3) the **one-runtime-or-two trade** of EPA-0005 §5,
-when the timing is right.
+> **The paragraph this replaces, retained:** "**MSG-0078 is the TASK-0026 execution record**, and it is
+> OPEN rather than a closed RECORD for one reason: **the organizational action MSG-0077 asked for has
+> not been taken.** … **MSG-0077 therefore stays OPEN alongside it**." True until the corpus was
+> supplied on 2026-08-22; both are now closed.
+
+**The Architecture Lead holds two open items, neither of which blocks TASK-0027:** (1) **accept, amend,
+or reject EPA-0005**, including its §9 recommendation that no stack ADR be created yet; and (2) the
+**one-runtime-or-two trade** of EPA-0005, when the timing is right. **The corpus action is discharged.**
+
+> **The paragraph this replaces, retained:** "**The Architecture Lead now holds three things, only the
+> first of which blocks anything:** (1) the **corpus action** … (2) accept, amend or reject EPA-0005 …
+> (3) the **one-runtime-or-two trade** …" Item (1) was discharged on 2026-08-22 when the corpus was
+> supplied.
 
 > **The line this replaces, retained:** "**Two messages carry `Status: OPEN`** — **MSG-0060** and
 > **MSG-0077**." True from the MSG-0077 reconciliation until TASK-0026 executed the same day.
@@ -1082,49 +1098,37 @@ required as a messenger.
 
 ## Open Blockers
 
-**One: BLK-0008, raised 2026-08-22** — the corpus the operator designated for A-SURVEY,
-`\\10.1.27.220\LXBackup\plan.pdf`, **is not reachable from this machine.**
+**None.** BLK-0001 through **BLK-0009** are all RESOLVED.
 
-**Corrected 2026-08-22: the path is an NFS export, not an SMB share.** The UNC form is how Windows'
-Client for NFS addresses an export, so it fitted either protocol and SMB was tested first. Re-tested
-against NFS, **two independent blockers exist and fixing either alone changes nothing**:
+**BLK-0009 was raised and resolved on 2026-08-22, both within the same day.** A supervisor-started TASK-0027 runner detected that a concurrent session was writing the working tree and that **TASK-0027 was READY only in an uncommitted file** — `git show HEAD:…CLAUDE-TASKS.md | grep -c TASK-0027` returned **0**. It refused to execute, refused to run `git add -A` (which would have swept another session's mid-edit files into history under its authorship), created only its own record, and stopped. **The concurrent writer was this interactive COMMS session**, which stopped writing on seeing the lock and has now committed. **The root cause is a process one:** the Supervisor reads the *working-tree* copy of the queue, not the committed one, so an interactive session editing the queue while the Supervisor is enabled can trigger a runner against half-written state. The mitigation needs no code change — commit locally first, since the Supervisor refuses to act when local is **ahead** of the remote.
 
-- **The export is unreachable** — NFS **2049** and portmapper **111** are both closed. NFSv4 needs no
-  portmapper, so 2049 alone would have sufficed; neither answers.
-- **This workstation has no NFS client.** `NFS-Client` and `FS-NFS-Service` both report
-  `InstallState: Available` — installable, **not installed**. `showmount.exe` and `nfsadmin.exe` are
-  absent, and the `mount.exe` on PATH is Git for Windows' MSYS binary, which cannot mount an NFS
-  export — so a check for "is mount available" returns a misleading yes.
+**BLK-0008 was resolved on 2026-08-22 without solving either transport problem.** It recorded two
+independent obstacles — the designated NFS export unreachable (2049 and portmapper 111 both closed)
+and **Client for NFS not installed** on this workstation. The operator supplied the file directly on
+local disk instead, which was the cheapest of the three options offered:
 
-**Client for NFS was not installed.** That is a privileged Windows feature installation and **nothing
-authorizes it** — TASK-0026 is closed and MSG-0076 authorized architecture work, not machine
-configuration. It is also not urgent alone: with 2049 closed, installing it would change nothing yet.
+```text
+D:\Work\pci-corpus\plan.pdf        626.8 KB      header %PDF-1.7      readable
+```
 
-> **The earlier SMB findings are retained in BLK-0008 and MSG-0079 rather than deleted.** They are
-> accurate — SMB genuinely is closed on that host — but they answered the wrong question, and **the
-> remedy they pointed at (check share publication, hand the SMB split to a network admin) is
-> superseded.** Keeping the correction visible is worth more than a tidy record.
+**Nothing was mounted and no Windows feature was installed.** The privileged change BLK-0008 declined
+to make was never needed.
 
-**It is not a credentials problem, and the distinction decides what to fix.** No TCP connection is
-established, so **no authentication is ever attempted** — a credentials failure would connect and
-return *access denied*. Credentials, drive mappings and share permission changes cannot help while the
-transport is closed. Four causes fit this signature (SMB disabled, host firewall, network filtering,
-share not published) and **cannot be distinguished from this machine**, so none is asserted.
+**One near-miss is recorded because it would otherwise recur.** The file first arrived at
+`D:\Work\pci-platform\plan.pdf` — **inside the Git working tree**, untracked and not covered by
+`.gitignore`. Every COMMS cycle and every unattended runner executes `git add -A`, so the next commit
+would have written 627 KB of corpus into permanent history, removable only by rewriting published
+history. It was moved out before anything staged it and `git status` verified clean; **nothing was ever
+committed.** MSG-0080 has since made the external location a standing constraint.
 
-**The designation itself resolved the authority half of PR5**: the organization named approved material
-and bounded its use to approved/synthetic, explicitly not production or confidential. What is missing
-is reachability, not permission.
+**The diagnosis is retained in the record** — SMB was tested first because the UNC form fits either
+protocol, then corrected to NFS — because the correction is worth more to a future reader than a tidy
+record would be.
 
-**Impact is bounded.** A-STACK is delivered (`EPA-0005`) and never depended on the corpus. A-SURVEY
-stays unexecutable, and because TASK-0026 is already COMPLETE (PARTIAL), **completing A-SURVEY needs a
-newly authorized task** rather than a re-run.
+> **The line this replaces, retained:** "**One: BLK-0008, raised 2026-08-22** — the corpus the operator
+> designated for A-SURVEY … **is not reachable from this machine.**" True until the file was supplied
+> locally the same day.
 
-**No workaround was attempted** — no alternative transport, no credentials, nothing copied anywhere,
-and **no survey observations produced**. See
-[`../blockers/BLK-0008-designated-corpus-unreachable.md`](../blockers/BLK-0008-designated-corpus-unreachable.md)
-and **MSG-0079**.
-
-**BLK-0001 through BLK-0007 are all RESOLVED.**
 
 > **The line this replaces, retained:** "**None.** BLK-0001 through **BLK-0007** are all RESOLVED."
 > True until BLK-0008 was raised on 2026-08-22.
@@ -1338,73 +1342,143 @@ both tables index it, and both were updated in the same commit as the record.
 
 ## Next Action
 
-**No task is READY. One operator action is required: make the designated A-SURVEY corpus reachable.**
+**TASK-0027 is READY and is the single READY task. The Supervisor will start it on its next cycle — no
+manual trigger is needed.**
 
-**The organization has designated the corpus** — `\\10.1.27.220\LXBackup\plan.pdf`, approved/synthetic,
-explicitly **not** production or confidential. **That resolves the authority half of PR5**, which had
-been open since EPA-0002: someone with standing has named material and bounded its use.
+**A decision may be needed before it can finish: MSG-0082.** MSG-0080 requires the corpus **outside**
+the repository; the unattended runner's permission boundary **is** the repository. A real runner
+session recorded its read of `D:\Work\pci-corpus` being **denied and not routed around** (BLK-0009).
+The queue section tells TASK-0027 to **stop and record** if the read is refused — not to copy the file
+in, not to edit permissions, and not to infer the document's properties from proxies. **Undecided is
+safe:** the run stops, records, and costs one cycle.
 
-**The path cannot be read**, and **it is an NFS export rather than an SMB share** — clarified by the
-operator after SMB was tested first, since the UNC form fits either. **BLK-0008** carries the full
-diagnosis; **MSG-0079** carries the verification and the correction.
 
-**Two independent blockers**, and fixing either alone changes nothing: **NFS 2049 and portmapper 111
-are both closed**, *and* **Client for NFS is not installed on this workstation** (`NFS-Client` reports
-`InstallState: Available`). Installing it is a privileged host change that nothing currently
-authorizes.
+**MSG-0080 authorized the bounded A-SURVEY follow-up** against the corpus the operator supplied, and
+reconciliation allocated it the id **TASK-0027** (MSG-0080 assigns none; the id was verified unused).
+**BLK-0008 is RESOLVED** — the corpus arrived on local disk, so neither the unreachable NFS export nor
+the uninstalled Client for NFS matters any more.
 
-**It is not a credentials problem**, and that decides what to fix. No TCP connection is established, so
-no authentication is ever attempted — credentials, drive mappings and share permission changes cannot
-help while the transport is closed. Four causes fit the signature and **cannot be distinguished from
-this machine**, so none is asserted.
+```text
+D:\Work\pci-corpus\plan.pdf        626.8 KB      header %PDF-1.7      readable, outside the repo
+```
 
-### What the operator needs to do
+### The one rule that must not break
 
-**Two conditions must both hold** — fixing either alone leaves the corpus unreadable:
+**The PDF must never enter the repository.** MSG-0080 makes that a standing constraint: it must not be
+copied, staged, committed, or otherwise added to history. **Read it in place.**
 
-1. **Make the NFS export reachable from this workstation** — port **2049** open, and `LXBackup`
-   exported to this host's address. Whether the export exists or simply excludes this address
-   **cannot be determined from here**: `showmount -e 10.1.27.220` would answer it, and that tool ships
-   with the feature that is not installed.
-2. **Install Client for NFS on this workstation** — `Install-WindowsFeature NFS-Client`, administrator
-   privilege. **Not done, and deliberately so:** it is a privileged host modification and nothing
-   authorizes it. It is also not urgent alone, since with 2049 closed it would change nothing yet.
+This is not hypothetical. The file first landed at `D:\Work\pci-platform\plan.pdf` — inside the working
+tree, untracked, **not** covered by `.gitignore`. Every COMMS cycle and every runner executes
+`git add -A`, so the next commit would have put 627 KB of corpus into permanent history, removable only
+by rewriting published history. It was moved out before anything staged it.
 
-**Or place the file somewhere already reachable** — the designation is about authority, not transport,
-so this remains equally valid and is likely the fastest of the three.
+### What TASK-0027 may and may not conclude
 
-> **Superseded guidance, retained:** this section previously said to confirm SMB publication and hand
-> the ICMP-works/SMB-closed split to a network administrator. **That was based on the wrong protocol
-> and should be disregarded.**
+**n=1 is the discipline, not a caveat.** Permitted: whether **this** document is text-native or
+scanned, its language, its format characteristics, and any classification, audience, version or
+supersession markers **present in it**.
 
-### Then — a new task, not a re-run
+Forbidden: format mix, language prevalence, scanned-document prevalence, classification and audience
+distribution, version and supersession prevalence **across a corpus**. For each, the record must state
+**n=1 is insufficient** and invent no estimate.
 
-**TASK-0026 is COMPLETE (PARTIAL) and closed.** A-STACK is delivered as `EPA-0005`; A-SURVEY is
-recorded unmet against MSG-0076 criterion 1. **Completing A-SURVEY needs a newly authorized task**, and
-that authorization is the Architecture Lead's. A closed task is not re-run.
+Four of A-SURVEY's five original questions describe a population, and one file is not a population. A
+record that reads like a corpus survey would feed **D6** normalization, **D14**'s rejection of scanned
+documents, and **ADR-0019** — accepted specifically on condition its rules come from *empirical corpus
+evidence*. A confident distribution drawn from one document would corrupt accepted architecture and be
+checkable against nothing.
 
-When it is authorized, its board row must be added in the same commit — the queue gap has recurred
-eight times and has only ever been repaired, never prevented.
+### What the Architecture Lead still holds
 
-### One thing to settle when authorizing it
+Two items, neither blocking TASK-0027:
 
-**One PDF cannot answer four of A-SURVEY's five questions.** Formats, language mix, scanned-document
-prevalence, and classification/audience patterns are *distributional* — they describe a population.
-A single file can establish whether **it** is text-native or scanned and what language **it** is in;
-it cannot establish prevalence or mix.
+1. **Accept, amend, or reject `EPA-0005`** (the A-STACK evaluation, PROPOSED), including its §9
+   recommendation that **no stack ADR be created yet**.
+2. **The one-runtime-or-two trade** in EPA-0005, when the timing is right.
 
-That matters because survey findings feed **D6** normalization, **D14**'s rejection of scanned
-documents, and **ADR-0019**, accepted specifically on condition its rules come from *empirical corpus
-evidence*. **The ask is not to change the ruling** — one document is genuinely useful for format,
-extraction and language questions, and for proving the ingestion path. It is that the resulting record
-**state its sample size**, so nobody later reads n=1 as a corpus survey.
+**The corpus action is discharged.**
 
 ### Still unauthorized
 
-Implementation remains prohibited. **T-A, T-B, T-D, T-E and T-0 are not authorized.** T-0 stays an
-operator prerequisite needing a privileged identity-provider deployment. `EPA-0005` is **PROPOSED** and
-selects nothing — it awaits the Architecture Lead's review.
+Implementation remains prohibited. **T-A, T-B, T-D, T-E and T-0 are not authorized**, and TASK-0027 may
+not mark them READY. **T-0 remains an operator prerequisite** — an identity provider needing a
+privileged deployment that no decision can substitute for.
 
+---
+
+**Historical — the position while the corpus was unreachable, retained.** The text below asked
+the organization to make the designated NFS path reachable or install a client. **Neither was
+needed**: the file was supplied directly on local disk on 2026-08-22, and BLK-0008 is RESOLVED.
+
+> ## Next Action
+> 
+> **No task is READY. One operator action is required: make the designated A-SURVEY corpus reachable.**
+> 
+> **The organization has designated the corpus** — `\\10.1.27.220\LXBackup\plan.pdf`, approved/synthetic,
+> explicitly **not** production or confidential. **That resolves the authority half of PR5**, which had
+> been open since EPA-0002: someone with standing has named material and bounded its use.
+> 
+> **The path cannot be read**, and **it is an NFS export rather than an SMB share** — clarified by the
+> operator after SMB was tested first, since the UNC form fits either. **BLK-0008** carries the full
+> diagnosis; **MSG-0079** carries the verification and the correction.
+> 
+> **Two independent blockers**, and fixing either alone changes nothing: **NFS 2049 and portmapper 111
+> are both closed**, *and* **Client for NFS is not installed on this workstation** (`NFS-Client` reports
+> `InstallState: Available`). Installing it is a privileged host change that nothing currently
+> authorizes.
+> 
+> **It is not a credentials problem**, and that decides what to fix. No TCP connection is established, so
+> no authentication is ever attempted — credentials, drive mappings and share permission changes cannot
+> help while the transport is closed. Four causes fit the signature and **cannot be distinguished from
+> this machine**, so none is asserted.
+> 
+> ### What the operator needs to do
+> 
+> **Two conditions must both hold** — fixing either alone leaves the corpus unreadable:
+> 
+> 1. **Make the NFS export reachable from this workstation** — port **2049** open, and `LXBackup`
+>    exported to this host's address. Whether the export exists or simply excludes this address
+>    **cannot be determined from here**: `showmount -e 10.1.27.220` would answer it, and that tool ships
+>    with the feature that is not installed.
+> 2. **Install Client for NFS on this workstation** — `Install-WindowsFeature NFS-Client`, administrator
+>    privilege. **Not done, and deliberately so:** it is a privileged host modification and nothing
+>    authorizes it. It is also not urgent alone, since with 2049 closed it would change nothing yet.
+> 
+> **Or place the file somewhere already reachable** — the designation is about authority, not transport,
+> so this remains equally valid and is likely the fastest of the three.
+> 
+> > **Superseded guidance, retained:** this section previously said to confirm SMB publication and hand
+> > the ICMP-works/SMB-closed split to a network administrator. **That was based on the wrong protocol
+> > and should be disregarded.**
+> 
+> ### Then — a new task, not a re-run
+> 
+> **TASK-0026 is COMPLETE (PARTIAL) and closed.** A-STACK is delivered as `EPA-0005`; A-SURVEY is
+> recorded unmet against MSG-0076 criterion 1. **Completing A-SURVEY needs a newly authorized task**, and
+> that authorization is the Architecture Lead's. A closed task is not re-run.
+> 
+> When it is authorized, its board row must be added in the same commit — the queue gap has recurred
+> eight times and has only ever been repaired, never prevented.
+> 
+> ### One thing to settle when authorizing it
+> 
+> **One PDF cannot answer four of A-SURVEY's five questions.** Formats, language mix, scanned-document
+> prevalence, and classification/audience patterns are *distributional* — they describe a population.
+> A single file can establish whether **it** is text-native or scanned and what language **it** is in;
+> it cannot establish prevalence or mix.
+> 
+> That matters because survey findings feed **D6** normalization, **D14**'s rejection of scanned
+> documents, and **ADR-0019**, accepted specifically on condition its rules come from *empirical corpus
+> evidence*. **The ask is not to change the ruling** — one document is genuinely useful for format,
+> extraction and language questions, and for proving the ingestion path. It is that the resulting record
+> **state its sample size**, so nobody later reads n=1 as a corpus survey.
+> 
+> ### Still unauthorized
+> 
+> Implementation remains prohibited. **T-A, T-B, T-D, T-E and T-0 are not authorized.** T-0 stays an
+> operator prerequisite needing a privileged identity-provider deployment. `EPA-0005` is **PROPOSED** and
+> selects nothing — it awaits the Architecture Lead's review.
+> 
 ---
 
 **Historical — the position before the corpus was designated, retained.** The text below asked

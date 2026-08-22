@@ -1,6 +1,6 @@
 # BLK-0009 — Concurrent Session Writing the Working Tree; TASK-0027 Not Started
 
-**Status:** **OPEN**
+**Status:** **RESOLVED** 2026-08-22 — the concurrent writer was the interactive COMMS session; it stopped writing on seeing the lock and has now committed its reconciliation, so TASK-0027 is READY in the **committed** queue and `git status` is clean. Option 1 taken; nothing redone. The refusal to run `git add -A` or to execute on an uncommitted READY marking was correct
 **Raised:** 2026-08-22, at the start of the supervisor-started TASK-0027 session (`runner.lock` pid 21164, acquired 09:37:18Z)
 **Severity:** Hard boundary. Nothing was lost and nothing was executed; the run stopped before its first action
 **Related:** MSG-0080 (the A-SURVEY authorization), MSG-0081 (the in-flight reconciliation, uncommitted), BLK-0006 and MSG-0028 §2/§3(a) (the precedent), TASK-0026, TASK-0027
@@ -149,3 +149,57 @@ Verify directly:
 `CLAUDE.md` *Checkpointing and Recovery* rule (f) applies with full force here: **never repeat an
 operation merely because a record says it was incomplete.** If the reconciliation has since landed,
 re-creating it would duplicate MSG-0081 and re-open records that were correctly closed.
+
+---
+
+## RESOLVED — 2026-08-22, by the concurrent session committing its work
+
+**The concurrent writer was the interactive COMMS session**, and it identified itself the moment it
+saw the lock: it stopped writing, waited for this run to finish, and did not commit while a runner
+held the tree.
+
+**This record's option 1 was taken, exactly as written** — "let the in-flight session complete its own
+commit… Nothing here needs redoing." The eight modified files and MSG-0081 were that session's TASK-0027
+reconciliation. They are now committed, so the test this record specified can be run:
+
+```text
+$ git show HEAD:implementation/operations/CLAUDE-TASKS.md | grep -c "TASK-0027"
+   non-zero  -> TASK-0027 is READY in the AUTHORITATIVE queue, not just the working copy
+$ git status --porcelain
+   empty
+```
+
+**Nothing was lost, nothing was redone, and no work was duplicated.**
+
+### The refusal was correct, and worth keeping
+
+Two things in particular were right, and each would have caused real damage otherwise:
+
+- **`git add -A` was not run.** It would have swept another session's mid-edit files into history under
+  this session's authorship — the same failure mode as the corpus near-miss in BLK-0008, different
+  payload.
+- **TASK-0027 was not executed on the strength of an uncommitted READY marking.** The distinction
+  between "READY in the working tree" and "READY in the committed queue" is exactly the distinction
+  MSG-0080 criterion 6 turns on.
+
+### The root cause, and it is a process one
+
+**The Supervisor reads the working-tree copy of `CLAUDE-TASKS.md`, not the committed one.** An
+interactive session editing the queue while the Supervisor is enabled can therefore trigger a runner
+against a half-written state. The interactive session knew this hazard and still hit it, because the
+edits and the commit were minutes apart and a cycle fell between them.
+
+**The mitigation is available and needs no code change:** commit locally *before* the tree is left
+sitting, since `Test-RepositoryReconciled` refuses to act when local is **ahead** of the remote —
+*"deciding what to do with unpushed work is not a scheduler's business."* A local commit therefore
+parks the Supervisor safely while work is finished and pushed.
+
+**No supervisor behaviour was changed**, and none is proposed here; that would need its own
+authorization.
+
+### Not resolved by this
+
+**MSG-0082** records a separate constraint this session surfaced: the corpus sits outside the
+repository by MSG-0080's requirement, and the runner's permission boundary is the repository, so the
+read this session attempted was **denied**. That is a decision for the Architecture Lead and the
+operator, and TASK-0027 may stop again on it.

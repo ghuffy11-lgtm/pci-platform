@@ -36,10 +36,29 @@ Only the architecture lead may authorize new work, mark a task READY, or change 
 | TASK-0024 | **A-ADR — draft the required EPA ADR set** | **COMPLETE** | TASK-0023 COMPLETE, MSG-0062 DECIDED, MSG-0067 DECIDED, MSG-0068 AUTHORIZED, WP-0009 defined | 2026-08-21 — 8/8 acceptance criteria, **ADR-0017…ADR-0022 drafted PROPOSED**, MSG-0070 | none — awaiting the Architecture Lead's acceptance of the drafts; **no task is READY** | Claude Code |
 | TASK-0025 | **Promote ADR-0018…ADR-0022 into the accepted decision register** | **COMPLETE** | TASK-0024 COMPLETE, MSG-0071 DECIDED, MSG-0073 AUTHORIZED | 2026-08-21 — 5/5 acceptance criteria; five ADRs promoted, **zero body differences** in the per-ADR diffs, MSG-0075 | none — **no task is READY**; A-SURVEY / A-STACK / T-0 stay unauthorized | Claude Code |
 | TASK-0026 | **A-SURVEY + A-STACK — bounded corpus survey and stack evaluation** | **COMPLETE (PARTIAL)** | TASK-0025 COMPLETE, MSG-0071 DECIDED, MSG-0076 AUTHORIZED | 2026-08-22 — 5/6 criteria MET; **criterion 1 UNMET (PR5)**; **EPA-0005** delivered, MSG-0078 | none — **no task is READY**. A-SURVEY awaits an organizational corpus action; EPA-0005 awaits the Lead's acceptance | Claude Code |
+| TASK-0027 | **A-SURVEY (n=1) — inspect the approved/synthetic corpus** | **READY** | TASK-0026 COMPLETE (PARTIAL), MSG-0076, MSG-0080 AUTHORIZED, corpus present outside the repo | — | none — architecture input only; **n=1, no distributional claims**; **the PDF must never enter the repository** | Claude Code |
 | TASK-0002 | Make test entry points shell-independent | **ABORTED** | — | 2026-08-19 | none — premise disproven by measurement | — |
 
 **TASK-0019 is COMPLETE (2026-08-21).** It was authorized by MSG-0050, reconciled into this queue in `39eabdb`, and executed by a supervisor-started session on its scheduled 06:37:13Z cycle. It was maintenance/audit work only, not a new product work package.
-**TASK-0026 is COMPLETE (PARTIAL) — executed 2026-08-22, and no task is READY.** It was run by a
+**TASK-0027 is READY — the single READY task.** Authorized by **MSG-0080**, which closes the gap
+TASK-0026 stopped at: the organization supplied an approved/synthetic corpus, and A-SURVEY may now run
+against it. **TASK-0027 is an id allocated here** — MSG-0080 assigns none — verified unused. There is
+no separate `TASK-0027-*.md` file; **MSG-0080 plus the task section below are the specification.**
+
+**The corpus is at `D:\Work\pci-corpus\plan.pdf`, deliberately outside this repository, and it must
+stay there.** MSG-0080 is explicit: it must not be copied, staged, committed, or otherwise added to
+repository history.
+
+> **That is not a theoretical risk.** The file was first placed at `D:\Work\pci-platform\plan.pdf` —
+> inside the working tree, untracked and not ignored — where the next `git add -A` would have committed
+> 627 KB of corpus into history. Every COMMS cycle runs `git add -A`, and so does the unattended
+> runner. It was moved out before anything staged it, and `git status` was verified clean afterwards.
+> **A runner that copies it in "just to read it" would recreate that risk.** Read it in place.
+
+**The survey is n=1, and the boundary between what one document can and cannot establish is the point
+of the task**, not a caveat on it. See the section below.
+
+**TASK-0026 is COMPLETE (PARTIAL) — executed 2026-08-22.** It was run by a
 supervisor-started session (`runner.lock` pid 27312, acquired 06:57:17Z) against the reconciliation
 MSG-0077 pushed in `69a4d03`. **Five of the six MSG-0076 acceptance criteria are MET; criterion 1 is
 UNMET on PR5**, each mapped to evidence in **MSG-0078** §2. Being documentary it produced **no test
@@ -538,9 +557,12 @@ READY means *authorized to attempt*, never *authorized to force*. A READY task w
 | MSG-0073 | Decision | AUTHORIZED | Architecture lead | Claude Code | **TASK-0025 authorized** — promote **ADR-0018…ADR-0022** into the authoritative `docs/decisions/` register, preserving approved content, numbering, traceability and explicit non-decisions. **Do not** change decision substance, introduce provider/model/framework/runtime selections left open, alter ADR-0019 normalization (deferred to empirical corpus evidence), authorize implementation, or mark A-SURVEY/A-STACK/T-0 READY. **Every promoted ADR must be verified against its source before completion is reported.** Answers MSG-0072. **Claude may execute it once reconciled as READY** | 2026-08-21 |
 | MSG-0075 | Record | CREATED — promotion applied | Claude Code | Architecture lead | **TASK-0025 execution record.** All five MSG-0073 acceptance criteria met with evidence. **ADR-0018…ADR-0022 promoted into `docs/decisions/`**, completing the WP-0009 set alongside the lead's own ADR-0017 promotion; the drafts are marked **RATIFIED** with their proposed text retained unchanged. **Verification is a `diff` per record and every hunk is in a header** — each promoted file is a byte copy of its draft with exactly two edits, the `Status` block and an added `Accepted by: Architecture Lead — MSG-0071` line, so **zero body differences**. **No accepted ADR modified** — `git status --porcelain` showed five new paths under `docs/decisions/` and no modified path there. **The three MSG-0071 conditions were re-checked in the promoted copies**, not inherited from MSG-0072's pre-promotion pass: no provider/model/framework/runtime selection (ADR-0022's ADR-0003 Ollama citation intact and still declining to elevate it), ADR-0019 still incomplete for production by design with **no rule invented**, ADR-0017's entailment model and thresholds still open under SPEC-0020. §6.2 records that the supervisor's heartbeat `head` lagged this session's verified HEAD by one commit and why that is **not** the BLK-0006 abort condition; §6.3 records a cosmetic line-wrapping difference in the lead's ADR-0017 promotion, proposing no correction. **No implementation, no provider/stack selection, no permission or Supervisor change, and no task marked READY** — A-SURVEY, A-STACK and T-0 stay unauthorized. **No decision requested** | TASK-0025 |
 | MSG-0076 | Decision | AUTHORIZED | Architecture lead | Claude Code | **Next bounded EPA architecture task authorized**, with two outputs: **A-SURVEY** (bounded, read-only corpus survey — formats, language mix, scanned-document prevalence, classification/audience patterns, version/supersession, **no production ingestion**) and **A-STACK** (evaluate candidate service stacks against accepted contracts and the EPA ADR set; **recommend or record why selection stays open — do not select** a provider, framework, model, embedding technology, or runtime). **Preserve ADR-0017…0022 exactly; no implementation; no IdP selection; no retrieve-then-suppress; do not mark T-A/T-B/T-D/T-E/T-0 READY.** Executable only once reconciled as the single READY task | 2026-08-22 |
-| MSG-0077 | Record | **OPEN** | Claude Code | Architecture lead | **TASK-0026 queue reconciliation, and an unmet prerequisite.** Reconciled as the single READY task; **TASK-0026 is an id allocated here** since MSG-0076 assigns none. **A-SURVEY cannot run: PR5 — a reachable approved-policy corpus — does not exist in this repository**, verified by inspection and corroborated by WP-0009 §6.1, EPA-0004 §11.5 and MSG-0061 §7.5. A-STACK is fully executable. The queue section instructs A-SURVEY to stop and record rather than produce observations it cannot have made. **Supplying the corpus is an organizational action** | 2026-08-22 |
-| MSG-0078 | Record | **OPEN** | Claude Code | Architecture lead | **TASK-0026 execution record — PARTIAL by design.** **5 of 6 MSG-0076 criteria MET; criterion 1 UNMET on PR5**, each mapped to evidence in §2. **A-STACK COMPLETE** → **EPA-0005** (PROPOSED, selects nothing): the stack is **not one decision** — the fork is one runtime or two, framed not settled; **ADR-0020 §3.1/§4 make pre-filtered retrieval a functional requirement on the index engine**, disqualifying post-filter-only similarity search, since over-fetch-then-filter is the prohibited shape one layer down and *looks* like enforcement; **three local models are required, not one** (generation, embedding, **and ADR-0017's entailment layer**), multiplying the unmeasured PR6; **conversation and audit are separate stores**, a single log violating ADR-0021 §2/§4 invisibly; and **streaming an answer as it generates is incompatible** with a post-generation gate that may veto it. **Every selection left open** in §9.2 with the evidence that would close each; **seven questions are corpus-blocked**. WP-0009 §6.2's ADR question is **answered** (§9.3: not yet; if the pre-filtering rule warrants recording it belongs with ADR-0020) and **no ADR was created**. **A-SURVEY NOT PERFORMED** — PR5 **re-verified UNMET by inspection**, not inherited; **no figure, estimate, illustration, or substitute method produced**. **No accepted ADR modified** (`git diff --name-only docs/decisions/` empty); **no task marked READY**; no host touched. **The organizational corpus action of MSG-0077 remains outstanding** | TASK-0026 |
-| MSG-0079 | Record | **OPEN** | Claude Code | Architecture lead | **Operator designated an A-SURVEY corpus; verified unreachable.** `\\10.1.27.220\LXBackup\plan.pdf`, designated approved/synthetic and explicitly **not** production/confidential — **the PR5 authority question is resolved by that designation**. **The path is not reachable:** host answers ICMP, **corrected 2026-08-22 — the path is **NFS, not SMB**. Re-tested: **NFS 2049 and portmapper 111 both closed**, *and* **Client for NFS is not installed** on this workstation (`NFS-Client` = `Available`, i.e. installable but absent; the `mount.exe` on PATH is Git Bash MSYS, not the NFS client). **Two independent blockers** — fixing either alone changes nothing. Installing the feature is a privileged host change nothing authorizes. **Not a credentials problem** — no TCP connection is established, so no authentication is attempted; credentials, drive mappings and share permissions cannot help while the transport is closed. Four causes fit the signature and cannot be distinguished from this machine, so none is asserted. **No workaround attempted, nothing copied, no observations produced.** A-SURVEY stays unexecutable and, since TASK-0026 is closed, **completing it needs a newly authorized task**. Also records that one PDF cannot answer four of A-SURVEY's five questions, which are distributional — offered so a future record states its sample size rather than reading as a corpus survey. See **BLK-0008** | 2026-08-22 |
+| MSG-0077 | Record | **CLOSED** 2026-08-22 — corpus supplied; the one organizational action it asked for is discharged and A-SURVEY is authorized as TASK-0027 | Claude Code | Architecture lead | **TASK-0026 queue reconciliation, and an unmet prerequisite.** Reconciled as the single READY task; **TASK-0026 is an id allocated here** since MSG-0076 assigns none. **A-SURVEY cannot run: PR5 — a reachable approved-policy corpus — does not exist in this repository**, verified by inspection and corroborated by WP-0009 §6.1, EPA-0004 §11.5 and MSG-0061 §7.5. A-STACK is fully executable. The queue section instructs A-SURVEY to stop and record rather than produce observations it cannot have made. **Supplying the corpus is an organizational action** | 2026-08-22 |
+| MSG-0078 | Record | **CLOSED** 2026-08-22 — the corpus action it waited on is discharged; its PARTIAL result stands unchanged and correct | Claude Code | Architecture lead | **TASK-0026 execution record — PARTIAL by design.** **5 of 6 MSG-0076 criteria MET; criterion 1 UNMET on PR5**, each mapped to evidence in §2. **A-STACK COMPLETE** → **EPA-0005** (PROPOSED, selects nothing): the stack is **not one decision** — the fork is one runtime or two, framed not settled; **ADR-0020 §3.1/§4 make pre-filtered retrieval a functional requirement on the index engine**, disqualifying post-filter-only similarity search, since over-fetch-then-filter is the prohibited shape one layer down and *looks* like enforcement; **three local models are required, not one** (generation, embedding, **and ADR-0017's entailment layer**), multiplying the unmeasured PR6; **conversation and audit are separate stores**, a single log violating ADR-0021 §2/§4 invisibly; and **streaming an answer as it generates is incompatible** with a post-generation gate that may veto it. **Every selection left open** in §9.2 with the evidence that would close each; **seven questions are corpus-blocked**. WP-0009 §6.2's ADR question is **answered** (§9.3: not yet; if the pre-filtering rule warrants recording it belongs with ADR-0020) and **no ADR was created**. **A-SURVEY NOT PERFORMED** — PR5 **re-verified UNMET by inspection**, not inherited; **no figure, estimate, illustration, or substitute method produced**. **No accepted ADR modified** (`git diff --name-only docs/decisions/` empty); **no task marked READY**; no host touched. **The organizational corpus action of MSG-0077 remains outstanding** | TASK-0026 |
+| MSG-0079 | Record | **CLOSED** 2026-08-22 — superseded by local delivery; the unreachable path is moot and its n=1 observation was adopted by MSG-0080 | Claude Code | Architecture lead | **Operator designated an A-SURVEY corpus; verified unreachable.** `\\10.1.27.220\LXBackup\plan.pdf`, designated approved/synthetic and explicitly **not** production/confidential — **the PR5 authority question is resolved by that designation**. **The path is not reachable:** host answers ICMP, **corrected 2026-08-22 — the path is **NFS, not SMB**. Re-tested: **NFS 2049 and portmapper 111 both closed**, *and* **Client for NFS is not installed** on this workstation (`NFS-Client` = `Available`, i.e. installable but absent; the `mount.exe` on PATH is Git Bash MSYS, not the NFS client). **Two independent blockers** — fixing either alone changes nothing. Installing the feature is a privileged host change nothing authorizes. **Not a credentials problem** — no TCP connection is established, so no authentication is attempted; credentials, drive mappings and share permissions cannot help while the transport is closed. Four causes fit the signature and cannot be distinguished from this machine, so none is asserted. **No workaround attempted, nothing copied, no observations produced.** A-SURVEY stays unexecutable and, since TASK-0026 is closed, **completing it needs a newly authorized task**. Also records that one PDF cannot answer four of A-SURVEY's five questions, which are distributional — offered so a future record states its sample size rather than reading as a corpus survey. See **BLK-0008** | 2026-08-22 |
+| MSG-0080 | Decision | AUTHORIZED | Architecture lead | Claude Code | **Bounded A-SURVEY follow-up authorized** against the approved/synthetic corpus at `D:\Work\pci-corpus\plan.pdf`, **deliberately outside the Git repository** — it must remain outside and must not be copied, staged, or committed. **Survey scope is n=1:** document-level observations only (text-native vs scanned, language present, format characteristics, and classification/audience/version/supersession **where present**). For format mix, language prevalence, scanned prevalence, classification distribution and supersession prevalence **across a corpus**, record that **n=1 is insufficient and invent no estimates**. No production/confidential ingestion, no ADR modification, no invented Arabic normalization rules, no provider/model/framework/embedding/runtime selection, and **T-A/T-B/T-D/T-E/T-0 stay unauthorized**. Seven acceptance criteria; executable only once reconciled as the single READY task | 2026-08-22 |
+| MSG-0081 | Record | **OPEN** | Claude Code | Architecture lead | **TASK-0027 queue reconciliation.** Reconciled as the single READY task; **id allocated here** since MSG-0080 assigns none. Corpus verified present and readable outside the repository (626.8 KB, `%PDF-1.7`). **BLK-0008 CLOSED** — the transport problem is gone: the file was supplied locally, so neither the NFS export nor the uninstalled Client for NFS matters any more. The queue section carries the n=1 boundary and an explicit warning that the PDF must never enter the working tree — **a hazard that already materialised once today**, when the file first landed inside the repo untracked and one `git add -A` from permanent history | 2026-08-22 |
+| MSG-0082 | Record + decision request | **OPEN** | Claude Code | Architecture lead | **Structural finding: the corpus is where the runner may not read.** MSG-0080 requires it **outside** the repository; the unattended runner's permission boundary **is** the repository, and `runner-settings.json` grants no read beyond it. **Observed, not inferred** — BLK-0009 records a real runner whose read of `D:\Work\pci-corpus` was **denied and not routed around**. Options for the Lead/operator: **(A)** a narrow read permission for that path, **(B)** run TASK-0027 interactively, **(C)** supply an extraction. **Not options:** copy the PDF into the repo, edit the permission set unauthorized, or infer document properties from filename/size. Undecided is safe — the run stops and records, costing one cycle | 2026-08-22 |
 | MSG-0074 | Record | **CLOSED** | Claude Code | Architecture lead | **TASK-0025 queue reconciliation.** Reconciled as the single READY task after verifying prerequisites individually. **No separate TASK-0025 specification file exists** — MSG-0073 plus the queue section are the specification, and the section records the promotion convention verified from the ADR-0015 precedent and the lead's own ADR-0017 promotion. **The gap did not recur this time** in one respect: the authorization arrived with no colliding sibling file. **The queue gap itself did recur** — the **eighth** occurrence. **Discharged by execution 2026-08-21** — TASK-0025 ran against this reconciliation and is COMPLETE (MSG-0075); because the repair landed before the next cycle, the task was already the single READY task when the run started and the Supervisor never idled on it | 2026-08-21 |
 | MSG-0051 | Record | CREATED — audit complete | Claude Code | Architecture lead | **TASK-0019 baseline audit.** Six documentary corrections applied with their authorities quoted; four record classes verified already correct; **§C refers seven items for decision**, led by the accepted WP-0001 work package still reading `Status: Ready for implementation` — the stop condition fired and that correction was **not** made | TASK-0019 |
 
@@ -1670,3 +1692,157 @@ verified, never in anticipation of one.
 On resumption, re-read MSG-0076 and this section, then **re-check the corpus question by inspection**
 before assuming either answer — the operator may have supplied material in the interval. Check which
 records already exist rather than rewriting them.
+
+---
+
+## TASK-0027 — A-SURVEY (n=1): inspect the approved/synthetic corpus
+
+**Priority:** 1 | **Status:** **READY** | **Owner:** Claude Code
+**Depends on:** TASK-0026 COMPLETE (PARTIAL); MSG-0076; MSG-0080 AUTHORIZED; the corpus present at its external path
+**Next eligible task:** none — implementation stays unauthorized
+**Work package:** WP-0009 — Employee Policy Assistant | **Architecture task:** A-SURVEY (bounded follow-up)
+
+**Specification:** [`MSG-0080-a-survey-authorization.md`](../comms/MSG-0080-a-survey-authorization.md)
+**plus this section.** No separate `TASK-0027-*.md` file exists — deliberate, as with TASK-0025 and
+TASK-0026. **TASK-0027 is an id allocated at reconciliation**, verified unused; MSG-0080 assigns none.
+
+### The corpus, and the one rule that must not be broken
+
+```text
+D:\Work\pci-corpus\plan.pdf        626.8 KB      header %PDF-1.7
+```
+
+**It is outside the repository on purpose and must stay outside.** MSG-0080: it "must remain outside
+the repository and must not be copied, staged, committed, or otherwise added to repository history."
+
+**Read it in place. Do not copy it into the working tree** — not to a temp folder inside the repo, not
+"just to inspect it", not even briefly. If a scratch working copy is genuinely needed, use the session
+scratchpad outside the repository.
+
+> **Why this is stated so firmly.** The file first arrived at `D:\Work\pci-platform\plan.pdf` — inside
+> the working tree, untracked and **not** covered by `.gitignore`. Every COMMS cycle and every runner
+> executes `git add -A`, so the next commit would have put 627 KB of corpus into permanent history,
+> removable only by rewriting published history. It was moved out before anything staged it. **The
+> hazard is real and has already happened once.**
+
+
+### ⚠ A permission constraint that may prevent unattended execution
+
+**BLK-0009 observed, in a real supervisor-started session, that a read of the corpus directory was
+requested and refused:** *"a read of that directory was requested and the permission was not granted,
+and it was not routed around."*
+
+That is a structural tension, not a bug:
+
+- **MSG-0080 requires the corpus to stay outside the repository** — it must not be copied, staged, or
+  committed.
+- **The unattended runner's permission boundary is the repository.** `runner-settings.json` grants no
+  read access outside it.
+
+**So the corpus is deliberately in the one place the runner may not be able to read.**
+
+**If the read is denied, stop and record it. Do not:**
+
+- copy the PDF into the repository to make it readable — that breaks MSG-0080's standing constraint and
+  recreates the near-miss BLK-0008 records;
+- edit `runner-settings.json` or any permission setting — no authorization exists, and weakening the
+  boundary to complete a task is exactly what the boundary is for;
+- infer the document's properties from its filename, size, or any other proxy.
+
+**Report the task blocked on the permission boundary and stop.** MSG-0082 puts the choice to the
+Architecture Lead and the operator: grant a narrow read permission for `D:\Work\pci-corpus\`, or run
+this one task interactively where reads outside the working directory are available. **Neither is
+Claude's to choose.**
+
+### Objective
+
+Inspect the single available PDF and record **document-level** observations, with the sample size
+stated as **n=1** and the distinction between what one document can and cannot establish made
+explicit. This is an **architecture input only**.
+
+### What n=1 CAN establish (MSG-0080)
+
+- whether **this document** is text-native or scanned;
+- the language(s) present **in this document**;
+- observed **format characteristics** of this file;
+- observed **classification / audience / version / supersession** characteristics **where present** in
+  this document.
+
+### What n=1 CANNOT establish — record as insufficient, do not estimate
+
+**Format mix · language prevalence · scanned-document prevalence · classification and audience
+distribution · version and supersession prevalence — across a corpus.**
+
+MSG-0080 is explicit: for these, **record that n=1 is insufficient and do not invent estimates.**
+
+**This is the substance of the task, not a disclaimer on it.** Four of A-SURVEY's five original
+questions are distributional — they describe a population, and one file is not a population. A record
+that reads like a corpus survey would feed **D6** normalization, **D14**'s rejection of scanned
+documents, and **ADR-0019**, which was accepted specifically on condition its rules come from
+*empirical corpus evidence*. **A confident-sounding distribution derived from one file would corrupt
+accepted architecture and be checkable against nothing.**
+
+### Constraints (MSG-0080)
+
+- **Approved/synthetic test corpus only.** No production or confidential corpus ingestion.
+- **Do not move the PDF into the repository. Do not stage or commit it.**
+- **Do not modify ADR-0017 … ADR-0022.**
+- **Do not invent Arabic normalization rules** — empirical evidence stays bounded to what this document
+  actually supports.
+- **Do not select** providers, models, frameworks, embedding technologies, or runtimes.
+- **Do not mark T-A, T-B, T-D, T-E, or T-0 READY.**
+
+### Acceptance criteria (MSG-0080)
+
+1. The PDF at the stated external path is **inspected successfully**.
+2. The record states **n=1** and distinguishes document-level observations from unsupported
+   distributional conclusions.
+3. The record **identifies which requested dimensions cannot be inferred** from n=1.
+4. **The corpus remains outside the repository and `git status` stays clean.**
+5. No ADR and no implementation authorization is changed.
+6. COMMS and the queue are reconciled consistently.
+7. **Completion is reported only after repository and corpus-path verification.**
+
+### Verification
+
+Being documentary, this task produces **no test count**; do not report one it cannot have.
+
+**Before reporting completion, verify and quote:**
+
+```text
+git status --porcelain                  ->  empty
+Test-Path D:\Work\pci-corpus\plan.pdf   ->  True
+Test-Path D:\Work\pci-platform\plan.pdf ->  False      (nothing copied in)
+git log --diff-filter=A --name-only | grep -i "\.pdf"  ->  no corpus PDF ever added
+```
+
+Criterion 4 is the one that can fail silently — check it explicitly rather than assuming.
+
+### Documentation
+
+Record the result in `implementation/comms/` as a numbered message, update
+`implementation/status/current.md`, this queue, and WP-0009 §6.2 where it tracks A-SURVEY. Write the
+checkpoint. Note the corpus location in the record so a future session does not repeat the
+in-repository mistake.
+
+### Checkpoint
+
+`implementation/operations/checkpoints/TASK-0027.md`. Write each checkpoint **after** an operation is
+verified, never in anticipation of one.
+
+### Stop conditions
+
+- **The corpus path is not readable** — verify by inspection first; do not assume it from this text.
+- Reading the document would require moving or copying it into the repository.
+- Any point where completing the record would require a distributional claim n=1 cannot support.
+- **`origin/main` moving mid-run** — BLK-0006 is the precedent. Record the starting HEAD in
+  checkpoint 1 and re-check before every push.
+
+> **Known runner limit.** `git fetch` is off the runner allowlist, so a mid-run move is detectable only
+> when a push is rejected. Record it and stop; do not route around it.
+
+### Recovery procedure
+
+Re-verify the corpus path by inspection before assuming either answer, and check which records already
+exist rather than rewriting them. **If a `plan.pdf` is found inside the repository at any point, that
+is a defect: move it out and record it — do not commit it and do not delete the corpus.**

@@ -1,6 +1,6 @@
 # MSG-0077 — TASK-0026 Reconciled; A-SURVEY's Corpus Prerequisite Is Not Met
 
-**Status:** **OPEN** — one organizational action needed before A-SURVEY can run; A-STACK is unblocked
+**Status:** **CLOSED** 2026-08-22 — the organizational action this record asked for has been taken: an approved/synthetic corpus was supplied at `D:\Work\pci-corpus\plan.pdf` and A-SURVEY is authorized by MSG-0080 as TASK-0027. The prerequisite it reported is discharged.
 **Raised:** 2026-08-22
 **Raised by:** Claude Code (interactive session, COMMS)
 **Type:** Queue reconciliation record + prerequisite report

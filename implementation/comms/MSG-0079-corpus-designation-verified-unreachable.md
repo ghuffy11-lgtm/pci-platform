@@ -1,6 +1,6 @@
 # MSG-0079 — Corpus Designated by the Operator: Verified, and Not Reachable
 
-**Status:** **OPEN** — operator action required. **Corrected 2026-08-22: the designated path is NFS, not SMB.** Re-tested: NFS 2049 and portmapper 111 both closed, **and** Client for NFS is not installed on this workstation. Two independent blockers; the earlier SMB guidance is superseded
+**Status:** **CLOSED** 2026-08-22 — superseded by local delivery. The designation resolved the authority question; the path was never reachable (NFS, not SMB — see the correction below), and the point is now moot: the file was supplied directly at `D:\Work\pci-corpus\plan.pdf`. The n=1 observation recorded here was adopted by MSG-0080.
 **Raised:** 2026-08-22
 **Raised by:** Claude Code (interactive session, COMMS)
 **Type:** Verification result + blocker report

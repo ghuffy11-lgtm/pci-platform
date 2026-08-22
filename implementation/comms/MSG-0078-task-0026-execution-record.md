@@ -1,6 +1,6 @@
 # MSG-0078 — TASK-0026 Execution Record: A-STACK Delivered, A-SURVEY Stopped at Its Prerequisite
 
-**Status:** **OPEN** — one organizational action outstanding (A-SURVEY's corpus). The A-STACK half is
+**Status:** **CLOSED** 2026-08-22 — the outstanding organizational corpus action has been taken (corpus supplied at `D:\Work\pci-corpus\plan.pdf`; MSG-0080 authorizes the A-SURVEY follow-up as TASK-0027). The PARTIAL result it records stands: A-STACK delivered as `EPA-0005`, A-SURVEY correctly not performed at the time.
 delivered and requests no decision beyond the ordinary acceptance of a PROPOSED record.
 **Raised:** 2026-08-22
 **Raised by:** Claude Code — supervisor-started session, `runner.lock` pid 27312, acquired 06:57:17Z
