@@ -2,7 +2,7 @@
 
 **Active Work Package:** WP-0001 — PCI Kernel Foundation
 **Status:** **COMPLETE** — declared by the architecture lead 2026-08-19 (MSG-0020(b), resolved by MSG-0022 / MSG-0023, TASK-0009)
-**Last Updated:** 2026-08-22 UTC — **A-SURVEY performed at n=1 for English** (TASK-0027 COMPLETE, 7/7 criteria, MSG-0084) — text-native verified, plus **three reproducible extraction hazards** that would corrupt ingestion silently. **MSG-0085 authorizes the Arabic follow-up**, reconciled as **TASK-0028**, the single READY task, using the existing MSG-0083 grant with **no permission change**. `EPA-0005` still PROPOSED. **No implementation authorized.**
+**Last Updated:** 2026-08-22 UTC — **A-SURVEY performed at n=1 twice.** TASK-0028 COMPLETE (9/9, MSG-0087): the Arabic document is **OCR-derived — ABBYY FineReader — the class D14 rejects**, mixed-script, with **no language declared at all**. `ADR-0019` untouched; implications recorded as evidence only. TASK-0027 (English, Word-produced, text-native) found three extraction hazards, **none of which reproduce here**. **The two documents are not a corpus.** No task READY; no implementation authorized.
 
 > **The line this replaces, retained:** "**BLK-0010 RESOLVED; TASK-0027 (A-SURVEY, n=1) is READY and
 > unblocked.** MSG-0083 authorized **option A**: a narrow read-only grant for `D:Workpci-corpus` only,
@@ -763,7 +763,7 @@ carry explicit supersession notes, with no supervisor behaviour, permission, or 
 C4 and C5 — no action, deliberately. **C6 (a bounded proof of MSG-0049 option B) and C7 (the next
 work package) remain the Lead's to decide and are not self-authorized.**
 
-**Four messages carry `Status: OPEN`** — **MSG-0060**, **MSG-0081**, **MSG-0084** and **MSG-0086**. Verified across all three views (message file, COMMS register, queue ledger). **MSG-0086** is the TASK-0028 reconciliation and **MSG-0084** the A-SURVEY n=1 record; both are informational, and MSG-0084 carries two items for the Lead that block nothing.
+**Five messages carry `Status: OPEN`** — **MSG-0060**, **MSG-0081**, **MSG-0084**, **MSG-0086** and **MSG-0087**. Verified across all three views (message file, COMMS register, queue ledger). All are informational or carry referrals that block nothing.
 
 **MSG-0084 is the TASK-0027 execution record** — a record, plus **two referrals that block nothing**
 (§8 of that message): the designated corpus is **real organizational material, not synthetic**, and the
@@ -1385,62 +1385,123 @@ both tables index it, and both were updated in the same commit as the record.
 
 ## Next Action
 
-**TASK-0028 is READY and is the single READY task — the Arabic follow-up survey. The Supervisor will
-start it on its next cycle; no manual trigger is needed.**
+**No task is READY. TASK-0028 is COMPLETE, and the next action is the Architecture Lead's.**
 
-**MSG-0085 authorized it** against `D:\Work\pci-corpus\Arabic.pdf` (663.3 KB, `%PDF-1.5`, verified
-present) to complement the completed English survey. **No permission change was needed or made** —
-MSG-0083 granted the *directory*, so the new file is already readable, and MSG-0085 §3 forbids
-broadening.
+**A-SURVEY has now been performed at n=1 twice**, and the two documents are strikingly unalike — which
+is the most useful thing to come out of the pair.
 
-### The two constraints that matter most
+| | `plan.pdf` (TASK-0027) | `Arabic.pdf` (TASK-0028) |
+|---|---|---|
+| Producer | Microsoft Word 2016 | **ABBYY FineReader PDF 15** |
+| Nature | **Text-native**, verified four ways | **OCR-derived** — 31 page images *plus* a text layer |
+| Language declared | `en-ZA` ×1,819, `en-GB` ×46 | **none at all** |
+| Script | Latin | **Mixed** Arabic + Latin |
+| Hazards found | Three, all reproducible | **None of those three** — a different defect population |
 
-**It is a separate n=1, and the two documents are not a corpus.** One English plus one Arabic file,
-both chosen by an operator, is not a sample. Any statement about language mix or prevalence would be
-the invented distribution the n=1 discipline exists to prevent.
+### The finding that matters: D14 would reject the Arabic sample
 
-**ADR-0019 must not be amended, and the reason is sharper here.** It was accepted *on condition* that
-its Arabic normalization rules come from empirical corpus evidence — and **this is the first Arabic
-evidence the project has.** That makes promoting one document's behaviour into a normalization rule
-both very tempting and exactly what the condition forbids. Implications are **evidence for a later
-decision**, nothing more.
+`Arabic.pdf` is **OCR-dependent by construction** — its text exists because ABBYY recognised it. **D14
+rules text-native only and rejects OCR-dependent documents rather than treating OCR output as
+authoritative.** So the first Arabic material the project has seen is precisely the class the accepted
+architecture excludes.
 
-### What A-SURVEY produced for English (MSG-0084, 7/7 criteria)
+**That is a result, not a failure**, and it cuts two ways for the Lead to decide between (MSG-0087 §6):
 
-**Text-native, verified four independent ways** — the one dimension n=1 answers cleanly. Beyond that,
-its most reusable output is three extraction hazards, each observed and reproducible, each of which
-would corrupt a T-B pipeline **silently rather than failing**:
+- as a **test** document it is genuinely valuable — the first concrete instance of what D14 must cope
+  with, and evidence of what a rejected file looks like structurally;
+- as **evidence about admissible Arabic policy material it says nothing**, because such a file would
+  never be admitted. Characterising what the assistant will actually ingest needs a **text-native**
+  Arabic document.
 
-1. **Drop-shadow glyph duplication.** Every title-page character is drawn twice; naive extraction reads
-   `HHAADDII CCLLIINNIICC`. Document-wide it is 0.7% of characters — **but on page 1 it is 231 artifact
-   characters against 276 of content.** The document-wide figure is the misleading one; the corruption
-   sits exactly where the governance metadata lives.
-2. **Language tags harvested as body text** — `en-ZA` picked up 1,819 times by a regex that does not
-   check the operand precedes `Tj`/`TJ`. Observed, not hypothesised.
-3. **A page whose meaning is a vector drawing**, yielding 67 characters. **D14 does not fire on it** —
-   the document *is* text-native — so a grounded-answer system would be unable to cite that content
-   while showing no sign anything is missing. **A gap between D14 and ADR-0017 that one document is
-   enough to demonstrate, and not enough to size.**
+**It is also not Hadi Clinic material** — its title is `00. Country COVID-19 IAR Guidance (vers 1.0)`.
+No boundary was crossed; the Lead designated the path. It is recorded so nobody later reads these
+observations as characterising the organization's own Arabic corpus.
 
-### Two items sitting with the Architecture Lead — neither blocking
+### Evidence for ADR-0019 — recorded, not acted on
 
-1. **The corpus is real, not synthetic.** `plan.pdf` is a genuine 45-page Hadi Clinic emergency
-   preparedness plan with named author and approver and a real signature block, carrying **no
-   confidentiality marking**. The Lead designated that exact path, so the read was authorized and no
-   boundary was crossed — but **the record should not quietly describe production material as
-   synthetic**, and the same question applies to `Arabic.pdf`. The surveys keep personal names and
-   document content out of the repository either way.
-2. **The runner has no PDF tooling** — `pdftoppm` absent, `pdftotext` off the allowlist. Both surveys
-   work by reading bytes directly. Making PDF inspection routine is a permission and tooling decision,
-   correctly not self-authorized.
+**ADR-0019 was not amended and no normalization rule was proposed**, per MSG-0085 §7. What the document
+evidences for a later decision: **language cannot be read from the file** (no `/Lang`, mixed script, so
+detection with its own error behaviour is required), and **glyph-to-Unicode round-tripping is not
+guaranteed** where `ToUnicode` is absent — extraction fidelity sits upstream of every normalization
+rule ADR-0019 might record. **On this evidence ADR-0019's deferral looks well-judged**: one mixed-script
+OCR document is exactly the material from which a plausible-but-wrong rule could have been generalised.
 
-### Still unauthorized
+### Still open, and unchanged
 
-**A-SURVEY at corpus scale remains unperformed**, and the organizational action that would enable it —
-representative approved material, **plural** — is unchanged. Implementation stays prohibited: **T-A,
-T-B, T-D, T-E and T-0 are not authorized**, and TASK-0028 may not mark them READY. `EPA-0005` (A-STACK)
-is still PROPOSED and awaits the Lead.
+**The two documents are not a corpus.** A-SURVEY **at corpus scale remains unperformed**, and the
+organizational action that would enable it — representative approved material, **plural** — has not
+changed.
 
+Also still with the Lead: **`EPA-0005`** (A-STACK, PROPOSED) and its §9 recommendation that no stack ADR
+be created yet; the **one-runtime-or-two** trade; **PDF tooling** for the runner (MSG-0084 §8.2); and
+the **synthetic-versus-real** designation question, which now applies to both files.
+
+**Implementation remains prohibited.** T-A, T-B, T-D, T-E and T-0 are unauthorized, and **T-0 is still
+an operator prerequisite** needing a privileged identity-provider deployment.
+
+---
+
+**Historical — the position while TASK-0028 was READY, retained.** The text below described the
+Arabic follow-up as pending. **It has since been executed** (MSG-0087, 9/9 criteria).
+
+> ## Next Action
+> 
+> **TASK-0028 is READY and is the single READY task — the Arabic follow-up survey. The Supervisor will
+> start it on its next cycle; no manual trigger is needed.**
+> 
+> **MSG-0085 authorized it** against `D:\Work\pci-corpus\Arabic.pdf` (663.3 KB, `%PDF-1.5`, verified
+> present) to complement the completed English survey. **No permission change was needed or made** —
+> MSG-0083 granted the *directory*, so the new file is already readable, and MSG-0085 §3 forbids
+> broadening.
+> 
+> ### The two constraints that matter most
+> 
+> **It is a separate n=1, and the two documents are not a corpus.** One English plus one Arabic file,
+> both chosen by an operator, is not a sample. Any statement about language mix or prevalence would be
+> the invented distribution the n=1 discipline exists to prevent.
+> 
+> **ADR-0019 must not be amended, and the reason is sharper here.** It was accepted *on condition* that
+> its Arabic normalization rules come from empirical corpus evidence — and **this is the first Arabic
+> evidence the project has.** That makes promoting one document's behaviour into a normalization rule
+> both very tempting and exactly what the condition forbids. Implications are **evidence for a later
+> decision**, nothing more.
+> 
+> ### What A-SURVEY produced for English (MSG-0084, 7/7 criteria)
+> 
+> **Text-native, verified four independent ways** — the one dimension n=1 answers cleanly. Beyond that,
+> its most reusable output is three extraction hazards, each observed and reproducible, each of which
+> would corrupt a T-B pipeline **silently rather than failing**:
+> 
+> 1. **Drop-shadow glyph duplication.** Every title-page character is drawn twice; naive extraction reads
+>    `HHAADDII CCLLIINNIICC`. Document-wide it is 0.7% of characters — **but on page 1 it is 231 artifact
+>    characters against 276 of content.** The document-wide figure is the misleading one; the corruption
+>    sits exactly where the governance metadata lives.
+> 2. **Language tags harvested as body text** — `en-ZA` picked up 1,819 times by a regex that does not
+>    check the operand precedes `Tj`/`TJ`. Observed, not hypothesised.
+> 3. **A page whose meaning is a vector drawing**, yielding 67 characters. **D14 does not fire on it** —
+>    the document *is* text-native — so a grounded-answer system would be unable to cite that content
+>    while showing no sign anything is missing. **A gap between D14 and ADR-0017 that one document is
+>    enough to demonstrate, and not enough to size.**
+> 
+> ### Two items sitting with the Architecture Lead — neither blocking
+> 
+> 1. **The corpus is real, not synthetic.** `plan.pdf` is a genuine 45-page Hadi Clinic emergency
+>    preparedness plan with named author and approver and a real signature block, carrying **no
+>    confidentiality marking**. The Lead designated that exact path, so the read was authorized and no
+>    boundary was crossed — but **the record should not quietly describe production material as
+>    synthetic**, and the same question applies to `Arabic.pdf`. The surveys keep personal names and
+>    document content out of the repository either way.
+> 2. **The runner has no PDF tooling** — `pdftoppm` absent, `pdftotext` off the allowlist. Both surveys
+>    work by reading bytes directly. Making PDF inspection routine is a permission and tooling decision,
+>    correctly not self-authorized.
+> 
+> ### Still unauthorized
+> 
+> **A-SURVEY at corpus scale remains unperformed**, and the organizational action that would enable it —
+> representative approved material, **plural** — is unchanged. Implementation stays prohibited: **T-A,
+> T-B, T-D, T-E and T-0 are not authorized**, and TASK-0028 may not mark them READY. `EPA-0005` (A-STACK)
+> is still PROPOSED and awaits the Lead.
+> 
 ---
 
 **Historical — the position after TASK-0027 and before MSG-0085, retained.** The text below
