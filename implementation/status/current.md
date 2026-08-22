@@ -2,7 +2,7 @@
 
 **Active Work Package:** WP-0001 — PCI Kernel Foundation
 **Status:** **COMPLETE** — declared by the architecture lead 2026-08-19 (MSG-0020(b), resolved by MSG-0022 / MSG-0023, TASK-0009)
-**Last Updated:** 2026-08-22 UTC (**MSG-0076 authorizes A-SURVEY + A-STACK**, reconciled as **TASK-0026**, the single READY task — MSG-0077; **A-SURVEY blocked on PR5, no corpus reachable**; A-STACK unblocked) · 2026-08-21 UTC (**TASK-0025 COMPLETE** — **ADR-0018…ADR-0022 promoted** into `docs/decisions/`, completing the WP-0009 ADR set; 5/5 acceptance criteria, zero body differences in the per-ADR diffs, MSG-0075. **No task is READY**)
+**Last Updated:** 2026-08-22 UTC (**TASK-0026 COMPLETE (PARTIAL)** — **A-STACK delivered `EPA-0005`**, PROPOSED and selecting nothing; **A-SURVEY not performed, PR5 re-verified UNMET**; 5/6 criteria met, MSG-0078. **No task is READY**) · 2026-08-22 UTC (**MSG-0076 authorizes A-SURVEY + A-STACK**, reconciled as **TASK-0026**, the single READY task — MSG-0077; **A-SURVEY blocked on PR5, no corpus reachable**; A-STACK unblocked) · 2026-08-21 UTC (**TASK-0025 COMPLETE** — **ADR-0018…ADR-0022 promoted** into `docs/decisions/`, completing the WP-0009 ADR set; 5/5 acceptance criteria, zero body differences in the per-ADR diffs, MSG-0075. **No task is READY**)
 
 > **The line this replaces, retained:** "2026-08-21 UTC (**MSG-0073 answers MSG-0072** — **TASK-0025
 > authorized** to promote ADR-0018…ADR-0022 and reconciled into the queue as the single READY task,
@@ -109,6 +109,7 @@ message on 2026-08-20 under MSG-0041 (MSG-0042) — the fifth.
 | TASK-0023 | EPA work-package governance reconciliation | **COMPLETE** (2026-08-21) — 7/7 criteria, **WP-0009 allocated**, MSG-0066 | TASK-0022, MSG-0062, MSG-0063 ✅ | Claude Code |
 | TASK-0024 | A-ADR — draft the required EPA ADR set | **COMPLETE** (2026-08-21) — 8/8 criteria, **ADR-0017…ADR-0022 drafted PROPOSED**, MSG-0070 | TASK-0023, MSG-0062, MSG-0067, MSG-0068 ✅ | Claude Code |
 | TASK-0025 | Promote ADR-0018…ADR-0022 into the accepted decision register | **COMPLETE** (2026-08-21) — 5/5 criteria, **five ADRs promoted, zero body differences**, MSG-0075 | TASK-0024, MSG-0071, MSG-0073 ✅ | Claude Code |
+| TASK-0026 | A-SURVEY + A-STACK — bounded corpus survey and stack evaluation | **COMPLETE (PARTIAL)** (2026-08-22) — **5/6 criteria; criterion 1 UNMET on PR5**. A-STACK delivered **EPA-0005**; **A-SURVEY not performed**, MSG-0078 | TASK-0025, MSG-0071, MSG-0076 ✅ | Claude Code |
 | TASK-0002 | Make test entry points shell-independent | **ABORTED** | — | — |
 
 **No task is READY** — but the reason has changed. The project now sits at an **architecture decision
@@ -121,7 +122,77 @@ boundary**, not at an empty queue.
 > been executed and is COMPLETE (MSG-0055). MSG-0051 §C is fully discharged: C1–C5 by MSG-0052,
 > C6–C7 by MSG-0053.
 
-**Current position, 2026-08-21 after TASK-0025: no task is READY, and for the first time in this
+**Current position, 2026-08-22 after TASK-0026: no task is READY, and the boundary is now split in
+two — one half is the Architecture Lead's acceptance of a record, and the other half is an
+organizational action nobody in this repository can take.**
+
+TASK-0026 executed MSG-0076 and is **COMPLETE (PARTIAL)**. **Five of six acceptance criteria are met;
+criterion 1 is UNMET on PR5**, each mapped to evidence in **MSG-0078** §2. Being documentary it
+produced **no test count and claims none**. The two halves came out differently, exactly as MSG-0077
+predicted they would:
+
+- **A-STACK is COMPLETE.** It delivered
+  [`EPA-0005`](../architecture/EPA-0005-assistant-stack-evaluation.md) — **PROPOSED, and it selects
+  nothing**, which is what MSG-0076 asked for when it permitted "a recommendation **or** an explicit
+  record of why selection remains open".
+- **A-SURVEY was NOT PERFORMED.** Its corpus prerequisite is unmet, and **it produced no figures at
+  all** rather than plausible ones.
+
+**The A-SURVEY restraint is the part worth reading twice, because an absence is easy to mistake for an
+oversight.** The corpus question was **re-checked by inspection in the executing session** — not
+inherited from MSG-0077, whose own text insisted on that, since the operator could have supplied
+material in the interval. A tree-wide search for document-like files returned **two TypeScript
+dependency licence texts and nothing else**. So **no format breakdown, no language mix, no
+scanned-document prevalence, no classification pattern, no version characteristic** — *not as
+estimates, not as illustrations, not as expected values* — and **no survey method or plan was
+substituted** for the authorized output. Those figures would have fed **D6**, **D14** and **ADR-0019**,
+which MSG-0071 accepted *on the express condition* that its normalization rules come from empirical
+corpus evidence. **Invented data would have corrupted accepted architecture and been traceable to
+nothing.**
+
+**What EPA-0005 actually establishes**, since "evaluation that selects nothing" could otherwise be
+mistaken for an evaluation that concludes nothing. Four findings, three of which hold **regardless of
+the corpus**:
+
+1. **"The stack" is not one decision.** The capability holds two workloads with different centres of
+   gravity — a governed application layer, and a document-and-model pipeline. The real fork is **one
+   runtime or two**, and EPA-0005 §5 frames that trade with three named approaches and **recommends
+   none**, because operational fit and team capability are the organization's context to weigh.
+2. **ADR-0020 makes pre-filtered retrieval a functional requirement on the index engine** (§3.3) —
+   the sharpest finding. §3.1 requires the candidate set be built *"already constrained"* and §4 makes
+   retrieve-then-filter a gate failure, which **disqualifies post-filter-only similarity search**. The
+   usual workaround — over-fetch top-k, then filter — is the prohibited shape executed one layer down,
+   where it is harder to see. **An implementer could violate this while believing they conform**,
+   because post-filtering looks like enforcement and the response body is identical either way.
+3. **Three local models are required, not one** (§3.5): generation, embedding, and **ADR-0017's
+   entailment layer**, which ADR-0022's own consequences confirm is local too. This multiplies **PR6**,
+   which is still unmeasured.
+4. **Conversation and audit storage are two stores, not one** (§3.7). ADR-0021 §2 keeps retained
+   conversation content from *an ordinary administrator*, and §3 requires expiry to actually delete. A
+   single "log everything to one place" design violates §2 and §4 at once, **invisibly**.
+
+One product-visible constraint surfaced early (§3.6): ADR-0017's gate runs *after* generation and may
+veto the whole response, so **streaming an answer to the user as it generates is incompatible with
+it** — better found now than at T-D.
+
+**Two boundaries EPA-0005 declined to cross.** It names **no serving runtime**: SPEC-0008 and ADR-0003
+both mention Ollama as a possible initial local runtime, and **ADR-0022 is explicit that it "does not
+select it or anything else"** — recording one in a PROPOSED document would convert an accepted
+non-decision into a de facto selection. And **it creates no ADR**: WP-0009 §6.2 assigns A-STACK the
+*question* of whether its output should be one, and §9.3 **answers** it — recommend **not yet**, since
+an ADR records a decision and the honest state is that selections are open; if the §3.3 pre-filtering
+rule warrants recording, it belongs with **ADR-0020**, whose own §3 and §4 it follows from.
+
+**PR5 sharpens from UNKNOWN to VERIFIED UNMET**, and the distinction is worth keeping: it was looked
+for, in this repository, on this date. **It is not a claim about what the organization possesses** —
+only about what is reachable here.
+
+> **Superseded — the position after TASK-0025, retained.** The paragraph below was written when the
+> boundary was purely that the Lead had not yet named the next task. **They then named it** (MSG-0076),
+> it was reconciled (MSG-0077), and it has now run. Everything it says about *implementation* is
+> unchanged: still prohibited, still no task READY.
+
+**Position after TASK-0025 (superseded, retained): no task is READY, and for the first time in this
 sequence the boundary is neither acceptance nor authorization of a record — it is simply that the
 Architecture Lead has not yet named the next task.**
 
@@ -619,8 +690,24 @@ carry explicit supersession notes, with no supervisor behaviour, permission, or 
 C4 and C5 — no action, deliberately. **C6 (a bounded proof of MSG-0049 option B) and C7 (the next
 work package) remain the Lead's to decide and are not self-authorized.**
 
-**Two messages carry `Status: OPEN`** — **MSG-0060** and **MSG-0077**. Verified across all three
-views (message file, COMMS register, queue ledger).
+**Three messages carry `Status: OPEN`** — **MSG-0060**, **MSG-0077**, and **MSG-0078**. Verified
+across all three views (message file, COMMS register, queue ledger).
+
+**MSG-0078 is the TASK-0026 execution record**, and it is OPEN rather than a closed RECORD for one
+reason: **the organizational action MSG-0077 asked for has not been taken.** TASK-0026 re-verified
+that by inspection rather than assuming it, and could not discharge it — supplying a corpus is not
+Claude's to do. **MSG-0077 therefore stays OPEN alongside it**; the two describe the same outstanding
+action from before and after an execution attempt, and closing either would hide it.
+
+**The Architecture Lead now holds three things, only the first of which blocks anything:** (1) the
+**corpus action** — supply representative approved policy material for a **read-only** survey, or rule
+A-SURVEY **deferred** until it exists, remembering that a survey **reads and does not ingest** and may
+not bypass approval controls; (2) **accept, amend, or reject EPA-0005**, including its §9.3
+recommendation that no stack ADR be created yet; (3) the **one-runtime-or-two trade** of EPA-0005 §5,
+when the timing is right.
+
+> **The line this replaces, retained:** "**Two messages carry `Status: OPEN`** — **MSG-0060** and
+> **MSG-0077**." True from the MSG-0077 reconciliation until TASK-0026 executed the same day.
 
 **MSG-0077 reports an unmet prerequisite and needs one organizational action.** MSG-0076
 authorized TASK-0026 with two outputs, and **A-SURVEY cannot run**: it requires representative
@@ -1197,12 +1284,61 @@ both tables index it, and both were updated in the same commit as the record.
 
 ## Next Action
 
-**TASK-0026 is READY and is the single READY task. The Supervisor will start it on its next cycle — no
-manual trigger is needed.**
+**No task is READY. TASK-0026 is COMPLETE (PARTIAL), and what happens next divides between the
+Architecture Lead and the organization.**
+
+### The one action that is genuinely blocking, and it is the organization's
+
+**Supply representative approved policy material for a read-only survey, or rule that A-SURVEY is
+deferred until the corpus exists.** MSG-0076's constraint binds either way: **a survey reads; it does
+not ingest**, and it may not bypass approval controls.
+
+This is the same action MSG-0077 asked for. **TASK-0026 re-verified by inspection that it is still
+outstanding** — it did not assume so from the earlier record — and it is not an action Claude Code can
+take or route around. Until it is taken, **MSG-0056a D6 stays partially discharged and ADR-0019's
+Arabic normalization rules stay deferred**, which is exactly the condition MSG-0071 accepted that ADR
+under. **D14's rejection exposure stays unmeasured** too: WP-0009 §6.2 warned that if the real corpus
+is largely scanned Arabic PDFs, the first release answers from a fraction of it and *nobody discovers
+that until T-B runs*.
+
+### What the Architecture Lead holds, neither of which blocks anything
+
+1. **Accept, amend, or reject `EPA-0005`** — the A-STACK evaluation, PROPOSED. Including its **§9.3**
+   recommendation that **no stack ADR be created yet**, and its observation that if the §3.3
+   pre-filtering rule warrants recording as accepted architecture, it belongs with **ADR-0020** —
+   whose §3 and §4 it follows from — rather than in a record of its own.
+2. **The one-runtime-or-two trade** of EPA-0005 §5, when the timing is right. It was deliberately left
+   open: it turns on operability and team capability in the customer's context, which the
+   technology-selection principles make a matter of **operational fit** rather than technical ranking.
+
+**A sequencing observation, offered and not self-authorized.** Seven of the questions a stack proposal
+would ordinarily answer are corpus-dependent (EPA-0005 §8), so **A-SURVEY is a genuine input to
+A-STACK** and running A-STACK first was always going to leave that residue. If the corpus becomes
+available, the natural follow-up is A-SURVEY and then a revision of EPA-0005 §8 and §9.2 against real
+evidence. **No task is marked READY on the strength of that observation** — naming the next task is
+the Lead's act, and it must be reconciled into `CLAUDE-TASKS.md` as the single READY task **in the same
+commit as the authorization** (the MSG-0044 gap, which has now recurred eight times).
+
+### Still unauthorized after TASK-0026
+
+Implementation stays prohibited. **T-A, T-B, T-D, T-E and T-0 are not authorized**, and TASK-0026
+marked none of them READY. **T-0 remains an operator prerequisite** needing a privileged
+identity-provider deployment that no decision can substitute for. **PR3 and PR4 remain NOT MET; PR5 is
+now VERIFIED UNMET; PR6 remains UNKNOWN** — and EPA-0005 §3.5 makes PR6 larger than it looked, since
+the capability needs **three** concurrent local models rather than one.
+
+---
+
+**Historical — the position after MSG-0077 and before TASK-0026 executed, retained.** The text below
+described TASK-0026 as READY and predicted the shape of its two halves. **The prediction held**:
+A-STACK ran, A-SURVEY stopped at PR5, and the task reported PARTIAL exactly as instructed.
+
+> **TASK-0026 is READY and is the single READY task. The Supervisor will start it on its next cycle — no
+> manual trigger is needed.**
 
 **MSG-0076 authorized one bounded architecture task with two outputs**, and reconciliation allocated it
-the id **TASK-0026** (MSG-0076 assigns none; the id was verified unused). The two halves are **not**
-equally executable, and that asymmetry is the substance of this entry.
+the id **TASK-0026** (MSG-0076 assigns none; the id was verified unused). The two halves were **not**
+equally executable, and that asymmetry was the substance of this entry.
 
 ### A-STACK — unblocked, and most of the task
 

@@ -127,7 +127,9 @@ Architecture Lead's, and both are now MET for the decisions — see §8.
 | ↳ | **EXECUTED as TASK-0024, 2026-08-21 (MSG-0068a/b → MSG-0070).** Delivered **ADR-0017…ADR-0022** as **PROPOSED** drafts in `implementation/decisions/` — one per §7 surface, all six independently judged required. **They are not accepted**; promotion to `docs/decisions/` is the Architecture Lead's. **ADR-0019 is incomplete by design** — D6's normalization rules await the empirical corpus evidence **A-SURVEY** would supply | — | — | — |
 | ↳ | **ACCEPTED and PROMOTED, 2026-08-21.** **MSG-0071 accepts all six** — ADR-0019 as a *bounded* decision with its normalization rules still deferred, ADR-0017 with the entailment model and thresholds still open under SPEC-0020. **ADR-0017 was promoted by the Architecture Lead** (`d9c4524`); **ADR-0018…ADR-0022 were promoted by TASK-0025** under MSG-0073 (record → MSG-0075). All six now live in `docs/decisions/` and are **accepted architecture**; the `implementation/decisions/` copies are RATIFIED historical drafts. **A-STACK and A-SURVEY remain unauthorized and no implementation task is READY** | — | — | — |
 | **A-STACK** | Evaluate and propose the assistant service's concrete implementation stack against `docs/architecture/technology-selection-principles.md` | this reconciliation | A stack proposal; **whether it is recorded as an ADR is that task's question**, not settled here | MSG-0062 §7.7 |
+| ↳ | **EXECUTED as TASK-0026, 2026-08-22 (MSG-0076 → MSG-0078).** Delivered **EPA-0005** in `implementation/architecture/`, **PROPOSED — and it selects nothing.** It maps candidate approaches to the accepted EPA ADR set and **preserves every open selection** (§9.2, with the evidence that would close each). Three constraints hold **regardless of the corpus**: **pre-filtered retrieval is a functional requirement on the index engine** (ADR-0020 §3.1/§4 disqualify post-filter-only similarity search — over-fetch-then-filter is the prohibited shape one layer down); **three local models are required, not one** (generation, embedding, **and ADR-0017's entailment layer**), multiplying the unmeasured PR6; and **conversation and audit storage are separate stores** (ADR-0021 §2/§4). **The ADR question above is ANSWERED, not left open** — EPA-0005 §9.3 recommends **not yet**, observing that if the pre-filtering rule warrants recording it belongs with **ADR-0020** rather than in a stack ADR — and **no ADR was created**. **Seven of its questions are corpus-blocked** because A-SURVEY could not run | — | — | — |
 | **A-SURVEY** | **Bounded, read-only corpus survey** — formats, language mix, scanned-document prevalence, classification/audience patterns, version and supersession characteristics | this reconciliation | Discovery input fixing D6's normalization rules and sizing D14's rejection exposure | MSG-0062 §7.5 |
+| ↳ | **AUTHORIZED as part of TASK-0026 but NOT PERFORMED, 2026-08-22 — prerequisite PR5 UNMET.** No approved policy corpus is reachable, **re-verified by inspection during the task** rather than inherited from the earlier records: a tree-wide search for document-like files returned two TypeScript dependency licence texts and nothing else. **No survey figure of any kind was produced** — no format breakdown, language mix, scanned-document prevalence, classification pattern, or version characteristic, *not as estimates, illustrations, or expected values* — and **no method or plan was substituted** for the authorized output, since a method document is easy to mistake later for a completed survey. **MSG-0056a D6 therefore remains partially discharged and ADR-0019's normalization rules remain deferred**, exactly as MSG-0071 accepted them. **The outstanding action is the organization's**: supply representative approved policy material for a read-only survey, or defer A-SURVEY until the corpus exists. Records: **MSG-0077**, **MSG-0078** | — | — | — |
 
 **A-SURVEY carries a hard constraint from its own ruling: it is a discovery/architecture input only.
 It must not ingest production content or bypass approval controls.** MSG-0062 §7.5 authorizes it
@@ -288,6 +290,22 @@ not itself resolve.**
 > PR5 and PR6 are still UNKNOWN. The three open items above are all still open — promotion touched
 > none of them. **A-SURVEY, A-STACK and T-0 remain unauthorized**, so ADR-0019's deferred normalization
 > rules and D14's unmeasured rejection exposure stay exactly where they were.
+
+> **Updated 2026-08-22 by TASK-0026 (MSG-0078). One prerequisite sharpens; the rest are unchanged.**
+> **PR5 moves from UNKNOWN to VERIFIED UNMET** — the corpus was searched for during A-SURVEY's
+> prerequisite check and **is not reachable from this repository**. That is a stronger statement than
+> "unknown": it was looked for, in this repository, on this date. **It is not a claim about whether the
+> organization possesses such material** — only about what is reachable here, which is the boundary the
+> survey depends on.
+>
+> **PR6 remains UNKNOWN, and EPA-0005 §3.5 makes it larger than it looked**: the capability needs
+> **three** concurrent local models — generation, embedding, and ADR-0017's entailment layer — not one.
+>
+> **Nothing else moved.** PR1 unchanged; PR2 still NOT MET as to implementation; PR3 and PR4 still NOT
+> MET. **T-0 remains unauthorized**, and no implementation task is READY. **A-STACK is now executed**
+> (§6.2); **A-SURVEY is authorized-but-unperformed**, so ADR-0019's deferred normalization rules and
+> D14's unmeasured rejection exposure **stay exactly where they were** — the one thing A-SURVEY existed
+> to move is the one thing that did not move. The three open items above all remain open.
 
 ---
 

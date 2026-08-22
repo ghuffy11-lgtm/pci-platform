@@ -21,13 +21,24 @@ recommendation awaiting a ruling.
 | EPA-0002 | Employee Policy Assistant — proposed work package, sequence, and gates | **PROPOSED — not authorized** | TASK-0021, MSG-0054 |
 | EPA-0003 | Employee Policy Assistant — required architecture-lead decisions | **ALL FOURTEEN RULED** 2026-08-21 (MSG-0056a/b); its three reconciliation findings **and the numbering collision were ruled by MSG-0058**, and MSG-0057 is CLOSED | TASK-0021, MSG-0054 |
 | EPA-0004 | Employee Policy Assistant — **work-package definition** | **PROPOSED — not authorized.** Folds in all fourteen rulings and MSG-0058 F1–F4; thirteen gates, ten tasks, **seven decisions still open** (§11). Allocates no work-package number, creates no ADR, marks no task READY | TASK-0022, MSG-0059 |
+| EPA-0005 | Employee Policy Assistant — **service stack evaluation (A-STACK)** | **PROPOSED — and it selects nothing.** Evaluates candidate stack approaches against the accepted EPA ADR set. Records three constraints that hold regardless of the corpus (pre-filtered retrieval is mandatory; **three** local models, not one; conversation and audit are separate stores) and **explicitly preserves every open selection**. **Seven questions are corpus-blocked** because A-SURVEY could not run. Recommends **no ADR yet** and creates none | TASK-0026, MSG-0076 |
 
 > **The EPA-0003 row above previously read "three reconciliation findings open (MSG-0057)".** That was
 > true when written and stopped being true the same day, when MSG-0058 ruled all four. Corrected by
 > TASK-0022 (MSG-0061 §4) — a fourth instance of the index-lags-its-records failure that TASK-0013,
 > TASK-0014 and TASK-0015 each corrected in a different index.
 
-Read EPA-0001 → EPA-0002 → EPA-0003 → EPA-0004. **EPA-0004 is the current one**: EPA-0002 was written
+> **EPA-0005 added 2026-08-22 by TASK-0026 (A-STACK), under MSG-0076.** It is an *evaluation*, not a
+> proposal of record: MSG-0076 permits "an evidence-based recommendation **or** an explicit record of
+> why selection remains open", and EPA-0005 does the second for the stack and the first for three
+> corpus-independent constraints. **Its companion half, A-SURVEY, did not run** — the approved policy
+> corpus (PR5) is not reachable, re-verified by inspection during the task. **No corpus figures exist
+> anywhere in this directory**, and none may be inferred from EPA-0005's presence. Execution record:
+> **MSG-0078**.
+
+Read EPA-0001 → EPA-0002 → EPA-0003 → EPA-0004, then **EPA-0005** for the stack evaluation.
+**EPA-0004 remains the current work-package definition**; EPA-0005 does not supersede it and adds no
+gate, task, or authorization. EPA-0002 was written
 before any decision was ruled and is retained unchanged as the pre-ruling proposal, so where the two
 differ, EPA-0004 is the later record and its §12 states why. The decisions in EPA-0003 are all
 answered; what remains open is the seven items in EPA-0004 §11 and the lead's acceptance of these
