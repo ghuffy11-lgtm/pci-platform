@@ -79,6 +79,43 @@ both were caught rather than routed around:
 Neither is a defect in either control. Both are the seam between two controls, and in both cases the
 unattended session **stopped and recorded instead of improvising**, which is the behaviour worth having.
 
+---
+
+## CONFIRMED by a second runner — 2026-08-22, added by the TASK-0027 session (BLK-0010)
+
+**This message's finding was tested by the very next Supervisor cycle and it held.** Recorded here so a
+reader of MSG-0082 alone knows the collision is observed, not merely predicted.
+
+Runner pid **24140** reached TASK-0027's first action and was refused:
+
+```text
+$ ls -l /d/Work/pci-corpus/
+ls in '/d/Work/pci-corpus/' was blocked. For security, Claude Code may only list files in the
+allowed working directories for this session: 'D:\Work\pci-platform'.
+```
+
+**This is better evidence than the BLK-0009 observation quoted above**, because it names the boundary
+explicitly. Worth knowing: that runner's *first* attempt produced an ambiguous refusal citing
+"multiple operations" in a compound command and **no path at all** — a message equally consistent with
+the corpus being readable. Re-issuing the same read as a single plain command produced the quotable
+result. **Had the ambiguous message been taken as the diagnosis, this message would have been asking
+the Lead to widen a permission on evidence that did not establish the need.**
+
+**Two corrections to this message's own expectations:**
+
+1. **"Undecided is safe" is right about damage and wrong about cost.** No damage occurred — nothing was
+   copied, no permission changed, no figure invented. But the cost is **not** "one supervisor cycle per
+   attempt" in any bounded sense: the boundary is **non-transient**, so cycles recur indefinitely and
+   each produces an identical blocker. **The queue and status files now say so explicitly.**
+2. **Option B is narrower than it reads.** "Run TASK-0027 interactively" assumes an interactive session
+   can read `D:\Work\pci-corpus\`. The refusal above names the restriction as applying to *"the allowed
+   working directories for **this session**"* — **whether an interactive session in this repository is
+   scoped differently was not tested here**, and should be confirmed before B is chosen rather than
+   assumed. **UNKNOWN**, stated as such.
+
+**The decision request is unchanged and still OPEN.** Nothing in this addendum selects between A, B,
+and C.
+
 ## State
 
 - **TASK-0027 is READY** in the committed queue as of this reconciliation, and remains authorized by
