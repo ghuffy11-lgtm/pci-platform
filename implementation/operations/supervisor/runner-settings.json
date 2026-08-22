@@ -3,7 +3,13 @@
 
   "_allow_comment": "Exactly the two capabilities authorized by MSG-0028, and nothing more. Both are narrowly scoped on purpose: the refresh is path-limited to *.md, and the push names its remote and branch so arbitrary refspecs remain unavailable.",
 
+  "_corpus_comment": "additionalDirectories grants the A-SURVEY corpus directory and nothing else, authorized by MSG-0083 option A after BLK-0010 recorded the runner being denied that read. It is READ-ONLY BY CONSTRUCTION: the directory is added for access, and a single Edit() deny against that path covers every file-editing tool, so the grant cannot become a write path. Only Edit(path) rules are matched by file permission checks - Write/MultiEdit/NotebookEdit variants were tried, warned about as unmatched, and removed rather than left in place giving false assurance. MSG-0083: 'No write, delete, move, stage, commit, or repository access is granted' and 'do not broaden the permission to other external directories'. The corpus must never enter the repository.",
+
   "permissions": {
+    "additionalDirectories": [
+      "D:\\Work\\pci-corpus"
+    ],
+
     "allow": [
       "Bash(git ls-files -z \"*.md\" | git checkout-index -f -z --stdin)",
       "Bash(git checkout-index -f -z --stdin)",
@@ -12,6 +18,8 @@
     ],
 
     "deny": [
+      "Edit(//D:/Work/pci-corpus/**)",
+
       "Bash(sudo:*)",
 
       "Bash(docker compose down:*)",

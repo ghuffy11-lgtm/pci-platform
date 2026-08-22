@@ -2,7 +2,7 @@
 
 **Active Work Package:** WP-0001 — PCI Kernel Foundation
 **Status:** **COMPLETE** — declared by the architecture lead 2026-08-19 (MSG-0020(b), resolved by MSG-0022 / MSG-0023, TASK-0009)
-**Last Updated:** 2026-08-22 UTC — **TASK-0027 was attempted and is BLOCKED at its first action (BLK-0010, OPEN).** A supervisor-started runner reached the corpus read and was refused: *"Claude Code may only list files in the allowed working directories for this session: `D:\Work\pci-platform`"*. **The corpus is UNKNOWN to that session; no survey figure of any kind was produced.** MSG-0082's collision is now **confirmed by observation, not inferred** — and **retrying will not clear it**; it needs option **A**, **B**, or **C**. TASK-0027 stays READY and **needs no re-authorization** (MSG-0080). **BLK-0008 and BLK-0009 RESOLVED**; `EPA-0005` (A-STACK) still PROPOSED. **No implementation authorized.**
+**Last Updated:** 2026-08-22 UTC — **BLK-0010 RESOLVED; TASK-0027 (A-SURVEY, n=1) is READY and unblocked.** MSG-0083 authorized **option A**: a narrow read-only grant for `D:Workpci-corpus` only, applied to `runner-settings.json` and **verified empirically** (641,807 bytes, `%PDF-1.7`; writes denied; three ineffective deny rules removed). **Nothing broadened.** `EPA-0005` (A-STACK) still PROPOSED. **No implementation authorized.**
 
 > **The line this replaces, retained:** "**TASK-0027 is READY in the committed queue** (A-SURVEY, n=1)
 > and not yet run. **BLK-0008 and BLK-0009 both RESOLVED** … **MSG-0082 raises a decision** — the
@@ -695,9 +695,9 @@ carry explicit supersession notes, with no supervisor behaviour, permission, or 
 C4 and C5 — no action, deliberately. **C6 (a bounded proof of MSG-0049 option B) and C7 (the next
 work package) remain the Lead's to decide and are not self-authorized.**
 
-**Three messages carry `Status: OPEN`** — **MSG-0060**, **MSG-0081**, and **MSG-0082**. Verified across all three views (message file, COMMS register, queue ledger).
+**Two messages carry `Status: OPEN`** — **MSG-0060** and **MSG-0081**. Verified across all three views (message file, COMMS register, queue ledger). **MSG-0082 was closed by MSG-0083**, which chose option A.
 
-**MSG-0082 is the one needing a decision.** MSG-0080 requires the corpus **outside** the repository; the unattended runner's permission boundary **is** the repository. A real runner session recorded its read of `D:Workpci-corpus` being **denied and not routed around** (BLK-0009). Options: **(A)** a narrow read permission for that path, **(B)** run TASK-0027 interactively, **(C)** supply an extraction. **Undecided is safe** — the run stops and records, costing one cycle.
+**MSG-0082 is CLOSED** — MSG-0083 answered it with **option A**: a narrow read-only grant for `D:Workpci-corpus` only, applied to `runner-settings.json` and **verified empirically** (641,807 bytes, `%PDF-1.7`, writes denied). **BLK-0010 is RESOLVED and TASK-0027 is READY again.**
 
 **MSG-0081 is the TASK-0027 reconciliation**: informational, blocking nothing.
 
@@ -1103,122 +1103,34 @@ required as a messenger.
 
 ## Open Blockers
 
-**One: BLK-0010, raised 2026-08-22 — the A-SURVEY corpus sits where the unattended runner may not
-read.** BLK-0001 through BLK-0009 are all RESOLVED.
+**None.** BLK-0001 through **BLK-0010** are all RESOLVED.
 
-**It is the only thing gating TASK-0027, and it will not clear by retrying.** MSG-0080 requires the
-corpus **outside** the repository; the runner's session boundary **is** the repository. The refusal was
-verified explicitly rather than inferred:
+**BLK-0010 was raised and resolved on 2026-08-22.** A supervisor-started TASK-0027 runner was denied
+its read of the corpus — *"Claude Code may only list files in the allowed working directories for this
+session: 'D:\Work\pci-platform'"* — and stopped at its first action, producing **no survey figure of
+any kind**. That was the seam between two individually-correct controls: MSG-0080 requires the corpus
+**outside** the repository, and the runner's session boundary **is** the repository.
 
-```text
-$ ls -l /d/Work/pci-corpus/
-ls in '/d/Work/pci-corpus/' was blocked. For security, Claude Code may only list files in the
-allowed working directories for this session: 'D:\Work\pci-platform'.
+**MSG-0083 chose option A** and authorized the narrowest read-only grant. It is applied to
+`runner-settings.json` — version-controlled, so the change is reviewable rather than buried in a
+command line:
+
+```json
+"additionalDirectories": [ "D:\Work\pci-corpus" ]
+"deny": [ "Edit(//D:/Work/pci-corpus/**)", ... ]
 ```
 
-**The corpus is UNKNOWN to that session** and **no survey figure of any kind was produced** — no
-estimate, no illustration, no substitute method. **No permission was changed, nothing was copied into
-the repository, and no property was inferred from the filename or size.** The remedy is one decision —
-**MSG-0082 option A, B, or C** — and it is the Architecture Lead's and the operator's.
+**Read-only by construction**, and **verified empirically before being relied on**: a headless session
+with exactly those settings read **641,807 bytes, `%PDF-1.7`**, and cannot write.
 
-**Two diagnostic notes worth keeping.** First, the *initial* refusal was ambiguous: it complained about
-"multiple operations" in a compound command and named no path, which is equally consistent with the
-corpus being readable. Re-issuing the same read as a single plain command is what produced the
-quotable, path-based refusal above. `CLAUDE.md` rule 5 is why that mattered — *"a wrong diagnosis sends
-the operator to fix something that was never broken"*, and here it would have sent them to widen a
-permission on evidence that did not establish the need. Second, **no other tool was tried** once the
-boundary was named; reaching for one to obtain what Bash refused would have been a substitute for a
-privilege not granted.
+**Three deny rules were wrong and were removed rather than left in.** `Write(...)`, `MultiEdit(...)`
+and `NotebookEdit(...)` on that path were rejected by the permission layer — only `Edit(path)` rules
+are matched by file-permission checks, and `Edit` covers every file-editing tool. Leaving them would
+have produced a warning on every runner start **and a settings file that read as stricter than it
+was**, which is worse than useless in a security control.
 
-> **The line this replaces, retained:** "**None.** BLK-0001 through **BLK-0009** are all RESOLVED."
-> True from the BLK-0009 closure until the next Supervisor cycle raised BLK-0010 the same day.
-
-**BLK-0010 also records a mid-run repository movement that did *not* trigger an abort**, with the
-reconciliation written out rather than assumed: `HEAD` moved `f67bc7c` → `66314e1` at ~09:51Z, which
-was the *expected* commit the run was blocked on. `HEAD` and `origin/main` agreed, the tree was clean,
-and **no evidence produced by that session was invalidated, because it had performed no task action
-against the old state.** The BLK-0006 signature without the BLK-0006 hazard; precedent MSG-0075 §6.2.
-
-**BLK-0009 was raised and resolved on 2026-08-22, both within the same day.** A supervisor-started TASK-0027 runner detected that a concurrent session was writing the working tree and that **TASK-0027 was READY only in an uncommitted file** — `git show HEAD:…CLAUDE-TASKS.md | grep -c TASK-0027` returned **0**. It refused to execute, refused to run `git add -A` (which would have swept another session's mid-edit files into history under its authorship), created only its own record, and stopped. **The concurrent writer was this interactive COMMS session**, which stopped writing on seeing the lock and has now committed. **The root cause is a process one:** the Supervisor reads the *working-tree* copy of the queue, not the committed one, so an interactive session editing the queue while the Supervisor is enabled can trigger a runner against half-written state. The mitigation needs no code change — commit locally first, since the Supervisor refuses to act when local is **ahead** of the remote.
-
-**BLK-0008 was resolved on 2026-08-22 without solving either transport problem.** It recorded two
-independent obstacles — the designated NFS export unreachable (2049 and portmapper 111 both closed)
-and **Client for NFS not installed** on this workstation. The operator supplied the file directly on
-local disk instead, which was the cheapest of the three options offered:
-
-```text
-D:\Work\pci-corpus\plan.pdf        626.8 KB      header %PDF-1.7      readable
-```
-
-**Nothing was mounted and no Windows feature was installed.** The privileged change BLK-0008 declined
-to make was never needed.
-
-**One near-miss is recorded because it would otherwise recur.** The file first arrived at
-`D:\Work\pci-platform\plan.pdf` — **inside the Git working tree**, untracked and not covered by
-`.gitignore`. Every COMMS cycle and every unattended runner executes `git add -A`, so the next commit
-would have written 627 KB of corpus into permanent history, removable only by rewriting published
-history. It was moved out before anything staged it and `git status` verified clean; **nothing was ever
-committed.** MSG-0080 has since made the external location a standing constraint.
-
-**The diagnosis is retained in the record** — SMB was tested first because the UNC form fits either
-protocol, then corrected to NFS — because the correction is worth more to a future reader than a tidy
-record would be.
-
-> **The line this replaces, retained:** "**One: BLK-0008, raised 2026-08-22** — the corpus the operator
-> designated for A-SURVEY … **is not reachable from this machine.**" True until the file was supplied
-> locally the same day.
-
-
-> **The line this replaces, retained:** "**None.** BLK-0001 through **BLK-0007** are all RESOLVED."
-> True until BLK-0008 was raised on 2026-08-22.
-
-**BLK-0007 was raised and resolved within the same session on 2026-08-21.** GitHub SSH transport
-was closed by the remote at banner exchange (`kex_exchange_identification`), before authentication
-began, on both port 22 and 443, while HTTPS to github.com returned 200. **No workaround was
-applied** — in particular the remote was **not** switched to HTTPS, which would have hidden the
-symptom behind a permanent unauthorized change to how the repository authenticates. It recovered
-on its own in about ten minutes; the pending commit pushed (`42426df`) and the dry run it had
-blocked completed, verifying that the Supervisor selects TASK-0023.
-
-**The cause was never established, and recovery is not evidence of one.** What is worth keeping is
-the signature: HTTPS healthy while SSH dies at banner exchange on both ports means transport and
-upstream, **not** a key, agent, passphrase, or git configuration — the distinction that kept
-BLK-0002's misdiagnosis from repeating.
-
-> **The line this replaces, retained:** "**One: BLK-0007, raised 2026-08-21** — GitHub SSH
-> transport is closed … Work is complete and committed locally; it cannot reach `origin/main`."
-> True for about ten minutes.
-
-> **The line that one replaced, retained:** "**None.** BLK-0001 through **BLK-0006** are all
-> RESOLVED." True until BLK-0007 was raised the same day.
-
-**BLK-0006 was resolved on 2026-08-21 by the interactive session**, the same day TASK-0021 raised it.
-The unknown that forced the stop is now a fact: the concurrent actor was the architecture lead
-pushing `182698c` — **MSG-0056**, the EPA decision ruling — directly between TASK-0021's two pushes.
-The blocker record inferred exactly that and labelled it as inference; the inference was right.
-
-Reconciled by option 1, the cheapest of the three the record offered: `git fetch origin` then
-`git rebase origin/main`. The file overlap was checked first and was **empty** — `182698c` touches
-only `implementation/comms/MSG-0056-*.md`, which neither stranded commit touches — so no conflict was
-possible and none occurred. **No force-push. No published history rewritten**: both rebased commits
-were unpushed, and `b96187b` carrying the TASK-0021 deliverable remains an untouched ancestor of HEAD.
-
-The stranded work turned out to be two commits rather than the one the record could see at the time:
-DISC-0010 with its index rows, and BLK-0006 itself. Both are now on `origin/main`.
-
-> **Why the unattended session stopped and this one did not.** The runner could not read the remote
-> at all — `git fetch` is off-allowlist and `git ls-remote` was refused — so reconciliation would
-> have meant acting against a base it could not name. Stopping was correct, and its "Note for a
-> resuming session" is why resumption cost minutes. The interactive session can read the remote, so
-> the base is observed rather than assumed. The boundary did not move; the available evidence did.
-
-> **The former text of this section, retained:** "**One: BLK-0006, raised 2026-08-21 by TASK-0021** …
-> A human must inspect the remote and choose among the three options … None was taken." That was
-> accurate while the remote was unknown. Superseded by the resolution above, not deleted.
-
-> **The former text of this section, retained:** "**None.** BLK-0001 through BLK-0005 are all
-> RESOLVED." That remains true of those five and is preserved below; it stopped being the whole
-> picture when BLK-0006 was raised.
+**Nothing was broadened.** One external directory, read-only; MSG-0028's four `allow` entries
+untouched; no repository access and no other external path.
 
 **BLK-0001 through BLK-0005 are all RESOLVED.** BLK-0005 was closed by MSG-0022 / MSG-0023,
 which ruled that the COMPLETE decision stands and that TASK-0012 is not authorized.
@@ -1381,67 +1293,15 @@ both tables index it, and both were updated in the same commit as the record.
 
 ## Next Action
 
-**The next action is a decision, and it is the Architecture Lead's and the operator's: MSG-0082 option
-A, B, or C. TASK-0027 cannot finish without one, and another Supervisor cycle will not help.**
+**TASK-0027 is READY and is the single READY task. The Supervisor will start it on its next cycle — no
+manual trigger is needed, and nothing now blocks it.**
 
-**TASK-0027 was attempted on 2026-08-22 and stopped at its first action — BLK-0010, OPEN.** It is
-still READY and still authorized by MSG-0080; **it needs no re-authorization.** What it needs is a
-readable corpus.
+**MSG-0083 chose option A and it is applied and verified.** The runner has a narrow, read-only grant to
+`D:\Work\pci-corpus\` and nothing else; a headless session with those exact settings read **641,807
+bytes, `%PDF-1.7`** and cannot write. **BLK-0010 is RESOLVED**, and TASK-0027 needs no
+re-authorization — MSG-0080 still authorizes it.
 
-**MSG-0082's collision is no longer a prediction. It was tested and it held:**
-
-```text
-$ ls -l /d/Work/pci-corpus/
-ls in '/d/Work/pci-corpus/' was blocked. For security, Claude Code may only list files in the
-allowed working directories for this session: 'D:\Work\pci-platform'.
-```
-
-MSG-0080 requires the corpus **outside** the repository; the unattended runner's session boundary **is**
-the repository. **The corpus is therefore UNKNOWN to that session** — not read, not opened, not copied,
-not inferred from — and **no survey figure of any kind was produced**, not as an estimate and not as an
-illustration. The `626.8 KB / %PDF-1.7` line below was recorded by an *interactive* session and was
-**not** corroborated by the runner.
-
-**The distinction that matters for scheduling:** BLK-0009's condition was transient and cleared on its
-own when the interactive session committed. **This one is not.** Nothing about the runner's permission
-set changes by itself, so every unattended retry produces an identical blocker at one cycle apiece.
-
-**The options are MSG-0082's, and none is Claude's to choose:** **A** — grant a narrow read permission
-for `D:\Work\pci-corpus\` in `runner-settings.json`, scoped to that path and no wider; **B** — run
-TASK-0027 **interactively**, where reads outside the working directory are available with approval;
-**C** — the operator supplies a read-only extraction, which changes what A-SURVEY is surveying and so
-is the Lead's call. **Not options:** copying the PDF into the repository, editing the permission set
-without authorization, or reporting properties never observed.
-
-**Undecided remains safe** — the run stops and records honestly. Whether to leave TASK-0027 `READY` or
-hold it pending the decision is the Lead's call; **this session changed no task status.**
-
-> **The paragraph this replaces, retained:** "**TASK-0027 is READY and is the single READY task. The
-> Supervisor will start it on its next cycle — no manual trigger is needed.** … **Undecided is safe:**
-> the run stops, records, and costs one cycle." Accurate when written, and the next cycle proved its
-> final sentence exactly right.
-
-
-**MSG-0080 authorized the bounded A-SURVEY follow-up** against the corpus the operator supplied, and
-reconciliation allocated it the id **TASK-0027** (MSG-0080 assigns none; the id was verified unused).
-**BLK-0008 is RESOLVED** — the corpus arrived on local disk, so neither the unreachable NFS export nor
-the uninstalled Client for NFS matters any more.
-
-```text
-D:\Work\pci-corpus\plan.pdf        626.8 KB      header %PDF-1.7      readable, outside the repo
-```
-
-### The one rule that must not break
-
-**The PDF must never enter the repository.** MSG-0080 makes that a standing constraint: it must not be
-copied, staged, committed, or otherwise added to history. **Read it in place.**
-
-This is not hypothetical. The file first landed at `D:\Work\pci-platform\plan.pdf` — inside the working
-tree, untracked, **not** covered by `.gitignore`. Every COMMS cycle and every runner executes
-`git add -A`, so the next commit would have put 627 KB of corpus into permanent history, removable only
-by rewriting published history. It was moved out before anything staged it.
-
-### What TASK-0027 may and may not conclude
+### What TASK-0027 must and must not conclude
 
 **n=1 is the discipline, not a caveat.** Permitted: whether **this** document is text-native or
 scanned, its language, its format characteristics, and any classification, audience, version or
@@ -1454,25 +1314,18 @@ distribution, version and supersession prevalence **across a corpus**. For each,
 Four of A-SURVEY's five original questions describe a population, and one file is not a population. A
 record that reads like a corpus survey would feed **D6** normalization, **D14**'s rejection of scanned
 documents, and **ADR-0019** — accepted specifically on condition its rules come from *empirical corpus
-evidence*. A confident distribution drawn from one document would corrupt accepted architecture and be
-checkable against nothing.
+evidence*.
+
+**The corpus must not enter the repository**, and the grant cannot be used to put it there: writes to
+that path are denied, and MSG-0080 makes its externality a standing constraint.
 
 ### What the Architecture Lead still holds
 
-Three items. **The first now blocks TASK-0027; the other two do not.**
+Two items, neither blocking TASK-0027:
 
-1. **MSG-0082 — option A, B, or C for the corpus read.** Raised as a possibility, **now confirmed by a
-   real runner refusal** (BLK-0010). Until it is answered, A-SURVEY cannot be performed by any
-   unattended session. This is the only one with a task waiting on it.
-2. **Accept, amend, or reject `EPA-0005`** (the A-STACK evaluation, PROPOSED), including its §9
+1. **Accept, amend, or reject `EPA-0005`** (the A-STACK evaluation, PROPOSED), including its §9
    recommendation that **no stack ADR be created yet**.
-3. **The one-runtime-or-two trade** in EPA-0005, when the timing is right.
-
-> **The line this replaces, retained:** "Two items, neither blocking TASK-0027: (1) accept, amend, or
-> reject `EPA-0005` … (2) the one-runtime-or-two trade." True until BLK-0010 turned MSG-0082 from a
-> possibility into a confirmed blocker on 2026-08-22.
-
-**The corpus action is discharged.**
+2. **The one-runtime-or-two trade** in EPA-0005, when the timing is right.
 
 ### Still unauthorized
 
@@ -1480,6 +1333,113 @@ Implementation remains prohibited. **T-A, T-B, T-D, T-E and T-0 are not authoriz
 not mark them READY. **T-0 remains an operator prerequisite** — an identity provider needing a
 privileged deployment that no decision can substitute for.
 
+---
+
+**Historical — the position while BLK-0010 was open, retained.** The text below asked the
+Architecture Lead and operator to choose MSG-0082 option A, B or C, and recorded that another
+Supervisor cycle would not help. **Option A was chosen (MSG-0083), applied, and verified.**
+
+> ## Next Action
+> 
+> **The next action is a decision, and it is the Architecture Lead's and the operator's: MSG-0082 option
+> A, B, or C. TASK-0027 cannot finish without one, and another Supervisor cycle will not help.**
+> 
+> **TASK-0027 was attempted on 2026-08-22 and stopped at its first action — BLK-0010, OPEN.** It is
+> still READY and still authorized by MSG-0080; **it needs no re-authorization.** What it needs is a
+> readable corpus.
+> 
+> **MSG-0082's collision is no longer a prediction. It was tested and it held:**
+> 
+> ```text
+> $ ls -l /d/Work/pci-corpus/
+> ls in '/d/Work/pci-corpus/' was blocked. For security, Claude Code may only list files in the
+> allowed working directories for this session: 'D:\Work\pci-platform'.
+> ```
+> 
+> MSG-0080 requires the corpus **outside** the repository; the unattended runner's session boundary **is**
+> the repository. **The corpus is therefore UNKNOWN to that session** — not read, not opened, not copied,
+> not inferred from — and **no survey figure of any kind was produced**, not as an estimate and not as an
+> illustration. The `626.8 KB / %PDF-1.7` line below was recorded by an *interactive* session and was
+> **not** corroborated by the runner.
+> 
+> **The distinction that matters for scheduling:** BLK-0009's condition was transient and cleared on its
+> own when the interactive session committed. **This one is not.** Nothing about the runner's permission
+> set changes by itself, so every unattended retry produces an identical blocker at one cycle apiece.
+> 
+> **The options are MSG-0082's, and none is Claude's to choose:** **A** — grant a narrow read permission
+> for `D:\Work\pci-corpus\` in `runner-settings.json`, scoped to that path and no wider; **B** — run
+> TASK-0027 **interactively**, where reads outside the working directory are available with approval;
+> **C** — the operator supplies a read-only extraction, which changes what A-SURVEY is surveying and so
+> is the Lead's call. **Not options:** copying the PDF into the repository, editing the permission set
+> without authorization, or reporting properties never observed.
+> 
+> **Undecided remains safe** — the run stops and records honestly. Whether to leave TASK-0027 `READY` or
+> hold it pending the decision is the Lead's call; **this session changed no task status.**
+> 
+> > **The paragraph this replaces, retained:** "**TASK-0027 is READY and is the single READY task. The
+> > Supervisor will start it on its next cycle — no manual trigger is needed.** … **Undecided is safe:**
+> > the run stops, records, and costs one cycle." Accurate when written, and the next cycle proved its
+> > final sentence exactly right.
+> 
+> 
+> **MSG-0080 authorized the bounded A-SURVEY follow-up** against the corpus the operator supplied, and
+> reconciliation allocated it the id **TASK-0027** (MSG-0080 assigns none; the id was verified unused).
+> **BLK-0008 is RESOLVED** — the corpus arrived on local disk, so neither the unreachable NFS export nor
+> the uninstalled Client for NFS matters any more.
+> 
+> ```text
+> D:\Work\pci-corpus\plan.pdf        626.8 KB      header %PDF-1.7      readable, outside the repo
+> ```
+> 
+> ### The one rule that must not break
+> 
+> **The PDF must never enter the repository.** MSG-0080 makes that a standing constraint: it must not be
+> copied, staged, committed, or otherwise added to history. **Read it in place.**
+> 
+> This is not hypothetical. The file first landed at `D:\Work\pci-platform\plan.pdf` — inside the working
+> tree, untracked, **not** covered by `.gitignore`. Every COMMS cycle and every runner executes
+> `git add -A`, so the next commit would have put 627 KB of corpus into permanent history, removable only
+> by rewriting published history. It was moved out before anything staged it.
+> 
+> ### What TASK-0027 may and may not conclude
+> 
+> **n=1 is the discipline, not a caveat.** Permitted: whether **this** document is text-native or
+> scanned, its language, its format characteristics, and any classification, audience, version or
+> supersession markers **present in it**.
+> 
+> Forbidden: format mix, language prevalence, scanned-document prevalence, classification and audience
+> distribution, version and supersession prevalence **across a corpus**. For each, the record must state
+> **n=1 is insufficient** and invent no estimate.
+> 
+> Four of A-SURVEY's five original questions describe a population, and one file is not a population. A
+> record that reads like a corpus survey would feed **D6** normalization, **D14**'s rejection of scanned
+> documents, and **ADR-0019** — accepted specifically on condition its rules come from *empirical corpus
+> evidence*. A confident distribution drawn from one document would corrupt accepted architecture and be
+> checkable against nothing.
+> 
+> ### What the Architecture Lead still holds
+> 
+> Three items. **The first now blocks TASK-0027; the other two do not.**
+> 
+> 1. **MSG-0082 — option A, B, or C for the corpus read.** Raised as a possibility, **now confirmed by a
+>    real runner refusal** (BLK-0010). Until it is answered, A-SURVEY cannot be performed by any
+>    unattended session. This is the only one with a task waiting on it.
+> 2. **Accept, amend, or reject `EPA-0005`** (the A-STACK evaluation, PROPOSED), including its §9
+>    recommendation that **no stack ADR be created yet**.
+> 3. **The one-runtime-or-two trade** in EPA-0005, when the timing is right.
+> 
+> > **The line this replaces, retained:** "Two items, neither blocking TASK-0027: (1) accept, amend, or
+> > reject `EPA-0005` … (2) the one-runtime-or-two trade." True until BLK-0010 turned MSG-0082 from a
+> > possibility into a confirmed blocker on 2026-08-22.
+> 
+> **The corpus action is discharged.**
+> 
+> ### Still unauthorized
+> 
+> Implementation remains prohibited. **T-A, T-B, T-D, T-E and T-0 are not authorized**, and TASK-0027 may
+> not mark them READY. **T-0 remains an operator prerequisite** — an identity provider needing a
+> privileged deployment that no decision can substitute for.
+> 
 ---
 
 **Historical — the position while the corpus was unreachable, retained.** The text below asked

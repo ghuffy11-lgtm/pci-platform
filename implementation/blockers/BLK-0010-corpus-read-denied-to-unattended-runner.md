@@ -1,6 +1,6 @@
 # BLK-0010 — The Corpus Read Is Denied to the Unattended Runner; TASK-0027 Stopped at Its First Action
 
-**Status:** **OPEN** — needs one decision (MSG-0082 option A, B, or C). **Not clearable by retrying.**
+**Status:** **RESOLVED** 2026-08-22 — MSG-0083 authorized option A; the narrow read-only grant is applied to `runner-settings.json` and **verified empirically** (headless session read 641,807 bytes, `%PDF-1.7`; writes denied). Three ineffective deny rules were caught by the permission layer and removed rather than left giving false assurance
 **Raised:** 2026-08-22, by the supervisor-started TASK-0027 session (`runner.lock` pid **24140**, acquired **2026-08-22T09:47:18Z**, host `LENOVO-LA0X1754`)
 **Severity:** Hard boundary. Nothing was executed, nothing was lost, **no survey figure of any kind exists**
 **Related:** MSG-0080 (the A-SURVEY authorization), **MSG-0082** (the decision request this confirms), BLK-0009 (the previous cycle's stop, pid 21164), BLK-0008, MSG-0028 (the runner permission set), TASK-0026, TASK-0027
@@ -238,3 +238,56 @@ decision is the Lead's call.
   and **the PDF never enters the repository**.
 - **If a `plan.pdf` is ever found inside the repository, that is a defect**: move it out and record it.
   Do not commit it, and do not delete the corpus.
+
+---
+
+## RESOLVED — 2026-08-22 by MSG-0083 option A
+
+**The Architecture Lead granted the narrowest read-only access**, and it was applied to
+`runner-settings.json` — the version-controlled permission file, so the change is reviewable rather
+than buried in a command line:
+
+```json
+"additionalDirectories": [ "D:\Work\pci-corpus" ]
+"deny": [ "Edit(//D:/Work/pci-corpus/**)", ... ]
+```
+
+**Read-only by construction.** The directory is granted for access, and a single `Edit()` deny covers
+every file-editing tool, so the grant cannot become a write path.
+
+### Verified empirically, before relying on it
+
+A headless session using exactly these settings was asked whether it could read the file:
+
+```text
+VERIFIED read: D:\Work\pci-corpus\plan.pdf readable - 641,807 bytes, magic %PDF-1.7
+Write: cannot - denied by Edit(//D:/Work/pci-corpus/**)
+```
+
+**This is the criterion MSG-0083 §2 asks for** — "the runner can read the authorized PDF without any
+broader permission grant" — and it is now observed rather than assumed. The alternative was to let the
+next supervisor cycle discover it, which would have cost a cycle and produced another blocker if the
+syntax were wrong. It nearly was: see below.
+
+### Three deny rules were wrong and were removed rather than left in
+
+The first attempt also denied `Write(...)`, `MultiEdit(...)` and `NotebookEdit(...)` on that path. The
+permission layer rejected them explicitly:
+
+```text
+Permission deny rule "MultiEdit(//D:/Work/pci-corpus/**)" matches no known tool - check for typos.
+Permission deny rule: Write(...) is not matched by file permission checks - only Edit(path) rules are.
+Use Edit(//D:/Work/pci-corpus/**) instead (Edit rules cover all file-editing tools).
+```
+
+They were removed. **Leaving them would have been worse than useless**: a warning on every runner start,
+and a settings file that appeared to deny writes through three tools it was not actually matching.
+A security control that reads as stricter than it is, is a liability.
+
+### Scope held
+
+**Nothing was broadened.** One external directory, read-only. The four `allow` entries from MSG-0028
+are untouched. No repository access, no write, no other external path — exactly the boundary MSG-0083
+drew.
+
+**TASK-0027 is READY again** and needs no re-authorization; MSG-0080 still authorizes it.

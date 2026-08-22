@@ -16,11 +16,15 @@ by an open blocker must never be reported as met.
 | [BLK-0007](BLK-0007-github-ssh-transport-closed.md) | GitHub SSH transport closed at banner exchange; push unavailable | Medium | **RESOLVED** 2026-08-21 — recovered on its own in ~10 min; push landed `42426df` and the blocked dry run completed. **No workaround was applied**; cause never established beyond "transport, upstream, transient" |
 | [BLK-0008](BLK-0008-designated-corpus-unreachable.md) | Designated A-SURVEY corpus (NFS export `\\10.1.27.220\LXBackup\plan.pdf`) is not reachable | Medium | **RESOLVED** 2026-08-22 — neither transport problem had to be solved: the corpus was supplied directly at `D:\Work\pci-corpus\plan.pdf` and is readable. Nothing mounted, no Windows feature installed, no privileged change. Retained for the diagnosis (SMB tested first, **corrected to NFS** — 2049/111 closed *and* Client for NFS not installed) and for the near-miss where the file first landed **inside the repository**, untracked, one `git add -A` from permanent history |
 | [BLK-0009](BLK-0009-concurrent-session-writing-working-tree.md) | Concurrent session writing the working tree; TASK-0027 READY only in an uncommitted file | Low impact, hard boundary | **RESOLVED** 2026-08-22 — the concurrent writer was the interactive COMMS session; it committed its reconciliation in `66314e1`, after which `git status` was clean and TASK-0027 was READY in the **committed** queue. The runner's refusal to run `git add -A` or to execute on an uncommitted READY marking was correct |
-| [BLK-0010](BLK-0010-corpus-read-denied-to-unattended-runner.md) | The A-SURVEY corpus sits outside the repository; the unattended runner may not read outside it | Medium | **OPEN** 2026-08-22 — **not clearable by retrying.** MSG-0080 requires the corpus to stay outside the repo; the runner's session boundary *is* the repo. Denial verified explicitly: *"Claude Code may only list files in the allowed working directories for this session: 'D:\Work\pci-platform'"*. **No survey figure was produced and the corpus is UNKNOWN to that session.** Needs one decision — MSG-0082 option **A** (narrow read permission), **B** (run TASK-0027 interactively), or **C** (operator-supplied extraction) |
+| [BLK-0010](BLK-0010-corpus-read-denied-to-unattended-runner.md) | The A-SURVEY corpus sits outside the repository; the unattended runner may not read outside it | Medium | **RESOLVED** 2026-08-22 — **MSG-0083 chose option A**: a narrow read-only grant for `D:\Work\pci-corpus\` applied to `runner-settings.json` (`additionalDirectories` plus an `Edit()` deny, read-only by construction). **Verified empirically** — a headless session with those settings read 641,807 bytes, `%PDF-1.7`, and cannot write. Three ineffective deny rules (`Write`/`MultiEdit`/`NotebookEdit`) were rejected by the permission layer and **removed rather than left giving false assurance** |
 
-**One blocker is open: BLK-0010.** It gates **TASK-0027 (A-SURVEY)** and nothing else. TASK-0027 needs
-**no re-authorization** — MSG-0080 still authorizes it — but it will stop identically on every
-unattended retry until MSG-0082's option A, B, or C is chosen.
+**No blocker is open.** BLK-0010 was the last, and MSG-0083 cleared it the same day by authorizing the
+narrow corpus read. **TASK-0027 (A-SURVEY) is READY** and needs no re-authorization — MSG-0080 still
+authorizes it, and the runner can now reach the corpus.
+
+> **The line this replaces, retained:** "**One blocker is open: BLK-0010.** It gates **TASK-0027
+> (A-SURVEY)** and nothing else … it will stop identically on every unattended retry until MSG-0082's
+> option A, B, or C is chosen." Option **A** was chosen and applied.
 
 > **The line this replaces, retained:** "**No blocker is open.**" True from the BLK-0008 closure on
 > 2026-08-22 until BLK-0010 was raised later the same day.

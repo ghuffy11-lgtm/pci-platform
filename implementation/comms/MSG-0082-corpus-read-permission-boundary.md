@@ -1,6 +1,6 @@
 # MSG-0082 — The Corpus Sits Where the Unattended Runner May Not Read
 
-**Status:** **OPEN** — one decision required before TASK-0027 can complete unattended
+**Status:** **CLOSED** 2026-08-22 — answered by **MSG-0083**, which chose **option A**: a narrow read-only grant for `D:Workpci-corpus` only. Applied to `runner-settings.json` and verified empirically; BLK-0010 is RESOLVED and TASK-0027 is READY again.
 **Raised:** 2026-08-22
 **Raised by:** Claude Code (interactive session, COMMS)
 **Type:** Structural finding + decision request
