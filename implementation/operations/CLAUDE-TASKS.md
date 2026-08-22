@@ -40,6 +40,7 @@ Only the architecture lead may authorize new work, mark a task READY, or change 
 | TASK-0028 | **A-SURVEY Arabic follow-up (n=1) — inspect `Arabic.pdf`** | **COMPLETE** | TASK-0027 COMPLETE, MSG-0085 AUTHORIZED, MSG-0083 read grant | 2026-08-22 — 9/9 criteria, MSG-0087; **document is OCR-derived (ABBYY FineReader) — the class D14 rejects** | none — two items referred to the Lead, neither blocking | Claude Code |
 | TASK-0029 | **A-SURVEY Arabic text-native follow-up (n=1)** | **COMPLETE** | TASK-0028 COMPLETE, MSG-0088 AUTHORIZED, MSG-0083 read grant | 2026-08-22 — 11/11 instructions, MSG-0089; **text-native and D14-ADMISSIBLE**; **Arabic stored in visual order — naive extraction reverses it** | none — two items referred, neither blocking | Claude Code |
 | TASK-0030 | **Draft the minimum ADR-0020 clarification — pre-constrained retrieval as an engine-selection gate** | **COMPLETE** | EPA-0005 ACCEPTED (MSG-0092), ADR-0020 accepted | 2026-08-22 — **7/7 acceptance criteria MET**; `ADR-0020-AMD-01` drafted **PROPOSED** and **NOT applied**, `git diff --name-only docs/` **empty**; **MSG-0094** | none — **no task is READY**. The Lead reviews AMD-01 before anything is applied; applying it needs an explicit authorization (MSG-0092 §5) | Claude Code |
+| TASK-0031 | **Apply ADR-0020 AMD-01 in place** — accepted by MSG-0095 | **READY** | AMD-01 ACCEPTED (MSG-0095), TASK-0030 COMPLETE | — | none — **apply only**; wording taken verbatim from AMD-01; no engine selected; ADR-0017…0022 otherwise untouched | Claude Code |
 | TASK-0002 | Make test entry points shell-independent | **ABORTED** | — | 2026-08-19 | none — premise disproven by measurement | — |
 
 **TASK-0019 is COMPLETE (2026-08-21).** It was authorized by MSG-0050, reconciled into this queue in `39eabdb`, and executed by a supervisor-started session on its scheduled 06:37:13Z cycle. It was maintenance/audit work only, not a new product work package.
@@ -632,6 +633,8 @@ READY means *authorized to attempt*, never *authorized to force*. A READY task w
 | MSG-0092 | Decision | DECIDED | Architecture lead | Claude Code | **EPA-0005 ACCEPTED** as the architecture evaluation record and the ruling record for the runtime seam. **§9.1's three constraints are settled**: authorization enforced **inside** the retrieval operation (no retrieve-then-filter or over-fetch-then-filter); capacity for **three** local model workloads (generation, multilingual embedding, entailment); conversation and audit storage **separate**, Restricted passages barred from ordinary logs/telemetry. **Approach C chosen** — two services along the C2/C6 seam, governed application layer for the authorization-critical path plus a document/inference worker behind an explicit contract; **the worker is not an authorization authority**, authorization stays in the governed layer before retrieval, SPEC-0008 preserved. **A stack-shape decision, not a runtime selection.** **No generic stack ADR** — declined explicitly. **Nine selection categories stay open**; ADR-0019's Arabic deferral unchanged and n=1 does not become production corpus evidence. Authorizes one bounded task to draft a minimum ADR-0020 clarification, **draft only** | 2026-08-22 |
 | MSG-0093 | Record | **OPEN** | Claude Code | Architecture lead | **MSG-0092 applied; TASK-0030 reconciled as the single READY task.** EPA-0005's header now records its acceptance, Approach C, and the three settled constraints — **not promoted to `docs/`**, because MSG-0092 accepted it without authorizing promotion and promotion is the Lead's act. TASK-0030 drafts the minimum ADR-0020 clarification making the existing §3/§4 pre-constrained requirement explicit as an **engine-selection gate**, and **stops before applying it** — ADR-0020 is accepted and promoted, so editing it is the Lead's act. Records that "no amendment is needed" is a legitimate outcome. **No engine selected, no ADR touched, no implementation task READY** | 2026-08-22 |
 | MSG-0094 | Record + decision request | **OPEN** | Claude Code | Architecture lead | **TASK-0030 execution record — the ADR-0020 clarification is drafted and NOT applied.** **7/7 acceptance criteria MET**; documentary, so **no test count and none claimed**. Delivers **`ADR-0020-AMD-01`** in `implementation/decisions/` as **PROPOSED**; **`git diff --name-only docs/` empty** — the accepted, promoted ADR-0020 is **unmodified**, per MSG-0092 §5. **The "no amendment needed" outcome was tested against the accepted text and rejected on evidence**: §3.1/§4 state the *rule* unambiguously and are silent on two *consequences* — that it **disqualifies a retrieval engine** unable to constrain inside the query, and **what G3 inspects**, since a conforming and a retrieve-then-filter design return **byte-identical responses**. The amendment is **one 148-word insertion at the end of §4** plus an optional traceability row; **twelve candidate changes were considered and deliberately not made**, including §3's four points, §7 and *Deliberately not decided here* — because **a criterion is not a selection**. **Selects nothing**; all nine MSG-0092 §4 categories stay open; ADR-0017/0018/0019/0021/0022 untouched. **One convention question referred**: no precedent exists for amending an accepted ADR, so **no header change was drafted** rather than invent one. **`git fetch` remains off the allowlist** — recorded, not routed around | 2026-08-22 |
+| MSG-0095 | Decision | DECIDED | Architecture lead | Claude Code | **ADR-0020 AMD-01 ACCEPTED as drafted, with the optional traceability row included.** The amendment is the minimum clarification making an already-settled confidentiality rule **operationally testable during engine selection**; it changes no substantive policy. Closes two interpretation gaps: that an engine unable to apply authorization constraints **inside** the retrieval operation is **disqualified**, and that **G3 must inspect the query issued to the engine**, not only the returned response. "Over-fetch-then-filter" is consistent with MSG-0092 §1(1), already settled. **Apply in place** with a concise header note naming AMD-01 and MSG-0095 — settling AMD-01 §8 as option **(a)**; **no superseding ADR**. **Selects no engine, index technology, model, framework, runtime or provider**, and authorizes no implementation beyond applying the amendment | 2026-08-22 |
+| MSG-0096 | Record | **OPEN** | Claude Code | Architecture lead | **TASK-0031 reconciled as the single READY task** to apply AMD-01 in place, per MSG-0095 §5. Three edits and nothing else: hunk 1 at the end of ADR-0020 §4, hunk 2 as one Traceability row, and a concise header note naming AMD-01 and MSG-0095. **Wording is taken verbatim from AMD-01** rather than retyped, since transcription drift in an accepted ADR is the failure this must not introduce. The task edits an **accepted, promoted** ADR — authorized here and only here — and its recovery procedure warns that re-running against an already-amended file would insert the clause twice | 2026-08-23 |
 | MSG-0074 | Record | **CLOSED** | Claude Code | Architecture lead | **TASK-0025 queue reconciliation.** Reconciled as the single READY task after verifying prerequisites individually. **No separate TASK-0025 specification file exists** — MSG-0073 plus the queue section are the specification, and the section records the promotion convention verified from the ADR-0015 precedent and the lead's own ADR-0017 promotion. **The gap did not recur this time** in one respect: the authorization arrived with no colliding sibling file. **The queue gap itself did recur** — the **eighth** occurrence. **Discharged by execution 2026-08-21** — TASK-0025 ran against this reconciliation and is COMPLETE (MSG-0075); because the repair landed before the next cycle, the task was already the single READY task when the run started and the Supervisor never idled on it | 2026-08-21 |
 | MSG-0051 | Record | CREATED — audit complete | Claude Code | Architecture lead | **TASK-0019 baseline audit.** Six documentary corrections applied with their authorities quoted; four record classes verified already correct; **§C refers seven items for decision**, led by the accepted WP-0001 work package still reading `Status: Ready for implementation` — the stop condition fired and that correction was **not** made | TASK-0019 |
 
@@ -2184,3 +2187,112 @@ verified, never in anticipation of one.
 Re-read MSG-0092 §3 and §5 and check which records already exist before drafting. **If a proposed
 amendment already exists, do not write a second one** — governance drafts are easy to duplicate and
 hard to reconcile, and duplication is the failure this queue has hit repeatedly.
+
+---
+
+## TASK-0031 — apply ADR-0020 AMD-01 in place
+
+**Priority:** 1 | **Status:** **READY** | **Owner:** Claude Code
+**Depends on:** AMD-01 ACCEPTED (MSG-0095); TASK-0030 COMPLETE
+**Next eligible task:** none — no implementation is authorized by MSG-0095
+**Type:** governance application, **in place on an accepted ADR**
+
+**Specification:** [`MSG-0095-adr-0020-amd-01-architecture-lead-ruling.md`](../comms/MSG-0095-adr-0020-amd-01-architecture-lead-ruling.md)
+**plus** [`ADR-0020-AMD-01-*.md`](../decisions/ADR-0020-AMD-01-pre-constrained-retrieval-engine-criterion.md)
+**plus this section.** No separate `TASK-0031-*.md` file; **the id was allocated at reconciliation**,
+verified unused.
+
+> **This task edits an accepted, promoted ADR.** That is authorized here and only here: MSG-0095 §3
+> *"authorizes acceptance/application of AMD-01 only"*. Nothing else in `docs/decisions/` may change.
+
+### What MSG-0095 decided
+
+- **ACCEPT AMD-01 as drafted, with the optional traceability row included** — so **both hunks**, not
+  hunk 1 alone.
+- **Apply it in place** to the accepted ADR-0020, with a **concise amendment note in its header
+  identifying AMD-01 and MSG-0095**. This settles the open convention question in AMD-01 §8 as
+  **option (a)**.
+- **Do not create a superseding ADR.**
+
+### Required work — three edits, and nothing else
+
+**Take the wording verbatim from AMD-01. Do not retype or paraphrase it** — transcription drift in an
+accepted ADR is exactly the failure this task must not introduce.
+
+1. **Hunk 1** — insert the block quoted in **AMD-01 §4** at the **end of ADR-0020 §4**, immediately
+   after the sentence *"An exclusion cannot fail open; a filter can."* **Nothing existing is deleted or
+   reworded.**
+2. **Hunk 2** — append the single row quoted in **AMD-01 §5** to ADR-0020's **Traceability** table.
+3. **Header note** — add a concise amendment line identifying **AMD-01** and **MSG-0095**, in the form
+   AMD-01 §8(a) suggests, e.g. `**Amended:** 2026-08-23 — AMD-01 (MSG-0095)`. Keep it to one line;
+   MSG-0095 says *concise*.
+
+### Everything AMD-01 §6 listed as untouched stays untouched
+
+§1, §2, §3 and its four numbered points, §3's closing line, §4's existing text including the MSG-0062
+§7.6 block quote, §5, §6, §7, §8, Consequences, *Deliberately not decided here*, Context, Rationale, and
+the reuse-before-create test. **ADR-0017, ADR-0018, ADR-0019, ADR-0021 and ADR-0022 are not touched at
+all.**
+
+### Forbidden (MSG-0095 §4)
+
+- **No change to ADR-0019 or its Arabic production-evidence gate.**
+- **No change to the three settled MSG-0092 constraints.**
+- **No generic stack ADR.**
+- **No retrieval engine, index technology, embedding model, framework, runtime, or provider selection**
+  — MSG-0095 §3 is explicit that this ruling selects none.
+- **No implementation task authorization beyond applying this amendment**, and no implementation task
+  may be marked READY.
+
+### Acceptance criteria
+
+1. Hunk 1 appears at the end of ADR-0020 §4, **verbatim from AMD-01 §4**, with the preceding text
+   unchanged.
+2. Hunk 2 appears as one new Traceability row, **verbatim from AMD-01 §5**.
+3. A concise header amendment note identifies **AMD-01 and MSG-0095**.
+4. **No other change to `docs/decisions/`** — `git diff --name-only docs/decisions/` names
+   **ADR-0020 and nothing else**.
+5. **No technology or engine name appears anywhere in the applied text.**
+6. AMD-01's own record is updated to **APPLIED**, citing MSG-0095 and the applying commit.
+7. COMMS, queue and status reconciled; **the resulting commit hash and a clean tree are reported**
+   (MSG-0095 §5).
+
+### Verification — run and quote before reporting completion
+
+```text
+git diff --name-only docs/decisions/     -> ADR-0020-retrieval-projection-and-index-boundary.md only
+git diff -- docs/decisions/ | grep '^-'  -> no substantive deletions (header line change aside)
+git status --porcelain                   -> empty after commit
+```
+
+**Diff-read the applied ADR against AMD-01's quoted hunks** and confirm they match character for
+character. Documentary task: **no test count** — do not report one it cannot have.
+
+### Documentation
+
+Record the result in `implementation/comms/` as a numbered message, update
+`implementation/status/current.md`, this queue, AMD-01's status, and WP-0009 where it tracks the ADR
+set. Write the checkpoint.
+
+### Checkpoint
+
+`implementation/operations/checkpoints/TASK-0031.md`, written **after** each operation is verified.
+
+### Stop conditions
+
+- **The insertion point cannot be located exactly**, or §4's closing sentence differs from what AMD-01
+  quoted — stop and record rather than placing the text approximately.
+- Applying either hunk would require altering existing wording.
+- Any point where the edit would touch a second ADR.
+- **`origin/main` moving mid-run** — BLK-0006 is the precedent. Record the starting HEAD in checkpoint 1
+  and re-check before every push.
+
+> **Known runner limit.** `git fetch` is off the allowlist, so a mid-run move is detectable only when a
+> push is rejected. Record it and stop.
+
+### Recovery procedure
+
+**Check whether the amendment is already applied before applying it.** Re-running this task against an
+already-amended ADR would insert hunk 1 twice — a duplicated clause in an accepted ADR is far worse
+than a missing one, and `CLAUDE.md` recovery rule (f) applies with full force: never repeat an
+operation merely because a record says it was incomplete.
