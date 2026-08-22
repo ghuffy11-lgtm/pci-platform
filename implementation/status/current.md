@@ -2,7 +2,7 @@
 
 **Active Work Package:** WP-0001 — PCI Kernel Foundation
 **Status:** **COMPLETE** — declared by the architecture lead 2026-08-19 (MSG-0020(b), resolved by MSG-0022 / MSG-0023, TASK-0009)
-**Last Updated:** 2026-08-22 UTC — **A-SURVEY performed at n=1 twice.** TASK-0028 COMPLETE (9/9, MSG-0087): the Arabic document is **OCR-derived — ABBYY FineReader — the class D14 rejects**, mixed-script, with **no language declared at all**. `ADR-0019` untouched; implications recorded as evidence only. TASK-0027 (English, Word-produced, text-native) found three extraction hazards, **none of which reproduce here**. **The two documents are not a corpus.** No task READY; no implementation authorized.
+**Last Updated:** 2026-08-22 UTC — **A-SURVEY performed at n=1 three times, on three producers.** TASK-0029 COMPLETE (11/11, MSG-0089): the text-native Arabic document is **D14-ADMISSIBLE**, and its Arabic is **stored in visual order — naive extraction reverses it**, proven by code-point identity. `/Lang` declares `en` on an Arabic document. **ADR-0019 untouched.** No defect family overlaps between the three producers. No task READY; scheduler Disabled; no implementation authorized.
 
 > **The line this replaces, retained:** "**BLK-0010 RESOLVED; TASK-0027 (A-SURVEY, n=1) is READY and
 > unblocked.** MSG-0083 authorized **option A**: a narrow read-only grant for `D:Workpci-corpus` only,
@@ -763,7 +763,7 @@ carry explicit supersession notes, with no supervisor behaviour, permission, or 
 C4 and C5 — no action, deliberately. **C6 (a bounded proof of MSG-0049 option B) and C7 (the next
 work package) remain the Lead's to decide and are not self-authorized.**
 
-**Four messages carry `Status: OPEN`** — **MSG-0060**, **MSG-0081**, **MSG-0084** and **MSG-0087**. Verified across all three views (message file, COMMS register, queue ledger). All are informational or carry referrals that block nothing. **MSG-0086 was closed 2026-08-22, discharged by execution** — its stale "TASK-0028 is READY" line is struck through in place, because that line later prompted a request to re-run a task that was already COMPLETE.
+**Five messages carry `Status: OPEN`** — **MSG-0060**, **MSG-0081**, **MSG-0084**, **MSG-0087** and **MSG-0089**. Verified across all three views. All are records or carry referrals that block nothing.
 
 **MSG-0084 is the TASK-0027 execution record** — a record, plus **two referrals that block nothing**
 (§8 of that message): the designated corpus is **real organizational material, not synthetic**, and the
@@ -1385,60 +1385,124 @@ both tables index it, and both were updated in the same commit as the record.
 
 ## Next Action
 
-**No task is READY. TASK-0028 is COMPLETE, and the next action is the Architecture Lead's.**
+**No task is READY. TASK-0029 is COMPLETE, and the next action is the Architecture Lead's.**
 
-**A-SURVEY has now been performed at n=1 twice**, and the two documents are strikingly unalike — which
-is the most useful thing to come out of the pair.
+**MSG-0088 asked whether an admissible, text-native Arabic document could yield ADR-0019 evidence
+without weakening D14. The answer is yes**, and TASK-0029 produced that evidence (MSG-0089, 11/11).
 
-| | `plan.pdf` (TASK-0027) | `Arabic.pdf` (TASK-0028) |
-|---|---|---|
-| Producer | Microsoft Word 2016 | **ABBYY FineReader PDF 15** |
-| Nature | **Text-native**, verified four ways | **OCR-derived** — 31 page images *plus* a text layer |
-| Language declared | `en-ZA` ×1,819, `en-GB` ×46 | **none at all** |
-| Script | Latin | **Mixed** Arabic + Latin |
-| Hazards found | Three, all reproducible | **None of those three** — a different defect population |
+### Three documents, three producers, three disjoint defect families
 
-### The finding that matters: D14 would reject the Arabic sample
+| | Producer | D14 | Language declared | Defects found |
+|---|---|---|---|---|
+| `plan.pdf` | Microsoft Word 2016 | **admissible** | `en-ZA` ×1,819 — correct | drop-shadow duplication, `/Lang` harvested as text, vector-only page |
+| `Arabic.pdf` *(since removed)* | ABBYY FineReader | **rejected** | **none at all** | — (excluded before defects matter) |
+| `سياسة التعافي.pdf` | WeasyPrint / ChatGPT | **admissible** | **`en` — wrong** | **visual-order storage**, intra-word spaces, detached diacritics |
 
-`Arabic.pdf` is **OCR-dependent by construction** — its text exists because ABBYY recognised it. **D14
-rules text-native only and rejects OCR-dependent documents rather than treating OCR output as
-authoritative.** So the first Arabic material the project has seen is precisely the class the accepted
-architecture excludes.
+**No defect family overlaps another.** Each producer generates its own, which is the single most
+useful thing the three surveys have established.
 
-**That is a result, not a failure**, and it cuts two ways for the Lead to decide between (MSG-0087 §6):
+### The new hazard, and it is the sharpest one yet
 
-- as a **test** document it is genuinely valuable — the first concrete instance of what D14 must cope
-  with, and evidence of what a rejected file looks like structurally;
-- as **evidence about admissible Arabic policy material it says nothing**, because such a file would
-  never be admitted. Characterising what the assistant will actually ingest needs a **text-native**
-  Arabic document.
+**Arabic text is stored in visual order.** Proven by code-point identity: reversing the first extracted
+run reproduces the authored `/Title` tail exactly. **Naive extraction yields fluent-looking but wholly
+reversed Arabic** — the pipeline does not fail, it produces confident garbage, the same shape as the
+English drop-shadow hazard.
 
-**It is also not Hadi Clinic material** — its title is `00. Country COVID-19 IAR Guidance (vers 1.0)`.
-No boundary was crossed; the Lead designated the path. It is recorded so nobody later reads these
-observations as characterising the organization's own Arabic corpus.
+**This sits upstream of every ADR-0019 normalization rule.** Normalizing reversed text produces
+normalized nonsense, so bidirectional order must be reconstructed at extraction before any
+normalization question is even reachable.
 
-### Evidence for ADR-0019 — recorded, not acted on
+**`/Lang` has now been correct once, absent once, and wrong once** across three documents. Offered as
+three observations, **not a rate** — three operator-chosen files are not a sample.
 
-**ADR-0019 was not amended and no normalization rule was proposed**, per MSG-0085 §7. What the document
-evidences for a later decision: **language cannot be read from the file** (no `/Lang`, mixed script, so
-detection with its own error behaviour is required), and **glyph-to-Unicode round-tripping is not
-guaranteed** where `ToUnicode` is absent — extraction fidelity sits upstream of every normalization
-rule ADR-0019 might record. **On this evidence ADR-0019's deferral looks well-judged**: one mixed-script
-OCR document is exactly the material from which a plausible-but-wrong rule could have been generalised.
+### ADR-0019 remains untouched, and its deferral looks better than ever
 
-### Still open, and unchanged
+**No rule was proposed.** A normalization rule generalised from any one of the three documents would
+have been wrong for the other two — which is precisely what the acceptance condition was protecting
+against.
 
-**The two documents are not a corpus.** A-SURVEY **at corpus scale remains unperformed**, and the
-organizational action that would enable it — representative approved material, **plural** — has not
-changed.
+### Two items with the Lead
 
-Also still with the Lead: **`EPA-0005`** (A-STACK, PROPOSED) and its §9 recommendation that no stack ADR
-be created yet; the **one-runtime-or-two** trade; **PDF tooling** for the runner (MSG-0084 §8.2); and
-the **synthetic-versus-real** designation question, which now applies to both files.
+1. **The Arabic specimen is generated, not organizational** — ChatGPT/WeasyPrint. Its hazards are its
+   toolchain's. **Extraction hazards are a property of the producer**, so characterising the real
+   corpus needs documents produced the way the organization actually produces policy.
+2. **`Arabic.pdf` was replaced rather than kept.** MSG-0087's findings stand as a record but can no
+   longer be re-verified against the file.
 
-**Implementation remains prohibited.** T-A, T-B, T-D, T-E and T-0 are unauthorized, and **T-0 is still
-an operator prerequisite** needing a privileged identity-provider deployment.
+Also still open: **`EPA-0005`** (A-STACK, PROPOSED) and its §9 recommendation that no stack ADR be
+created yet; the **one-runtime-or-two** trade; **PDF tooling** for the runner; and the
+**synthetic-versus-real designation** question, which now has a third instance.
 
+### Operational
+
+**The scheduled task `PCI-Execution-Supervisor` is Disabled** (last run 17:37:37). No unattended cycle
+will pick up future work until it is re-enabled — TASK-0029 was executed interactively for that reason.
+
+**Implementation remains prohibited.** T-A, T-B, T-D, T-E and T-0 are unauthorized; T-0 still needs a
+privileged identity-provider deployment.
+
+---
+
+**Historical — the position after TASK-0028, retained.** The text below described the OCR Arabic
+document as the newest evidence and asked for a text-native one. **MSG-0088 supplied it and
+TASK-0029 surveyed it** (MSG-0089).
+
+> ## Next Action
+> 
+> **No task is READY. TASK-0028 is COMPLETE, and the next action is the Architecture Lead's.**
+> 
+> **A-SURVEY has now been performed at n=1 twice**, and the two documents are strikingly unalike — which
+> is the most useful thing to come out of the pair.
+> 
+> | | `plan.pdf` (TASK-0027) | `Arabic.pdf` (TASK-0028) |
+> |---|---|---|
+> | Producer | Microsoft Word 2016 | **ABBYY FineReader PDF 15** |
+> | Nature | **Text-native**, verified four ways | **OCR-derived** — 31 page images *plus* a text layer |
+> | Language declared | `en-ZA` ×1,819, `en-GB` ×46 | **none at all** |
+> | Script | Latin | **Mixed** Arabic + Latin |
+> | Hazards found | Three, all reproducible | **None of those three** — a different defect population |
+> 
+> ### The finding that matters: D14 would reject the Arabic sample
+> 
+> `Arabic.pdf` is **OCR-dependent by construction** — its text exists because ABBYY recognised it. **D14
+> rules text-native only and rejects OCR-dependent documents rather than treating OCR output as
+> authoritative.** So the first Arabic material the project has seen is precisely the class the accepted
+> architecture excludes.
+> 
+> **That is a result, not a failure**, and it cuts two ways for the Lead to decide between (MSG-0087 §6):
+> 
+> - as a **test** document it is genuinely valuable — the first concrete instance of what D14 must cope
+>   with, and evidence of what a rejected file looks like structurally;
+> - as **evidence about admissible Arabic policy material it says nothing**, because such a file would
+>   never be admitted. Characterising what the assistant will actually ingest needs a **text-native**
+>   Arabic document.
+> 
+> **It is also not Hadi Clinic material** — its title is `00. Country COVID-19 IAR Guidance (vers 1.0)`.
+> No boundary was crossed; the Lead designated the path. It is recorded so nobody later reads these
+> observations as characterising the organization's own Arabic corpus.
+> 
+> ### Evidence for ADR-0019 — recorded, not acted on
+> 
+> **ADR-0019 was not amended and no normalization rule was proposed**, per MSG-0085 §7. What the document
+> evidences for a later decision: **language cannot be read from the file** (no `/Lang`, mixed script, so
+> detection with its own error behaviour is required), and **glyph-to-Unicode round-tripping is not
+> guaranteed** where `ToUnicode` is absent — extraction fidelity sits upstream of every normalization
+> rule ADR-0019 might record. **On this evidence ADR-0019's deferral looks well-judged**: one mixed-script
+> OCR document is exactly the material from which a plausible-but-wrong rule could have been generalised.
+> 
+> ### Still open, and unchanged
+> 
+> **The two documents are not a corpus.** A-SURVEY **at corpus scale remains unperformed**, and the
+> organizational action that would enable it — representative approved material, **plural** — has not
+> changed.
+> 
+> Also still with the Lead: **`EPA-0005`** (A-STACK, PROPOSED) and its §9 recommendation that no stack ADR
+> be created yet; the **one-runtime-or-two** trade; **PDF tooling** for the runner (MSG-0084 §8.2); and
+> the **synthetic-versus-real** designation question, which now applies to both files.
+> 
+> **Implementation remains prohibited.** T-A, T-B, T-D, T-E and T-0 are unauthorized, and **T-0 is still
+> an operator prerequisite** needing a privileged identity-provider deployment.
+> 
 ---
 
 **Historical — the position while TASK-0028 was READY, retained.** The text below described the
