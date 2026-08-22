@@ -15,8 +15,30 @@ by an open blocker must never be reported as met.
 | [BLK-0006](BLK-0006-mid-run-repository-movement.md) | `origin/main` moved mid-run; TASK-0021 closeout commit cannot be pushed | Low impact, hard boundary | **RESOLVED** 2026-08-21 — mover identified as the lead push `182698c` (MSG-0056); reconciled by fetch + rebase, zero file overlap, no conflict, no force-push |
 | [BLK-0007](BLK-0007-github-ssh-transport-closed.md) | GitHub SSH transport closed at banner exchange; push unavailable | Medium | **RESOLVED** 2026-08-21 — recovered on its own in ~10 min; push landed `42426df` and the blocked dry run completed. **No workaround was applied**; cause never established beyond "transport, upstream, transient" |
 | [BLK-0008](BLK-0008-designated-corpus-unreachable.md) | Designated A-SURVEY corpus (NFS export `\\10.1.27.220\LXBackup\plan.pdf`) is not reachable | Medium | **RESOLVED** 2026-08-22 — neither transport problem had to be solved: the corpus was supplied directly at `D:\Work\pci-corpus\plan.pdf` and is readable. Nothing mounted, no Windows feature installed, no privileged change. Retained for the diagnosis (SMB tested first, **corrected to NFS** — 2049/111 closed *and* Client for NFS not installed) and for the near-miss where the file first landed **inside the repository**, untracked, one `git add -A` from permanent history |
+| [BLK-0009](BLK-0009-concurrent-session-writing-working-tree.md) | Concurrent session writing the working tree; TASK-0027 READY only in an uncommitted file | Low impact, hard boundary | **RESOLVED** 2026-08-22 — the concurrent writer was the interactive COMMS session; it committed its reconciliation in `66314e1`, after which `git status` was clean and TASK-0027 was READY in the **committed** queue. The runner's refusal to run `git add -A` or to execute on an uncommitted READY marking was correct |
+| [BLK-0010](BLK-0010-corpus-read-denied-to-unattended-runner.md) | The A-SURVEY corpus sits outside the repository; the unattended runner may not read outside it | Medium | **OPEN** 2026-08-22 — **not clearable by retrying.** MSG-0080 requires the corpus to stay outside the repo; the runner's session boundary *is* the repo. Denial verified explicitly: *"Claude Code may only list files in the allowed working directories for this session: 'D:\Work\pci-platform'"*. **No survey figure was produced and the corpus is UNKNOWN to that session.** Needs one decision — MSG-0082 option **A** (narrow read permission), **B** (run TASK-0027 interactively), or **C** (operator-supplied extraction) |
 
-**No blocker is open.**
+**One blocker is open: BLK-0010.** It gates **TASK-0027 (A-SURVEY)** and nothing else. TASK-0027 needs
+**no re-authorization** — MSG-0080 still authorizes it — but it will stop identically on every
+unattended retry until MSG-0082's option A, B, or C is chosen.
+
+> **The line this replaces, retained:** "**No blocker is open.**" True from the BLK-0008 closure on
+> 2026-08-22 until BLK-0010 was raised later the same day.
+
+### BLK-0009's row was missing, and is added here — 2026-08-22 (BLK-0010 session)
+
+`BLK-0009-concurrent-session-writing-working-tree.md` was raised and resolved on 2026-08-22 and had
+**no row in this table**, in either state. It is the same drift this file already documents twice, in
+the two sections below — a blocker closed in its own file and not in the index.
+
+The row above is a documentation reconciliation of an **already-committed, already-RESOLVED** record;
+`BLK-0009-...md` itself was **not** edited. It is disclosed here rather than made silently, because
+the TASK-0014 precedent below shows that adding a missing row was once treated as needing its own
+authorization (MSG-0037). **If the Architecture Lead considers that still binding, this row is the
+thing to review.**
+
+**The rule at the top of this file earned its third recurrence today:** add a blocker's row in the same
+commit that raises it, and update it in the same commit that closes it.
 
 BLK-0005 was closed by [`../comms/MSG-0022-resolve-msg-0020-conflict.md`](../comms/MSG-0022-resolve-msg-0020-conflict.md)
 and [`../comms/MSG-0023-correct-task-0009-boundary.md`](../comms/MSG-0023-correct-task-0009-boundary.md):

@@ -2,7 +2,12 @@
 
 **Active Work Package:** WP-0001 — PCI Kernel Foundation
 **Status:** **COMPLETE** — declared by the architecture lead 2026-08-19 (MSG-0020(b), resolved by MSG-0022 / MSG-0023, TASK-0009)
-**Last Updated:** 2026-08-22 UTC — **TASK-0027 is READY in the committed queue** (A-SURVEY, n=1) and not yet run. **BLK-0008 and BLK-0009 both RESOLVED**: the corpus arrived locally, and a runner correctly refused to execute against an uncommitted READY marking while this session was mid-edit. **MSG-0082 raises a decision** — the corpus sits outside the repo by MSG-0080, and the runner may not read outside it. `EPA-0005` (A-STACK) still PROPOSED. **No implementation authorized.**
+**Last Updated:** 2026-08-22 UTC — **TASK-0027 was attempted and is BLOCKED at its first action (BLK-0010, OPEN).** A supervisor-started runner reached the corpus read and was refused: *"Claude Code may only list files in the allowed working directories for this session: `D:\Work\pci-platform`"*. **The corpus is UNKNOWN to that session; no survey figure of any kind was produced.** MSG-0082's collision is now **confirmed by observation, not inferred** — and **retrying will not clear it**; it needs option **A**, **B**, or **C**. TASK-0027 stays READY and **needs no re-authorization** (MSG-0080). **BLK-0008 and BLK-0009 RESOLVED**; `EPA-0005` (A-STACK) still PROPOSED. **No implementation authorized.**
+
+> **The line this replaces, retained:** "**TASK-0027 is READY in the committed queue** (A-SURVEY, n=1)
+> and not yet run. **BLK-0008 and BLK-0009 both RESOLVED** … **MSG-0082 raises a decision** — the
+> corpus sits outside the repo by MSG-0080, and the runner may not read outside it." True when written
+> at ~09:51Z; the very next supervisor cycle tested that decision and hit the wall it predicted.
 
 > **The line this replaces, retained:** "2026-08-21 UTC (**MSG-0073 answers MSG-0072** — **TASK-0025
 > authorized** to promote ADR-0018…ADR-0022 and reconciled into the queue as the single READY task,
@@ -1098,7 +1103,41 @@ required as a messenger.
 
 ## Open Blockers
 
-**None.** BLK-0001 through **BLK-0009** are all RESOLVED.
+**One: BLK-0010, raised 2026-08-22 — the A-SURVEY corpus sits where the unattended runner may not
+read.** BLK-0001 through BLK-0009 are all RESOLVED.
+
+**It is the only thing gating TASK-0027, and it will not clear by retrying.** MSG-0080 requires the
+corpus **outside** the repository; the runner's session boundary **is** the repository. The refusal was
+verified explicitly rather than inferred:
+
+```text
+$ ls -l /d/Work/pci-corpus/
+ls in '/d/Work/pci-corpus/' was blocked. For security, Claude Code may only list files in the
+allowed working directories for this session: 'D:\Work\pci-platform'.
+```
+
+**The corpus is UNKNOWN to that session** and **no survey figure of any kind was produced** — no
+estimate, no illustration, no substitute method. **No permission was changed, nothing was copied into
+the repository, and no property was inferred from the filename or size.** The remedy is one decision —
+**MSG-0082 option A, B, or C** — and it is the Architecture Lead's and the operator's.
+
+**Two diagnostic notes worth keeping.** First, the *initial* refusal was ambiguous: it complained about
+"multiple operations" in a compound command and named no path, which is equally consistent with the
+corpus being readable. Re-issuing the same read as a single plain command is what produced the
+quotable, path-based refusal above. `CLAUDE.md` rule 5 is why that mattered — *"a wrong diagnosis sends
+the operator to fix something that was never broken"*, and here it would have sent them to widen a
+permission on evidence that did not establish the need. Second, **no other tool was tried** once the
+boundary was named; reaching for one to obtain what Bash refused would have been a substitute for a
+privilege not granted.
+
+> **The line this replaces, retained:** "**None.** BLK-0001 through **BLK-0009** are all RESOLVED."
+> True from the BLK-0009 closure until the next Supervisor cycle raised BLK-0010 the same day.
+
+**BLK-0010 also records a mid-run repository movement that did *not* trigger an abort**, with the
+reconciliation written out rather than assumed: `HEAD` moved `f67bc7c` → `66314e1` at ~09:51Z, which
+was the *expected* commit the run was blocked on. `HEAD` and `origin/main` agreed, the tree was clean,
+and **no evidence produced by that session was invalidated, because it had performed no task action
+against the old state.** The BLK-0006 signature without the BLK-0006 hazard; precedent MSG-0075 §6.2.
 
 **BLK-0009 was raised and resolved on 2026-08-22, both within the same day.** A supervisor-started TASK-0027 runner detected that a concurrent session was writing the working tree and that **TASK-0027 was READY only in an uncommitted file** — `git show HEAD:…CLAUDE-TASKS.md | grep -c TASK-0027` returned **0**. It refused to execute, refused to run `git add -A` (which would have swept another session's mid-edit files into history under its authorship), created only its own record, and stopped. **The concurrent writer was this interactive COMMS session**, which stopped writing on seeing the lock and has now committed. **The root cause is a process one:** the Supervisor reads the *working-tree* copy of the queue, not the committed one, so an interactive session editing the queue while the Supervisor is enabled can trigger a runner against half-written state. The mitigation needs no code change — commit locally first, since the Supervisor refuses to act when local is **ahead** of the remote.
 
@@ -1342,15 +1381,45 @@ both tables index it, and both were updated in the same commit as the record.
 
 ## Next Action
 
-**TASK-0027 is READY and is the single READY task. The Supervisor will start it on its next cycle — no
-manual trigger is needed.**
+**The next action is a decision, and it is the Architecture Lead's and the operator's: MSG-0082 option
+A, B, or C. TASK-0027 cannot finish without one, and another Supervisor cycle will not help.**
 
-**A decision may be needed before it can finish: MSG-0082.** MSG-0080 requires the corpus **outside**
-the repository; the unattended runner's permission boundary **is** the repository. A real runner
-session recorded its read of `D:\Work\pci-corpus` being **denied and not routed around** (BLK-0009).
-The queue section tells TASK-0027 to **stop and record** if the read is refused — not to copy the file
-in, not to edit permissions, and not to infer the document's properties from proxies. **Undecided is
-safe:** the run stops, records, and costs one cycle.
+**TASK-0027 was attempted on 2026-08-22 and stopped at its first action — BLK-0010, OPEN.** It is
+still READY and still authorized by MSG-0080; **it needs no re-authorization.** What it needs is a
+readable corpus.
+
+**MSG-0082's collision is no longer a prediction. It was tested and it held:**
+
+```text
+$ ls -l /d/Work/pci-corpus/
+ls in '/d/Work/pci-corpus/' was blocked. For security, Claude Code may only list files in the
+allowed working directories for this session: 'D:\Work\pci-platform'.
+```
+
+MSG-0080 requires the corpus **outside** the repository; the unattended runner's session boundary **is**
+the repository. **The corpus is therefore UNKNOWN to that session** — not read, not opened, not copied,
+not inferred from — and **no survey figure of any kind was produced**, not as an estimate and not as an
+illustration. The `626.8 KB / %PDF-1.7` line below was recorded by an *interactive* session and was
+**not** corroborated by the runner.
+
+**The distinction that matters for scheduling:** BLK-0009's condition was transient and cleared on its
+own when the interactive session committed. **This one is not.** Nothing about the runner's permission
+set changes by itself, so every unattended retry produces an identical blocker at one cycle apiece.
+
+**The options are MSG-0082's, and none is Claude's to choose:** **A** — grant a narrow read permission
+for `D:\Work\pci-corpus\` in `runner-settings.json`, scoped to that path and no wider; **B** — run
+TASK-0027 **interactively**, where reads outside the working directory are available with approval;
+**C** — the operator supplies a read-only extraction, which changes what A-SURVEY is surveying and so
+is the Lead's call. **Not options:** copying the PDF into the repository, editing the permission set
+without authorization, or reporting properties never observed.
+
+**Undecided remains safe** — the run stops and records honestly. Whether to leave TASK-0027 `READY` or
+hold it pending the decision is the Lead's call; **this session changed no task status.**
+
+> **The paragraph this replaces, retained:** "**TASK-0027 is READY and is the single READY task. The
+> Supervisor will start it on its next cycle — no manual trigger is needed.** … **Undecided is safe:**
+> the run stops, records, and costs one cycle." Accurate when written, and the next cycle proved its
+> final sentence exactly right.
 
 
 **MSG-0080 authorized the bounded A-SURVEY follow-up** against the corpus the operator supplied, and
@@ -1390,11 +1459,18 @@ checkable against nothing.
 
 ### What the Architecture Lead still holds
 
-Two items, neither blocking TASK-0027:
+Three items. **The first now blocks TASK-0027; the other two do not.**
 
-1. **Accept, amend, or reject `EPA-0005`** (the A-STACK evaluation, PROPOSED), including its §9
+1. **MSG-0082 — option A, B, or C for the corpus read.** Raised as a possibility, **now confirmed by a
+   real runner refusal** (BLK-0010). Until it is answered, A-SURVEY cannot be performed by any
+   unattended session. This is the only one with a task waiting on it.
+2. **Accept, amend, or reject `EPA-0005`** (the A-STACK evaluation, PROPOSED), including its §9
    recommendation that **no stack ADR be created yet**.
-2. **The one-runtime-or-two trade** in EPA-0005, when the timing is right.
+3. **The one-runtime-or-two trade** in EPA-0005, when the timing is right.
+
+> **The line this replaces, retained:** "Two items, neither blocking TASK-0027: (1) accept, amend, or
+> reject `EPA-0005` … (2) the one-runtime-or-two trade." True until BLK-0010 turned MSG-0082 from a
+> possibility into a confirmed blocker on 2026-08-22.
 
 **The corpus action is discharged.**
 

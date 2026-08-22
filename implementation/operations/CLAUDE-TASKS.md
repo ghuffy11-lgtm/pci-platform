@@ -36,10 +36,22 @@ Only the architecture lead may authorize new work, mark a task READY, or change 
 | TASK-0024 | **A-ADR — draft the required EPA ADR set** | **COMPLETE** | TASK-0023 COMPLETE, MSG-0062 DECIDED, MSG-0067 DECIDED, MSG-0068 AUTHORIZED, WP-0009 defined | 2026-08-21 — 8/8 acceptance criteria, **ADR-0017…ADR-0022 drafted PROPOSED**, MSG-0070 | none — awaiting the Architecture Lead's acceptance of the drafts; **no task is READY** | Claude Code |
 | TASK-0025 | **Promote ADR-0018…ADR-0022 into the accepted decision register** | **COMPLETE** | TASK-0024 COMPLETE, MSG-0071 DECIDED, MSG-0073 AUTHORIZED | 2026-08-21 — 5/5 acceptance criteria; five ADRs promoted, **zero body differences** in the per-ADR diffs, MSG-0075 | none — **no task is READY**; A-SURVEY / A-STACK / T-0 stay unauthorized | Claude Code |
 | TASK-0026 | **A-SURVEY + A-STACK — bounded corpus survey and stack evaluation** | **COMPLETE (PARTIAL)** | TASK-0025 COMPLETE, MSG-0071 DECIDED, MSG-0076 AUTHORIZED | 2026-08-22 — 5/6 criteria MET; **criterion 1 UNMET (PR5)**; **EPA-0005** delivered, MSG-0078 | none — **no task is READY**. A-SURVEY awaits an organizational corpus action; EPA-0005 awaits the Lead's acceptance | Claude Code |
-| TASK-0027 | **A-SURVEY (n=1) — inspect the approved/synthetic corpus** | **READY** | TASK-0026 COMPLETE (PARTIAL), MSG-0076, MSG-0080 AUTHORIZED, corpus present outside the repo | — | none — architecture input only; **n=1, no distributional claims**; **the PDF must never enter the repository** | Claude Code |
+| TASK-0027 | **A-SURVEY (n=1) — inspect the approved/synthetic corpus** | **READY — attempted 2026-08-22, BLOCKED at its first action (BLK-0010)** | TASK-0026 COMPLETE (PARTIAL), MSG-0076, MSG-0080 AUTHORIZED, corpus present outside the repo | 2026-08-22 — **not started; no survey figure produced.** Prerequisites were unmet at session start and cleared mid-run (`66314e1`); the run then stopped on the corpus read: *"Claude Code may only list files in the allowed working directories for this session: 'D:\Work\pci-platform'"*. **BLK-0010** — needs MSG-0082 option A, B or C; **a retry will fail identically** | none — architecture input only; **n=1, no distributional claims**; **the PDF must never enter the repository** | Claude Code |
 | TASK-0002 | Make test entry points shell-independent | **ABORTED** | — | 2026-08-19 | none — premise disproven by measurement | — |
 
 **TASK-0019 is COMPLETE (2026-08-21).** It was authorized by MSG-0050, reconciled into this queue in `39eabdb`, and executed by a supervisor-started session on its scheduled 06:37:13Z cycle. It was maintenance/audit work only, not a new product work package.
+> **Attempted and blocked — 2026-08-22, BLK-0010. Read this before scheduling another cycle.**
+> A supervisor-started runner (pid 24140) reached TASK-0027's **first action** and stopped there. The
+> corpus read was refused: *"Claude Code may only list files in the allowed working directories for
+> this session: `D:\Work\pci-platform`"*. **The corpus is UNKNOWN to that session and no survey figure
+> of any kind was produced.** The queue/tree condition that stopped the *previous* cycle (BLK-0009) had
+> cleared by then — this is a different, **non-transient** boundary.
+> **Retrying will not clear it.** It needs one decision: **MSG-0082 option A** (a narrow read
+> permission for `D:\Work\pci-corpus\`), **B** (run TASK-0027 interactively), or **C** (an
+> operator-supplied extraction). **TASK-0027 needs no re-authorization** — MSG-0080 still authorizes
+> it. Whether to leave it `READY` (one honest, identical blocker per cycle) or hold it pending that
+> decision is **the Architecture Lead's call; this session changed no status.**
+
 **TASK-0027 is READY — the single READY task.** Authorized by **MSG-0080**, which closes the gap
 TASK-0026 stopped at: the organization supplied an approved/synthetic corpus, and A-SURVEY may now run
 against it. **TASK-0027 is an id allocated here** — MSG-0080 assigns none — verified unused. There is
