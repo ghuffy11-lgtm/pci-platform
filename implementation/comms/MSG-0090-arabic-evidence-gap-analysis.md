@@ -1,6 +1,6 @@
 # MSG-0090 — What ADR-0019 Still Needs, and Whether the Material Exists
 
-**Status:** **OPEN** — analysis for the Architecture Lead; identifies the next action, authorizes nothing
+**Status:** **OPEN** — **SCOPED 2026-08-22 (MSG-0091)**: the finding is preserved for the eventual production normalization decision and does **not** gate current bounded architecture testing. The requirement before ADR-0019 amendment and before production is unchanged.
 **Raised:** 2026-08-22
 **Raised by:** Claude Code (interactive session, COMMS)
 **Type:** Evidence-gap analysis + decision request
@@ -170,3 +170,27 @@ cheap now and expensive later**, and it is the first thing worth establishing.
   is the thing ADR-0019's amendment waits on.
 - **Representative approved organizational Arabic policy material: NOT AVAILABLE, and REQUIRED** before
   ADR-0019 can be amended and therefore before production use.
+
+---
+
+## SCOPED — 2026-08-22 by Architecture Lead ruling (MSG-0091)
+
+**This finding stands unchanged and is preserved.** The Architecture Lead ruled that the Arabic **n=1**
+documents are **sufficient technical test evidence for the current architecture work**, that
+representative organizational Arabic material is **not required to continue bounded testing**, and that
+this record's evidence gap is **preserved for the eventual production normalization decision**.
+
+**What changed is the scope of consequence, not the finding:**
+
+| | This record's position | After the ruling |
+|---|---|---|
+| Representative material required for **bounded architecture testing** | implied | **No — explicitly not required** |
+| Required before **ADR-0019's amendment** | Yes | **Yes, unchanged** |
+| Required before **production use**, via MSG-0056a D6 | Yes | **Yes, unchanged** |
+
+**Nothing here was withdrawn, softened, or re-argued**, and §4's evidence specification remains the
+statement of what the production decision will need. **ADR-0019 §6 still requires empirical corpus
+evidence in its own words**, and that requirement is untouched by this scoping.
+
+**No new corpus requirement was created by this record**, then or now — it reported one an accepted ADR
+already states. See **MSG-0091**.

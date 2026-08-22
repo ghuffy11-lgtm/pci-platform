@@ -2,7 +2,7 @@
 
 **Active Work Package:** WP-0001 — PCI Kernel Foundation
 **Status:** **COMPLETE** — declared by the architecture lead 2026-08-19 (MSG-0020(b), resolved by MSG-0022 / MSG-0023, TASK-0009)
-**Last Updated:** 2026-08-22 UTC — **MSG-0090: representative approved organizational Arabic policy material is REQUIRED and NOT AVAILABLE.** Nothing authorized is blocked; **ADR-0019 amendment is**, and through D6 so is production use. The three surveys evidenced the **extraction** layer only — normalization evidence depends on how the organization writes, not on any PDF producer. **No rule proposed, ADR-0019 untouched.** No task READY; scheduler Disabled.
+**Last Updated:** 2026-08-22 UTC — **n=1 Arabic evidence ruled sufficient for bounded architecture testing** (MSG-0091); MSG-0090's gap **preserved for the production normalization decision**, ADR-0019 and D6 untouched. **WP-0009 §6.2 architecture tasks are complete** — A-ADR, A-STACK, A-SURVEY all executed; **no fourth exists and none was invented**. The live gate is the **Lead's ruling on `EPA-0005`**. No task READY; scheduler Disabled.
 
 > **The line this replaces, retained:** "**BLK-0010 RESOLVED; TASK-0027 (A-SURVEY, n=1) is READY and
 > unblocked.** MSG-0083 authorized **option A**: a narrow read-only grant for `D:Workpci-corpus` only,
@@ -763,7 +763,7 @@ carry explicit supersession notes, with no supervisor behaviour, permission, or 
 C4 and C5 — no action, deliberately. **C6 (a bounded proof of MSG-0049 option B) and C7 (the next
 work package) remain the Lead's to decide and are not self-authorized.**
 
-**Six messages carry `Status: OPEN`** — **MSG-0060**, **MSG-0081**, **MSG-0084**, **MSG-0087**, **MSG-0089** and **MSG-0090**. Verified across all three views. **MSG-0090 is the one requesting a decision**; the rest are records or carry referrals that block nothing.
+**Seven messages carry `Status: OPEN`** — **MSG-0060**, **MSG-0081**, **MSG-0084**, **MSG-0087**, **MSG-0089**, **MSG-0090** (now **SCOPED**) and **MSG-0091**. Verified across all three views. **MSG-0091 identifies the live gate**: the Lead's ruling on `EPA-0005`. The rest are records or carry referrals that block nothing.
 
 **MSG-0084 is the TASK-0027 execution record** — a record, plus **two referrals that block nothing**
 (§8 of that message): the designated corpus is **real organizational material, not synthetic**, and the
@@ -1385,65 +1385,125 @@ both tables index it, and both were updated in the same commit as the record.
 
 ## Next Action
 
-**No task is READY. The next action is a scoping decision by the Architecture Lead, and it needs one
-answer from the organization first (MSG-0090).**
+**No task is READY, and there is no authorized architecture task remaining. The live gate is the
+Architecture Lead's ruling on `EPA-0005`.**
 
-### The finding
+### The ruling that changed the position
 
-**Representative approved organizational Arabic policy material is REQUIRED and is NOT AVAILABLE.**
-Verified by inspection of the corpus directory: one **real English** organizational policy
-(`plan.pdf`, Word 2016) and one **ChatGPT/WeasyPrint-generated** Arabic specimen. Nothing else.
+The Lead ruled (MSG-0091) that the Arabic **n=1** documents are **sufficient technical test evidence
+for the current architecture work**, that representative organizational Arabic material is **not
+required to continue bounded testing**, and that MSG-0090's evidence gap is **preserved for the
+eventual production normalization decision**.
 
-**Across three surveys the project has seen real+English+admissible, real+Arabic+rejected (OCR), and
-generated+Arabic+admissible. It has never seen real+Arabic+admissible** — which is exactly the
-intersection ADR-0019's evidence requirement names.
+**It conflicts with nothing.** ADR-0019 §6 and MSG-0056a **D6** gate **production use**, which the
+ruling explicitly leaves intact; they say nothing about evidence adequacy for bounded testing. Had the
+ruling declared n=1 sufficient to *amend* ADR-0019, that would have conflicted and this session would
+have stopped instead of recording it.
 
-### What this does and does not block
+**MSG-0090 is preserved, not withdrawn** — unchanged and still OPEN, with a note recording that its
+consequence is now scoped to the production decision. Its §4 evidence specification remains the
+statement of what that decision will need.
 
-**Not blocked:** no task is READY and none waits on this; the architecture is not blocked — ADR-0019
-was accepted *as a bounded decision* with this gap recorded, not overlooked; `EPA-0005` awaits review
-on its own merits.
+### Why there is no next architecture task
 
-**Blocked:** **ADR-0019's amendment with the concrete rule set**, and through MSG-0056a D6 —
-*"the final normalization rule must be recorded in an ADR before production use"* — **production use**.
-T-B is blocked in practice rather than formally: building normalization against unknown orthographic
-variation means making the guess D6 forbids, relocated from an ADR into code.
+**Verified rather than assumed.** WP-0009 §6.2 defines exactly three architecture tasks, and no fourth
+is referenced anywhere in WP-0009, EPA-0004 or EPA-0005:
 
-### The distinction that matters most
+| Task | Executed as | State |
+|---|---|---|
+| **A-ADR** | TASK-0024 | ADR-0017…ADR-0022 **accepted (MSG-0071) and promoted (TASK-0025)** |
+| **A-STACK** | TASK-0026 | **`EPA-0005` delivered — PROPOSED, awaiting the ruling** |
+| **A-SURVEY** | TASK-0027 / 0028 / 0029 | **Performed at n=1 on three producers** |
 
-**The three surveys evidenced the extraction layer. They say nothing about normalization, and cannot.**
+Every AUTHORIZED message has a matching execution record. Everything remaining in the sequence is an
+**implementation** task — T-0 and T-A…T-I — and all are explicitly unauthorized.
 
-- **Extraction** — bidi order, tokenization, diacritic attachment, `/Lang` reliability, OCR vs native —
-  follows from the **producing toolchain**. Well evidenced now: three producers, three disjoint defect
-  families.
-- **Normalization** — alef/hamza forms, ta marbuta, tatweel, diacritics, Arabic-Indic digits — follows
-  from **how the organization's authors actually write Arabic**. **No evidence at all.**
+**The instruction was to proceed with the next authorized architecture task. The honest execution is to
+report that the set is empty rather than manufacture a task to satisfy the verb.**
 
-Treating the first as the second would be the error. MSG-0089's visual-order finding is a fact about
-WeasyPrint; it tells you what an extractor must repair, and nothing about whether policy authors use
-tatweel or mix digit forms.
+### What waits behind EPA-0005
 
-### The next action, ordered by cost
+1. **Accept, amend, or reject `EPA-0005`**, including its **§9.1** constraints recommended as settled
+   and its position that stack **selection** stays open.
+2. **The one-runtime-or-two trade.**
+3. **Whether a stack ADR is created now** — EPA-0005 recommends **not** yet.
 
-1. **Establish what form the organization's approved Arabic policy actually takes** — text-native,
-   scanned, or non-existent. A question to the organization, not a task. **If it exists only as scans,
-   D14 leaves no admissible Arabic corpus at all**, and the question becomes whether Arabic is in the
-   first release — the risk EPA-0004 §11.5 flagged, where nobody discovers it until ingestion runs.
-2. **Decide pursue-or-defer.** Deferring is legitimate — ADR-0019 is already accepted as bounded — but
-   it should be a decision on the record rather than a gap that quietly persists.
-3. **If pursued**, the corpus is an organizational prerequisite of the same class as PR5, and **has
-   never been requested in these specific terms**: genuinely organizational, approved, text-native,
-   plural, spanning authors and dates, produced the way policy is actually produced. **No sample size
-   is named** — naming one would invent a threshold on no more evidence than the guess D6 forbids.
-4. **Independently:** `EPA-0005` (A-STACK) still awaits acceptance, with its §9 recommendation that no
-   stack ADR be created yet, and the one-runtime-or-two trade.
+**Once ruled on, the next authorization is a work-package or implementation-task decision**, which is
+also the Lead's. This session can self-authorize neither.
 
 ### Operational
 
 The scheduled task `PCI-Execution-Supervisor` is **Disabled**; nothing runs unattended until it is
-re-enabled. **Implementation remains prohibited** — T-A, T-B, T-D, T-E and T-0 are unauthorized, and
-T-0 still needs a privileged identity-provider deployment.
+re-enabled. **Implementation remains prohibited**, and **T-0 still needs a privileged
+identity-provider deployment** that no decision can substitute for.
 
+---
+
+**Historical — the position before the n=1 sufficiency ruling, retained.** The text below
+reported the Arabic evidence gap as gating. **MSG-0091 scoped it** to the production
+normalization decision, leaving bounded architecture testing unblocked.
+
+> ## Next Action
+> 
+> **No task is READY. The next action is a scoping decision by the Architecture Lead, and it needs one
+> answer from the organization first (MSG-0090).**
+> 
+> ### The finding
+> 
+> **Representative approved organizational Arabic policy material is REQUIRED and is NOT AVAILABLE.**
+> Verified by inspection of the corpus directory: one **real English** organizational policy
+> (`plan.pdf`, Word 2016) and one **ChatGPT/WeasyPrint-generated** Arabic specimen. Nothing else.
+> 
+> **Across three surveys the project has seen real+English+admissible, real+Arabic+rejected (OCR), and
+> generated+Arabic+admissible. It has never seen real+Arabic+admissible** — which is exactly the
+> intersection ADR-0019's evidence requirement names.
+> 
+> ### What this does and does not block
+> 
+> **Not blocked:** no task is READY and none waits on this; the architecture is not blocked — ADR-0019
+> was accepted *as a bounded decision* with this gap recorded, not overlooked; `EPA-0005` awaits review
+> on its own merits.
+> 
+> **Blocked:** **ADR-0019's amendment with the concrete rule set**, and through MSG-0056a D6 —
+> *"the final normalization rule must be recorded in an ADR before production use"* — **production use**.
+> T-B is blocked in practice rather than formally: building normalization against unknown orthographic
+> variation means making the guess D6 forbids, relocated from an ADR into code.
+> 
+> ### The distinction that matters most
+> 
+> **The three surveys evidenced the extraction layer. They say nothing about normalization, and cannot.**
+> 
+> - **Extraction** — bidi order, tokenization, diacritic attachment, `/Lang` reliability, OCR vs native —
+>   follows from the **producing toolchain**. Well evidenced now: three producers, three disjoint defect
+>   families.
+> - **Normalization** — alef/hamza forms, ta marbuta, tatweel, diacritics, Arabic-Indic digits — follows
+>   from **how the organization's authors actually write Arabic**. **No evidence at all.**
+> 
+> Treating the first as the second would be the error. MSG-0089's visual-order finding is a fact about
+> WeasyPrint; it tells you what an extractor must repair, and nothing about whether policy authors use
+> tatweel or mix digit forms.
+> 
+> ### The next action, ordered by cost
+> 
+> 1. **Establish what form the organization's approved Arabic policy actually takes** — text-native,
+>    scanned, or non-existent. A question to the organization, not a task. **If it exists only as scans,
+>    D14 leaves no admissible Arabic corpus at all**, and the question becomes whether Arabic is in the
+>    first release — the risk EPA-0004 §11.5 flagged, where nobody discovers it until ingestion runs.
+> 2. **Decide pursue-or-defer.** Deferring is legitimate — ADR-0019 is already accepted as bounded — but
+>    it should be a decision on the record rather than a gap that quietly persists.
+> 3. **If pursued**, the corpus is an organizational prerequisite of the same class as PR5, and **has
+>    never been requested in these specific terms**: genuinely organizational, approved, text-native,
+>    plural, spanning authors and dates, produced the way policy is actually produced. **No sample size
+>    is named** — naming one would invent a threshold on no more evidence than the guess D6 forbids.
+> 4. **Independently:** `EPA-0005` (A-STACK) still awaits acceptance, with its §9 recommendation that no
+>    stack ADR be created yet, and the one-runtime-or-two trade.
+> 
+> ### Operational
+> 
+> The scheduled task `PCI-Execution-Supervisor` is **Disabled**; nothing runs unattended until it is
+> re-enabled. **Implementation remains prohibited** — T-A, T-B, T-D, T-E and T-0 are unauthorized, and
+> T-0 still needs a privileged identity-provider deployment.
+> 
 ---
 
 **Historical — the position immediately after TASK-0029, retained.** The text below summarised
