@@ -39,6 +39,7 @@ Only the architecture lead may authorize new work, mark a task READY, or change 
 | TASK-0027 | **A-SURVEY (n=1) — inspect the approved/synthetic corpus** | **COMPLETE** | TASK-0026 COMPLETE (PARTIAL), MSG-0080, MSG-0083 (corpus read permission), corpus readable by the runner | 2026-08-22 — **7/7 acceptance criteria MET**; PDF inspected in place, `git status` clean, no PDF in history; **MSG-0084** | none — **no task is READY**. MSG-0084 §8 refers two non-blocking items to the Lead; A-SURVEY at *corpus* scale still awaits representative material | Claude Code |
 | TASK-0028 | **A-SURVEY Arabic follow-up (n=1) — inspect `Arabic.pdf`** | **COMPLETE** | TASK-0027 COMPLETE, MSG-0085 AUTHORIZED, MSG-0083 read grant | 2026-08-22 — 9/9 criteria, MSG-0087; **document is OCR-derived (ABBYY FineReader) — the class D14 rejects** | none — two items referred to the Lead, neither blocking | Claude Code |
 | TASK-0029 | **A-SURVEY Arabic text-native follow-up (n=1)** | **COMPLETE** | TASK-0028 COMPLETE, MSG-0088 AUTHORIZED, MSG-0083 read grant | 2026-08-22 — 11/11 instructions, MSG-0089; **text-native and D14-ADMISSIBLE**; **Arabic stored in visual order — naive extraction reverses it** | none — two items referred, neither blocking | Claude Code |
+| TASK-0030 | **Draft the minimum ADR-0020 clarification — pre-constrained retrieval as an engine-selection gate** | **READY** | EPA-0005 ACCEPTED (MSG-0092), ADR-0020 accepted | — | none — **draft only, stop before applying**; no engine selected; ADR-0017…0022 otherwise untouched | Claude Code |
 | TASK-0002 | Make test entry points shell-independent | **ABORTED** | — | 2026-08-19 | none — premise disproven by measurement | — |
 
 **TASK-0019 is COMPLETE (2026-08-21).** It was authorized by MSG-0050, reconciled into this queue in `39eabdb`, and executed by a supervisor-started session on its scheduled 06:37:13Z cycle. It was maintenance/audit work only, not a new product work package.
@@ -628,6 +629,8 @@ READY means *authorized to attempt*, never *authorized to force*. A READY task w
 | MSG-0089 | Record | **OPEN** | Claude Code | Architecture lead | **TASK-0029 execution record — text-native Arabic at n=1, 11/11.** **D14-ADMISSIBLE**: zero images, zero OCR markers, four subset-embedded CID fonts each with a `ToUnicode` CMap (209 mappings, 186 Arabic), text round-trips to real Arabic. **New reproducible hazard: the text is stored in VISUAL order** — proven by code-point identity between the reversed first run and the authored `/Title` tail; naive extraction yields fluent-looking but wholly reversed Arabic. Also **intra-word spaces from kerning** and **detached diacritics**. **`/Lang` declares `en` on an Arabic document** — across three surveys the declaration has now been correct once, absent once, and wrong once. **ADR-0019 untouched.** Referred: the file is ChatGPT/WeasyPrint-generated, so its hazards are its toolchain's and not the organization's; and `Arabic.pdf` was replaced rather than kept | 2026-08-22 |
 | MSG-0090 | Record + decision request | **OPEN** | Claude Code | Architecture lead | **Evidence-gap analysis for ADR-0019.** Verified the corpus directory: one **real English** organizational policy and one **ChatGPT/WeasyPrint-generated Arabic** specimen — **representative approved organizational Arabic material is REQUIRED and NOT AVAILABLE**, and across three surveys the project has never seen real+Arabic+admissible. **Nothing currently authorized is blocked**; ADR-0019's amendment is, and through MSG-0056a D6 so is **production use**. The needed evidence is **observed orthographic variation in real approved documents** across the five classes ADR-0019 §6 deferred. **Key distinction:** the surveys evidenced the **extraction** layer, which follows from the producing toolchain, and say nothing about normalization, which follows from how the organization's authors write — treating one as the other would be the error. Also flags that if approved Arabic policy exists only as scans, D14 leaves no admissible Arabic corpus and the question becomes whether Arabic is in the first release at all. **No rule proposed, no sample threshold invented, no task marked READY, ADR-0019 untouched** | 2026-08-22 |
 | MSG-0091 | Record + ruling | **OPEN** | Claude Code | Architecture lead | **Records the Lead's n=1 sufficiency ruling** — the Arabic n=1 documents are sufficient technical test evidence for current architecture work; representative organizational Arabic material is **not required for bounded testing**; MSG-0090's gap is **preserved for the eventual production normalization decision**; and no new Arabic corpus requirement is to be created unless an existing ADR requires it. **Conflict check: none** — ADR-0019 §6 and MSG-0056a D6 gate **production**, which the ruling leaves intact; had it declared n=1 sufficient to amend ADR-0019 it would have conflicted and this session would have stopped. **Next-task identification: there is no authorized architecture task remaining.** WP-0009 §6.2 defines exactly three — A-ADR (TASK-0024, accepted and promoted), A-STACK (TASK-0026, `EPA-0005` PROPOSED), A-SURVEY (TASK-0027/0028/0029, n=1 ×3) — all executed, with no fourth referenced anywhere and every AUTHORIZED message matched to an execution record. **The gate is now the Lead's ruling on EPA-0005.** No task invented, no ADR touched, no corpus requirement created | 2026-08-22 |
+| MSG-0092 | Decision | DECIDED | Architecture lead | Claude Code | **EPA-0005 ACCEPTED** as the architecture evaluation record and the ruling record for the runtime seam. **§9.1's three constraints are settled**: authorization enforced **inside** the retrieval operation (no retrieve-then-filter or over-fetch-then-filter); capacity for **three** local model workloads (generation, multilingual embedding, entailment); conversation and audit storage **separate**, Restricted passages barred from ordinary logs/telemetry. **Approach C chosen** — two services along the C2/C6 seam, governed application layer for the authorization-critical path plus a document/inference worker behind an explicit contract; **the worker is not an authorization authority**, authorization stays in the governed layer before retrieval, SPEC-0008 preserved. **A stack-shape decision, not a runtime selection.** **No generic stack ADR** — declined explicitly. **Nine selection categories stay open**; ADR-0019's Arabic deferral unchanged and n=1 does not become production corpus evidence. Authorizes one bounded task to draft a minimum ADR-0020 clarification, **draft only** | 2026-08-22 |
+| MSG-0093 | Record | **OPEN** | Claude Code | Architecture lead | **MSG-0092 applied; TASK-0030 reconciled as the single READY task.** EPA-0005's header now records its acceptance, Approach C, and the three settled constraints — **not promoted to `docs/`**, because MSG-0092 accepted it without authorizing promotion and promotion is the Lead's act. TASK-0030 drafts the minimum ADR-0020 clarification making the existing §3/§4 pre-constrained requirement explicit as an **engine-selection gate**, and **stops before applying it** — ADR-0020 is accepted and promoted, so editing it is the Lead's act. Records that "no amendment is needed" is a legitimate outcome. **No engine selected, no ADR touched, no implementation task READY** | 2026-08-22 |
 | MSG-0074 | Record | **CLOSED** | Claude Code | Architecture lead | **TASK-0025 queue reconciliation.** Reconciled as the single READY task after verifying prerequisites individually. **No separate TASK-0025 specification file exists** — MSG-0073 plus the queue section are the specification, and the section records the promotion convention verified from the ADR-0015 precedent and the lead's own ADR-0017 promotion. **The gap did not recur this time** in one respect: the authorization arrived with no colliding sibling file. **The queue gap itself did recur** — the **eighth** occurrence. **Discharged by execution 2026-08-21** — TASK-0025 ran against this reconciliation and is COMPLETE (MSG-0075); because the repair landed before the next cycle, the task was already the single READY task when the run started and the Supervisor never idled on it | 2026-08-21 |
 | MSG-0051 | Record | CREATED — audit complete | Claude Code | Architecture lead | **TASK-0019 baseline audit.** Six documentary corrections applied with their authorities quoted; four record classes verified already correct; **§C refers seven items for decision**, led by the accepted WP-0001 work package still reading `Status: Ready for implementation` — the stop condition fired and that correction was **not** made | TASK-0019 |
 
@@ -2042,3 +2045,129 @@ verified, never in anticipation of one.
 Re-verify the corpus path by inspection before assuming either answer, and check which records already
 exist rather than rewriting them. **If any PDF is found inside the repository, that is a defect: move it
 out and record it — do not commit it and do not delete the corpus.**
+
+---
+
+## TASK-0030 — draft the minimum ADR-0020 clarification (pre-constrained retrieval as a gate criterion)
+
+**Priority:** 1 | **Status:** **READY** | **Owner:** Claude Code
+**Depends on:** EPA-0005 ACCEPTED (MSG-0092); ADR-0020 accepted and promoted
+**Next eligible task:** none — the Lead reviews the draft before anything is applied
+**Work package:** WP-0009 — Employee Policy Assistant | **Type:** architecture governance, draft only
+
+**Specification:** [`MSG-0092-architecture-lead-epa-0005-ruling.md`](../comms/MSG-0092-architecture-lead-epa-0005-ruling.md) §3 and §5,
+**plus this section.** No separate `TASK-0030-*.md` file — deliberate, as with TASK-0025 onward.
+**TASK-0030 is an id allocated at reconciliation**, verified unused; MSG-0092 assigns none.
+
+### Objective
+
+**Draft the minimum clarification to ADR-0020 that makes its existing §3/§4 pre-constrained retrieval
+requirement explicit as an engine-selection / gate criterion — without changing its substantive
+policy.**
+
+MSG-0092 §3: *"Authorize a narrow follow-on governance task to draft the minimum
+clarification/amendment to ADR-0020, without changing its substantive policy … No retrieval engine is
+selected by that task."*
+
+### The requirement being made explicit
+
+ADR-0020 already contains it. **§4 is titled "No retrieve-then-suppress — the rule this ADR exists
+for"**, and **§3 sets out authorization enforced at four points, each independently sufficient to
+deny.** MSG-0092 §1(1) restates it as a settled constraint: *"Retrieval must enforce
+authorization-relevant constraints **inside the retrieval operation**. Retrieve-then-filter or
+over-fetch-then-filter is not acceptable."*
+
+**The gap is not policy, it is consequence.** The ADR states the rule; it does not say in terms that
+the rule **disqualifies any retrieval engine that cannot apply authorization constraints inside the
+query**. That consequence is what the clarification must make unambiguous, so a future engine
+evaluation cannot satisfy the ADR on paper while planning to filter after retrieval.
+
+### Required work
+
+1. **Read ADR-0020 §§3–4 in `docs/decisions/`** — the accepted, promoted copy — and establish exactly
+   what they already say. Quote rather than paraphrase.
+2. **Draft the minimum wording** that makes the pre-constrained requirement explicit as an
+   **engine-selection and gate criterion**. Minimum means: the smallest change that removes the
+   ambiguity, not a rewrite, not a tidy-up, and not an improvement of adjacent text.
+3. **Preserve all accepted semantics.** The four enforcement points, the fail-closed behaviour, the
+   named side channels, and the Restricted-document condition are unchanged. If the draft would alter
+   any of them, that is a stop condition, not a judgement call.
+4. **Produce the draft as a proposal for Architecture Lead review** — in
+   `implementation/decisions/` or `implementation/comms/` as a clearly-marked proposed amendment.
+5. **STOP before applying it.** See below.
+
+### The boundary that matters most
+
+**Do not apply the amendment to `docs/decisions/ADR-0020-*.md`.** MSG-0092 §5 is explicit: *"stop
+before applying the amendment unless a subsequent explicit authorization permits acceptance."*
+
+**ADR-0020 is accepted and promoted — it carries architectural authority.** Editing it is the Lead's
+act, exactly as ADR promotion was (TASK-0025 / MSG-0073). Producing the draft is this task's whole
+scope.
+
+### Forbidden
+
+- **No retrieval engine, index engine, framework, model, runtime, or provider is selected** — MSG-0092
+  §4 lists nine categories that stay open, and this task touches none of them.
+- **No change to ADR-0020's substantive policy**, and **ADR-0017, ADR-0018, ADR-0019, ADR-0021 and
+  ADR-0022 are not touched at all**.
+- **No new generic stack ADR** — MSG-0092 §3 declined one explicitly.
+- **No Arabic normalization rule**; ADR-0019's deferral is unchanged and the n=1 evidence does not
+  become production corpus evidence (MSG-0092 §4).
+- **Do not start T-A, T-B, T-D, T-E, T-0**, model selection, engine selection, or any production
+  implementation (MSG-0092 §5).
+- **Do not mark any implementation task READY.**
+
+### Acceptance criteria
+
+1. ADR-0020 §§3–4 are inspected in the accepted copy and quoted, not summarised.
+2. A **minimum** clarification is drafted, with its minimality argued — what was deliberately *not*
+   changed is stated.
+3. **No substantive policy change**: the four enforcement points, fail-closed behaviour, side-channel
+   closure and Restricted condition are demonstrably preserved.
+4. **No engine or technology selection appears anywhere in the draft.**
+5. **ADR-0020 in `docs/decisions/` is unmodified** — `git diff --name-only docs/` is empty.
+6. The draft is presented for Lead review, with the exact proposed wording quotable in isolation.
+7. COMMS, queue and status are reconciled; completion reported only after repository verification.
+
+### Verification
+
+Documentary — **no test count**; do not report one it cannot have. Before reporting completion, verify
+and quote:
+
+```text
+git diff --name-only docs/                     -> empty   (no accepted ADR touched)
+grep -c READY on the board                     -> the intended count, no implementation task added
+```
+
+State explicitly which ADR-0020 semantics were preserved and how that was checked.
+
+### Documentation
+
+Record the result in `implementation/comms/` as a numbered message, update
+`implementation/status/current.md`, this queue, and WP-0009 where it tracks the ADR set. Write the
+checkpoint.
+
+### Checkpoint
+
+`implementation/operations/checkpoints/TASK-0030.md`. Write each checkpoint **after** an operation is
+verified, never in anticipation of one.
+
+### Stop conditions
+
+- **The minimum clarification cannot be drafted without changing substantive policy** — stop and record
+  the conflict rather than deciding it.
+- ADR-0020 §§3–4 turn out to already state the consequence unambiguously — **that is a legitimate
+  finding**: report that no amendment is needed rather than manufacturing one.
+- Any point where the wording would imply an engine choice.
+- **`origin/main` moving mid-run** — BLK-0006 is the precedent. Record the starting HEAD in checkpoint 1
+  and re-check before every push.
+
+> **Known runner limits.** `git fetch` is off the allowlist, so a mid-run move is detectable only when a
+> push is rejected. Record it and stop; do not route around it.
+
+### Recovery procedure
+
+Re-read MSG-0092 §3 and §5 and check which records already exist before drafting. **If a proposed
+amendment already exists, do not write a second one** — governance drafts are easy to duplicate and
+hard to reconcile, and duplication is the failure this queue has hit repeatedly.

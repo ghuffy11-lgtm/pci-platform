@@ -1,8 +1,30 @@
 # EPA-0005 — Employee Policy Assistant: Service Stack Evaluation (A-STACK)
 
-**Status:** **PROPOSED — not authorized, and it selects nothing.**
-This record carries no architectural authority. Per `implementation/architecture/README.md`, records in
-this directory are proposals awaiting a ruling.
+**Status:** **ACCEPTED 2026-08-22 by MSG-0092** — as the architecture evaluation record **and** as the
+ruling record for the runtime seam. **It still selects no provider, framework, model, engine, or
+runtime**; MSG-0092 §4 keeps every such selection deliberately open.
+
+**What MSG-0092 settled:**
+
+- **§9.1's three constraints are now settled architecture constraints** — authorization enforced
+  *inside* the retrieval operation (no retrieve-then-filter, no over-fetch-then-filter); capacity
+  planned for **three** local model workloads (generation, multilingual embedding, entailment);
+  conversation and audit storage kept **separate**, with Restricted passages barred from ordinary logs
+  and telemetry. These are consequences of the existing ADR set, **not** technology selections.
+- **Approach C is chosen** — two services along the C2/C6 seam: a governed application layer for the
+  authorization-critical path, and a separate document/inference worker behind an explicit contract.
+  **The worker is not an authorization authority and makes no authorization decisions**; authorization
+  stays in the governed layer *before* retrieval, and the SPEC-0008 boundary is preserved. A
+  **stack-shape** decision, not a runtime selection.
+- **No generic stack ADR is to be created.** This record is the ruling record; manufacturing an ADR
+  merely to restate that selections remain open was explicitly declined.
+
+> **Not promoted to `docs/`, deliberately.** MSG-0092 accepted this record but did not authorize
+> promotion, and promotion is the Lead's act. It stays in `implementation/architecture/` with its
+> acceptance recorded here and its authority resting on MSG-0092.
+
+> **The line this replaces, retained:** "**PROPOSED — not authorized, and it selects nothing.** This
+> record carries no architectural authority." True until MSG-0092 ruled on it.
 **Date:** 2026-08-22
 **Produced by:** Claude Code — TASK-0026, architecture task **A-STACK**
 **Authority:** MSG-0076 (AUTHORIZED) · WP-0009 §6.2 · MSG-0062 **§7.7**

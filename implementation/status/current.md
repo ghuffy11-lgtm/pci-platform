@@ -2,7 +2,7 @@
 
 **Active Work Package:** WP-0001 — PCI Kernel Foundation
 **Status:** **COMPLETE** — declared by the architecture lead 2026-08-19 (MSG-0020(b), resolved by MSG-0022 / MSG-0023, TASK-0009)
-**Last Updated:** 2026-08-22 UTC — **n=1 Arabic evidence ruled sufficient for bounded architecture testing** (MSG-0091); MSG-0090's gap **preserved for the production normalization decision**, ADR-0019 and D6 untouched. **WP-0009 §6.2 architecture tasks are complete** — A-ADR, A-STACK, A-SURVEY all executed; **no fourth exists and none was invented**. The live gate is the **Lead's ruling on `EPA-0005`**. No task READY; scheduler Disabled.
+**Last Updated:** 2026-08-22 UTC — **EPA-0005 ACCEPTED (MSG-0092)**: three §9.1 constraints settled, **Approach C** chosen for the runtime seam, **no generic stack ADR**. Recorded in EPA-0005's header; **not promoted** — promotion is the Lead's act. **TASK-0030 READY** — draft the minimum ADR-0020 clarification as an engine-selection gate, **then stop before applying**. Nine selection categories stay open; ADR-0019 deferral unchanged. Scheduler Disabled.
 
 > **The line this replaces, retained:** "**BLK-0010 RESOLVED; TASK-0027 (A-SURVEY, n=1) is READY and
 > unblocked.** MSG-0083 authorized **option A**: a narrow read-only grant for `D:Workpci-corpus` only,
@@ -763,7 +763,7 @@ carry explicit supersession notes, with no supervisor behaviour, permission, or 
 C4 and C5 — no action, deliberately. **C6 (a bounded proof of MSG-0049 option B) and C7 (the next
 work package) remain the Lead's to decide and are not self-authorized.**
 
-**Seven messages carry `Status: OPEN`** — **MSG-0060**, **MSG-0081**, **MSG-0084**, **MSG-0087**, **MSG-0089**, **MSG-0090** (now **SCOPED**) and **MSG-0091**. Verified across all three views. **MSG-0091 identifies the live gate**: the Lead's ruling on `EPA-0005`. The rest are records or carry referrals that block nothing.
+**Eight messages carry `Status: OPEN`** — MSG-0060, MSG-0081, MSG-0084, MSG-0087, MSG-0089, MSG-0090 (**SCOPED**), MSG-0091 and MSG-0093. Verified across all three views. All are records or carry referrals; **none blocks TASK-0030**.
 
 **MSG-0084 is the TASK-0027 execution record** — a record, plus **two referrals that block nothing**
 (§8 of that message): the designated corpus is **real organizational material, not synthetic**, and the
@@ -1385,58 +1385,132 @@ both tables index it, and both were updated in the same commit as the record.
 
 ## Next Action
 
-**No task is READY, and there is no authorized architecture task remaining. The live gate is the
-Architecture Lead's ruling on `EPA-0005`.**
+**TASK-0030 is READY and is the single READY task — the only one authorized by MSG-0092. Nothing else
+may start from that message.**
 
-### The ruling that changed the position
+### EPA-0005 is ACCEPTED
 
-The Lead ruled (MSG-0091) that the Arabic **n=1** documents are **sufficient technical test evidence
-for the current architecture work**, that representative organizational Arabic material is **not
-required to continue bounded testing**, and that MSG-0090's evidence gap is **preserved for the
-eventual production normalization decision**.
+**MSG-0092 accepted it** as the architecture evaluation record **and** as the ruling record for the
+runtime seam. Its header now records that; **it was not promoted to `docs/`**, because MSG-0092
+accepted without authorizing promotion and promotion is the Lead's act — the same distinction TASK-0025
+turned on.
 
-**It conflicts with nothing.** ADR-0019 §6 and MSG-0056a **D6** gate **production use**, which the
-ruling explicitly leaves intact; they say nothing about evidence adequacy for bounded testing. Had the
-ruling declared n=1 sufficient to *amend* ADR-0019, that would have conflicted and this session would
-have stopped instead of recording it.
+**Three constraints are now settled architecture**, as consequences of the existing ADR set rather than
+technology selections:
 
-**MSG-0090 is preserved, not withdrawn** — unchanged and still OPEN, with a note recording that its
-consequence is now scoped to the production decision. Its §4 evidence specification remains the
-statement of what that decision will need.
+1. **Authorization enforced inside the retrieval operation** — retrieve-then-filter and
+   over-fetch-then-filter are both unacceptable.
+2. **Capacity planned for three local model workloads** — generation, multilingual embedding,
+   entailment.
+3. **Conversation and audit storage separate**, with **Restricted passages barred from ordinary logs
+   and telemetry**.
 
-### Why there is no next architecture task
+**Approach C is chosen** — two services on the C2/C6 seam: a governed application layer holding the
+authorization-critical path, and a document/inference worker behind an explicit contract. **The worker
+is not an authorization authority**; authorization stays in the governed layer *before* retrieval, and
+SPEC-0008's boundary is preserved. **A stack-shape decision that selects no runtime.**
 
-**Verified rather than assumed.** WP-0009 §6.2 defines exactly three architecture tasks, and no fourth
-is referenced anywhere in WP-0009, EPA-0004 or EPA-0005:
+**No generic stack ADR is created** — declined explicitly, on the ground that an ADR restating that
+selections remain open adds nothing.
 
-| Task | Executed as | State |
-|---|---|---|
-| **A-ADR** | TASK-0024 | ADR-0017…ADR-0022 **accepted (MSG-0071) and promoted (TASK-0025)** |
-| **A-STACK** | TASK-0026 | **`EPA-0005` delivered — PROPOSED, awaiting the ruling** |
-| **A-SURVEY** | TASK-0027 / 0028 / 0029 | **Performed at n=1 on three producers** |
+### What TASK-0030 does, and where it stops
 
-Every AUTHORIZED message has a matching execution record. Everything remaining in the sequence is an
-**implementation** task — T-0 and T-A…T-I — and all are explicitly unauthorized.
+**Draft the minimum clarification** making ADR-0020's existing §3/§4 pre-constrained retrieval
+requirement explicit **as an engine-selection / gate criterion**, without changing substantive policy.
 
-**The instruction was to proceed with the next authorized architecture task. The honest execution is to
-report that the set is empty rather than manufacture a task to satisfy the verb.**
+**The gap is consequence, not policy.** §4 is already *"No retrieve-then-suppress — the rule this ADR
+exists for"*, and §3 already sets out four independently-sufficient enforcement points. What is not
+stated in terms is that the rule **disqualifies any retrieval engine that cannot apply authorization
+constraints inside the query** — so a future evaluation could satisfy the ADR on paper while planning
+to filter afterwards.
 
-### What waits behind EPA-0005
+**It drafts and stops.** MSG-0092 §5: *"stop before applying the amendment unless a subsequent explicit
+authorization permits acceptance."* **ADR-0020 is accepted and promoted — editing it is the Lead's
+act.**
 
-1. **Accept, amend, or reject `EPA-0005`**, including its **§9.1** constraints recommended as settled
-   and its position that stack **selection** stays open.
-2. **The one-runtime-or-two trade.**
-3. **Whether a stack ADR is created now** — EPA-0005 recommends **not** yet.
+**One outcome is legitimate and named in advance:** if §§3–4 already state the consequence
+unambiguously, **reporting that no amendment is needed is a correct result.** A task that must produce
+an amendment will produce one whether or not it is warranted.
 
-**Once ruled on, the next authorization is a work-package or implementation-task decision**, which is
-also the Lead's. This session can self-authorize neither.
+### What stays open
+
+**Nine selection categories** remain deliberately open — application framework/runtime, retrieval/index
+engine, extraction toolchain, embedding model, generation model, entailment model, local serving
+runtime, frontend framework, identity provider. **TASK-0030 touches none.**
+
+**ADR-0019's Arabic deferral is unchanged**, and MSG-0092 restates the scoping exactly: n=1 is
+sufficient for bounded architecture testing and **does not become production corpus evidence**.
+
+**T-0 and T-A…T-I remain unauthorized**, and MSG-0092 §5 forbids starting any of them, or any model or
+engine selection, from that message.
 
 ### Operational
 
-The scheduled task `PCI-Execution-Supervisor` is **Disabled**; nothing runs unattended until it is
-re-enabled. **Implementation remains prohibited**, and **T-0 still needs a privileged
-identity-provider deployment** that no decision can substitute for.
+MSG-0092 directs execution through the normal queue/supervisor path. **The scheduled task is
+`Disabled`**, so no unattended cycle will take TASK-0030 — the supervisor path remains available by
+manual trigger, as used for TASK-0021 and TASK-0022. **Re-enabling the schedule is an operator action
+and was not taken.**
 
+---
+
+**Historical — the position while EPA-0005 awaited a ruling, retained.** The text below reported
+no authorized architecture task remaining and named EPA-0005 as the gate. **MSG-0092 ruled on it**
+and authorized TASK-0030.
+
+> ## Next Action
+> 
+> **No task is READY, and there is no authorized architecture task remaining. The live gate is the
+> Architecture Lead's ruling on `EPA-0005`.**
+> 
+> ### The ruling that changed the position
+> 
+> The Lead ruled (MSG-0091) that the Arabic **n=1** documents are **sufficient technical test evidence
+> for the current architecture work**, that representative organizational Arabic material is **not
+> required to continue bounded testing**, and that MSG-0090's evidence gap is **preserved for the
+> eventual production normalization decision**.
+> 
+> **It conflicts with nothing.** ADR-0019 §6 and MSG-0056a **D6** gate **production use**, which the
+> ruling explicitly leaves intact; they say nothing about evidence adequacy for bounded testing. Had the
+> ruling declared n=1 sufficient to *amend* ADR-0019, that would have conflicted and this session would
+> have stopped instead of recording it.
+> 
+> **MSG-0090 is preserved, not withdrawn** — unchanged and still OPEN, with a note recording that its
+> consequence is now scoped to the production decision. Its §4 evidence specification remains the
+> statement of what that decision will need.
+> 
+> ### Why there is no next architecture task
+> 
+> **Verified rather than assumed.** WP-0009 §6.2 defines exactly three architecture tasks, and no fourth
+> is referenced anywhere in WP-0009, EPA-0004 or EPA-0005:
+> 
+> | Task | Executed as | State |
+> |---|---|---|
+> | **A-ADR** | TASK-0024 | ADR-0017…ADR-0022 **accepted (MSG-0071) and promoted (TASK-0025)** |
+> | **A-STACK** | TASK-0026 | **`EPA-0005` delivered — PROPOSED, awaiting the ruling** |
+> | **A-SURVEY** | TASK-0027 / 0028 / 0029 | **Performed at n=1 on three producers** |
+> 
+> Every AUTHORIZED message has a matching execution record. Everything remaining in the sequence is an
+> **implementation** task — T-0 and T-A…T-I — and all are explicitly unauthorized.
+> 
+> **The instruction was to proceed with the next authorized architecture task. The honest execution is to
+> report that the set is empty rather than manufacture a task to satisfy the verb.**
+> 
+> ### What waits behind EPA-0005
+> 
+> 1. **Accept, amend, or reject `EPA-0005`**, including its **§9.1** constraints recommended as settled
+>    and its position that stack **selection** stays open.
+> 2. **The one-runtime-or-two trade.**
+> 3. **Whether a stack ADR is created now** — EPA-0005 recommends **not** yet.
+> 
+> **Once ruled on, the next authorization is a work-package or implementation-task decision**, which is
+> also the Lead's. This session can self-authorize neither.
+> 
+> ### Operational
+> 
+> The scheduled task `PCI-Execution-Supervisor` is **Disabled**; nothing runs unattended until it is
+> re-enabled. **Implementation remains prohibited**, and **T-0 still needs a privileged
+> identity-provider deployment** that no decision can substitute for.
+> 
 ---
 
 **Historical — the position before the n=1 sufficiency ruling, retained.** The text below
