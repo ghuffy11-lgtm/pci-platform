@@ -2,7 +2,7 @@
 
 **Active Work Package:** WP-0001 — PCI Kernel Foundation
 **Status:** **COMPLETE** — declared by the architecture lead 2026-08-19 (MSG-0020(b), resolved by MSG-0022 / MSG-0023, TASK-0009)
-**Last Updated:** 2026-08-22 UTC (operator designated an A-SURVEY corpus; **verified NOT reachable — BLK-0008**; A-SURVEY still unexecutable, A-STACK delivered as `EPA-0005`; no task READY)** — **A-STACK delivered `EPA-0005`**, PROPOSED and selecting nothing; **A-SURVEY not performed, PR5 re-verified UNMET**; 5/6 criteria met, MSG-0078. **No task is READY**) · 2026-08-22 UTC (**MSG-0076 authorizes A-SURVEY + A-STACK**, reconciled as **TASK-0026**, the single READY task — MSG-0077; **A-SURVEY blocked on PR5, no corpus reachable**; A-STACK unblocked) · 2026-08-21 UTC (**TASK-0025 COMPLETE** — **ADR-0018…ADR-0022 promoted** into `docs/decisions/`, completing the WP-0009 ADR set; 5/5 acceptance criteria, zero body differences in the per-ADR diffs, MSG-0075. **No task is READY**)
+**Last Updated:** 2026-08-22 UTC — operator designated an A-SURVEY corpus; **verified NOT reachable**. Corrected: the path is an **NFS export, not SMB** — NFS 2049 and portmapper 111 closed, **and** Client for NFS is not installed here. Two independent blockers (**BLK-0008**, MSG-0079). A-SURVEY still unexecutable; **A-STACK delivered as `EPA-0005`** (PROPOSED, selecting nothing); TASK-0026 **COMPLETE (PARTIAL)**, 5/6 criteria met (MSG-0078). **No task is READY.**
 
 > **The line this replaces, retained:** "2026-08-21 UTC (**MSG-0073 answers MSG-0072** — **TASK-0025
 > authorized** to promote ADR-0018…ADR-0022 and reconciled into the queue as the single READY task,
@@ -1083,9 +1083,27 @@ required as a messenger.
 ## Open Blockers
 
 **One: BLK-0008, raised 2026-08-22** — the corpus the operator designated for A-SURVEY,
-`\\10.1.27.220\LXBackup\plan.pdf`, **is not reachable from this machine.** The host answers ICMP, but
-**SMB 445 and 139 are both closed**, `net view` returns system error 53, and `Test-Path` is false for
-both the file and the share root.
+`\\10.1.27.220\LXBackup\plan.pdf`, **is not reachable from this machine.**
+
+**Corrected 2026-08-22: the path is an NFS export, not an SMB share.** The UNC form is how Windows'
+Client for NFS addresses an export, so it fitted either protocol and SMB was tested first. Re-tested
+against NFS, **two independent blockers exist and fixing either alone changes nothing**:
+
+- **The export is unreachable** — NFS **2049** and portmapper **111** are both closed. NFSv4 needs no
+  portmapper, so 2049 alone would have sufficed; neither answers.
+- **This workstation has no NFS client.** `NFS-Client` and `FS-NFS-Service` both report
+  `InstallState: Available` — installable, **not installed**. `showmount.exe` and `nfsadmin.exe` are
+  absent, and the `mount.exe` on PATH is Git for Windows' MSYS binary, which cannot mount an NFS
+  export — so a check for "is mount available" returns a misleading yes.
+
+**Client for NFS was not installed.** That is a privileged Windows feature installation and **nothing
+authorizes it** — TASK-0026 is closed and MSG-0076 authorized architecture work, not machine
+configuration. It is also not urgent alone: with 2049 closed, installing it would change nothing yet.
+
+> **The earlier SMB findings are retained in BLK-0008 and MSG-0079 rather than deleted.** They are
+> accurate — SMB genuinely is closed on that host — but they answered the wrong question, and **the
+> remedy they pointed at (check share publication, hand the SMB split to a network admin) is
+> superseded.** Keeping the correction visible is worth more than a tidy record.
 
 **It is not a credentials problem, and the distinction decides what to fix.** No TCP connection is
 established, so **no authentication is ever attempted** — a credentials failure would connect and
@@ -1326,9 +1344,14 @@ both tables index it, and both were updated in the same commit as the record.
 explicitly **not** production or confidential. **That resolves the authority half of PR5**, which had
 been open since EPA-0002: someone with standing has named material and bounded its use.
 
-**The path cannot be read.** The host answers ICMP, but **SMB 445 and 139 are both closed**, `net view`
-returns system error 53, and `Test-Path` is false for the file and the share root. **BLK-0008** carries
-the full diagnosis; **MSG-0079** carries the verification.
+**The path cannot be read**, and **it is an NFS export rather than an SMB share** — clarified by the
+operator after SMB was tested first, since the UNC form fits either. **BLK-0008** carries the full
+diagnosis; **MSG-0079** carries the verification and the correction.
+
+**Two independent blockers**, and fixing either alone changes nothing: **NFS 2049 and portmapper 111
+are both closed**, *and* **Client for NFS is not installed on this workstation** (`NFS-Client` reports
+`InstallState: Available`). Installing it is a privileged host change that nothing currently
+authorizes.
 
 **It is not a credentials problem**, and that decides what to fix. No TCP connection is established, so
 no authentication is ever attempted — credentials, drive mappings and share permission changes cannot
@@ -1337,11 +1360,22 @@ this machine**, so none is asserted.
 
 ### What the operator needs to do
 
-1. **Confirm the share is published and the SMB service running** on `10.1.27.220`.
-2. **Check whether SMB is filtered** between this workstation and that host — the ICMP-works /
-   SMB-closed split is the signature to hand a network administrator.
-3. **Or place the file somewhere already reachable.** The designation is about authority, not
-   transport, so this is equally valid and may be faster.
+**Two conditions must both hold** — fixing either alone leaves the corpus unreadable:
+
+1. **Make the NFS export reachable from this workstation** — port **2049** open, and `LXBackup`
+   exported to this host's address. Whether the export exists or simply excludes this address
+   **cannot be determined from here**: `showmount -e 10.1.27.220` would answer it, and that tool ships
+   with the feature that is not installed.
+2. **Install Client for NFS on this workstation** — `Install-WindowsFeature NFS-Client`, administrator
+   privilege. **Not done, and deliberately so:** it is a privileged host modification and nothing
+   authorizes it. It is also not urgent alone, since with 2049 closed it would change nothing yet.
+
+**Or place the file somewhere already reachable** — the designation is about authority, not transport,
+so this remains equally valid and is likely the fastest of the three.
+
+> **Superseded guidance, retained:** this section previously said to confirm SMB publication and hand
+> the ICMP-works/SMB-closed split to a network administrator. **That was based on the wrong protocol
+> and should be disregarded.**
 
 ### Then — a new task, not a re-run
 

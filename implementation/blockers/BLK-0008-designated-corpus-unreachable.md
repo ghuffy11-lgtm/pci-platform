@@ -1,6 +1,6 @@
 # BLK-0008 — The Designated A-SURVEY Corpus Is Not Reachable
 
-**Status:** **OPEN** — operator action required; no local remedy exists and none was attempted
+**Status:** **OPEN** — operator action required. **Corrected 2026-08-22: the path is NFS, not SMB.** Two independent blockers: the NFS export is unreachable (2049 and 111 both closed) **and** Client for NFS is not installed on this workstation. No local remedy was attempted; installing the feature is a privileged change nothing authorizes
 **Raised:** 2026-08-22, on the operator's designation of a corpus path
 **Severity:** Medium. A-SURVEY stays unexecutable; A-STACK is delivered and unaffected
 **Related:** MSG-0077 (PR5 unmet), MSG-0078 §3 (A-SURVEY stopped), MSG-0076, MSG-0062 §7.5, BLK-0007 (same diagnostic shape)
@@ -114,3 +114,73 @@ sampled, so nobody later mistakes n=1 for a corpus.
 path now succeeds, this blocker is stale — but note that **A-SURVEY still requires a newly authorized
 task**, because TASK-0026 is closed. Do not re-run a closed task, and do not survey without
 authorization.
+
+---
+
+## CORRECTION — 2026-08-22: the path is NFS, not SMB
+
+**The operator has clarified: `\10.1.27.220\LXBackup\plan.pdf` is an NFS export**, not an SMB share.
+The UNC-style notation is how Windows' own Client for NFS addresses an export, so the form was
+consistent with either protocol and **this record tested the wrong one first.**
+
+The original SMB findings above are left in place rather than deleted — they are true (SMB genuinely is
+closed on that host) but they were **the wrong question**, and the remedy they pointed at was
+correspondingly wrong.
+
+### Re-tested against NFS
+
+```text
+Test-NetConnection 10.1.27.220 -Port 2049   ->  False    NFS closed
+Test-NetConnection 10.1.27.220 -Port 111    ->  False    portmapper/rpcbind closed
+```
+
+**Both closed.** NFSv4 does not require portmapper, so 2049 alone would have sufficed; neither
+responds.
+
+### And a second, independent blocker: there is no NFS client on this machine
+
+```text
+Get-WindowsFeature NFS-Client       ->  InstallState: Available     (i.e. NOT installed)
+Get-WindowsFeature FS-NFS-Service   ->  InstallState: Available     (i.e. NOT installed)
+
+showmount.exe  ->  NOT PRESENT
+nfsadmin.exe   ->  NOT PRESENT
+mount.exe      ->  C:\Program Files\Git\usr\bin\mount.exe   <- Git Bash MSYS binary, NOT the Windows NFS client
+```
+
+`Available` in this cmdlet means *installable but not installed*. **This workstation cannot mount NFS
+at all**, independently of whether the server is reachable.
+
+The `mount.exe` on PATH is a decoy worth naming: it belongs to Git for Windows and cannot mount an NFS
+export. Anyone checking for "is mount available" would get a misleading yes.
+
+### What this changes, and what it does not
+
+**Unchanged:** the corpus is unreachable, A-SURVEY stays unexecutable, and no observations were
+produced.
+
+**Changed — the remedy.** The earlier guidance said to check SMB publication and hand the
+ICMP-works/SMB-closed split to a network administrator. **That advice was based on the wrong protocol
+and should be disregarded.** Two things must both be true before the corpus can be read:
+
+1. **The NFS export must be reachable** from this workstation — 2049 open, and `LXBackup` exported to
+   this host with a permitted client address.
+2. **Client for NFS must be installed here** — `Install-WindowsFeature NFS-Client`, which requires
+   administrator privilege and a Windows feature installation.
+
+### Why item 2 was not done
+
+**Installing a Windows feature is a privileged host modification**, and no current work package or
+recorded decision authorizes it. TASK-0026 is closed; MSG-0076 authorized architecture work, not
+machine configuration. Per the operating rules, the destination, privilege and authorization must be
+stated and confirmed before any host change — the first two are known, the third does not exist.
+
+**So it is recorded as an operator decision rather than performed.** It is also not urgent on its own:
+with 2049 closed, installing the client would change nothing yet.
+
+### Corrected diagnosis
+
+**The host answers ICMP and offers neither SMB nor NFS to this workstation, and this workstation has no
+NFS client installed.** Whether the export exists, is exported to this address, or is firewalled cannot
+be determined from here — `showmount -e` would answer it, and that tool is part of the uninstalled
+feature.

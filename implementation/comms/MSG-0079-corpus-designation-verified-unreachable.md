@@ -1,6 +1,6 @@
 # MSG-0079 — Corpus Designated by the Operator: Verified, and Not Reachable
 
-**Status:** **OPEN** — operator action required to make the designated corpus reachable
+**Status:** **OPEN** — operator action required. **Corrected 2026-08-22: the designated path is NFS, not SMB.** Re-tested: NFS 2049 and portmapper 111 both closed, **and** Client for NFS is not installed on this workstation. Two independent blockers; the earlier SMB guidance is superseded
 **Raised:** 2026-08-22
 **Raised by:** Claude Code (interactive session, COMMS)
 **Type:** Verification result + blocker report
@@ -113,3 +113,61 @@ the queue as the single READY task before execution.
 - **A-SURVEY: still unexecutable.** A-STACK: delivered (`EPA-0005`).
 - **TASK-0026: COMPLETE (PARTIAL)**, criterion 1 unmet, unchanged by this record.
 - **No task is READY.** No accepted ADR touched. No implementation authorized.
+
+---
+
+## CORRECTION — 2026-08-22: NFS, not SMB
+
+**The operator clarified that the designated path is an NFS export.** This record originally tested SMB,
+because `\host\share\file` is UNC notation — but Windows' own Client for NFS addresses exports the
+same way, so the form was consistent with either protocol and **the wrong one was tested first.**
+
+The SMB findings above are left standing rather than removed. They are accurate — SMB genuinely is
+closed on that host — but they answered a question nobody asked, and **the remedy they pointed at was
+wrong**, which is the part that matters.
+
+### Re-tested against NFS, and a second blocker found
+
+```text
+Test-NetConnection 10.1.27.220 -Port 2049   ->  False    NFS closed
+Test-NetConnection 10.1.27.220 -Port 111    ->  False    portmapper closed
+
+Get-WindowsFeature NFS-Client               ->  InstallState: Available   (NOT installed)
+Get-WindowsFeature FS-NFS-Service           ->  InstallState: Available   (NOT installed)
+showmount.exe / nfsadmin.exe                ->  NOT PRESENT
+mount.exe                                   ->  Git Bash MSYS binary, not the Windows NFS client
+```
+
+**Two independent things are wrong, and fixing either alone changes nothing:**
+
+1. **The export is not reachable** — 2049 and 111 both closed. NFSv4 needs no portmapper, so 2049 alone
+   would have been enough; neither answers.
+2. **This workstation has no NFS client installed.** `Available` means installable, not installed. The
+   `mount.exe` on PATH belongs to Git for Windows and cannot mount an NFS export — a check for "is
+   mount available" returns a misleading yes.
+
+### What was not done, and why
+
+**Client for NFS was not installed.** That is a privileged Windows feature installation, and **nothing
+authorizes it**: TASK-0026 is closed, and MSG-0076 authorized architecture work rather than machine
+configuration. The operating rules require the destination, privilege and authorization to be stated
+before any host change; the first two are known and the third does not exist.
+
+It is also not urgent in isolation — with 2049 closed, installing the client would change nothing yet.
+
+### Corrected guidance for the operator
+
+**Disregard the SMB advice above.** Two conditions must both hold before the corpus can be read:
+
+1. **The NFS export must be reachable from this workstation** — 2049 open, and `LXBackup` exported to
+   this host's address.
+2. **Client for NFS must be installed here** — `Install-WindowsFeature NFS-Client`, administrator
+   privilege, and an operator decision to make it.
+
+Whether the export exists at all, or is simply not exported to this address, **cannot be determined
+from here**: `showmount -e 10.1.27.220` would answer it, and that tool ships with the uninstalled
+feature.
+
+**Everything else in this record stands.** The authority half of PR5 remains resolved by the
+designation; no observations were produced; and completing A-SURVEY still requires a newly authorized
+task, since TASK-0026 is closed.
