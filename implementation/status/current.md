@@ -2,7 +2,7 @@
 
 **Active Work Package:** WP-0001 — PCI Kernel Foundation
 **Status:** **COMPLETE** — declared by the architecture lead 2026-08-19 (MSG-0020(b), resolved by MSG-0022 / MSG-0023, TASK-0009)
-**Last Updated:** 2026-08-22 UTC (**TASK-0026 COMPLETE (PARTIAL)** — **A-STACK delivered `EPA-0005`**, PROPOSED and selecting nothing; **A-SURVEY not performed, PR5 re-verified UNMET**; 5/6 criteria met, MSG-0078. **No task is READY**) · 2026-08-22 UTC (**MSG-0076 authorizes A-SURVEY + A-STACK**, reconciled as **TASK-0026**, the single READY task — MSG-0077; **A-SURVEY blocked on PR5, no corpus reachable**; A-STACK unblocked) · 2026-08-21 UTC (**TASK-0025 COMPLETE** — **ADR-0018…ADR-0022 promoted** into `docs/decisions/`, completing the WP-0009 ADR set; 5/5 acceptance criteria, zero body differences in the per-ADR diffs, MSG-0075. **No task is READY**)
+**Last Updated:** 2026-08-22 UTC (operator designated an A-SURVEY corpus; **verified NOT reachable — BLK-0008**; A-SURVEY still unexecutable, A-STACK delivered as `EPA-0005`; no task READY)** — **A-STACK delivered `EPA-0005`**, PROPOSED and selecting nothing; **A-SURVEY not performed, PR5 re-verified UNMET**; 5/6 criteria met, MSG-0078. **No task is READY**) · 2026-08-22 UTC (**MSG-0076 authorizes A-SURVEY + A-STACK**, reconciled as **TASK-0026**, the single READY task — MSG-0077; **A-SURVEY blocked on PR5, no corpus reachable**; A-STACK unblocked) · 2026-08-21 UTC (**TASK-0025 COMPLETE** — **ADR-0018…ADR-0022 promoted** into `docs/decisions/`, completing the WP-0009 ADR set; 5/5 acceptance criteria, zero body differences in the per-ADR diffs, MSG-0075. **No task is READY**)
 
 > **The line this replaces, retained:** "2026-08-21 UTC (**MSG-0073 answers MSG-0072** — **TASK-0025
 > authorized** to promote ADR-0018…ADR-0022 and reconciled into the queue as the single READY task,
@@ -690,8 +690,17 @@ carry explicit supersession notes, with no supervisor behaviour, permission, or 
 C4 and C5 — no action, deliberately. **C6 (a bounded proof of MSG-0049 option B) and C7 (the next
 work package) remain the Lead's to decide and are not self-authorized.**
 
-**Three messages carry `Status: OPEN`** — **MSG-0060**, **MSG-0077**, and **MSG-0078**. Verified
-across all three views (message file, COMMS register, queue ledger).
+**Four messages carry `Status: OPEN`** — **MSG-0060**, **MSG-0077**, **MSG-0078**, and
+**MSG-0079**. Verified across all three views (message file, COMMS register, queue ledger).
+
+**MSG-0079 records the operator's corpus designation and the verification that followed.** The
+organization named `\\10.1.27.220\LXBackup\plan.pdf` as the approved/synthetic A-SURVEY corpus,
+explicitly **not** production or confidential — **which resolves the authority half of PR5.** The
+path is **not reachable** (BLK-0008), so A-SURVEY remains unexecutable for a different reason than
+before: no longer "nobody has supplied material", now "the supplied material cannot be read".
+
+> **The line this replaces, retained:** "**Three messages carry `Status: OPEN`** — **MSG-0060**,
+> **MSG-0077**, and **MSG-0078**." True until MSG-0079 was raised on 2026-08-22.
 
 **MSG-0078 is the TASK-0026 execution record**, and it is OPEN rather than a closed RECORD for one
 reason: **the organizational action MSG-0077 asked for has not been taken.** TASK-0026 re-verified
@@ -1073,7 +1082,34 @@ required as a messenger.
 
 ## Open Blockers
 
-**None.** BLK-0001 through **BLK-0007** are all RESOLVED.
+**One: BLK-0008, raised 2026-08-22** — the corpus the operator designated for A-SURVEY,
+`\\10.1.27.220\LXBackup\plan.pdf`, **is not reachable from this machine.** The host answers ICMP, but
+**SMB 445 and 139 are both closed**, `net view` returns system error 53, and `Test-Path` is false for
+both the file and the share root.
+
+**It is not a credentials problem, and the distinction decides what to fix.** No TCP connection is
+established, so **no authentication is ever attempted** — a credentials failure would connect and
+return *access denied*. Credentials, drive mappings and share permission changes cannot help while the
+transport is closed. Four causes fit this signature (SMB disabled, host firewall, network filtering,
+share not published) and **cannot be distinguished from this machine**, so none is asserted.
+
+**The designation itself resolved the authority half of PR5**: the organization named approved material
+and bounded its use to approved/synthetic, explicitly not production or confidential. What is missing
+is reachability, not permission.
+
+**Impact is bounded.** A-STACK is delivered (`EPA-0005`) and never depended on the corpus. A-SURVEY
+stays unexecutable, and because TASK-0026 is already COMPLETE (PARTIAL), **completing A-SURVEY needs a
+newly authorized task** rather than a re-run.
+
+**No workaround was attempted** — no alternative transport, no credentials, nothing copied anywhere,
+and **no survey observations produced**. See
+[`../blockers/BLK-0008-designated-corpus-unreachable.md`](../blockers/BLK-0008-designated-corpus-unreachable.md)
+and **MSG-0079**.
+
+**BLK-0001 through BLK-0007 are all RESOLVED.**
+
+> **The line this replaces, retained:** "**None.** BLK-0001 through **BLK-0007** are all RESOLVED."
+> True until BLK-0008 was raised on 2026-08-22.
 
 **BLK-0007 was raised and resolved within the same session on 2026-08-21.** GitHub SSH transport
 was closed by the remote at banner exchange (`kex_exchange_identification`), before authentication
@@ -1284,49 +1320,110 @@ both tables index it, and both were updated in the same commit as the record.
 
 ## Next Action
 
-**No task is READY. TASK-0026 is COMPLETE (PARTIAL), and what happens next divides between the
-Architecture Lead and the organization.**
+**No task is READY. One operator action is required: make the designated A-SURVEY corpus reachable.**
 
-### The one action that is genuinely blocking, and it is the organization's
+**The organization has designated the corpus** — `\\10.1.27.220\LXBackup\plan.pdf`, approved/synthetic,
+explicitly **not** production or confidential. **That resolves the authority half of PR5**, which had
+been open since EPA-0002: someone with standing has named material and bounded its use.
 
-**Supply representative approved policy material for a read-only survey, or rule that A-SURVEY is
-deferred until the corpus exists.** MSG-0076's constraint binds either way: **a survey reads; it does
-not ingest**, and it may not bypass approval controls.
+**The path cannot be read.** The host answers ICMP, but **SMB 445 and 139 are both closed**, `net view`
+returns system error 53, and `Test-Path` is false for the file and the share root. **BLK-0008** carries
+the full diagnosis; **MSG-0079** carries the verification.
 
-This is the same action MSG-0077 asked for. **TASK-0026 re-verified by inspection that it is still
-outstanding** — it did not assume so from the earlier record — and it is not an action Claude Code can
-take or route around. Until it is taken, **MSG-0056a D6 stays partially discharged and ADR-0019's
-Arabic normalization rules stay deferred**, which is exactly the condition MSG-0071 accepted that ADR
-under. **D14's rejection exposure stays unmeasured** too: WP-0009 §6.2 warned that if the real corpus
-is largely scanned Arabic PDFs, the first release answers from a fraction of it and *nobody discovers
-that until T-B runs*.
+**It is not a credentials problem**, and that decides what to fix. No TCP connection is established, so
+no authentication is ever attempted — credentials, drive mappings and share permission changes cannot
+help while the transport is closed. Four causes fit the signature and **cannot be distinguished from
+this machine**, so none is asserted.
 
-### What the Architecture Lead holds, neither of which blocks anything
+### What the operator needs to do
 
-1. **Accept, amend, or reject `EPA-0005`** — the A-STACK evaluation, PROPOSED. Including its **§9.3**
-   recommendation that **no stack ADR be created yet**, and its observation that if the §3.3
-   pre-filtering rule warrants recording as accepted architecture, it belongs with **ADR-0020** —
-   whose §3 and §4 it follows from — rather than in a record of its own.
-2. **The one-runtime-or-two trade** of EPA-0005 §5, when the timing is right. It was deliberately left
-   open: it turns on operability and team capability in the customer's context, which the
-   technology-selection principles make a matter of **operational fit** rather than technical ranking.
+1. **Confirm the share is published and the SMB service running** on `10.1.27.220`.
+2. **Check whether SMB is filtered** between this workstation and that host — the ICMP-works /
+   SMB-closed split is the signature to hand a network administrator.
+3. **Or place the file somewhere already reachable.** The designation is about authority, not
+   transport, so this is equally valid and may be faster.
 
-**A sequencing observation, offered and not self-authorized.** Seven of the questions a stack proposal
-would ordinarily answer are corpus-dependent (EPA-0005 §8), so **A-SURVEY is a genuine input to
-A-STACK** and running A-STACK first was always going to leave that residue. If the corpus becomes
-available, the natural follow-up is A-SURVEY and then a revision of EPA-0005 §8 and §9.2 against real
-evidence. **No task is marked READY on the strength of that observation** — naming the next task is
-the Lead's act, and it must be reconciled into `CLAUDE-TASKS.md` as the single READY task **in the same
-commit as the authorization** (the MSG-0044 gap, which has now recurred eight times).
+### Then — a new task, not a re-run
 
-### Still unauthorized after TASK-0026
+**TASK-0026 is COMPLETE (PARTIAL) and closed.** A-STACK is delivered as `EPA-0005`; A-SURVEY is
+recorded unmet against MSG-0076 criterion 1. **Completing A-SURVEY needs a newly authorized task**, and
+that authorization is the Architecture Lead's. A closed task is not re-run.
 
-Implementation stays prohibited. **T-A, T-B, T-D, T-E and T-0 are not authorized**, and TASK-0026
-marked none of them READY. **T-0 remains an operator prerequisite** needing a privileged
-identity-provider deployment that no decision can substitute for. **PR3 and PR4 remain NOT MET; PR5 is
-now VERIFIED UNMET; PR6 remains UNKNOWN** — and EPA-0005 §3.5 makes PR6 larger than it looked, since
-the capability needs **three** concurrent local models rather than one.
+When it is authorized, its board row must be added in the same commit — the queue gap has recurred
+eight times and has only ever been repaired, never prevented.
 
+### One thing to settle when authorizing it
+
+**One PDF cannot answer four of A-SURVEY's five questions.** Formats, language mix, scanned-document
+prevalence, and classification/audience patterns are *distributional* — they describe a population.
+A single file can establish whether **it** is text-native or scanned and what language **it** is in;
+it cannot establish prevalence or mix.
+
+That matters because survey findings feed **D6** normalization, **D14**'s rejection of scanned
+documents, and **ADR-0019**, accepted specifically on condition its rules come from *empirical corpus
+evidence*. **The ask is not to change the ruling** — one document is genuinely useful for format,
+extraction and language questions, and for proving the ingestion path. It is that the resulting record
+**state its sample size**, so nobody later reads n=1 as a corpus survey.
+
+### Still unauthorized
+
+Implementation remains prohibited. **T-A, T-B, T-D, T-E and T-0 are not authorized.** T-0 stays an
+operator prerequisite needing a privileged identity-provider deployment. `EPA-0005` is **PROPOSED** and
+selects nothing — it awaits the Architecture Lead's review.
+
+---
+
+**Historical — the position before the corpus was designated, retained.** The text below asked
+the organization to supply approved policy material. **It has now been designated** —
+`\\10.1.27.220\LXBackup\plan.pdf`, approved/synthetic — but the path is **not reachable**
+(BLK-0008), so A-SURVEY remains blocked for a different reason. Retained as the record of what
+was asked.
+
+> ## Next Action
+> 
+> **No task is READY. TASK-0026 is COMPLETE (PARTIAL), and what happens next divides between the
+> Architecture Lead and the organization.**
+> 
+> ### The one action that is genuinely blocking, and it is the organization's
+> 
+> **Supply representative approved policy material for a read-only survey, or rule that A-SURVEY is
+> deferred until the corpus exists.** MSG-0076's constraint binds either way: **a survey reads; it does
+> not ingest**, and it may not bypass approval controls.
+> 
+> This is the same action MSG-0077 asked for. **TASK-0026 re-verified by inspection that it is still
+> outstanding** — it did not assume so from the earlier record — and it is not an action Claude Code can
+> take or route around. Until it is taken, **MSG-0056a D6 stays partially discharged and ADR-0019's
+> Arabic normalization rules stay deferred**, which is exactly the condition MSG-0071 accepted that ADR
+> under. **D14's rejection exposure stays unmeasured** too: WP-0009 §6.2 warned that if the real corpus
+> is largely scanned Arabic PDFs, the first release answers from a fraction of it and *nobody discovers
+> that until T-B runs*.
+> 
+> ### What the Architecture Lead holds, neither of which blocks anything
+> 
+> 1. **Accept, amend, or reject `EPA-0005`** — the A-STACK evaluation, PROPOSED. Including its **§9.3**
+>    recommendation that **no stack ADR be created yet**, and its observation that if the §3.3
+>    pre-filtering rule warrants recording as accepted architecture, it belongs with **ADR-0020** —
+>    whose §3 and §4 it follows from — rather than in a record of its own.
+> 2. **The one-runtime-or-two trade** of EPA-0005 §5, when the timing is right. It was deliberately left
+>    open: it turns on operability and team capability in the customer's context, which the
+>    technology-selection principles make a matter of **operational fit** rather than technical ranking.
+> 
+> **A sequencing observation, offered and not self-authorized.** Seven of the questions a stack proposal
+> would ordinarily answer are corpus-dependent (EPA-0005 §8), so **A-SURVEY is a genuine input to
+> A-STACK** and running A-STACK first was always going to leave that residue. If the corpus becomes
+> available, the natural follow-up is A-SURVEY and then a revision of EPA-0005 §8 and §9.2 against real
+> evidence. **No task is marked READY on the strength of that observation** — naming the next task is
+> the Lead's act, and it must be reconciled into `CLAUDE-TASKS.md` as the single READY task **in the same
+> commit as the authorization** (the MSG-0044 gap, which has now recurred eight times).
+> 
+> ### Still unauthorized after TASK-0026
+> 
+> Implementation stays prohibited. **T-A, T-B, T-D, T-E and T-0 are not authorized**, and TASK-0026
+> marked none of them READY. **T-0 remains an operator prerequisite** needing a privileged
+> identity-provider deployment that no decision can substitute for. **PR3 and PR4 remain NOT MET; PR5 is
+> now VERIFIED UNMET; PR6 remains UNKNOWN** — and EPA-0005 §3.5 makes PR6 larger than it looked, since
+> the capability needs **three** concurrent local models rather than one.
+> 
 ---
 
 **Historical — the position after MSG-0077 and before TASK-0026 executed, retained.** The text below

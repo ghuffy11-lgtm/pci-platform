@@ -14,6 +14,7 @@ by an open blocker must never be reported as met.
 | BLK-0005 | Two contradictory MSG-0020 decisions | High | **RESOLVED** 2026-08-19 |
 | [BLK-0006](BLK-0006-mid-run-repository-movement.md) | `origin/main` moved mid-run; TASK-0021 closeout commit cannot be pushed | Low impact, hard boundary | **RESOLVED** 2026-08-21 — mover identified as the lead push `182698c` (MSG-0056); reconciled by fetch + rebase, zero file overlap, no conflict, no force-push |
 | [BLK-0007](BLK-0007-github-ssh-transport-closed.md) | GitHub SSH transport closed at banner exchange; push unavailable | Medium | **RESOLVED** 2026-08-21 — recovered on its own in ~10 min; push landed `42426df` and the blocked dry run completed. **No workaround was applied**; cause never established beyond "transport, upstream, transient" |
+| [BLK-0008](BLK-0008-designated-corpus-unreachable.md) | Designated A-SURVEY corpus (UNC path `\\10.1.27.220\LXBackup\plan.pdf`) is not reachable | Medium | **OPEN** 2026-08-22 — host answers ICMP but **SMB 445 and 139 are both closed** and `net view` returns error 53. **Not a credentials problem**: no TCP connection, so no authentication is attempted. A-SURVEY stays unexecutable; A-STACK unaffected. Operator action required |
 
 **No blocker is open.**
 
