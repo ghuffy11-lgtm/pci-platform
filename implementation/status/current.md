@@ -2,7 +2,9 @@
 
 **Active Work Package:** WP-0001 — PCI Kernel Foundation
 **Status:** **COMPLETE** — declared by the architecture lead 2026-08-19 (MSG-0020(b), resolved by MSG-0022 / MSG-0023, TASK-0009)
-**Last Updated:** 2026-08-22 UTC — **EPA-0005 ACCEPTED (MSG-0092)**: three §9.1 constraints settled, **Approach C** chosen for the runtime seam, **no generic stack ADR**. Recorded in EPA-0005's header; **not promoted** — promotion is the Lead's act. **TASK-0030 READY** — draft the minimum ADR-0020 clarification as an engine-selection gate, **then stop before applying**. Nine selection categories stay open; ADR-0019 deferral unchanged. Scheduler Disabled.
+**Last Updated:** 2026-08-22 UTC — **TASK-0030 COMPLETE (MSG-0094)**: the minimum ADR-0020 clarification is **drafted as `ADR-0020-AMD-01` — PROPOSED and NOT applied**. `git diff --name-only docs/decisions/` is **empty**; the accepted, promoted ADR-0020 is **unmodified**, and applying the amendment needs an explicit Lead authorization (MSG-0092 §5). **No task is READY.** Nine selection categories stay open; ADR-0019's deferral unchanged. Scheduler Disabled.
+
+> **The line this replaces, retained:** "**EPA-0005 ACCEPTED (MSG-0092)**: three §9.1 constraints settled, **Approach C** chosen for the runtime seam, **no generic stack ADR**. Recorded in EPA-0005's header; **not promoted** — promotion is the Lead's act. **TASK-0030 READY** — draft the minimum ADR-0020 clarification as an engine-selection gate, **then stop before applying**. Nine selection categories stay open; ADR-0019 deferral unchanged. Scheduler Disabled." True until the next supervisor cycle started that task and completed it the same day.
 
 > **The line this replaces, retained:** "**BLK-0010 RESOLVED; TASK-0027 (A-SURVEY, n=1) is READY and
 > unblocked.** MSG-0083 authorized **option A**: a narrow read-only grant for `D:Workpci-corpus` only,
@@ -122,7 +124,16 @@ message on 2026-08-20 under MSG-0041 (MSG-0042) — the fifth.
 | TASK-0025 | Promote ADR-0018…ADR-0022 into the accepted decision register | **COMPLETE** (2026-08-21) — 5/5 criteria, **five ADRs promoted, zero body differences**, MSG-0075 | TASK-0024, MSG-0071, MSG-0073 ✅ | Claude Code |
 | TASK-0026 | A-SURVEY + A-STACK — bounded corpus survey and stack evaluation | **COMPLETE (PARTIAL)** (2026-08-22) — **5/6 criteria; criterion 1 UNMET on PR5**. A-STACK delivered **EPA-0005**; **A-SURVEY not performed**, MSG-0078 | TASK-0025, MSG-0071, MSG-0076 ✅ | Claude Code |
 | TASK-0027 | A-SURVEY (n=1) — inspect the approved/synthetic corpus | **COMPLETE** (2026-08-22) — **7/7 criteria**; PDF inspected in place, repository boundary held, **MSG-0084** | TASK-0026, MSG-0080, MSG-0083 ✅ | Claude Code |
+| TASK-0028 | A-SURVEY Arabic follow-up (n=1) — inspect `Arabic.pdf` | **COMPLETE** (2026-08-22) — 9/9, MSG-0087; **OCR-derived (ABBYY FineReader) — the class D14 rejects** | TASK-0027, MSG-0085 ✅ | Claude Code |
+| TASK-0029 | A-SURVEY Arabic text-native follow-up (n=1) | **COMPLETE** (2026-08-22) — 11/11, MSG-0089; **text-native and D14-admissible**; **Arabic stored in visual order** | TASK-0028, MSG-0088 ✅ | Claude Code |
+| TASK-0030 | Draft the minimum ADR-0020 clarification — pre-constrained retrieval as an engine-selection gate | **COMPLETE** (2026-08-22) — **7/7 criteria**; `ADR-0020-AMD-01` **PROPOSED, NOT applied**; **MSG-0094** | EPA-0005 ACCEPTED (MSG-0092) ✅ | Claude Code |
 | TASK-0002 | Make test entry points shell-independent | **ABORTED** | — | — |
+
+> **Reconciled 2026-08-22 by TASK-0030 — additive and declared.** The three rows above were missing:
+> the table stopped at TASK-0027 while TASK-0028 and TASK-0029 had both executed and completed, so
+> this file's own table lagged the queue by two tasks. **No existing row was altered.** The queue at
+> `implementation/operations/CLAUDE-TASKS.md` was correct throughout and remains the authoritative
+> board; this is the status file catching up to it.
 
 **No task is READY** — but the reason has changed. The project now sits at an **architecture decision
 boundary**, not at an empty queue.
@@ -134,8 +145,67 @@ boundary**, not at an empty queue.
 > been executed and is COMPLETE (MSG-0055). MSG-0051 §C is fully discharged: C1–C5 by MSG-0052,
 > C6–C7 by MSG-0053.
 
-**Current position, 2026-08-22 after TASK-0027: no task is READY, and for the first time the corpus
-half of the boundary has actually moved — but only from "no corpus" to "one document".**
+**Current position, 2026-08-22 after TASK-0030: no task is READY, and the boundary is a draft the
+Architecture Lead has not yet reviewed.**
+
+TASK-0030 executed MSG-0092 §3 and is **COMPLETE** — **7/7 acceptance criteria MET**, each mapped to
+evidence in **MSG-0094** §7. Being documentary it produced **no test count and claims none**.
+
+**The deliverable is a proposal, and the boundary it respected is the whole point of the task.**
+[`ADR-0020-AMD-01`](../decisions/ADR-0020-AMD-01-pre-constrained-retrieval-engine-criterion.md) is
+**PROPOSED and NOT applied**. `git diff --name-only docs/decisions/` is **empty** — the accepted,
+promoted ADR-0020 is unmodified. **Editing a promoted ADR is the Lead's act**, exactly as promotion
+was (TASK-0025 / MSG-0073), and MSG-0092 §5 said so in terms: *"stop before applying the amendment
+unless a subsequent explicit authorization permits acceptance."*
+
+**The "no amendment is needed" outcome was a real possibility and it was tested, not assumed.** The
+queue permits it explicitly. Reading §§3–4 in the accepted copy shows **the policy is already
+unambiguous**: §3.1 requires the candidate set be built "already constrained" and says "Unauthorized
+content is never a candidate"; §4 makes retrieve-then-filter "a **gate failure**". **Nothing in the
+draft changes any of that.**
+
+**What is missing is consequence, in two specific places** — and both are what an implementer gets
+wrong rather than what a reviewer would notice:
+
+1. **The rule never says it disqualifies an engine.** As written it reads as a constraint on how the
+   assistant is built, which a permissive reading satisfies with any engine plus careful surrounding
+   code — the exact reading that lets post-filtering through.
+2. **The ADR never says what G3 inspects.** §3 closes with "A design in which three are decorative
+   fails G3 however correct its output looks" — the right failure, no evidence rule. **A conforming
+   design and a retrieve-then-filter design return byte-identical responses**, so a gate evidenced
+   from the response cannot tell them apart. The draft's answer: **G3 is evidenced against the query
+   issued to the engine, not the response returned to the caller.**
+
+**The amendment is one 148-word insertion at the end of §4, and twelve candidate changes were
+deliberately not made** (MSG-0094 §4). The two worth naming: **§3's four numbered points were not
+edited**, because rewording accepted policy text to make a §4 point is a rewrite rather than a
+clarification; and **§7 and *Deliberately not decided here* were left exactly as they are**, because
+**a criterion is not a selection** — §7 must go on saying no index technology is selected, and it
+does.
+
+**Nothing was selected.** All nine MSG-0092 §4 categories remain open, ADR-0019's §6 deferral is
+untouched, no Arabic normalization rule was written, ADR-0017/0018/0019/0021/0022 were not touched at
+all, and no implementation task was marked READY.
+
+**Two items are referred to the Lead, neither blocking.** (1) **How an accepted ADR is amended** — the
+repository has **no precedent**: ADR-0015 and ADR-0016 carry `Supersedes:` lines, but those record the
+promotion of a *draft*, not the amendment of an accepted record. **No header change was drafted**,
+because inventing the convention is the silent architecture change this task forbids. (2) **A conflict
+inside TASK-0030's own specification** (MSG-0094 §11): criterion 5 requires `git diff --name-only
+docs/` to be empty, while the same task's Documentation section requires updating **WP-0009**, which
+lives under `docs/`. The WP-0009 update was made — **one added row, nothing modified or deleted** —
+and the deviation is reported rather than hidden by skipping the update or by quoting a narrower
+command as though it were the one asked for. **The durable fix is one word**: scope the check to
+`docs/decisions/`.
+
+> **Superseded — the position after TASK-0027, retained.** The paragraphs below were written when the
+> corpus half of the boundary had just moved from "no corpus" to "one document". **Everything they say
+> about the corpus, D6, ADR-0019 and D14 is still true and still outstanding** — TASK-0030 was a
+> governance drafting task and moved none of it.
+
+**Current position, 2026-08-22 after TASK-0027 (superseded, retained): no task is READY, and for the
+first time the corpus half of the boundary has actually moved — but only from "no corpus" to "one
+document".**
 
 TASK-0027 executed MSG-0080 under MSG-0083's read grant and is **COMPLETE**. All seven acceptance
 criteria are MET, each mapped to evidence in **MSG-0084** §3. Being documentary it produced **no test
@@ -763,7 +833,18 @@ carry explicit supersession notes, with no supervisor behaviour, permission, or 
 C4 and C5 — no action, deliberately. **C6 (a bounded proof of MSG-0049 option B) and C7 (the next
 work package) remain the Lead's to decide and are not self-authorized.**
 
-**Eight messages carry `Status: OPEN`** — MSG-0060, MSG-0081, MSG-0084, MSG-0087, MSG-0089, MSG-0090 (**SCOPED**), MSG-0091 and MSG-0093. Verified across all three views. All are records or carry referrals; **none blocks TASK-0030**.
+**Nine messages carry `Status: OPEN`** — MSG-0060, MSG-0081, MSG-0084, MSG-0087, MSG-0089, MSG-0090 (**SCOPED**), MSG-0091, MSG-0093 and **MSG-0094**. All are records or carry referrals; **none blocks anything, because no task is READY**.
+
+**MSG-0094 is the TASK-0030 execution record**, and it is OPEN for a reason rather than as housekeeping:
+it carries **a drafted amendment the Architecture Lead has not reviewed**. The one decision it asks for
+is **accept, amend, or reject `ADR-0020-AMD-01`** — and, if accepting, which recording convention and
+whether the optional traceability row is included. **Applying it requires an explicit authorization**;
+this session had none and did not act as though it did.
+
+> **The line this replaces, retained:** "**Eight messages carry `Status: OPEN`** — MSG-0060, MSG-0081,
+> MSG-0084, MSG-0087, MSG-0089, MSG-0090 (**SCOPED**), MSG-0091 and MSG-0093. Verified across all three
+> views. All are records or carry referrals; **none blocks TASK-0030**." True until TASK-0030 executed
+> and raised MSG-0094.
 
 **MSG-0084 is the TASK-0027 execution record** — a record, plus **two referrals that block nothing**
 (§8 of that message): the designated corpus is **real organizational material, not synthetic**, and the
@@ -1385,8 +1466,28 @@ both tables index it, and both were updated in the same commit as the record.
 
 ## Next Action
 
-**TASK-0030 is READY and is the single READY task — the only one authorized by MSG-0092. Nothing else
-may start from that message.**
+**No task is READY. TASK-0030 is COMPLETE (MSG-0094), and the next action is the Architecture Lead's:
+review `ADR-0020-AMD-01`.**
+
+**The decision, precisely:** accept, amend, or reject the drafted amendment — and if accepting, say
+**which recording convention** (in place with a header amendment note, or a superseding ADR; the
+repository has **no precedent** for amending an accepted ADR) and **whether the optional traceability
+row is included**. **Applying the amendment requires an explicit authorization** — MSG-0092 §5 withheld
+it, and TASK-0030 stopped accordingly.
+
+**A second, smaller item is referred and blocks nothing** (MSG-0094 §11): TASK-0030's criterion 5
+requires `git diff --name-only docs/` to be empty while the same task's Documentation section requires
+updating **WP-0009**, which lives under `docs/`. Both cannot hold literally. The check's stated intent —
+*"no accepted ADR touched"* — **is met**: `git diff --name-only docs/decisions/` is empty. **Scoping the
+check to `docs/decisions/` is the durable fix**, and it is the Lead's wording to change.
+
+**Nothing else may start.** T-0 and T-A…T-I remain unauthorized, no engine or model may be selected,
+and no implementation task is READY.
+
+> **Superseded 2026-08-22 — the position while TASK-0030 was READY, retained.** The section below was
+> written when MSG-0092 had just authorized the task and it had not run. **It has now run and is
+> COMPLETE.** Everything it says about what stays open — the nine selection categories, ADR-0019's
+> deferral, T-0 and T-A…T-I — is **unchanged and still current**; TASK-0030 touched none of it.
 
 ### EPA-0005 is ACCEPTED
 
@@ -1431,6 +1532,11 @@ act.**
 **One outcome is legitimate and named in advance:** if §§3–4 already state the consequence
 unambiguously, **reporting that no amendment is needed is a correct result.** A task that must produce
 an amendment will produce one whether or not it is warranted.
+
+> **Outcome, recorded 2026-08-22 (MSG-0094).** That named outcome **was tested against the accepted
+> text and did not apply.** §§3–4 state the *rule* unambiguously; what they omit is the *consequence* —
+> engine disqualification, and what G3 inspects. **An amendment was drafted, one 148-word insertion at
+> the end of §4, and it was NOT applied.**
 
 ### What stays open
 
