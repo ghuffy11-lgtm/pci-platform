@@ -35,10 +35,30 @@ Only the architecture lead may authorize new work, mark a task READY, or change 
 | TASK-0023 | **EPA work-package governance reconciliation** | **COMPLETE** | TASK-0022 COMPLETE, MSG-0062 DECIDED, MSG-0063 AUTHORIZED | 2026-08-21 — 7/7 acceptance criteria, **WP-0009** allocated, MSG-0066 | none — awaiting the Architecture Lead's next authorization; **no task is READY** | Claude Code |
 | TASK-0024 | **A-ADR — draft the required EPA ADR set** | **COMPLETE** | TASK-0023 COMPLETE, MSG-0062 DECIDED, MSG-0067 DECIDED, MSG-0068 AUTHORIZED, WP-0009 defined | 2026-08-21 — 8/8 acceptance criteria, **ADR-0017…ADR-0022 drafted PROPOSED**, MSG-0070 | none — awaiting the Architecture Lead's acceptance of the drafts; **no task is READY** | Claude Code |
 | TASK-0025 | **Promote ADR-0018…ADR-0022 into the accepted decision register** | **COMPLETE** | TASK-0024 COMPLETE, MSG-0071 DECIDED, MSG-0073 AUTHORIZED | 2026-08-21 — 5/5 acceptance criteria; five ADRs promoted, **zero body differences** in the per-ADR diffs, MSG-0075 | none — **no task is READY**; A-SURVEY / A-STACK / T-0 stay unauthorized | Claude Code |
+| TASK-0026 | **A-SURVEY + A-STACK — bounded corpus survey and stack evaluation** | **READY** | TASK-0025 COMPLETE, MSG-0071 DECIDED, MSG-0076 AUTHORIZED | — | **A-SURVEY is blocked on PR5** — no corpus is reachable from this repository; A-STACK is executable now | Claude Code |
 | TASK-0002 | Make test entry points shell-independent | **ABORTED** | — | 2026-08-19 | none — premise disproven by measurement | — |
 
 **TASK-0019 is COMPLETE (2026-08-21).** It was authorized by MSG-0050, reconciled into this queue in `39eabdb`, and executed by a supervisor-started session on its scheduled 06:37:13Z cycle. It was maintenance/audit work only, not a new product work package.
-**TASK-0025 is COMPLETE (2026-08-21), and no task is READY.** It was executed by a supervisor-started
+**TASK-0026 is READY — the single READY task.** Authorized by **MSG-0076**, which authorizes one
+bounded architecture task with two outputs: **A-SURVEY** (bounded corpus survey) and **A-STACK**
+(stack evaluation). MSG-0076 assigns no task number; **TASK-0026 was allocated here** as the next
+unused id, verified free across the repository. There is **no separate `TASK-0026-*.md` file** — as
+with TASK-0025, MSG-0076 plus the task section below are the specification.
+
+**The two halves are not equally executable, and that is the most important thing in this entry.**
+
+- **A-STACK can run now.** Every input it needs is in the repository: `docs/architecture/technology-selection-principles.md`,
+  the six accepted EPA ADRs in `docs/decisions/`, and WP-0009.
+- **A-SURVEY is blocked on PR5.** It requires "representative approved policy material", and **no such
+  corpus is reachable from this repository** — verified, not assumed: a search for policy documents
+  returns only kernel source files named `policy`. WP-0009 §6.1 records PR5 as the **organization's**
+  prerequisite and EPA-0004 §11.5 records it as **UNKNOWN — not visible from the repository**.
+
+**A-SURVEY must therefore stop at its prerequisite and record why. It must not produce empirical
+observations it cannot have made.** See the task section; this is the failure mode the entry exists to
+prevent.
+
+**TASK-0025 is COMPLETE (2026-08-21).** It was executed by a supervisor-started
 session (`runner.lock` pid 16980, acquired 20:47:18Z) — the cycle immediately after the MSG-0074
 reconciliation was pushed. All five MSG-0073 acceptance criteria are met, each mapped to evidence in
 **MSG-0075** §2. Being documentary it produced **no test count and claims none**.
@@ -483,6 +503,8 @@ READY means *authorized to attempt*, never *authorized to force*. A READY task w
 | MSG-0072 | Record | **CLOSED** | Claude Code | Architecture lead | **ADR promotion gap.** MSG-0071 accepted all six ADRs and directed promotion; only **ADR-0017** was promoted to `docs/decisions/`. ADR-0018…0022 exist solely as drafts. The ADR index and all six draft headers are reconciled to record the acceptance, and the ADR-0017 draft is marked RATIFIED per the ADR-0015 convention. **The promotion itself was not performed** — it is the act that confers authority, and no READY task authorizes it. **Pre-promotion verification passed** (MSG-0072): no provider/model/runtime selection leaked in, ADR-0019 invents no normalization rules, ADR numbering collision-free. One decision required: finish it yourself, or authorize a bounded task | 2026-08-21 |
 | MSG-0073 | Decision | AUTHORIZED | Architecture lead | Claude Code | **TASK-0025 authorized** — promote **ADR-0018…ADR-0022** into the authoritative `docs/decisions/` register, preserving approved content, numbering, traceability and explicit non-decisions. **Do not** change decision substance, introduce provider/model/framework/runtime selections left open, alter ADR-0019 normalization (deferred to empirical corpus evidence), authorize implementation, or mark A-SURVEY/A-STACK/T-0 READY. **Every promoted ADR must be verified against its source before completion is reported.** Answers MSG-0072. **Claude may execute it once reconciled as READY** | 2026-08-21 |
 | MSG-0075 | Record | CREATED — promotion applied | Claude Code | Architecture lead | **TASK-0025 execution record.** All five MSG-0073 acceptance criteria met with evidence. **ADR-0018…ADR-0022 promoted into `docs/decisions/`**, completing the WP-0009 set alongside the lead's own ADR-0017 promotion; the drafts are marked **RATIFIED** with their proposed text retained unchanged. **Verification is a `diff` per record and every hunk is in a header** — each promoted file is a byte copy of its draft with exactly two edits, the `Status` block and an added `Accepted by: Architecture Lead — MSG-0071` line, so **zero body differences**. **No accepted ADR modified** — `git status --porcelain` showed five new paths under `docs/decisions/` and no modified path there. **The three MSG-0071 conditions were re-checked in the promoted copies**, not inherited from MSG-0072's pre-promotion pass: no provider/model/framework/runtime selection (ADR-0022's ADR-0003 Ollama citation intact and still declining to elevate it), ADR-0019 still incomplete for production by design with **no rule invented**, ADR-0017's entailment model and thresholds still open under SPEC-0020. §6.2 records that the supervisor's heartbeat `head` lagged this session's verified HEAD by one commit and why that is **not** the BLK-0006 abort condition; §6.3 records a cosmetic line-wrapping difference in the lead's ADR-0017 promotion, proposing no correction. **No implementation, no provider/stack selection, no permission or Supervisor change, and no task marked READY** — A-SURVEY, A-STACK and T-0 stay unauthorized. **No decision requested** | TASK-0025 |
+| MSG-0076 | Decision | AUTHORIZED | Architecture lead | Claude Code | **Next bounded EPA architecture task authorized**, with two outputs: **A-SURVEY** (bounded, read-only corpus survey — formats, language mix, scanned-document prevalence, classification/audience patterns, version/supersession, **no production ingestion**) and **A-STACK** (evaluate candidate service stacks against accepted contracts and the EPA ADR set; **recommend or record why selection stays open — do not select** a provider, framework, model, embedding technology, or runtime). **Preserve ADR-0017…0022 exactly; no implementation; no IdP selection; no retrieve-then-suppress; do not mark T-A/T-B/T-D/T-E/T-0 READY.** Executable only once reconciled as the single READY task | 2026-08-22 |
+| MSG-0077 | Record | **OPEN** | Claude Code | Architecture lead | **TASK-0026 queue reconciliation, and an unmet prerequisite.** Reconciled as the single READY task; **TASK-0026 is an id allocated here** since MSG-0076 assigns none. **A-SURVEY cannot run: PR5 — a reachable approved-policy corpus — does not exist in this repository**, verified by inspection and corroborated by WP-0009 §6.1, EPA-0004 §11.5 and MSG-0061 §7.5. A-STACK is fully executable. The queue section instructs A-SURVEY to stop and record rather than produce observations it cannot have made. **Supplying the corpus is an organizational action** | 2026-08-22 |
 | MSG-0074 | Record | **CLOSED** | Claude Code | Architecture lead | **TASK-0025 queue reconciliation.** Reconciled as the single READY task after verifying prerequisites individually. **No separate TASK-0025 specification file exists** — MSG-0073 plus the queue section are the specification, and the section records the promotion convention verified from the ADR-0015 precedent and the lead's own ADR-0017 promotion. **The gap did not recur this time** in one respect: the authorization arrived with no colliding sibling file. **The queue gap itself did recur** — the **eighth** occurrence. **Discharged by execution 2026-08-21** — TASK-0025 ran against this reconciliation and is COMPLETE (MSG-0075); because the repair landed before the next cycle, the task was already the single READY task when the run started and the Supervisor never idled on it | 2026-08-21 |
 | MSG-0051 | Record | CREATED — audit complete | Claude Code | Architecture lead | **TASK-0019 baseline audit.** Six documentary corrections applied with their authorities quoted; four record classes verified already correct; **§C refers seven items for decision**, led by the accepted WP-0001 work package still reading `Status: Ready for implementation` — the stop condition fired and that correction was **not** made | TASK-0019 |
 
@@ -1455,3 +1477,153 @@ checkpoint 1 and re-check before every push.
 **Check which ADRs already exist in `docs/decisions/` before writing anything.** ADR-0017 is already
 there legitimately; a resumed session that assumes an empty target could overwrite a promoted record
 or double-promote. Promotion is idempotent only if you look first.
+
+---
+
+## TASK-0026 — A-SURVEY (bounded corpus survey) and A-STACK (stack evaluation)
+
+**Priority:** 1 | **Status:** **READY** | **Owner:** Claude Code
+**Depends on:** TASK-0025 COMPLETE; MSG-0071 DECIDED and the ADR set promoted; MSG-0076 AUTHORIZED
+**Next eligible task:** none — implementation stays unauthorized
+**Work package:** WP-0009 — Employee Policy Assistant | **Architecture tasks:** A-SURVEY, A-STACK
+
+**Specification:** [`MSG-0076-next-architecture-task-authorization.md`](../comms/MSG-0076-next-architecture-task-authorization.md)
+**plus this section.** No separate `TASK-0026-*.md` file exists — as with TASK-0025, that is deliberate
+and not a missing file. **TASK-0026 is an id allocated during reconciliation**, verified unused;
+MSG-0076 assigns none.
+
+---
+
+### ⚠ Read this before starting A-SURVEY
+
+**A-SURVEY's prerequisite is NOT met, and the task must not paper over it.**
+
+MSG-0076 asks A-SURVEY to "inspect representative approved policy material" and record **formats,
+language mix, scanned-document prevalence, classification/audience patterns, and version/supersession
+characteristics**.
+
+**No such corpus is reachable from this repository.** Verified at reconciliation time, not assumed:
+
+```text
+$ find . -iname "*.pdf" -o -iname "*.docx" -o -iname "*policy*"   (excluding .md, .git)
+  ./services/kernel/src/adapters/policy            <- kernel source, not policy documents
+  ./services/kernel/src/ports/policy.ts
+  ...
+```
+
+The authoritative records agree and have said so all along:
+
+- **WP-0009 §6.1** — "PR5 (the corpus) is the **organization's**" prerequisite.
+- **EPA-0004 §11.5 / PR5** — "A real approved policy corpus available for ingestion and gate
+  evaluation — **UNKNOWN — not visible from the repository** — Organization".
+- **MSG-0061 §7.5** — "**No survey was performed or scheduled.**"
+
+**Required behaviour:**
+
+1. **Establish first, by inspection, whether any corpus is actually reachable.** Do not infer it from
+   this entry — if the operator has since supplied material, that changes the answer, and this text was
+   written before they could have.
+2. **If none is reachable: stop A-SURVEY at that prerequisite and record it.** Produce **no** figures,
+   **no** format breakdown, **no** language mix, **no** scanned-document prevalence, and **no**
+   classification patterns. Not as estimates, not as illustrations, not as "expected" values.
+3. **Do not substitute a survey method, template, or plan for the authorized output** unless the
+   Architecture Lead authorizes that separately. It would be scope invention, and a method document is
+   easy to mistake later for a completed survey.
+4. **Complete A-STACK regardless** — it has no such dependency — and report the task as **PARTIAL**,
+   naming A-SURVEY and MSG-0076 acceptance criterion 1 as the unmet part and PR5 as the reason.
+
+**Why this is spelled out at length.** A survey with no corpus is the single most inviting place in
+this work package to produce confident, plausible, invented findings — and those findings would feed
+D6 normalization, D14's scanned-document ruling, and ADR-0019. **Fabricated survey data would corrupt
+accepted architecture.** Partial completion, reported honestly, costs nothing by comparison.
+
+---
+
+### A-STACK — executable now
+
+**Objective.** Evaluate candidate service-stack approaches against the accepted platform contracts and
+the EPA ADR set, and produce **either** an evidence-based recommendation **or** an explicit record of
+why selection remains open.
+
+**Inputs, all present in the repository:** `docs/architecture/technology-selection-principles.md`; the
+six accepted ADRs `docs/decisions/ADR-0017 … ADR-0022`; WP-0009 (especially §6.2 and §7); EPA-0004;
+and the accepted ADR register generally.
+
+**Binding constraints it must respect:**
+
+- **MSG-0062 §7.7 — ADR-0015 is NOT inherited.** The service sits outside the kernel boundary and uses
+  accepted platform contracts. A-STACK proposes; it does not adopt the kernel stack by default.
+- **ADR-0022 — inference locality.** External inference is prohibited by default; the ADR selects no
+  model, runtime, embedding model, or serving technology, and A-STACK must not quietly do so on its
+  behalf.
+- **ADR-0007 — identity terminates at the OIDC/OAuth2 boundary.** No direct LDAP or Kerberos.
+- **ADR-0020 — no retrieve-then-suppress**, fail-closed without existence, timing, or result-count
+  side channels.
+- **ADR-0019 — Arabic normalization stays deferred** to empirical corpus evidence.
+
+**Evaluate, do not select.** MSG-0076 is explicit: "Do not select or authorize a provider, framework,
+model, embedding technology, or runtime." A recommendation is permitted; an authorization is not. Where
+evidence is insufficient, **record that selection remains open and say what evidence would close it** —
+several of those gaps depend on the corpus survey that cannot run yet, and saying so is a result.
+
+---
+
+### Constraints on the whole task (MSG-0076)
+
+- **No production corpus ingestion.** No implementation. No identity-provider implementation or
+  provider selection.
+- **Preserve ADR-0017 … ADR-0022 exactly as accepted.** No accepted ADR may be modified — they are now
+  in `docs/decisions/` and carry authority.
+- **Do not invent ADR-0019 Arabic normalization rules.**
+- **Do not introduce retrieve-then-suppress behaviour.**
+- **Do not mark T-A, T-B, T-D, T-E, or T-0 READY.**
+- Architecture work only; it authorizes no implementation.
+
+### Acceptance criteria (MSG-0076)
+
+1. A bounded corpus-survey record documents the required empirical observations without production
+   ingestion. **Expected UNMET — see the prerequisite warning above. Report it unmet with the reason;
+   do not manufacture observations to satisfy it.**
+2. A stack-evaluation record maps candidate approaches to the accepted EPA constraints and explicitly
+   preserves open selections.
+3. No accepted ADR is modified.
+4. No implementation task is marked READY.
+5. COMMS and the queue are reconciled consistently before execution.
+6. **Execution is reported complete only after repository verification.**
+
+### Verification
+
+Being documentary, this task produces **no test count**; do not report one it cannot have. Map each
+criterion to re-readable evidence, and state plainly which are MET, UNMET, and why.
+
+**Confirm before reporting:** `git diff --name-only docs/decisions/` is **empty** — no accepted ADR was
+touched — and no board row gained READY status.
+
+### Documentation
+
+Record the result in `implementation/comms/` as a numbered message, update
+`implementation/status/current.md`, this queue, and WP-0009 §6.2 where it tracks A-SURVEY and A-STACK.
+Write the checkpoint. A completely new session must be able to resume from the repository alone.
+
+### Checkpoint
+
+`implementation/operations/checkpoints/TASK-0026.md`. Write each checkpoint **after** an operation is
+verified, never in anticipation of one.
+
+### Stop conditions
+
+- **A-SURVEY's corpus prerequisite is unmet** — stop that half, record, and continue with A-STACK.
+- Any conflict between the accepted ADR set and what the task would need to conclude.
+- Any point where completing an output would require selecting a provider, framework, model, embedding
+  technology, or runtime.
+- **`origin/main` moving mid-run** — BLK-0006 is the precedent. Record the starting HEAD in checkpoint 1
+  and re-check before every push.
+
+> **Known runner limit.** `git fetch` is off the runner allowlist, so a mid-run move is detectable only
+> when a push is rejected. Record it and stop; do not route around it.
+
+### Recovery procedure
+
+On resumption, re-read MSG-0076 and this section, then **re-check the corpus question by inspection**
+before assuming either answer — the operator may have supplied material in the interval. Check which
+records already exist rather than rewriting them.

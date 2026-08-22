@@ -2,7 +2,7 @@
 
 **Active Work Package:** WP-0001 — PCI Kernel Foundation
 **Status:** **COMPLETE** — declared by the architecture lead 2026-08-19 (MSG-0020(b), resolved by MSG-0022 / MSG-0023, TASK-0009)
-**Last Updated:** 2026-08-22 UTC (independent post-promotion verification passed; no change required) · 2026-08-21 UTC (**TASK-0025 COMPLETE** — **ADR-0018…ADR-0022 promoted** into `docs/decisions/`, completing the WP-0009 ADR set; 5/5 acceptance criteria, zero body differences in the per-ADR diffs, MSG-0075. **No task is READY**)
+**Last Updated:** 2026-08-22 UTC (**MSG-0076 authorizes A-SURVEY + A-STACK**, reconciled as **TASK-0026**, the single READY task — MSG-0077; **A-SURVEY blocked on PR5, no corpus reachable**; A-STACK unblocked) · 2026-08-21 UTC (**TASK-0025 COMPLETE** — **ADR-0018…ADR-0022 promoted** into `docs/decisions/`, completing the WP-0009 ADR set; 5/5 acceptance criteria, zero body differences in the per-ADR diffs, MSG-0075. **No task is READY**)
 
 > **The line this replaces, retained:** "2026-08-21 UTC (**MSG-0073 answers MSG-0072** — **TASK-0025
 > authorized** to promote ADR-0018…ADR-0022 and reconciled into the queue as the single READY task,
@@ -619,8 +619,22 @@ carry explicit supersession notes, with no supervisor behaviour, permission, or 
 C4 and C5 — no action, deliberately. **C6 (a bounded proof of MSG-0049 option B) and C7 (the next
 work package) remain the Lead's to decide and are not self-authorized.**
 
-**One message carries `Status: OPEN`** — **MSG-0060**. Verified across all three views (message file,
-COMMS register, queue ledger).
+**Two messages carry `Status: OPEN`** — **MSG-0060** and **MSG-0077**. Verified across all three
+views (message file, COMMS register, queue ledger).
+
+**MSG-0077 reports an unmet prerequisite and needs one organizational action.** MSG-0076
+authorized TASK-0026 with two outputs, and **A-SURVEY cannot run**: it requires representative
+approved policy material, and **no corpus is reachable from this repository** — verified by
+inspection, and corroborated by three records that have said so all along (WP-0009 §6.1,
+EPA-0004 §11.5 PR5, MSG-0061 §7.5). **A-STACK is unblocked and is most of the task.**
+
+**The action is the organization's:** make representative approved policy material available for
+a read-only survey, or rule that A-SURVEY is deferred until the corpus exists. MSG-0076's
+constraint still binds either way — **a survey reads; it does not ingest**, and it may not bypass
+approval controls.
+
+> **The line this replaces, retained:** "**One message carries `Status: OPEN`** — **MSG-0060**."
+> True until MSG-0077 was raised on 2026-08-22.
 
 **MSG-0074 was closed** 2026-08-21 by execution, not by tidying: TASK-0025 ran against its
 reconciliation and is COMPLETE (MSG-0075). The reconciliation did its job — it repaired the **eighth**
@@ -1183,43 +1197,101 @@ both tables index it, and both were updated in the same commit as the record.
 
 ## Next Action
 
-**No task is READY. The next move is the Architecture Lead's: authorize A-SURVEY or A-STACK, or neither.**
+**TASK-0026 is READY and is the single READY task. The Supervisor will start it on its next cycle — no
+manual trigger is needed.**
 
-**TASK-0025 is COMPLETE (2026-08-21, MSG-0075).** The Supervisor started it on its 20:47:18Z cycle — the
-next one after MSG-0074 was pushed, exactly as predicted — and it promoted **ADR-0018 … ADR-0022** into
-`docs/decisions/`. **The WP-0009 ADR set is complete and authoritative**, ADR-0017 … ADR-0022.
+**MSG-0076 authorized one bounded architecture task with two outputs**, and reconciliation allocated it
+the id **TASK-0026** (MSG-0076 assigns none; the id was verified unused). The two halves are **not**
+equally executable, and that asymmetry is the substance of this entry.
 
-**MSG-0071's own gate is what opens next.** Its *Next architecture boundary* says the Lead may consider
-authorizing the next bounded architecture task **only after** the accepted set is reconciled and
-promoted. That is now done, so both candidates in WP-0009 §6.2 are eligible to be authorized:
+### A-STACK — unblocked, and most of the task
 
-- **A-SURVEY** — the bounded, read-only corpus survey. It is the one that unblocks something already
-  known to be incomplete: **ADR-0019's Arabic normalization rules are deferred to empirical corpus
-  evidence**, and that evidence does not exist. Until it does, ADR-0019 remains incomplete for
-  production **by design**. MSG-0062 §7.5 authorizes it *in principle* before T-B; that is not the same
-  as marking it READY, which remains the Lead's act.
-- **A-STACK** — propose the assistant service's concrete implementation stack. ADR-0015 is **not**
-  inherited (MSG-0062 §7.7), and no promoted ADR selects a provider, model, framework or runtime.
+Evaluate candidate service-stack approaches against the accepted platform contracts and the EPA ADR
+set, then **either** recommend with evidence **or** record explicitly why selection stays open. Every
+input is present and was checked: `technology-selection-principles.md`, the six accepted ADRs, WP-0009.
 
-**Neither is authorized, and this record does not recommend one over the other** — that judgment is the
-Lead's, and nothing in the repository forces the order.
+**MSG-0062 §7.7 governs it — ADR-0015 is not inherited.** The kernel stack must not be adopted by
+default and then described as inheritance. And MSG-0076 is explicit that A-STACK **evaluates**: it may
+not select or authorize a provider, framework, model, embedding technology, or runtime.
 
-### What is still true after promotion
+### A-SURVEY — prerequisite PR5 is NOT met
 
-- **Implementation remains prohibited.** WP-0009 reads `DEFINED — NOT AUTHORIZED FOR IMPLEMENTATION`.
-- **T-0 remains an operator prerequisite** — the identity provider needs a privileged deployment that no
-  decision can substitute for.
-- **WP-0009 §8's three open items are untouched**: the T-D/T-E interim mitigation, PR3's owner and date,
-  and which PLAN-WP-0001 entries WP-0009 sits beside.
-- **ADR-0017's entailment model and numeric thresholds stay open** under SPEC-0020.
+It requires "representative approved policy material". **No corpus is reachable from this repository** —
+established by inspection, not inferred, and corroborated by three records that have said so from the
+start: **WP-0009 §6.1** (PR5 is the organization's), **EPA-0004 §11.5** ("UNKNOWN — not visible from
+the repository"), and **MSG-0061 §7.5** ("no survey was performed or scheduled").
 
-### When the next task is authorized
+**The queue section instructs A-SURVEY to stop at that prerequisite and record it** — producing no
+format breakdown, no language mix, no scanned-document prevalence, "not as estimates, not as
+illustrations, not as expected values" — to complete A-STACK regardless, and to report the task
+**PARTIAL** with acceptance criterion 1 named as unmet and PR5 as the reason.
 
-**Its board row must be added in the same commit as the authorization.** The queue gap reached its
-**eighth** occurrence with MSG-0073 and was repaired by MSG-0074 before the Supervisor's next cycle —
-which is why TASK-0025 started on time. It is the one failure in this project that has never been
-prevented, only repaired, and repairing it in time is luck about timing rather than a control.
+**Why the emphasis.** A survey with no corpus is the most inviting place in this work package to
+produce confident, invented findings, and they would not stay harmless: those figures feed **D6**
+normalization, **D14**'s rejection of scanned documents, and **ADR-0019**, which was accepted
+specifically on condition its rules come from *empirical* corpus evidence. Fabricated data would
+corrupt accepted architecture and be checkable against nothing.
 
+The section also tells the runner to **re-check by inspection rather than trust that text** — if
+material has since been supplied, the right answer changes.
+
+### What the organization must decide
+
+**One action:** make representative approved policy material available for a read-only survey, or rule
+that A-SURVEY is deferred until the corpus exists. MSG-0076's constraint binds either way — **a survey
+reads, it does not ingest**, and it may not bypass approval controls.
+
+### Still unauthorized after TASK-0026
+
+Implementation stays prohibited. **T-A, T-B, T-D, T-E and T-0 are not authorized**, and TASK-0026 may
+not mark them READY. **T-0 remains an operator prerequisite** needing a privileged identity-provider
+deployment that no decision can substitute for.
+
+---
+
+**Historical — the position after TASK-0025 and before MSG-0076, retained.** The text below
+described a queue at rest with the WP-0009 ADR set complete and nothing READY, awaiting the
+lead's choice between A-SURVEY and A-STACK. **MSG-0076 authorized both**, as one bounded task.
+
+> ## Next Action
+> 
+> **No task is READY. The next move is the Architecture Lead's: authorize A-SURVEY or A-STACK, or neither.**
+> 
+> **TASK-0025 is COMPLETE (2026-08-21, MSG-0075).** The Supervisor started it on its 20:47:18Z cycle — the
+> next one after MSG-0074 was pushed, exactly as predicted — and it promoted **ADR-0018 … ADR-0022** into
+> `docs/decisions/`. **The WP-0009 ADR set is complete and authoritative**, ADR-0017 … ADR-0022.
+> 
+> **MSG-0071's own gate is what opens next.** Its *Next architecture boundary* says the Lead may consider
+> authorizing the next bounded architecture task **only after** the accepted set is reconciled and
+> promoted. That is now done, so both candidates in WP-0009 §6.2 are eligible to be authorized:
+> 
+> - **A-SURVEY** — the bounded, read-only corpus survey. It is the one that unblocks something already
+>   known to be incomplete: **ADR-0019's Arabic normalization rules are deferred to empirical corpus
+>   evidence**, and that evidence does not exist. Until it does, ADR-0019 remains incomplete for
+>   production **by design**. MSG-0062 §7.5 authorizes it *in principle* before T-B; that is not the same
+>   as marking it READY, which remains the Lead's act.
+> - **A-STACK** — propose the assistant service's concrete implementation stack. ADR-0015 is **not**
+>   inherited (MSG-0062 §7.7), and no promoted ADR selects a provider, model, framework or runtime.
+> 
+> **Neither is authorized, and this record does not recommend one over the other** — that judgment is the
+> Lead's, and nothing in the repository forces the order.
+> 
+> ### What is still true after promotion
+> 
+> - **Implementation remains prohibited.** WP-0009 reads `DEFINED — NOT AUTHORIZED FOR IMPLEMENTATION`.
+> - **T-0 remains an operator prerequisite** — the identity provider needs a privileged deployment that no
+>   decision can substitute for.
+> - **WP-0009 §8's three open items are untouched**: the T-D/T-E interim mitigation, PR3's owner and date,
+>   and which PLAN-WP-0001 entries WP-0009 sits beside.
+> - **ADR-0017's entailment model and numeric thresholds stay open** under SPEC-0020.
+> 
+> ### When the next task is authorized
+> 
+> **Its board row must be added in the same commit as the authorization.** The queue gap reached its
+> **eighth** occurrence with MSG-0073 and was repaired by MSG-0074 before the Supervisor's next cycle —
+> which is why TASK-0025 started on time. It is the one failure in this project that has never been
+> prevented, only repaired, and repairing it in time is luck about timing rather than a control.
+> 
 ---
 
 > **Historical — the position while TASK-0025 was READY and unstarted, retained.** The text below
