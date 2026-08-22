@@ -71,3 +71,18 @@ The task must:
 Do not start T-A, T-B, T-D, T-E, T-0, model selection, engine selection, or production implementation from this message.
 
 **This message is the Architecture Lead's ruling required by EPA-0005.**
+
+---
+
+## Action discharged — 2026-08-22
+
+**The action this ruling required (§5) has been taken.** TASK-0030 was reconciled as the single READY
+task (MSG-0093), executed through the supervisor path, and is **COMPLETE** (MSG-0094).
+
+It produced **`ADR-0020 AMD-01`** — the minimum clarification, **PROPOSED and NOT APPLIED**, exactly as
+§5 required: *"stop before applying the amendment unless a subsequent explicit authorization permits
+acceptance."* `docs/decisions/` is unmodified.
+
+**The ruling itself stands as DECIDED.** This note records only that its required action is discharged;
+**the Architecture Lead's status line above is left exactly as written.** What remains is the Lead's
+review of AMD-01, which MSG-0094 §10 states as the one decision outstanding.

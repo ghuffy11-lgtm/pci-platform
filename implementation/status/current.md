@@ -833,7 +833,7 @@ carry explicit supersession notes, with no supervisor behaviour, permission, or 
 C4 and C5 — no action, deliberately. **C6 (a bounded proof of MSG-0049 option B) and C7 (the next
 work package) remain the Lead's to decide and are not self-authorized.**
 
-**Nine messages carry `Status: OPEN`** — MSG-0060, MSG-0081, MSG-0084, MSG-0087, MSG-0089, MSG-0090 (**SCOPED**), MSG-0091, MSG-0093 and **MSG-0094**. All are records or carry referrals; **none blocks anything, because no task is READY**.
+**Nine messages carry an open status** — MSG-0060, MSG-0081, MSG-0084, MSG-0087, MSG-0089, MSG-0090 (**SCOPED**), MSG-0091, MSG-0093 and **MSG-0094**. **MSG-0094 is the live one**: `ADR-0020 AMD-01` is drafted and awaits the Lead's review. **MSG-0092's §5 action is discharged** — TASK-0030 executed — and its file retains the Lead's own "OPEN — action required" line, annotated rather than overwritten. Note that status lines vary in formatting, so a strict `**OPEN**` grep undercounts; match on the status *word*, not the bold.
 
 **MSG-0094 is the TASK-0030 execution record**, and it is OPEN for a reason rather than as housekeeping:
 it carries **a drafted amendment the Architecture Lead has not reviewed**. The one decision it asks for
