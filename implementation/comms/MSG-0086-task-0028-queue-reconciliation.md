@@ -1,6 +1,6 @@
 # MSG-0086 — TASK-0028 Reconciled: the Arabic Follow-up Survey
 
-**Status:** **OPEN** — informational; no decision blocks TASK-0028
+**Status:** **CLOSED** 2026-08-22 — discharged by execution. TASK-0028 ran and is **COMPLETE** (MSG-0087, 9/9 criteria). This record reconciled the task into the queue; that job is done and the survey it enabled has been performed.
 **Raised:** 2026-08-22
 **Raised by:** Claude Code (interactive session, COMMS)
 **Type:** Queue reconciliation record
@@ -82,9 +82,36 @@ self-authorize it.
 
 ## State
 
-- **TASK-0028 is READY and is the single READY task.** Not started at the time of writing.
+- ~~**TASK-0028 is READY and is the single READY task.** Not started at the time of writing.~~ **Superseded 2026-08-22:** it has since executed and is **COMPLETE** (MSG-0087). Struck through rather than deleted, because a stale "READY" here is what later prompted a request to re-run a finished task.
 - `Arabic.pdf` verified present and outside the repository; `git status` clean; no PDF has ever entered
   history.
 - **No permission was changed.** MSG-0083's grant is used as-is.
 - MSG-0085 registered in the COMMS register and the queue ledger.
 - No ADR touched. **T-A, T-B, T-D, T-E and T-0 remain unauthorized.** No OPEN blocker.
+
+---
+
+## CLOSED — 2026-08-22, discharged by execution
+
+**TASK-0028 executed and is COMPLETE** — the Arabic follow-up survey was performed at n=1 and recorded
+in **MSG-0087** (9/9 acceptance criteria).
+
+**The "TASK-0028 is READY and is the single READY task" line in §State above was accurate when written
+and is now superseded.** The authoritative statement of the task's state is the queue board, which
+reads **COMPLETE**; this record is the reconciliation that made the execution possible, not a live
+status.
+
+**Recorded because the stale line caused a real confusion.** A later instruction asked for TASK-0028 to
+be executed "now" on the basis that it was still the single READY task — it was not, and re-running it
+would have surveyed a byte-identical file to produce duplicate findings and a second record of the same
+document. The committed queue and MSG-0087 were checked before anything was re-run.
+
+**The five things this record asked the task to get right were all honoured**, per MSG-0087:
+
+| Constraint | Outcome |
+|---|---|
+| The two documents are not a corpus | Stated explicitly; no distributional claim made |
+| ADR-0019 must not be amended | Untouched; implications recorded as evidence only |
+| TASK-0027's hazards are to be checked for, not expected | All three checked; **all three absent** — reported as a real result |
+| Personal-data restraint carries forward | No personal names found in metadata; none transcribed regardless |
+| No PDF tooling may be added | None added; byte-level inspection only, and its ceiling recorded where it was hit |

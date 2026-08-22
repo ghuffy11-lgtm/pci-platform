@@ -763,7 +763,7 @@ carry explicit supersession notes, with no supervisor behaviour, permission, or 
 C4 and C5 — no action, deliberately. **C6 (a bounded proof of MSG-0049 option B) and C7 (the next
 work package) remain the Lead's to decide and are not self-authorized.**
 
-**Five messages carry `Status: OPEN`** — **MSG-0060**, **MSG-0081**, **MSG-0084**, **MSG-0086** and **MSG-0087**. Verified across all three views (message file, COMMS register, queue ledger). All are informational or carry referrals that block nothing.
+**Four messages carry `Status: OPEN`** — **MSG-0060**, **MSG-0081**, **MSG-0084** and **MSG-0087**. Verified across all three views (message file, COMMS register, queue ledger). All are informational or carry referrals that block nothing. **MSG-0086 was closed 2026-08-22, discharged by execution** — its stale "TASK-0028 is READY" line is struck through in place, because that line later prompted a request to re-run a task that was already COMPLETE.
 
 **MSG-0084 is the TASK-0027 execution record** — a record, plus **two referrals that block nothing**
 (§8 of that message): the designated corpus is **real organizational material, not synthetic**, and the
