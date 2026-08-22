@@ -2,7 +2,7 @@
 
 **Active Work Package:** WP-0001 — PCI Kernel Foundation
 **Status:** **COMPLETE** — declared by the architecture lead 2026-08-19 (MSG-0020(b), resolved by MSG-0022 / MSG-0023, TASK-0009)
-**Last Updated:** 2026-08-22 UTC — **TASK-0027 is COMPLETE. A-SURVEY has been performed, at n=1.** The corpus PDF was **read in place** under MSG-0083's grant and **never entered the repository** (verified four ways). 7/7 acceptance criteria MET; record **MSG-0084**. The document is **text-native, English-only, 45 pages, unclassified, versioned only in title-page prose** — and it supplies **zero Arabic evidence**, so **D6 stays deferred and ADR-0019 was not amended**. Four of five A-SURVEY dimensions are **recorded INSUFFICIENT at n=1 with no estimates invented**. `EPA-0005` (A-STACK) still PROPOSED. **No task is READY. No implementation authorized.**
+**Last Updated:** 2026-08-22 UTC — **A-SURVEY performed at n=1 for English** (TASK-0027 COMPLETE, 7/7 criteria, MSG-0084) — text-native verified, plus **three reproducible extraction hazards** that would corrupt ingestion silently. **MSG-0085 authorizes the Arabic follow-up**, reconciled as **TASK-0028**, the single READY task, using the existing MSG-0083 grant with **no permission change**. `EPA-0005` still PROPOSED. **No implementation authorized.**
 
 > **The line this replaces, retained:** "**BLK-0010 RESOLVED; TASK-0027 (A-SURVEY, n=1) is READY and
 > unblocked.** MSG-0083 authorized **option A**: a narrow read-only grant for `D:Workpci-corpus` only,
@@ -763,7 +763,7 @@ carry explicit supersession notes, with no supervisor behaviour, permission, or 
 C4 and C5 — no action, deliberately. **C6 (a bounded proof of MSG-0049 option B) and C7 (the next
 work package) remain the Lead's to decide and are not self-authorized.**
 
-**Three messages carry `Status: OPEN`** — **MSG-0060**, **MSG-0081** and **MSG-0084**. Verified across all three views (message file, COMMS register, queue ledger). **MSG-0082 was closed by MSG-0083**, which chose option A.
+**Four messages carry `Status: OPEN`** — **MSG-0060**, **MSG-0081**, **MSG-0084** and **MSG-0086**. Verified across all three views (message file, COMMS register, queue ledger). **MSG-0086** is the TASK-0028 reconciliation and **MSG-0084** the A-SURVEY n=1 record; both are informational, and MSG-0084 carries two items for the Lead that block nothing.
 
 **MSG-0084 is the TASK-0027 execution record** — a record, plus **two referrals that block nothing**
 (§8 of that message): the designated corpus is **real organizational material, not synthetic**, and the
@@ -1385,65 +1385,129 @@ both tables index it, and both were updated in the same commit as the record.
 
 ## Next Action
 
-**No task is READY. TASK-0027 is COMPLETE, and the next action is the Architecture Lead's.**
+**TASK-0028 is READY and is the single READY task — the Arabic follow-up survey. The Supervisor will
+start it on its next cycle; no manual trigger is needed.**
 
-**A-SURVEY has been performed at n=1** (MSG-0084, 7/7 acceptance criteria MET). The corpus read
-succeeded on the first attempt under MSG-0083's grant, the survey ran against the file **in place**, and
-**the repository boundary held** — checked four ways, all quoted in MSG-0084 §9.
+**MSG-0085 authorized it** against `D:\Work\pci-corpus\Arabic.pdf` (663.3 KB, `%PDF-1.5`, verified
+present) to complement the completed English survey. **No permission change was needed or made** —
+MSG-0083 granted the *directory*, so the new file is already readable, and MSG-0085 §3 forbids
+broadening.
 
-### What the survey established, and what it deliberately did not
+### The two constraints that matter most
 
-**Established, about that one document:** it is **text-native, not scanned** (107,988 characters decoded
-from all 45 pages, 0 undecodable glyphs, only two image XObjects in the entire file), **English only**
-(**0 Arabic characters**, confirmed structurally), **carries no classification marking of any kind**, and
-**versions itself only in title-page prose** with blank date fields and a handwritten-signature
-convention. So **at least one real approved policy document carries none of ADR-0018's lifecycle
-metadata in-band** — an existence claim n=1 can carry.
+**It is a separate n=1, and the two documents are not a corpus.** One English plus one Arabic file,
+both chosen by an operator, is not a sample. Any statement about language mix or prevalence would be
+the invented distribution the n=1 discipline exists to prevent.
 
-**Deliberately not established** — recorded as INSUFFICIENT with **no estimates invented**: format mix,
-language prevalence, scanned-document prevalence, classification and audience distribution, and
-version/supersession prevalence **across a corpus**.
+**ADR-0019 must not be amended, and the reason is sharper here.** It was accepted *on condition* that
+its Arabic normalization rules come from empirical corpus evidence — and **this is the first Arabic
+evidence the project has.** That makes promoting one document's behaviour into a normalization rule
+both very tempting and exactly what the condition forbids. Implications are **evidence for a later
+decision**, nothing more.
 
-**Read this before citing A-SURVEY for anything.** The document contains **zero Arabic**, which means it
-supplied **no Arabic evidence at all**. **MSG-0056a D6 is exactly as partially discharged as before, and
-ADR-0019's normalization rules were not written, inferred, or amended.** **D14's rejection exposure
-remains completely unmeasured.** The one thing A-SURVEY was meant to unblock is still blocked, and now
-for a different reason — not "no corpus" but "one document".
+### What A-SURVEY produced for English (MSG-0084, 7/7 criteria)
 
-### The finding most likely to matter later
+**Text-native, verified four independent ways** — the one dimension n=1 answers cleanly. Beyond that,
+its most reusable output is three extraction hazards, each observed and reproducible, each of which
+would corrupt a T-B pipeline **silently rather than failing**:
 
-**Three extraction hazards, each of which corrupts ingestion silently rather than failing** (MSG-0084
-§5): page 1 draws **every glyph twice**, the second copy an `/Artifact`-tagged drop shadow, so an
-extractor without marked-content scoping doubles the one page carrying title, authorship and approval;
-`/Span <</Lang(...)>>` property dictionaries read as body text to a naive regex; and **page 23 yields 67
-characters** because its content is a vector flow chart — **text-native, so D14 never fires, yet
-effectively unreadable**, which is a gap between D14 and ADR-0017's grounding contract.
+1. **Drop-shadow glyph duplication.** Every title-page character is drawn twice; naive extraction reads
+   `HHAADDII CCLLIINNIICC`. Document-wide it is 0.7% of characters — **but on page 1 it is 231 artifact
+   characters against 276 of content.** The document-wide figure is the misleading one; the corruption
+   sits exactly where the governance metadata lives.
+2. **Language tags harvested as body text** — `en-ZA` picked up 1,819 times by a regex that does not
+   check the operand precedes `Tj`/`TJ`. Observed, not hypothesised.
+3. **A page whose meaning is a vector drawing**, yielding 67 characters. **D14 does not fire on it** —
+   the document *is* text-native — so a grounded-answer system would be unable to cite that content
+   while showing no sign anything is missing. **A gap between D14 and ADR-0017 that one document is
+   enough to demonstrate, and not enough to size.**
 
-### What the Architecture Lead holds
+### Two items sitting with the Architecture Lead — neither blocking
 
-Four items, none of them blocking, because no task is READY:
-
-1. **Accept, amend, or reject `EPA-0005`** (the A-STACK evaluation, PROPOSED), including its §9
-   recommendation that **no stack ADR be created yet**.
-2. **The one-runtime-or-two trade** in EPA-0005, when the timing is right.
-3. **Confirm the corpus designation.** MSG-0080 authorizes A-SURVEY against an *approved/synthetic*
-   corpus; the file at the designated path is **real organizational material** — a genuine clinic
-   emergency-preparedness plan with a named approver and **no confidentiality marking**. The read was
-   authorized and no boundary was crossed; what needs confirming is whether the record should keep
-   calling it synthetic. MSG-0084 §8.
-4. **Whether the unattended runner should have PDF tooling.** `pdftoppm` is not installed and
-   `pdftotext` is off the runner's Bash allowlist, so TASK-0027 read the file's bytes directly rather
-   than widening any permission. MSG-0084 §8.
-
-**And one item is the organization's:** **representative** approved policy material — plural — if
-A-SURVEY is to answer the four distributional questions it was created for.
+1. **The corpus is real, not synthetic.** `plan.pdf` is a genuine 45-page Hadi Clinic emergency
+   preparedness plan with named author and approver and a real signature block, carrying **no
+   confidentiality marking**. The Lead designated that exact path, so the read was authorized and no
+   boundary was crossed — but **the record should not quietly describe production material as
+   synthetic**, and the same question applies to `Arabic.pdf`. The surveys keep personal names and
+   document content out of the repository either way.
+2. **The runner has no PDF tooling** — `pdftoppm` absent, `pdftotext` off the allowlist. Both surveys
+   work by reading bytes directly. Making PDF inspection routine is a permission and tooling decision,
+   correctly not self-authorized.
 
 ### Still unauthorized
 
-Implementation remains prohibited. **T-A, T-B, T-D, T-E and T-0 are not authorized**, and TASK-0027 did
-not mark them READY. **T-0 remains an operator prerequisite** — an identity provider needing a
-privileged deployment that no decision can substitute for.
+**A-SURVEY at corpus scale remains unperformed**, and the organizational action that would enable it —
+representative approved material, **plural** — is unchanged. Implementation stays prohibited: **T-A,
+T-B, T-D, T-E and T-0 are not authorized**, and TASK-0028 may not mark them READY. `EPA-0005` (A-STACK)
+is still PROPOSED and awaits the Lead.
 
+---
+
+**Historical — the position after TASK-0027 and before MSG-0085, retained.** The text below
+described a queue at rest with A-SURVEY performed at n=1 for English and nothing READY.
+**MSG-0085 then authorized the Arabic follow-up**, reconciled as TASK-0028.
+
+> ## Next Action
+> 
+> **No task is READY. TASK-0027 is COMPLETE, and the next action is the Architecture Lead's.**
+> 
+> **A-SURVEY has been performed at n=1** (MSG-0084, 7/7 acceptance criteria MET). The corpus read
+> succeeded on the first attempt under MSG-0083's grant, the survey ran against the file **in place**, and
+> **the repository boundary held** — checked four ways, all quoted in MSG-0084 §9.
+> 
+> ### What the survey established, and what it deliberately did not
+> 
+> **Established, about that one document:** it is **text-native, not scanned** (107,988 characters decoded
+> from all 45 pages, 0 undecodable glyphs, only two image XObjects in the entire file), **English only**
+> (**0 Arabic characters**, confirmed structurally), **carries no classification marking of any kind**, and
+> **versions itself only in title-page prose** with blank date fields and a handwritten-signature
+> convention. So **at least one real approved policy document carries none of ADR-0018's lifecycle
+> metadata in-band** — an existence claim n=1 can carry.
+> 
+> **Deliberately not established** — recorded as INSUFFICIENT with **no estimates invented**: format mix,
+> language prevalence, scanned-document prevalence, classification and audience distribution, and
+> version/supersession prevalence **across a corpus**.
+> 
+> **Read this before citing A-SURVEY for anything.** The document contains **zero Arabic**, which means it
+> supplied **no Arabic evidence at all**. **MSG-0056a D6 is exactly as partially discharged as before, and
+> ADR-0019's normalization rules were not written, inferred, or amended.** **D14's rejection exposure
+> remains completely unmeasured.** The one thing A-SURVEY was meant to unblock is still blocked, and now
+> for a different reason — not "no corpus" but "one document".
+> 
+> ### The finding most likely to matter later
+> 
+> **Three extraction hazards, each of which corrupts ingestion silently rather than failing** (MSG-0084
+> §5): page 1 draws **every glyph twice**, the second copy an `/Artifact`-tagged drop shadow, so an
+> extractor without marked-content scoping doubles the one page carrying title, authorship and approval;
+> `/Span <</Lang(...)>>` property dictionaries read as body text to a naive regex; and **page 23 yields 67
+> characters** because its content is a vector flow chart — **text-native, so D14 never fires, yet
+> effectively unreadable**, which is a gap between D14 and ADR-0017's grounding contract.
+> 
+> ### What the Architecture Lead holds
+> 
+> Four items, none of them blocking, because no task is READY:
+> 
+> 1. **Accept, amend, or reject `EPA-0005`** (the A-STACK evaluation, PROPOSED), including its §9
+>    recommendation that **no stack ADR be created yet**.
+> 2. **The one-runtime-or-two trade** in EPA-0005, when the timing is right.
+> 3. **Confirm the corpus designation.** MSG-0080 authorizes A-SURVEY against an *approved/synthetic*
+>    corpus; the file at the designated path is **real organizational material** — a genuine clinic
+>    emergency-preparedness plan with a named approver and **no confidentiality marking**. The read was
+>    authorized and no boundary was crossed; what needs confirming is whether the record should keep
+>    calling it synthetic. MSG-0084 §8.
+> 4. **Whether the unattended runner should have PDF tooling.** `pdftoppm` is not installed and
+>    `pdftotext` is off the runner's Bash allowlist, so TASK-0027 read the file's bytes directly rather
+>    than widening any permission. MSG-0084 §8.
+> 
+> **And one item is the organization's:** **representative** approved policy material — plural — if
+> A-SURVEY is to answer the four distributional questions it was created for.
+> 
+> ### Still unauthorized
+> 
+> Implementation remains prohibited. **T-A, T-B, T-D, T-E and T-0 are not authorized**, and TASK-0027 did
+> not mark them READY. **T-0 remains an operator prerequisite** — an identity provider needing a
+> privileged deployment that no decision can substitute for.
+> 
 ---
 
 **Historical — the position while TASK-0027 was READY and unrun, retained.** The text below was accurate

@@ -37,6 +37,7 @@ Only the architecture lead may authorize new work, mark a task READY, or change 
 | TASK-0025 | **Promote ADR-0018…ADR-0022 into the accepted decision register** | **COMPLETE** | TASK-0024 COMPLETE, MSG-0071 DECIDED, MSG-0073 AUTHORIZED | 2026-08-21 — 5/5 acceptance criteria; five ADRs promoted, **zero body differences** in the per-ADR diffs, MSG-0075 | none — **no task is READY**; A-SURVEY / A-STACK / T-0 stay unauthorized | Claude Code |
 | TASK-0026 | **A-SURVEY + A-STACK — bounded corpus survey and stack evaluation** | **COMPLETE (PARTIAL)** | TASK-0025 COMPLETE, MSG-0071 DECIDED, MSG-0076 AUTHORIZED | 2026-08-22 — 5/6 criteria MET; **criterion 1 UNMET (PR5)**; **EPA-0005** delivered, MSG-0078 | none — **no task is READY**. A-SURVEY awaits an organizational corpus action; EPA-0005 awaits the Lead's acceptance | Claude Code |
 | TASK-0027 | **A-SURVEY (n=1) — inspect the approved/synthetic corpus** | **COMPLETE** | TASK-0026 COMPLETE (PARTIAL), MSG-0080, MSG-0083 (corpus read permission), corpus readable by the runner | 2026-08-22 — **7/7 acceptance criteria MET**; PDF inspected in place, `git status` clean, no PDF in history; **MSG-0084** | none — **no task is READY**. MSG-0084 §8 refers two non-blocking items to the Lead; A-SURVEY at *corpus* scale still awaits representative material | Claude Code |
+| TASK-0028 | **A-SURVEY Arabic follow-up (n=1) — inspect `Arabic.pdf`** | **READY** | TASK-0027 COMPLETE, MSG-0085 AUTHORIZED, MSG-0083 read permission already covers the path | — | none — **n=1 for the Arabic follow-up**, no corpus-wide claims; **ADR-0019 must not be amended**; the PDF must never enter the repository | Claude Code |
 | TASK-0002 | Make test entry points shell-independent | **ABORTED** | — | 2026-08-19 | none — premise disproven by measurement | — |
 
 **TASK-0019 is COMPLETE (2026-08-21).** It was authorized by MSG-0050, reconciled into this queue in `39eabdb`, and executed by a supervisor-started session on its scheduled 06:37:13Z cycle. It was maintenance/audit work only, not a new product work package.
@@ -619,6 +620,8 @@ READY means *authorized to attempt*, never *authorized to force*. A READY task w
 | MSG-0082 | Record + decision request | **CLOSED** 2026-08-22 — answered by MSG-0083 option A | Claude Code | Architecture lead | **Structural finding: the corpus is where the runner may not read.** MSG-0080 requires it **outside** the repository; the unattended runner's permission boundary **is** the repository, and `runner-settings.json` grants no read beyond it. **Observed, not inferred** — BLK-0009 records a real runner whose read of `D:\Work\pci-corpus` was **denied and not routed around**. Options for the Lead/operator: **(A)** a narrow read permission for that path, **(B)** run TASK-0027 interactively, **(C)** supply an extraction. **Not options:** copy the PDF into the repo, edit the permission set unauthorized, or infer document properties from filename/size. Undecided is safe — the run stops and records, costing one cycle | 2026-08-22 |
 | MSG-0083 | Decision | AUTHORIZED — applied, verified, and **exercised successfully by TASK-0027 on 2026-08-22** | Architecture lead | Claude Code | **Option A authorized**: grant the unattended runner the narrowest read-only access to `D:\Work\pci-corpus\` for TASK-0027. **No write, delete, move, stage, commit, or repository access; do not broaden to other external directories; the PDF stays outside the repository.** Applied to `runner-settings.json` via `additionalDirectories` plus an `Edit()` deny on that path — read-only by construction — and **verified empirically** before being relied on: a headless session with those settings read 641,807 bytes, `%PDF-1.7`, and cannot write. Three ineffective deny rules were rejected by the permission layer and removed rather than left giving false assurance. **BLK-0010 RESOLVED; TASK-0027 READY, no re-authorization needed** | 2026-08-22 |
 | MSG-0084 | Record + two referrals | **OPEN** — informational; neither referral blocks anything | Claude Code | Architecture lead | **TASK-0027 execution record — A-SURVEY performed at n=1.** **7/7 acceptance criteria MET.** The PDF was **read in place** and never entered the repository, verified four ways. **Document-level:** 45 pages, PDF 1.7, Word 2016, uniform near-A4, tagged, unencrypted, **no active content of any kind**; **text-native** — 107,988 characters decoded from all 45 pages, 0 undecodable glyphs, only two image XObjects (a 103×92 logo and its mask) in the whole file, so **D14 would not reject it**; **English only** — **0 Arabic characters**, all five `ToUnicode` CMaps Basic-Latin-only, all simple fonts `WinAnsiEncoding` — but three *different* English locale tags (`en-US` catalog, `en-ZA`×1819, `en-GB`×46), so a document's own declared language is not a single reliable value; **no classification marking whatsoever**, and version/approval exist only as title-page prose (`Developed: June 2010` / `Revised: November 2024`) with blank date fields and a handwritten-signature convention — so **at least one real approved policy document carries none of ADR-0018's lifecycle metadata in-band**. **Three extraction hazards** that corrupt ingestion *silently* (§5): every page-1 glyph drawn twice with an `/Artifact` drop-shadow copy; `/Lang` property strings that read as body text; and a 67-character vector flow-chart page. **INSUFFICIENT at n=1, no estimates invented:** format mix, language prevalence, scanned prevalence, classification/audience distribution, version/supersession prevalence — **so D6 stays deferred and ADR-0019 was not amended.** **Referrals:** the designated corpus is **real, not synthetic**; and the runner has **no PDF tooling** | 2026-08-22 |
+| MSG-0085 | Decision | AUTHORIZED | Architecture lead | Claude Code | **Arabic corpus follow-up authorized** against `D:\Work\pci-corpus\Arabic.pdf` as an approved/synthetic test document, to complement the completed n=1 English survey. Assess **Arabic text encoding/extraction, language declarations, font/`ToUnicode` behaviour, text-native vs scanned, and normalization/extraction hazards relevant to ADR-0019** and downstream retrieval. **Record as n=1 for the Arabic follow-up; do not generalize.** Uses the existing MSG-0083 read grant — **no permission broadening**. **Do not amend ADR-0019**; implications are evidence for a later decision only. Keep the file outside Git; no production ingestion, no implementation, no corpus-wide prevalence claims; accepted ADRs preserved. Requires a new bounded task rather than re-running the closed TASK-0027 | 2026-08-22 |
+| MSG-0086 | Record | **OPEN** | Claude Code | Architecture lead | **TASK-0028 queue reconciliation.** Reconciled as the single READY task; **id allocated here** since MSG-0085 assigns none, and MSG-0085 §9 explicitly requires a new task rather than re-running closed TASK-0027. `Arabic.pdf` verified present (663.3 KB, `%PDF-1.5`) in the directory MSG-0083 already grants read-only — **no permission change needed or made**. Queue section carries the separate-n=1 rule (the two documents must not be combined into a "corpus"), the ADR-0019 no-amendment constraint, TASK-0027's three extraction hazards as things to **check for rather than expect**, the personal-data restraint, and the no-PDF-tooling limit | 2026-08-22 |
 | MSG-0074 | Record | **CLOSED** | Claude Code | Architecture lead | **TASK-0025 queue reconciliation.** Reconciled as the single READY task after verifying prerequisites individually. **No separate TASK-0025 specification file exists** — MSG-0073 plus the queue section are the specification, and the section records the promotion convention verified from the ADR-0015 precedent and the lead's own ADR-0017 promotion. **The gap did not recur this time** in one respect: the authorization arrived with no colliding sibling file. **The queue gap itself did recur** — the **eighth** occurrence. **Discharged by execution 2026-08-21** — TASK-0025 ran against this reconciliation and is COMPLETE (MSG-0075); because the repair landed before the next cycle, the task was already the single READY task when the run started and the Supervisor never idled on it | 2026-08-21 |
 | MSG-0051 | Record | CREATED — audit complete | Claude Code | Architecture lead | **TASK-0019 baseline audit.** Six documentary corrections applied with their authorities quoted; four record classes verified already correct; **§C refers seven items for decision**, led by the accepted WP-0001 work package still reading `Status: Ready for implementation` — the stop condition fired and that correction was **not** made | TASK-0019 |
 
@@ -1902,3 +1905,134 @@ verified, never in anticipation of one.
 Re-verify the corpus path by inspection before assuming either answer, and check which records already
 exist rather than rewriting them. **If a `plan.pdf` is found inside the repository at any point, that
 is a defect: move it out and record it — do not commit it and do not delete the corpus.**
+
+---
+
+## TASK-0028 — A-SURVEY Arabic follow-up (n=1): inspect `Arabic.pdf`
+
+**Priority:** 1 | **Status:** **READY** | **Owner:** Claude Code
+**Depends on:** TASK-0027 COMPLETE; MSG-0085 AUTHORIZED; MSG-0083's read grant (already covers the path)
+**Next eligible task:** none — implementation stays unauthorized
+**Work package:** WP-0009 — Employee Policy Assistant | **Architecture task:** A-SURVEY, Arabic follow-up
+
+**Specification:** [`MSG-0085-arabic-corpus-follow-up-authorization.md`](../comms/MSG-0085-arabic-corpus-follow-up-authorization.md)
+**plus this section.** No separate `TASK-0028-*.md` file — deliberate, as with TASK-0025 through
+TASK-0027. **TASK-0028 is an id allocated at reconciliation**, verified unused; MSG-0085 assigns none
+but explicitly requires this step: *"If a new bounded task/READY reconciliation is required by the
+queue, record that rather than silently re-running a closed task."* **TASK-0027 is closed and must not
+be re-run.**
+
+### The corpus
+
+```text
+D:\Work\pci-corpus\Arabic.pdf      663.3 KB      header %PDF-1.5      (verified present)
+D:\Work\pci-corpus\plan.pdf        626.8 KB      the TASK-0027 subject - not this task's subject
+```
+
+**Both files sit in the directory MSG-0083 already granted read-only.** No permission change is needed
+and **none is authorized** — MSG-0085 §3: *"Use the existing narrow read-only corpus permission
+authorized by MSG-0083. Do not broaden permissions."*
+
+**Read it in place. The PDF must never enter the repository** — writes to that path are denied by
+`Edit(//D:/Work/pci-corpus/**)`, and BLK-0008 records the near-miss where a corpus file briefly sat
+inside the working tree, one `git add -A` from permanent history.
+
+### Objective (MSG-0085 §6)
+
+Inspect the Arabic PDF directly and record **only observations supported by the file**, specifically
+assessing:
+
+- **Arabic text encoding and extraction** — what actually comes out of the content streams;
+- **language declarations** — `/Lang` at document and span level;
+- **font and `ToUnicode` behaviour** — whether glyphs map back to Unicode, and how reliably;
+- **text-native vs scanned** characteristics;
+- **normalization and extraction hazards** relevant to **ADR-0019** and downstream retrieval.
+
+### n=1, again — and it is a separate n=1
+
+**Record the sample as n=1 for the Arabic follow-up** (MSG-0085 §5). Do not generalize to the wider
+corpus, and **do not combine it with TASK-0027's English document into a two-document "corpus"** — two
+files chosen by an operator are not a sample, and "1 English + 1 Arabic" is not evidence about the
+prevalence of either.
+
+**Do not amend ADR-0019** (MSG-0085 §7). Any implication for its deferred Arabic normalization rules is
+**evidence for a later architecture decision**, recorded as such — not a rule, not a proposal adopted,
+and not a change to an accepted ADR.
+
+> **Why this matters more here than it did for English.** ADR-0019 was accepted **on condition** that
+> its normalization rules come from empirical corpus evidence. This is the first Arabic evidence the
+> project has. The temptation to promote a single document's behaviour into a normalization rule is
+> exactly what the condition exists to prevent.
+
+### What TASK-0027 found that is worth carrying in
+
+Its three extraction hazards are reproducible and should be **checked for, not assumed**, in this file:
+
+1. **Duplicated glyphs from drop shadows** — artifact-marked text that naive extraction doubles;
+   negligible document-wide, severe on the one page carrying governance metadata.
+2. **Language tags harvested as body text** — `/Span <</Lang (..)>>` property strings picked up by a
+   regex that does not check the operand precedes `Tj`/`TJ`.
+3. **A page whose meaning is vector graphics**, yielding almost no text — ingested silently as nearly
+   empty rather than rejected.
+
+**Whether any of these appear here is a question, not an expectation.** A different producer and a
+different script may produce entirely different hazards, and finding none of the three is a real result.
+
+### Constraints (MSG-0085 guardrails)
+
+- **No production or confidential corpus ingestion.**
+- **No copying the PDF into Git.**
+- **No permission changes beyond MSG-0083.**
+- **No implementation.**
+- **No unsupported corpus-wide prevalence claims.**
+- **Preserve all accepted ADRs unchanged** unless separately authorized.
+- Do not mark T-A, T-B, T-D, T-E, or T-0 READY.
+
+### Personal data — carry TASK-0027's restraint forward
+
+MSG-0084 §4.1 read the author and approver names in the English document and **deliberately did not
+transcribe them**, on the ground that an ordinary project record is not the right place for personal
+data about identifiable staff. **Do the same here.** Record that such fields are *present* and what
+their *structure* is; do not copy their values into the repository.
+
+### Verification
+
+Being documentary, this task produces **no test count**. Before reporting completion, verify and quote:
+
+```text
+git status --porcelain                        ->  empty
+Test-Path D:\Work\pci-corpus\Arabic.pdf       ->  True
+Test-Path D:\Work\pci-platform\Arabic.pdf     ->  False     (nothing copied in)
+git log --diff-filter=A --name-only | grep -i "\.pdf"   ->  nothing
+```
+
+### Documentation
+
+Record the result in `implementation/comms/` as a numbered message, update
+`implementation/status/current.md`, this queue, and WP-0009 §6.2 where it tracks A-SURVEY. Write the
+checkpoint.
+
+### Checkpoint
+
+`implementation/operations/checkpoints/TASK-0028.md`. Write each checkpoint **after** an operation is
+verified, never in anticipation of one.
+
+### Stop conditions
+
+- **The corpus file is not readable** — verify by inspection; do not assume it from this text.
+- Reading it would require copying it into the repository or broadening any permission.
+- Any point where a conclusion would need more than one document to support it.
+- **`origin/main` moving mid-run** — BLK-0006 is the precedent. Record the starting HEAD in checkpoint 1
+  and re-check before every push.
+
+> **Known runner limits.** `git fetch` is off the allowlist, so a mid-run move is detectable only when a
+> push is rejected. **There is also no PDF tooling** — `pdftoppm` is absent and `pdftotext` is not on
+> the allowlist (MSG-0084 §8.2). TASK-0027 worked within that by reading the file's bytes directly,
+> which the read grant permits. **Do not install tooling and do not request it mid-run**; if byte-level
+> inspection cannot answer a question, record the question as unanswered.
+
+### Recovery procedure
+
+Re-verify the corpus path by inspection before assuming either answer, and check which records already
+exist rather than rewriting them. **If any PDF is found inside the repository, that is a defect: move it
+out and record it — do not commit it and do not delete the corpus.**
