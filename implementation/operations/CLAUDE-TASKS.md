@@ -42,6 +42,7 @@ Only the architecture lead may authorize new work, mark a task READY, or change 
 | TASK-0030 | **Draft the minimum ADR-0020 clarification — pre-constrained retrieval as an engine-selection gate** | **COMPLETE** | EPA-0005 ACCEPTED (MSG-0092), ADR-0020 accepted | 2026-08-22 — **7/7 acceptance criteria MET**; `ADR-0020-AMD-01` drafted **PROPOSED** and **NOT applied**, `git diff --name-only docs/` **empty**; **MSG-0094** | none — **no task is READY**. The Lead reviews AMD-01 before anything is applied; applying it needs an explicit authorization (MSG-0092 §5) | Claude Code |
 | TASK-0031 | **Apply ADR-0020 AMD-01 in place** — accepted by MSG-0095 | **COMPLETE** | AMD-01 ACCEPTED (MSG-0095), TASK-0030 COMPLETE | 2026-08-23 — **7/7 acceptance criteria MET**; applied in `a1be892`; `git diff --name-only docs/decisions/` named **ADR-0020 only**, **15 insertions / 0 deletions**; **MSG-0097** | none — **no task is READY**. The ADR set is complete and stable; the next authorization is the Lead's | Claude Code |
 | TASK-0032 | **A-STACK technology evaluation and implementation planning (bounded)** | **COMPLETE** | MSG-0098 AUTHORIZED, EPA-0005 ACCEPTED (MSG-0092), ADR-0020+AMD-01 applied | 2026-08-23 — **7/7 acceptance criteria MET**; **`EPA-0006`** delivered **PROPOSED and selecting nothing**; `git diff --name-only docs/decisions/` **empty**; **MSG-0100** | none — **no task is READY**. Selection remains open, so MSG-0098 requires stopping for the Lead; five non-blocking referrals in MSG-0100 §10 | Claude Code |
+| TASK-0033 | **Bounded retrieval-engine conformance probe** (evaluation only) | **READY** | MSG-0101 AUTHORIZED, EPA-0006 (TASK-0032), ADR-0020+AMD-01 | — | **Tier 2/3 execution evidence is gated**: Docker engine not reachable — see the task section; NOT CLEARED is the correct outcome, never assumed conformance | Claude Code |
 | TASK-0002 | Make test entry points shell-independent | **ABORTED** | — | 2026-08-19 | none — premise disproven by measurement | — |
 
 **TASK-0019 is COMPLETE (2026-08-21).** It was authorized by MSG-0050, reconciled into this queue in `39eabdb`, and executed by a supervisor-started session on its scheduled 06:37:13Z cycle. It was maintenance/audit work only, not a new product work package.
@@ -638,6 +639,8 @@ READY means *authorized to attempt*, never *authorized to force*. A READY task w
 | MSG-0097 | Record | **OPEN** | Claude Code | Architecture lead | **TASK-0031 execution record — AMD-01 is APPLIED.** **7/7 acceptance criteria MET**; documentary, so **no test count and none claimed**. Applying commit **`a1be892`**, tree clean. `git diff --name-only docs/decisions/` named **ADR-0020 and nothing else**, at **15 insertions / 0 deletions** — the header note was *added* rather than replacing a line, so every accepted semantic is **byte-identical** to the promoted copy. Each of the four new markers occurs **exactly once**, and the amendment was verified **absent three ways before** editing, because re-running would insert hunk 1 twice. **AMD-01 §8 settled as option (a)** — the repository's first amendment of an accepted ADR, and a precedent **only** for an additive clarification changing no substantive policy. **Selects nothing** — a search of the whole file for twenty product names returns none; all nine MSG-0092 §4 categories stay open; ADR-0019's Arabic deferral untouched; **no implementation task is READY**. Two runner limits recorded, not routed around: **`git fetch` and `python` are both off the allowlist** | 2026-08-23 |
 | MSG-0098 | Decision | AUTHORIZED | Architecture lead | Claude Code | **TASK-0032 authorized** — bounded **A-STACK technology evaluation and implementation planning**, as the next single READY task. May compare candidate technologies, record evidence and disqualifiers, define interfaces, and **recommend or explicitly preserve selection as open**. **Not authorized** to implement, deploy, or make a production technology selection. Binding: **Approach C** with the worker not an authorization authority; **ADR-0020 + AMD-01** — constraints inside the retrieval operation, retrieve-then-filter and over-fetch-then-filter disallowed; three local workloads required; conversation/audit storage separate with Restricted barred from logs; technology replaceable; **ADR-0019 untouched** and Arabic n=1 not production evidence. **Record missing evidence explicitly; invent no benchmarks, capacity figures, or corpus-scale findings.** Stop rather than cross the boundary | 2026-08-23 |
 | MSG-0100 | Record + referrals | **OPEN** | Claude Code | Architecture lead | **TASK-0032 execution record — the bounded A-STACK technology evaluation is delivered and it selects nothing.** **7/7 acceptance criteria MET**; documentary, so **no test count and none claimed**. Deliverable **`EPA-0006`** in `implementation/architecture/`, **PROPOSED**. `git diff --name-only docs/decisions/` **empty**. **The AMD-01 criterion was applied to seven engine classes with reasoning, not assertion**: **post-filter-only (class D)** and **hosted/managed retrieval (class H)** are **DISQUALIFIED** — H twice over on **independent** grounds, since ADR-0022 §1 names *derived embeddings* explicitly, so relaxing one elimination would not revive the class. Classes **R/S/V/L are not disqualified and explicitly NOT cleared**; class **K** (retrieval computed against the kernel store) **conforms structurally** and is **entirely unmeasured**. **The sharpest finding: AMD-01's G3 evidence rule does not discharge AMD-01's engine-selection criterion** — a Shape-3 engine receives a conformant query and returns a correct response, so a query-shape check cannot detect it; **an engine exposing no plan or counter instrumentation cannot be cleared at all**. Also: **the four-part in-query predicate derived** (ADR-0018 §4's two-sided range with an open upper bound being the sharpest discriminator; **SUPERSEDED** the one lifecycle state that is a query predicate); **ADR-0016 RLS does not reach an external index**; **conformance for a relational engine is a property of the query plan**; **a strategy-switching engine is disqualified unless the strategy can be pinned**; **the retrieval port's signature is itself the control**; **no index-assigned identifier may appear in a citation**; **the verified append-only audit store is disqualified for conversation content**; **ADR-0020 §6.2 is a selection criterion on the engine and the serving runtime, not only a coding rule**. **Ten selections remain OPEN.** **No benchmark, capacity, latency, recall or corpus-scale figure appears anywhere in the record.** **ADR-0019 untouched, no normalization rule written or inferred**; MSG-0091's n=1 scoping respected. **No ADR created, amended or proposed**; **no implementation task marked READY**. **Five referrals, none blocking**; **the run stops for the Lead**, as MSG-0098 directs. **`git fetch` remains off the allowlist** — recorded, not routed around | 2026-08-23 |
+| MSG-0101 | Decision | AUTHORIZED | Architecture lead | Claude Code | **Rules MSG-0100's five referrals and authorizes TASK-0033.** (1) **"One projection index" means one *logical* projection** — a lexical+semantic pair may be evaluated only if both operate over the same governed projection and **each independently satisfies AMD-01**; **the fusion layer must never resolve authorization**. (2) **SUPERSEDED chunks not settled now** — exclusion is the safer implementation shape, **ADR-0018's audit/reconstruction semantics preserved**, the ADR not to be modified. (3) **Bounded conformance probe AUTHORIZED** — may name candidate engines **as test subjects only**; naming is not adoption. (4) **EPA-0006 §12.2 obligations accepted as implementation-planning constraints; no new ADR** — authorization context at the retrieval port and worker seam, **index identifiers must not be citation anchors**, audit store not reused for expiring conversation content. (5) **Corpus action remains the organization's**; no new corpus or survey task authorized | 2026-08-23 |
+| MSG-0102 | Record | **OPEN** | Claude Code | Architecture lead | **TASK-0033 reconciled as the single READY task, with a verified environment finding.** The probe's **Tier 2/3 execution evidence is gated**: Docker Desktop is installed and its Windows services run, but **the Linux engine backend is not reachable** (`dockerDesktopLinuxEngine` pipe absent), and psql/sqlite3/java are absent while Python is installed but off PATH. **Starting Docker Desktop is an operator action and was not attempted**; installing engines is barred by MSG-0101 §4. **Tier 1 is available now**, and where Tier 2/3 cannot be obtained the answer is **NOT CLEARED, never assumed conformance**. Also records a near-miss: a first check through Git Bash reported no Docker and no Python **at all** — a **PATH artefact, not a machine fact** | 2026-08-23 |
 | MSG-0099 | Record | **CLOSED** 2026-08-23 — discharged by execution (MSG-0100); the distinction it asked for is recorded in WP-0009 §6.2, the architecture README and MSG-0100 §5, and its warning held — no unmeasured figure appears in the delivered record | Claude Code | Architecture lead | **TASK-0032 reconciled as the single READY task.** Records that this is **not a re-run of TASK-0026**: that task evaluated stack **shape** (Approaches A/B/C) and produced EPA-0005; this evaluates **technology classes** against the now-settled Approach C and against ADR-0020 **as amended by AMD-01**, neither of which existed then. **Both are labelled "A-STACK" in WP-0009 §6.2**, where A-STACK already reads EXECUTED — the label reuse is flagged so the record is not read as one task run twice, and the task is told to distinguish the rows rather than overwrite. Also flags the likeliest failure mode: a technology comparison invites throughput, latency, memory and recall numbers, **none of which has been measured here** | 2026-08-23 |
 | MSG-0096 | Record | **CLOSED** 2026-08-23 — discharged by execution (MSG-0097) | Claude Code | Architecture lead | **TASK-0031 reconciled as the single READY task** to apply AMD-01 in place, per MSG-0095 §5. Three edits and nothing else: hunk 1 at the end of ADR-0020 §4, hunk 2 as one Traceability row, and a concise header note naming AMD-01 and MSG-0095. **Wording is taken verbatim from AMD-01** rather than retyped, since transcription drift in an accepted ADR is the failure this must not introduce. The task edits an **accepted, promoted** ADR — authorized here and only here — and its recovery procedure warns that re-running against an already-amended file would insert the clause twice | 2026-08-23 |
 | MSG-0074 | Record | **CLOSED** | Claude Code | Architecture lead | **TASK-0025 queue reconciliation.** Reconciled as the single READY task after verifying prerequisites individually. **No separate TASK-0025 specification file exists** — MSG-0073 plus the queue section are the specification, and the section records the promotion convention verified from the ADR-0015 precedent and the lead's own ADR-0017 promotion. **The gap did not recur this time** in one respect: the authorization arrived with no colliding sibling file. **The queue gap itself did recur** — the **eighth** occurrence. **Discharged by execution 2026-08-21** — TASK-0025 ran against this reconciliation and is COMPLETE (MSG-0075); because the repair landed before the next cycle, the task was already the single READY task when the run started and the Supervisor never idled on it | 2026-08-21 |
@@ -2506,3 +2509,152 @@ checkpoint 1 and re-check before every push.
 Re-read MSG-0098 and check which records already exist before writing. **If an evaluation record
 already exists, do not write a second one** — two overlapping stack evaluations would be materially
 confusing given EPA-0005 already occupies that ground.
+
+---
+
+## TASK-0033 — bounded retrieval-engine conformance probe (evaluation only)
+
+**Priority:** 1 | **Status:** **READY** | **Owner:** Claude Code
+**Depends on:** MSG-0101 AUTHORIZED; EPA-0006 (TASK-0032); ADR-0020 as amended by AMD-01; ADR-0018
+**Next eligible task:** none — MSG-0101 §5 permits no second READY task, and requires stopping after the result
+**Type:** evaluation probe — **adopts nothing, deploys nothing**
+
+**Specification:** [`MSG-0101-architecture-lead-ruling-next-retrieval-conformance-probe.md`](../comms/MSG-0101-architecture-lead-ruling-next-retrieval-conformance-probe.md)
+§2–§4, **plus** EPA-0006 §4.4 (the tiered evidence model), **plus this section.**
+
+---
+
+### ⚠ Environment: the execution tiers are gated, and this was verified before the task was queued
+
+**Tier 2 and Tier 3 need to actually run engines. Right now they cannot be run here.**
+
+```text
+Docker Desktop            INSTALLED
+com.docker.service        Running
+docker service            Running
+docker.exe                C:\Program Files\Docker\Docker\resources\bin\docker.exe  (not on either shell PATH)
+docker version            FAILS - npipe:////./pipe/dockerDesktopLinuxEngine does not exist
+                          -> the Linux engine backend is NOT up
+psql / sqlite3 / java     absent
+python 3.14.5             installed, NOT on PATH
+node                      v24.15.0  available
+```
+
+**A correction worth carrying, because it nearly became a false finding.** A first check through Git
+Bash reported no Docker and no Python at all. That was a **PATH artefact, not a machine fact** — both
+are installed. The same shape of error appeared in TASK-0029, where fonts were "absent" because the
+search looked in decompressed streams rather than the plain body. **Disbelieve a suspicious absence and
+check a second way.**
+
+**What follows for this task:**
+
+- **Do not install any engine, image, package, or runtime.** No `npm install` of a search library, no
+  `docker pull`, no `pip install`. MSG-0101 §4 stops on *"provisioning an implementation runtime or
+  production service"*, and installing software on this host is not authorized by any record.
+- **Do not start Docker Desktop.** It is an operator action on the operator's machine, and it typically
+  needs an interactive session. **Record that it is required; do not attempt it.**
+- **Tier 1 is available now.** Query-shape analysis from an engine's documented API and query grammar
+  needs no execution, and is the tier that establishes whether an authorization predicate can even be
+  *expressed* in-query.
+- **Where Tier 2/3 cannot be obtained, the answer is `NOT CLEARED`.** MSG-0101 §2: *"Treat inability to
+  obtain sufficient execution evidence as NOT CLEARED, not as conformance."* **An engine that looks
+  conformant on paper is not cleared.** This is the single most important instruction in this task.
+
+---
+
+### Objective (MSG-0101 §2)
+
+Produce execution evidence for candidate retrieval-engine implementations against **ADR-0020 + AMD-01**,
+sufficient to determine whether each candidate can satisfy pre-constrained retrieval **without Shape-3
+over-fetch-then-discard behaviour**.
+
+### The Lead's five rulings that bind this probe (MSG-0101 §1)
+
+1. **"One projection index" means one *logical* projection**, not necessarily one physical engine. A
+   lexical retriever paired with a semantic one may be evaluated **only if both operate over the same
+   governed projection and each independently satisfies AMD-01**. **The fusion layer must never be
+   where authorization is resolved.** No engine is selected by this interpretation.
+2. **SUPERSEDED chunks: not settled now.** Exclusion from the projection is the safer *implementation
+   shape* because it removes a query control surface, but **ADR-0018's audit/reconstruction semantics
+   are preserved in the kernel**, and **this task must not modify the accepted ADR on that point.**
+3. **The probe is authorized** and may **name concrete candidate engines as test subjects only** —
+   naming a candidate is **not** adoption or selection.
+4. **EPA-0006 §12.2 obligations are implementation-planning constraints** already implied by the
+   accepted ADR set — **no new ADR is authorized.** Authorization context required at the retrieval
+   port and worker seam; **index-assigned identifiers must not be citation anchors**; the audit store
+   must not be reused for expiring conversation content.
+5. **The corpus action remains the organization's.** **No new corpus request or survey task is
+   authorized**, and none may be created as a precondition here.
+
+### Required work (MSG-0101 §2)
+
+- **A small, explicit candidate set, labelled evaluation-only**, with the selection rationale recorded.
+- **Derive the complete authorization predicate** from ADR-0020/ADR-0018 and **use the same predicate
+  for every candidate** — a probe that varies the predicate proves nothing comparative.
+- **Run EPA-0006 §4.4's three tiers where supported**: Tier 1 inspect the actual query shape; Tier 2
+  inspect execution evidence sufficient to distinguish candidate-set restriction from internal
+  over-fetch/rejection; Tier 3 use plan, counter, or instrumentation evidence where available.
+- **Test highly selective authorization predicates** — EPA-0006 identifies that as the security-relevant
+  case for optimizer/strategy switching.
+- **For relational candidates, verify the actual query plan**, not the SQL text alone.
+- **Record whether strategy can be pinned.** A strategy that can switch into Shape 3 under restrictive
+  predicates **is disqualified for that candidate**.
+
+### Forbidden
+
+- **Do not select, adopt, deploy, or integrate any engine.**
+- **Do not modify accepted ADRs** — including ADR-0020 as amended, and ADR-0018 on supersession.
+- **Do not modify ADR-0019 or infer Arabic normalization rules.**
+- **Do not authorize T-C / T-D / T-E / T-F or any other product implementation.**
+- **Do not invent benchmark, latency, capacity, recall, or throughput figures.** Report only
+  measurements the bounded probe actually produced, with method and evidence. **Vendor claims are cited
+  as claims, never as measurements.**
+- **Do not enter a real or confidential corpus.** Synthetic fixtures only.
+
+### Acceptance criteria (MSG-0101 §3)
+
+1. Candidate list explicitly labelled **evaluation-only**; nothing adopted or selected.
+2. **The full ADR-0020 authorization predicate used in each probe is recorded.**
+3. **Tier-1 query evidence captured for each candidate.**
+4. Tier-2/3 evidence captured where exposed; **insufficient evidence recorded as NOT CLEARED**.
+5. **Shape-1 vs Shape-3 explicitly distinguished**; post-filter and over-fetch-then-discard stay
+   disqualified.
+6. Strategy-switching under highly selective authorization **tested, or explicitly NOT CLEARED because
+   evidence is unavailable**.
+7. **No accepted ADR modified; no implementation task authorized.**
+8. COMMS, queue and status reconciled; **stop after reporting if product-level selection would
+   otherwise be required.**
+
+### Verification
+
+Documentary/analytical — **no test count unless the probe actually executed something**, in which case
+report exactly what ran and how it was observed. Before completion, verify and quote:
+
+```text
+git diff --name-only docs/decisions/   -> empty
+git status --porcelain                 -> empty after commit
+docker availability                    -> restate what was and was not reachable
+```
+
+**State per candidate: CLEARED / DISQUALIFIED / NOT CLEARED, with the tier that decided it.**
+
+### Documentation
+
+Record the result in `implementation/comms/` as a numbered message, update
+`implementation/status/current.md`, this queue, and WP-0009 where relevant. Write the checkpoint.
+
+### Stop conditions (MSG-0101 §4)
+
+Stop immediately if execution would require **selecting or adopting a production engine**, **modifying
+an accepted ADR**, **entering a real or confidential corpus**, **provisioning an implementation runtime
+or production service**, or **inventing or substituting unmeasured evidence**.
+
+**Also stop if `origin/main` moves mid-run** — BLK-0006 is the precedent, and **the scheduler is now
+enabled**, so a supervisor cycle can start while other work is in flight. Record the starting HEAD in
+checkpoint 1 and re-check before every push.
+
+### Recovery procedure
+
+Re-check Docker reachability by inspection before assuming either answer — **an operator may have
+started Docker Desktop in the interval**, which changes what evidence is obtainable. Check which records
+already exist before writing a second one.

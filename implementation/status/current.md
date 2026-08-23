@@ -2,7 +2,7 @@
 
 **Active Work Package:** WP-0001 — PCI Kernel Foundation
 **Status:** **COMPLETE** — declared by the architecture lead 2026-08-19 (MSG-0020(b), resolved by MSG-0022 / MSG-0023, TASK-0009)
-**Last Updated:** 2026-08-23 UTC — **TASK-0032 COMPLETE (MSG-0100)**: the bounded A-STACK **technology** evaluation delivered **`EPA-0006`** — **PROPOSED, and it selects nothing.** The AMD-01 criterion was applied to **seven engine classes with reasoning**; **post-filter-only** and **hosted/managed retrieval** are **DISQUALIFIED**, the rest **not disqualified and explicitly not cleared**. **No benchmark, capacity, latency or corpus figure appears anywhere in it.** **No ADR created, amended or proposed; ADR-0019 untouched; no task READY.** Selection remains open, so the run **stops for the Lead**, as MSG-0098 directs. Scheduler recorded Disabled — **verify directly**, since this run was supervisor-started.
+**Last Updated:** 2026-08-23 UTC — **TASK-0032 COMPLETE**, delivering `EPA-0006` and selecting nothing. **MSG-0101 rules MSG-0100's five referrals** — "one projection index" is one **logical** projection, the fusion layer must never resolve authorization, SUPERSEDED chunks not settled now — and authorizes **TASK-0033**, a bounded conformance probe, now READY. **Its Tier 2/3 evidence is gated**: Docker engine not reachable, so unobtainable evidence is **NOT CLEARED**, never conformance (MSG-0102). **Scheduler is enabled again.**
 
 > **The line this replaces, retained:** "**AMD-01 APPLIED IN PLACE** (TASK-0031, MSG-0097): only ADR-0020 changed in `docs/decisions/`, hunk 1 present exactly once, header note recorded. **MSG-0098 authorizes TASK-0032** — bounded A-STACK **technology** evaluation against the settled Approach C and the amended ADR-0020; **selects nothing**, invents no benchmarks. Not a re-run of TASK-0026 (MSG-0099). Scheduler Disabled." True until the supervisor cycle at 05:57:17Z started that task and completed it the same morning.
 
@@ -999,7 +999,7 @@ carry explicit supersession notes, with no supervisor behaviour, permission, or 
 C4 and C5 — no action, deliberately. **C6 (a bounded proof of MSG-0049 option B) and C7 (the next
 work package) remain the Lead's to decide and are not self-authorized.**
 
-**Open messages: MSG-0060, MSG-0081, MSG-0084, MSG-0087, MSG-0089, MSG-0090 (SCOPED), MSG-0091, MSG-0093, MSG-0096, MSG-0097 and MSG-0099.** All are records or carry referrals; **none blocks TASK-0032**. Status lines vary in formatting, so match on the status *word*, not the bold.
+**Open messages:** MSG-0060, MSG-0081, MSG-0084, MSG-0087, MSG-0089, MSG-0090 (SCOPED), MSG-0091, MSG-0093, MSG-0096, MSG-0097, MSG-0099, MSG-0100 and MSG-0102. All are records or carry referrals; **none blocks TASK-0033**. Status lines vary in formatting, so match on the status *word*, not the bold.
 
 **MSG-0094 is the TASK-0030 execution record**, and it is OPEN for a reason rather than as housekeeping:
 it carries **a drafted amendment the Architecture Lead has not reviewed**. The one decision it asks for
