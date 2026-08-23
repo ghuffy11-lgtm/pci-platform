@@ -2,7 +2,9 @@
 
 **Active Work Package:** WP-0001 — PCI Kernel Foundation
 **Status:** **COMPLETE** — declared by the architecture lead 2026-08-19 (MSG-0020(b), resolved by MSG-0022 / MSG-0023, TASK-0009)
-**Last Updated:** 2026-08-23 UTC — **MSG-0105 selects strict Shape-1: "examines nothing unauthorized."** The weaker materialization-only reading is **rejected**, and all MSG-0104 verdicts stand — the probe found an engine returning results **indistinguishable from a conforming one** while examining unauthorized rows growing with the collection. **TASK-0034 READY**: update the criterion and probe spec to test strict Shape-1, an **evidence-instrument** change, **not an ADR amendment**. Scheduler enabled.
+**Last Updated:** 2026-08-23 UTC — **TASK-0034 COMPLETE (7/7), and the criterion now has a number: the bar is ZERO unauthorized units examined**, invariant across at least three collection sizes. **EPA-0006 §4.6** states it in testable form — five unit kinds, **four evidence classes all required for CLEARED**, and the rule that decides everything: **counters can prove failure but never success**, so clearance rests on **traversal-bounding plan evidence** and **an unmeasurable stage is NOT CLEARED by rule**. **§4.7 surfaces three questions and decides none**, led by **whether strict Shape-1 implies physical organisation of the projection**. **All nine MSG-0104 verdicts reproduced unchanged; nothing became CLEARED**; EPA-0006 §4.3's class-K *"CONFORMS structurally"* claim is **withdrawn** while its NOT CLEARED verdict stands. **`git diff --name-only docs/` empty. No task is READY.** Scheduler enabled. **MSG-0107.**
+
+> **The line this replaces, retained:** "**MSG-0105 selects strict Shape-1: "examines nothing unauthorized."** The weaker materialization-only reading is **rejected**, and all MSG-0104 verdicts stand — the probe found an engine returning results **indistinguishable from a conforming one** while examining unauthorized rows growing with the collection. **TASK-0034 READY**: update the criterion and probe spec to test strict Shape-1, an **evidence-instrument** change, **not an ADR amendment**. Scheduler enabled." True when written; **the task it announced has now run.** The scheduler took it on the cycle at **09:17:18Z** and it completed the same morning. **The "evidence-instrument, not an ADR amendment" boundary held** — `git diff --name-only docs/` is empty — **and so did the no-relabelling constraint**, the MSG-0104 verdict table being reproduced verbatim rather than summarised.
 
 > **The line this replaces, retained:** "**TASK-0033 is READY and was attempted once, stopping before it started (MSG-0103).** A supervisor-started runner held the lock from **06:37:18Z**; at **06:39:24Z** a concurrent interactive session committed `55a617c` — the task's own reconciliation — moving `HEAD` **and** `origin/main` under it. **Both the global abort rule (MSG-0028 d2) and TASK-0033's own *"stop if `origin/main` moves mid-run"* fired.** **The probe was never built or run: no candidate evaluated, no verdict, no `EPA-0007`, no ADR touched, nothing installed, no corpus entered.** The move was benign and convergent, **and that was deliberately not treated as licence to continue.** **The condition has cleared** — `HEAD` = `origin/main` = `55a617c` — so **the next supervisor cycle should simply run the task.** **One correction was left behind and it changes the probe's scope: Tier 2/3 are NOT gated for class R.** `sqlite3` the *CLI* is absent, but **SQLite 3.51.3 with FTS5 is embedded in the Node runtime already recorded as available** (`node:sqlite`), exposing `EXPLAIN QUERY PLAN` and counter instrumentation with **no install, no PATH change, no network, no Docker** — so **all three EPA-0006 §4.4 tiers are obtainable against one class-R test subject.** **Capability evidence, explicitly not a conformance verdict.** Classes **S and V stay unreachable**, **K unmeasured**, **criterion 6 unsettleable for S/V**, and **`NOT CLEARED` remains correct wherever evidence is absent.** **Scheduler enabled.**" True when written; **the prediction it made held.** The very next supervisor cycle ran the task to completion, and **the environment correction it left behind was re-verified in that session and was correct** — all three tiers were obtained against a class-R subject. **Its `NOT CLEARED` expectation also held, and for a reason it did not anticipate**: not because evidence was absent, but because the evidence obtained was **adverse** (MSG-0104).
 
@@ -138,6 +140,7 @@ message on 2026-08-20 under MSG-0041 (MSG-0042) — the fifth.
 | TASK-0031 | Apply ADR-0020 AMD-01 in place | **COMPLETE** (2026-08-23) — **7/7 criteria**; applied in `a1be892`, **15 insertions / 0 deletions**, one file under `docs/decisions/`; **MSG-0097** | AMD-01 ACCEPTED (MSG-0095) ✅ | Claude Code |
 | TASK-0032 | A-STACK **technology** evaluation and implementation planning (bounded) | **COMPLETE** (2026-08-23) — **7/7 criteria**; **`EPA-0006`** delivered **PROPOSED, selecting nothing**; `git diff --name-only docs/decisions/` **empty**; **MSG-0100** | MSG-0098 AUTHORIZED, EPA-0005 ACCEPTED, ADR-0020+AMD-01 applied ✅ | Claude Code |
 | TASK-0033 | Bounded retrieval-engine conformance probe (evaluation only) | **COMPLETE** (2026-08-23, run 2) — **8/8 criteria**; probe executed, **24 candidate runs across 6 fixtures**, all three tiers; **nothing CLEARED** — class R **NOT CLEARED** at Tier 3, class D **DISQUALIFIED** and demonstrated, classes S/V/K **NOT CLEARED** with zero evidence; `git diff --name-only docs/decisions/` **empty**; **MSG-0104**. Run 1 (MSG-0103) stopped before starting and is retained as history | MSG-0101 AUTHORIZED, EPA-0006, ADR-0020+AMD-01 ✅ | Claude Code |
+| TASK-0034 | Update the retrieval-engine criterion and probe specification for strict Shape-1 | **COMPLETE** (2026-08-23) — **7/7 criteria**; **`EPA-0006` §4.6 and §4.7** added, all changes additive and declared; **the bar is ZERO unauthorized units examined**; **all nine MSG-0104 verdicts reproduced unchanged** and **nothing became CLEARED**; `git diff --name-only docs/` **empty**; **MSG-0107** | MSG-0105 DECIDED, MSG-0104, ADR-0020+AMD-01 ✅ | Claude Code |
 | TASK-0002 | Make test entry points shell-independent | **ABORTED** | — | — |
 
 > **Reconciled 2026-08-22 by TASK-0030 — additive and declared.** The three rows above were missing:
@@ -156,8 +159,97 @@ boundary**, not at an empty queue.
 > been executed and is COMPLETE (MSG-0055). MSG-0051 §C is fully discharged: C1–C5 by MSG-0052,
 > C6–C7 by MSG-0053.
 
-**Current position, 2026-08-23 after TASK-0032: no task is READY, and the boundary is back to being a
-document awaiting review — but a different kind of document, and the difference matters.**
+**Current position, 2026-08-23 after TASK-0034: no task is READY, and the boundary is a criterion that
+now has a number — with three questions attached that only the Architecture Lead can answer.**
+
+TASK-0034 executed MSG-0105 §3–§5 and is **COMPLETE** — **7/7 acceptance criteria MET**, each mapped to
+evidence in **MSG-0107** §6. Being documentary it produced **no test count and claims none**. It was run
+by a supervisor-started session (`runner.lock` pid 24340, acquired 09:17:18Z) against starting
+`HEAD = 1451024`, **unchanged at commit time**.
+
+**The deliverable is `EPA-0006` §4.6 — the strict Shape-1 criterion in testable form — and §4.7, three
+questions surfaced and none decided.** Every change is **additive and declared**: no existing sentence of
+EPA-0006 was deleted or reworded, and **`git diff --name-only docs/` is empty**, which is stronger than
+the acceptance criterion's `docs/decisions/` check.
+
+**The criterion had a strictness problem and a testability problem, and only the second was real.**
+EPA-0006 §4.1 already defined Shape 1 as *"the engine only ever examines chunks that satisfy it"* — which
+**is** the strict reading MSG-0105 selected. What it lacked was any statement of what evidence
+establishes it, and MSG-0104 §6.3 proposed relaxing the definition on exactly that gap. **The ruling
+confirms the original wording and rejects the relaxation**, so this task strengthened the instrument, not
+the policy.
+
+**Four things the old tier 3 left undecidable are now settled, and one of them decides everything else.**
+
+1. **The bar is ZERO unauthorized units examined**, shown **invariant across at least three collection
+   sizes**. Tier 3 previously asked that candidates examined be *"bounded by the authorized subset"* — a
+   phrase admitting both *"no more numerous than"* and *"a subset of"*, which differ by exactly the
+   quantity the probe measured. **Growth with collection size rather than with selectivity is the
+   signature of a traversal bounded by index coverage instead of by authorization**, which is why
+   invariance is required and not decorative.
+2. **Five unit kinds are counted.** The two additions are the consequential ones: **U4**, term postings
+   and vector-index nodes — the FTS5 stage MSG-0104 recorded as **NOT MEASURED** — and **U5**, buffers,
+   caches, temporary structures and log lines, which follows from ADR-0020's own Context and from §6.2
+   carrying **no authorization exception**.
+3. **Counters can prove failure but never success**, and this is the load-bearing sentence in the whole
+   update. A zero count observes only the point where the instrument sits; an instrument in a `WHERE`
+   clause is **structurally incapable** of seeing index entries scanned or pages read. **So clearance
+   rests on traversal-bounding plan evidence, and a plan showing a scan over a structure that spans
+   authorization scopes is disqualifying regardless of any counter.** Without this rule the criterion
+   could be satisfied by placing an instrument conveniently. **The precedent is MSG-0104 §4.2**, where
+   two candidates with **identical query plans** reported **2000** and **1000** purely because the
+   counter sat in different places.
+4. **An unmeasurable stage is NOT CLEARED by rule**, not by the author's care — MSG-0104 was scrupulous
+   about flagging that its FTS5 zeros were *absence of measurement, not evidence of absence*, and that
+   distinction no longer depends on anyone being scrupulous.
+
+**The two constraints this task could most easily have blurred both held, and both are checkable.**
+**All nine MSG-0104 verdicts are reproduced verbatim** in MSG-0107 §5 rather than summarised, so
+"unchanged" can be verified rather than trusted. **The rejected reading is recorded as rejected**, and it
+carries the example that gives it teeth: **candidate C1 met the materialization line exactly — zero
+unauthorized bodies at every collection size, under both index designs — while examining 1000
+unauthorized rows at `M=5000`. It was NOT CLEARED then and it is NOT CLEARED now.**
+
+**One claim was withdrawn, and a reader should be clear that a claim is not a verdict.** EPA-0006 §4.3's
+class-K cell read *"CONFORMS structurally"*, on the argument that *"the candidate set **is** an authorized
+query result"* — **a statement about what the query returns, not about what the engine examined while
+resolving it**, which is precisely the reasoning MSG-0105 §2 rejects. Enforcing the rule through RLS
+rather than a `WHERE` clause changes **where the rule is written**, not **what the traversal touches**.
+The cell is **annotated, not deleted**; **class K's verdict remains NOT CLEARED**, exactly as MSG-0104
+recorded it; and **the correction moves in the strict direction only** — it removes a conformance claim
+and creates none. **Class K may still conform; it has simply never been measured.**
+
+**Three questions are referred, none blocks anything, and each has a fail-closed default** — so a future
+probe can run and return a defensible verdict with all three still open. **The one with the most leverage
+is MSG-0106 §4's:** the evidence suggests `U = 0` requires the traversal to open only structures whose
+every entry is already authorized, which is a claim about **physical organisation**, not about query
+text. **Two difficulties are recorded because they bear on whether the question has a clean answer at
+all** — **not every conjunct partitions** (scope, classification and lifecycle state are discrete and
+finite; **effectivity is a continuous two-sided range with an open upper bound** and **audience is a
+multi-valued set overlap**), and it interacts directly with **MSG-0101 §1(1)**, whose ruling that "one
+projection index" means one **logical** projection deliberately left physical organisation open and may
+prove load-bearing exactly here. **The third question is stated because it may be the outcome: if no
+engine class can reach zero, the response is the Lead's** — and **relaxing the bar is explicitly not
+proposed**, since MSG-0105 §3 forbids weakening AMD-01 and a criterion loosened whenever nothing passes
+it is not a criterion.
+
+**Nothing was selected, adopted, recommended, installed or deployed. The probe was NOT re-run and no
+figure in the record is new** — every number is transcribed from MSG-0104, whose harness at
+`implementation/probes/TASK-0033/` is untouched. **No accepted ADR was modified, ADR-0019 included, and
+no Arabic normalization rule was written, inferred or proposed. No implementation task is READY, and no
+engine is CLEARED.**
+
+> **Superseded — the position after TASK-0032, retained.** The paragraphs below were written when
+> EPA-0006 had just been delivered and awaited the Lead's reading. **That boundary has been passed
+> twice since**: MSG-0101 ruled its five referrals and authorized the probe (TASK-0033), and MSG-0105
+> ruled the probe's one referral and authorized this task. **Their account of what EPA-0006 established
+> remains exact**, with one correction now recorded above and in EPA-0006 §4.3 itself: the class-K
+> *"conforms structurally"* claim they repeat does not survive strict Shape-1 and is withdrawn. **Every
+> other finding they describe stands unchanged.**
+
+**Current position, 2026-08-23 after TASK-0032 (superseded, retained): no task is READY, and the boundary
+is back to being a document awaiting review — but a different kind of document, and the difference
+matters.**
 
 TASK-0032 executed MSG-0098 and is **COMPLETE** — **7/7 acceptance criteria MET**, each mapped to evidence
 in **MSG-0100** §3. Being documentary it produced **no test count and claims none**. It was run by a

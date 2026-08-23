@@ -9,6 +9,10 @@ record.
 **Work package:** WP-0009 — Employee Policy Assistant
 **Binding inputs read in full:** ADR-0017, ADR-0018, ADR-0019, **ADR-0020 as amended by AMD-01**, ADR-0021,
 ADR-0022; EPA-0005 (ACCEPTED, MSG-0092); `docs/architecture/technology-selection-principles.md`; WP-0009 §6
+**Amended:** 2026-08-23 — **TASK-0034 (MSG-0105), §4 only**: strict Shape-1 criterion and probe
+specification added as **§4.6**, three surfaced questions as **§4.7**, declared notes at §4.1, §4.3, §4.4
+and §4.5. **Additive** — no existing sentence of §1–§16 was deleted or reworded, and **one claim was
+withdrawn by annotation** (§4.3, class K). **This record still selects nothing, and no ADR was touched.**
 
 ---
 
@@ -194,6 +198,15 @@ product category and not by API surface** — and that distinction is the whole 
 | **Shape 2 — post-filter** | The engine ranks over the whole collection, returns top-k, and something downstream discards the unauthorized ones | **DISQUALIFIED** — this is the shape ADR-0020 §4 has always forbidden |
 | **Shape 3 — over-fetch-then-discard, inside the engine** | The engine accepts the predicate in the query, then satisfies it by retrieving a wider set and dropping non-matching entries — commonly by traversing an unfiltered index and rejecting as it goes, or by fetching `k × f` and truncating | **DISQUALIFIED — and this is the one AMD-01 was written to catch.** *"at any layer, including inside the retrieval component"* |
 
+> **Amended 2026-08-23 by TASK-0034 (MSG-0105), additive and declared — and the Shape-1 row above is
+> confirmed rather than changed.** MSG-0105 selects **strict Shape-1: *"examines nothing
+> unauthorized."*** The row's existing wording — *"the engine only ever examines chunks that satisfy
+> it"* — **already states the strict reading**, and the Lead's ruling adopts it. **What was missing was
+> not strictness but testability**: the row says what conformance *is* and not what evidence
+> establishes it, and MSG-0104 §6.3 proposed relaxing it to *"materializes no unauthorized content"* on
+> exactly that gap. **That weaker reading is explicitly REJECTED** (MSG-0105 §2). **§4.6 below is the
+> testable form of this row**, and nothing in §4.1–§4.5 is deleted or reworded.
+
 ### 4.2 Finding 1 — Shape 3 is invisible to the evidence rule that AMD-01 itself specifies
 
 **AMD-01 states two obligations, and an implementer will conflate them.**
@@ -247,6 +260,27 @@ settled by §4.4's test.
 > execution strategy, not about predicate coverage, not about suitability — and this list is not a
 > shortlist.** Determining any product's shape is §4.4's job and has not been done.
 
+> **Amended 2026-08-23 by TASK-0034 (MSG-0105) — one claim in the table above is WITHDRAWN, and the
+> class verdicts are otherwise unchanged.**
+>
+> **Class K's cell reads *"CONFORMS structurally"*. That claim does not survive strict Shape-1 and is
+> withdrawn.** Its supporting argument is *"the candidate set **is** an authorized query result; there
+> is no wider set to over-fetch from"* — a statement about **what the query returns**, not about what
+> the engine **examined** while resolving it. **That is the materialization-only reasoning MSG-0105 §2
+> rejects.** A relational engine evaluating this predicate examines rows and rejects them exactly as
+> the probed class-R engine did (MSG-0104 §5.3); enforcing the predicate through RLS rather than a
+> `WHERE` clause changes **where the rule is written**, not **what the traversal touches**. Class K may
+> still turn out to conform — **it has simply never been measured**, and the structural argument is no
+> longer sufficient to assert it without measurement.
+>
+> **Class K's authoritative verdict is unchanged: NOT CLEARED** (MSG-0104 §7, "no PostgreSQL on this
+> host … this probe produced no execution evidence for it"). **No verdict in MSG-0104 is softened,
+> relabelled, or re-presented as conformance** (MSG-0105 §3). **This withdrawal moves in the strict
+> direction only** — it removes a conformance claim, and creates none.
+>
+> The rest of the table stands: **D and H DISQUALIFIED**; **R, S, V, L not disqualified and explicitly
+> not cleared.** The phrase *"not cleared"* now carries the §4.6 bar rather than the §4.4 one.
+
 ### 4.4 Finding 2, finding 3, and the conformance probe that settles them
 
 **Finding 2 — for class R, conformance is a property of the query plan, and a plan is not stable.** The same
@@ -277,6 +311,27 @@ it is offered as an implementation-planning artifact, not as a selection.
 cannot be cleared.** Under AMD-01 the burden is on the engine to demonstrate Shape 1, and an opaque engine
 fails that burden regardless of what its documentation asserts.
 
+> **Amended 2026-08-23 by TASK-0034 (MSG-0105) — tiers 1 and 2 stand; tier 3's bar is RESTATED in
+> testable form in §4.6, which governs where the two differ.**
+>
+> **Tier 3's evidence column requires that the candidates examined be *"bounded by the authorized
+> subset"*, and that phrase is not decidable as written.** It admits two readings — *"no more numerous
+> than the authorized subset"* and *"a subset of the authorized set"* — which differ by exactly the
+> quantity MSG-0104 measured. Under **strict Shape-1** only the second is the bar, and **the threshold
+> is zero**: §4.6 S3.
+>
+> **Tier 3 also leaves the instrument's placement unspecified, and that gap is load-bearing.** MSG-0104
+> §4.2 found two candidates with **identical query plans** reporting **2000** and **1000** unauthorized
+> rows examined, purely because the counter sat at different points in predicate evaluation. **A count
+> is therefore a lower bound, and a zero count from a conveniently placed instrument is not evidence of
+> conformance.** §4.6 S4–S6 supply the asymmetry rule and the placement rule that close this.
+>
+> **Tier 2 is unchanged, and its worth is now demonstrated rather than argued** — the TASK-0033
+> negative control passed it at `M=50` and failed at `M=500` and `M=5000` (MSG-0104 §5.2), so a probe
+> run at a single collection size would have cleared a post-filter design. **Tier 1 is unchanged**, and
+> finding 1's warning that it establishes nothing about execution is now an experimental result
+> (MSG-0104 §5.5) rather than a prediction.
+
 ### 4.5 A clarification question the criterion raises, referred rather than answered
 
 **ADR-0020 §7 says "hybrid lexical + semantic retrieval, multilingual local embeddings, *one projection
@@ -295,6 +350,257 @@ implication. It is referred in §15 as a non-blocking clarification. **What hold
 worth stating now, is the fusion hazard**: where results from two retrievers are combined, **the fusion step
 must not be where authorization is resolved**. A fusion layer that merges a constrained result set with an
 unconstrained one and then filters is Shape 2 wearing a different name.
+
+> **Ruled 2026-08-23 — MSG-0101 §1(1) answers this question and it is no longer open.** *"One
+> projection index"* means **one *logical* projection**; a lexical + semantic pair may be evaluated
+> only if both operate over that same governed projection and **each independently satisfies AMD-01**,
+> and **the fusion layer must never resolve authorization**. The first reading above is therefore the
+> ruled one, with the independent-binding condition attached. **The fusion hazard paragraph is
+> confirmed by that ruling, not superseded by it.** §4.7 Q2 records why the word *logical* may become
+> load-bearing under strict Shape-1.
+
+---
+
+### 4.6 The strict Shape-1 criterion and probe specification (TASK-0034, MSG-0105)
+
+**Added 2026-08-23 by TASK-0034.** This section is an **evidence instrument, not policy.** It states
+how a future probe decides whether a candidate satisfies the Shape-1 gate that ADR-0020 §4, as amended
+by AMD-01, already imposes. **It amends no ADR, weakens nothing, and selects, adopts, recommends,
+installs and deploys no engine.** Authority: **MSG-0105 §3–§5**, which authorizes exactly this
+instrument update and calls it *"an interpretation of AMD-01's existing Shape-1 gate"* that *"does not
+authorize weakening AMD-01 or changing the accepted confidentiality policy."*
+
+#### S1 — The requirement, quoted rather than paraphrased
+
+> **Strict Shape-1 is selected: "examines nothing unauthorized."**
+>
+> For purposes of AMD-01 and future retrieval-engine evaluation, the retrieval engine **must not
+> examine, retrieve, inspect, or otherwise process** content that the requesting user is not authorized
+> to access. **Authorization must constrain the candidate set before retrieval/search occurs.**
+>
+> It is **not sufficient** merely to prevent unauthorized content from being materialized or returned
+> after the engine has examined it.
+>
+> — MSG-0105 §1
+
+#### S2 — The rejected reading, recorded as rejected so it cannot quietly return
+
+**MSG-0104 §6.3 proposed that the architecturally meaningful line is *"materializes no unauthorized
+passage content"* rather than *"examines nothing unauthorized."* MSG-0105 §2 rejects it explicitly**,
+as *"insufficient to clear Shape-1."*
+
+**The worked example is why this must be written down rather than assumed remembered.** TASK-0033's
+candidate **C1 met the rejected line exactly** — zero unauthorized bodies materialized, at every
+collection size, under both index designs — while examining **1000 unauthorized rows at `M=5000`** under
+its better index. Its verdict was **NOT CLEARED**, and under this criterion it stays NOT CLEARED. **A
+future probe reporting zero materialized bodies has reported a true thing that clears nothing.**
+
+**Stated as a rule:** *no candidate may be marked CLEARED on materialization evidence.* Materialization
+evidence is still worth collecting — it is how class D was disqualified on measurement rather than
+argument — but it evidences **a distinct and lesser property**, and a probe must label it as such.
+
+#### S3 — The bar: zero, and invariant with collection size
+
+**The passing threshold is ZERO unauthorized units examined.** Strict Shape-1 admits **no non-zero
+allowance** — not a fixed budget, not a proportion of the collection, not a "negligible at realistic
+scale" exception.
+
+For a candidate `C`, a requesting subject `s`, and a collection of size `N`:
+
+```text
+U(C, s, N) = | { units examined by the engine while resolving the query
+                 that do NOT satisfy the §3 predicate for s at answer time } |
+
+CLEARED requires   U(C, s, N) = 0    at every measured N
+```
+
+**And it must be shown invariant with `N`.** Measure at **no fewer than three collection sizes** with
+`M ≫ k`, as tier 2 already requires. **A count that grows with `N` is decisive evidence of failure**:
+growth with collection size — rather than with the predicate's selectivity — is the signature of a
+traversal bounded by **index coverage** instead of by **authorization**. That is exactly what TASK-0033
+measured: **30 / 300 / 3000** on a partial index and **10 / 100 / 1000** on a covering one, with the
+residual immovable because the multi-valued audience conjunct lives in a junction table and cannot be
+pushed into the chunks index (MSG-0104 §6.1).
+
+#### S4 — What counts as a "unit examined"
+
+**A criterion that does not say what it counts cannot return a defensible verdict.** A unit is
+**examined** if the engine, while resolving the query, does any of:
+
+| | Unit | Why it counts |
+|---|---|---|
+| **U1** | reads an **index entry or key** during traversal | the traversal *is* the candidate-set construction that MSG-0105 §1 requires to be already constrained |
+| **U2** | reads a **row, document, or vector** from storage | the ordinary meaning of *retrieve* |
+| **U3** | passes a value to a **ranking, scoring, distance, or filter function** | measured directly by TASK-0033's `probe_rank` |
+| **U4** | traverses a **term posting, token, or vector-index node** while resolving a full-text or approximate match | the FTS5 gap of MSG-0104 §5.3 — the stage the prior probe **could not see into** |
+| **U5** | places content in a **buffer, cache, temporary structure, or log line** while resolving the query | ADR-0020 Context: *"the content is in the process, in memory, in a log line, or in a timing difference"*; ADR-0020 §6.2 carries **no authorization exception**, so the engine's own slow-query or debug log is in scope |
+
+A unit is **unauthorized** if it fails the §3 predicate **for the requesting subject at answer time** —
+including any of the five failure modes the TASK-0033 fixture kept separate: wrong scope, disallowed
+classification, non-overlapping audience, outside the effectivity window, and **SUPERSEDED** lifecycle
+state.
+
+> **The scoping question this raises is surfaced in §4.7 Q1 and is NOT decided here.** Until it is
+> ruled, **the criterion takes the strictest available reading**: U1–U5 all count, and reading an index
+> entry's metadata key counts as examining it even where no passage content is touched. **That default
+> is fail-closed** — it can only turn a would-be CLEARED into NOT CLEARED, never the reverse — **so the
+> criterion is usable now and needs no ruling to operate.**
+
+#### S5 — The asymmetry rule: counters can prove failure, never success
+
+**This is the most important rule in the specification**, because it is what stops a future probe from
+clearing an engine by placing its instrument somewhere convenient.
+
+- **A non-zero count is conclusive.** It proves the engine examined unauthorized units. **NOT CLEARED**,
+  and no plan evidence rehabilitates it.
+- **A zero count is not conclusive.** It proves only that nothing unauthorized crossed **the point where
+  the instrument sits**. It says nothing about what the engine touched *before* that point — index
+  entries scanned, pages read, postings traversed — and an instrument written into a `WHERE` clause is
+  **structurally incapable** of observing those.
+
+**A CLEARED verdict may therefore never rest on counters alone.** It requires **E1**, with E2–E4
+corroborating.
+
+#### S6 — The four evidence classes, all required for CLEARED
+
+| | Evidence | What it must show | If absent |
+|---|---|---|---|
+| **E1** | **Traversal-bounding evidence** — query plan, explain output, or engine-internal trace | that the traversal is **confined to a structure or region every entry of which satisfies the predicate**. A plan showing a scan or seek over a structure that **spans authorization scopes** is **disqualifying regardless of any counter**, because the counter may sit past the point where those entries were read | **NOT CLEARED** |
+| **E2** | **Counter evidence** — engine-reported counters: rows read, index entries examined, documents scored, pages or buffers touched | `U = 0` at every measured collection size, with **instrument placement recorded** | **NOT CLEARED** |
+| **E3** | **Opaque-stage evidence** — for every stage whose internals the engine does not expose | that the stage examined nothing unauthorized. **The worked example is FTS5's `MATCH` traversal**, recorded by MSG-0104 §5.3 as **NOT MEASURED**, no instrument reachable through `node:sqlite` getting inside it | **NOT CLEARED for that candidate** — *never* a pass by default |
+| **E4** | **Log inspection** — carried forward unchanged from §4.4 tier 3 | no unauthorized passage text in the engine's own logs (§9.3; ADR-0020 §6.2) | **NOT CLEARED** |
+
+**E3 is the addition that changes how a record like MSG-0104 reads.** That probe's C2 and C3 reported
+*"0 unauthorized bodies materialized"*, and the record was careful to say this was **absence of
+measurement, not evidence of absence**. Under this criterion that distinction no longer depends on the
+writer's care: **an unmeasurable stage yields NOT CLEARED by rule.**
+
+#### S7 — Instrument placement, and reporting the maximum
+
+Because counts are position-dependent (S5), a probe **must**:
+
+1. **record where each instrument sits** in the evaluation order;
+2. **report the maximum count across all placements** as the candidate's `U`, treated as a **lower
+   bound** on units examined;
+3. **never present a single count as "the" number**, and never compare two candidates on counts taken at
+   different placements.
+
+**MSG-0104 §4.2 is the precedent:** C2 and C3 had **identical query plans** and reported **2000** and
+**1000**, and that record states plainly that **neither is "the" answer and C2 is not worse than C3.**
+
+**An in-query counter does not measure rows scanned at all.** The **plan** is the evidence for scan
+extent — which is why E1 is required rather than optional.
+
+#### S8 — Mandatory negative control, and the adversarial precondition
+
+Both carried forward from TASK-0033, because both earned their place.
+
+- **A deliberately non-conforming candidate must be included in every probe run.** If the harness does
+  not fail it, **the run is void and its passes prove nothing.** TASK-0033's control was k-complete at
+  `M=50` and returned **empty** at `M=500` and `M=5000` — so a post-filter design *"looks perfectly
+  correct on a small collection and silently starts returning empty answers as the collection grows"*
+  (MSG-0104 §6.2), surfacing as an **availability** defect long after the design decision was made.
+- **The fixture must be verified adversarial before every measurement**, by issuing the **unconstrained**
+  top-`k` and asserting **no authorized chunk appears in it**. If one does, tier 2 is void and the
+  harness must say so rather than proceed quietly.
+
+#### S9 — Verdict vocabulary, and how absence of evidence is recorded
+
+**Unchanged from MSG-0101 §2, and as MSG-0104 applied it.**
+
+| Verdict | Awarded when |
+|---|---|
+| **CLEARED** | **E1 + E2 + E3 + E4 all obtained**, `U = 0` at every measured collection size, and the count shown **not to grow** with `N` |
+| **DISQUALIFIED** | The candidate is Shape 2 or Shape 3 by design or by demonstration — post-filtering, or over-fetch-then-discard at any layer — or is excluded on independent grounds such as ADR-0022 §1 |
+| **NOT CLEARED** | **Everything else.** Any missing evidence class, any unmeasurable stage, any non-zero `U`, any engine exposing no plan or counter instrumentation, and **any candidate not reachable at all** |
+
+**`NOT CLEARED` is the required answer wherever evidence is absent.** It is **never** upgraded to
+conformance by a documentary argument, a vendor claim, an API description, or a structural inference.
+**The class-K withdrawal in §4.3 is the worked example of that rule applied to this record's own prior
+text.**
+
+#### S10 — The engine-exposure criterion, restated and strengthened
+
+§4.4 already held that **an engine exposing neither plan nor counter instrumentation cannot be cleared
+at all.** Strict Shape-1 extends it: **an engine must also expose its opaque stages**, or those stages
+are NOT CLEARED and the candidate with them.
+
+**This is a selection criterion in its own right, and it is prior to any performance question.** Under
+AMD-01 the burden is on the engine to demonstrate Shape 1; an engine that cannot be observed fails that
+burden **regardless of what its documentation asserts**, and regardless of how well it performs.
+
+#### S11 — What a probe running this specification must NOT do
+
+- **Must not relabel prior evidence.** MSG-0104's verdicts stand; nothing already measured may be
+  re-presented as conformance under the rejected reading (MSG-0105 §3).
+- **Must not select, adopt, recommend, install, or deploy an engine.** Naming a candidate names a **test
+  subject** (MSG-0101 §3).
+- **Must not enter a real or confidential corpus.** Fixtures are synthetic.
+- **Must not amend an ADR**, propose one, or mark any implementation task READY.
+- **Must not report a timing figure** taken on a shared workstation as a measurement, and must not
+  invent a benchmark, capacity, latency, or recall figure of any kind.
+
+---
+
+### 4.7 Three questions strict Shape-1 raises — surfaced, and deliberately NOT decided
+
+**MSG-0105 §5 and MSG-0106 §4 both require these be surfaced rather than answered.** Deciding any of
+them would be an architecture change TASK-0034 is not authorized to make. **§4.6 is operable without any
+of them being answered** — each carries a stated fail-closed default.
+
+#### Q1 — Does "examine" reach index metadata, or only passage content?
+
+§4.6 S4 counts **U1** — reading an index entry or key — as examining. A narrower reading would count
+only units carrying **passage content** (U2–U5), on the ground that ADR-0020's stated hazard is content
+in the process.
+
+**This is NOT the rejected MSG-0104 §6.3 reading returning under a new name, and the difference should
+be checked rather than taken on trust.** §6.3 asked *what suffices to clear a candidate*, and was
+rejected. Q1 asks *what the counter counts*. They come apart in a case that is not hypothetical: an
+engine that seeks an index confined to authorized entries but reads **one boundary key** belonging to an
+unauthorized row scores `U = 1` under the strict reading and `U = 0` under the narrow one, **while
+touching no passage content under either.**
+
+**Default until ruled: the strict reading, U1–U5.** Fail-closed, and therefore safe to operate under.
+
+#### Q2 — Can strict Shape-1 be satisfied by query-time predicates alone, or does it constrain how the projection is *physically organised*?
+
+**This is the question with the most architectural leverage, and it is MSG-0106 §4's question.**
+
+**The evidence points one way and this record stops there.** Evaluating a conjunctive predicate normally
+means examining candidates and rejecting them — an engine cannot know a row fails the audience test
+without examining that row's audience. TASK-0033 drove the residual down by widening the index and
+**could not reach zero** (MSG-0104 §6.1). **So `U = 0` appears to require that the traversal open only
+structures whose every entry is already authorized** — a statement about **physical organisation**
+(partitioned, sharded, or per-scope structures), not about query text.
+
+**Two further difficulties are recorded because they bear on whether the question has a clean answer at
+all:**
+
+1. **Not every conjunct partitions.** Scope, classification and lifecycle state are **discrete and
+   finite**, and could plausibly be organised cleanly. **Effectivity-at-answer-time is a continuous
+   two-sided range with an open upper bound** — §3 already calls it *"the sharpest discriminator"* — and
+   **audience is a multi-valued set overlap**. Whether these can be physically organised at all, rather
+   than only evaluated, is genuinely open.
+2. **It interacts directly with MSG-0101 §1(1)**, which ruled that *"one projection index"* means one
+   **logical** projection. That wording deliberately leaves physical organisation open, and **may prove
+   load-bearing precisely here** — per-scope physical structures beneath one logical projection is the
+   shape Q2 points at.
+
+**Default until ruled: none needed.** The criterion measures `U` and reports it. If no candidate reaches
+zero, the correct output is **NOT CLEARED for all of them** — a defensible verdict, not a stalemate.
+
+#### Q3 — If no engine class can reach zero, what is the architectural response?
+
+**This may well be the outcome, and it should be visible before a probe runs rather than discovered
+after.** TASK-0033 cleared nothing; §4.3's one structural conformance claim is withdrawn above; and
+**class K faces the same measurement question as class R**, having never been measured at all.
+
+**The response is the Architecture Lead's and this record proposes none.** For completeness, the shape
+of the choice is: accept physical organisation as an architectural requirement (Q2); or settle what `U`
+counts (Q1); or reconsider the retrieval topology. **What this record explicitly does NOT propose is
+relaxing the bar** — MSG-0105 §3 forbids weakening AMD-01, and **a criterion loosened whenever nothing
+passes it is not a criterion.**
 
 ---
 
@@ -888,3 +1194,7 @@ self-authorized.
 | PR4 NOT MET; PR5 the organization's; PR6 UNKNOWN | **WP-0009** §6.1, §8; ADR-0022 consequences; EPA-0004 §11.5 |
 | `/data/docker` boundary; offline deployment and verified artifacts | Bootstrap contract v0.2; MSG-0006; SPEC-0026; ADR-0005; ADR-0014 |
 | Component decomposition and answer path | EPA-0001 §4 (PROPOSED — read as description, not authority) |
+| **Strict Shape-1 — "examines nothing unauthorized"; the materialization-only reading REJECTED; existing evidence not to be relabelled; criterion/probe-spec update authorized as an evidence instrument, not an ADR amendment** | **MSG-0105** §1–§5 (DECIDED); queue §TASK-0034; MSG-0106 (reconciliation) |
+| **The measured behaviour §4.6 is written against** — unauthorized rows examined growing linearly with the collection while results stay indistinguishable from a conforming engine's; the FTS5 stage NOT MEASURED; instrument counts position-dependent; the negative control passing at `M=50` and failing at `M=500`/`M=5000` | **MSG-0104** §4.2, §5.2, §5.3, §6.1, §6.2 (TASK-0033 probe evidence) |
+| **"One projection index" means one *logical* projection; both halves bind independently; the fusion layer never resolves authorization** | **MSG-0101** §1(1) |
+| Verdict vocabulary — CLEARED / DISQUALIFIED / **NOT CLEARED**, and absence of evidence is never conformance | **MSG-0101** §2; applied by **MSG-0104** §7 |
