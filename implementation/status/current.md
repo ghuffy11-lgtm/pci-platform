@@ -2,7 +2,9 @@
 
 **Active Work Package:** WP-0001 — PCI Kernel Foundation
 **Status:** **COMPLETE** — declared by the architecture lead 2026-08-19 (MSG-0020(b), resolved by MSG-0022 / MSG-0023, TASK-0009)
-**Last Updated:** 2026-08-23 UTC — **MSG-0107b answers the question MSG-0106 surfaced**: physical projection isolation **is** part of strict Shape-1 where necessary, and **query-time predicates alone are insufficient unless execution evidence proves they prevent examination** — not disqualified in principle, only unproven. **TASK-0035 READY**: evaluate isolation strategies per EPA-0006 class; **the bar is zero**; the SQLite result condemns the tested configuration, **not the class**. Sixth number collision recorded (MSG-0107a/b). Nothing selected or deployed.
+**Last Updated:** 2026-08-23 UTC — **TASK-0035 COMPLETE (MSG-0109): physical isolation reaches `U = 0`, and the way it reaches it introduces a failure mode nothing before it had.** A probe ran — **8 isolation designs × 3 collection sizes** on the one reachable engine, negative control **failed as required**. **`U` equals the number of unauthorized rows the routed structures still contain**, and nothing else. **Scope-only partitioning was the WORST design tested.** **Zero is reached only when effectivity is materialised — and a stale materialised structure RETURNS unauthorized rows, 5 of 5**, where every TASK-0033 candidate merely examined and rejected them. **Nothing CLEARED; all nine MSG-0104 verdicts unchanged; `git diff --name-only docs/` empty.** Three questions referred, none blocking. **No task is READY.**
+
+> **The line this replaces, retained:** "**MSG-0107b answers the question MSG-0106 surfaced**: physical projection isolation **is** part of strict Shape-1 where necessary, and **query-time predicates alone are insufficient unless execution evidence proves they prevent examination** — not disqualified in principle, only unproven. **TASK-0035 READY**: evaluate isolation strategies per EPA-0006 class; **the bar is zero**; the SQLite result condemns the tested configuration, **not the class**. Sixth number collision recorded (MSG-0107a/b). Nothing selected or deployed." True when written; **the task it announced has now run**, started by the supervisor cycle at **09:57:18Z** and completed the same afternoon. **Its two constraints both held**: MSG-0104's verdicts are reproduced verbatim and none was altered, and **nothing was selected or deployed**. **The "condemns the configuration, not the class" instruction was load-bearing and is now evidenced** — the same class-R engine that was NOT CLEARED under a shared structure reached `U = 0` under a partitioned one.
 
 > **The line this replaces, retained:** "**MSG-0105 selects strict Shape-1: "examines nothing unauthorized."** The weaker materialization-only reading is **rejected**, and all MSG-0104 verdicts stand — the probe found an engine returning results **indistinguishable from a conforming one** while examining unauthorized rows growing with the collection. **TASK-0034 READY**: update the criterion and probe spec to test strict Shape-1, an **evidence-instrument** change, **not an ADR amendment**. Scheduler enabled." True when written; **the task it announced has now run.** The scheduler took it on the cycle at **09:17:18Z** and it completed the same morning. **The "evidence-instrument, not an ADR amendment" boundary held** — `git diff --name-only docs/` is empty — **and so did the no-relabelling constraint**, the MSG-0104 verdict table being reproduced verbatim rather than summarised.
 
@@ -141,6 +143,7 @@ message on 2026-08-20 under MSG-0041 (MSG-0042) — the fifth.
 | TASK-0032 | A-STACK **technology** evaluation and implementation planning (bounded) | **COMPLETE** (2026-08-23) — **7/7 criteria**; **`EPA-0006`** delivered **PROPOSED, selecting nothing**; `git diff --name-only docs/decisions/` **empty**; **MSG-0100** | MSG-0098 AUTHORIZED, EPA-0005 ACCEPTED, ADR-0020+AMD-01 applied ✅ | Claude Code |
 | TASK-0033 | Bounded retrieval-engine conformance probe (evaluation only) | **COMPLETE** (2026-08-23, run 2) — **8/8 criteria**; probe executed, **24 candidate runs across 6 fixtures**, all three tiers; **nothing CLEARED** — class R **NOT CLEARED** at Tier 3, class D **DISQUALIFIED** and demonstrated, classes S/V/K **NOT CLEARED** with zero evidence; `git diff --name-only docs/decisions/` **empty**; **MSG-0104**. Run 1 (MSG-0103) stopped before starting and is retained as history | MSG-0101 AUTHORIZED, EPA-0006, ADR-0020+AMD-01 ✅ | Claude Code |
 | TASK-0034 | Update the retrieval-engine criterion and probe specification for strict Shape-1 | **COMPLETE** (2026-08-23) — **7/7 criteria**; **`EPA-0006` §4.6 and §4.7** added, all changes additive and declared; **the bar is ZERO unauthorized units examined**; **all nine MSG-0104 verdicts reproduced unchanged** and **nothing became CLEARED**; `git diff --name-only docs/` **empty**; **MSG-0107** | MSG-0105 DECIDED, MSG-0104, ADR-0020+AMD-01 ✅ | Claude Code |
+| TASK-0035 | Physical projection isolation evaluation against strict Shape-1 | **COMPLETE** (2026-08-23) — **8/8 acceptance items**; **a probe ran**: 8 isolation designs × 3 collection sizes plus a staleness measurement, negative control **failed as required**; **`U` = 0 reached only where the routed structures hold no unauthorized row**; **a stale materialised structure RETURNS unauthorized rows**; **nothing CLEARED**, all nine MSG-0104 verdicts **unchanged**; `git diff --name-only docs/` **empty**; **MSG-0109** | MSG-0107b AUTHORIZED, MSG-0105, MSG-0104, EPA-0006 ✅ | Claude Code |
 | TASK-0002 | Make test entry points shell-independent | **ABORTED** | — | — |
 
 > **Reconciled 2026-08-22 by TASK-0030 — additive and declared.** The three rows above were missing:
@@ -159,8 +162,106 @@ boundary**, not at an empty queue.
 > been executed and is COMPLETE (MSG-0055). MSG-0051 §C is fully discharged: C1–C5 by MSG-0052,
 > C6–C7 by MSG-0053.
 
-**Current position, 2026-08-23 after TASK-0034: no task is READY, and the boundary is a criterion that
-now has a number — with three questions attached that only the Architecture Lead can answer.**
+**Current position, 2026-08-23 after TASK-0035: no task is READY, and for the first time in this
+sequence the boundary is not a document or a criterion — it is a measured result the Architecture
+Lead has to decide what to do with.**
+
+TASK-0035 executed MSG-0107b and is **COMPLETE** — **8/8 acceptance items discharged**, each mapped to
+evidence in **MSG-0109** §10. It was run by a supervisor-started session (`runner.lock` pid 26532,
+acquired 09:57:18Z) against starting `HEAD = f24b21e`, **unchanged at every push**. **Unlike the four
+tasks before it this one is not documentary: a probe was built and executed**, and
+`implementation/probes/TASK-0035/probe.mjs` with its 354-line captured output are committed as
+re-readable evidence. **TASK-0033's harness was not modified and its probe was not re-run.**
+
+**The question MSG-0106 §4 asked, MSG-0107b ruled on, and this task measured, now has an answer with
+numbers behind it — and the answer has a sting in it.**
+
+**One rule generates the whole pattern catalogue: a physical partitioning discharges a conjunct only
+if its key REFINES that conjunct** — every row in a partition agreeing on that conjunct's truth value
+for every subject routed to it. Under that rule the four EPA-0006 §3 constraints do **not** split
+evenly. Scope, classification and lifecycle state refine cleanly. **Audience refines only by
+replicating rows** — one structure per token, a chunk stored once per token it carries. **And
+effectivity-at-answer-time does not refine at all without fixing a time**, being a two-sided range
+with an open upper bound. That is exactly the difficulty EPA-0006 §4.7 Q2 recorded in advance,
+**before anything was measured**.
+
+**What was measured**, `U` being unauthorized units examined at three collection sizes, maximum
+across three instrument placements:
+
+| Design | M=50 | M=500 | M=5000 |
+|---|---|---|---|
+| no isolation | 20 | 200 | 2000 |
+| **scope-partitioned** | **40** | **400** | **4000** |
+| + classification + lifecycle state | 20 | 200 | 2000 |
+| + audience | 10 | 100 | 1000 |
+| **+ effectivity materialised** | **0** | **0** | **0** |
+| **the same design, after the clock moved** | **5** | **50** | **500** |
+
+**Four things in that table are worth more than the numbers themselves.**
+
+1. **`U` equals the number of unauthorized rows the routed structures still contain — exactly, at
+   every design and every size.** Two independent measurements, one counting stored rows and one
+   counting engine calls inside each structure's own scan, agree throughout. **Isolation reduces `U`
+   insofar as it removes unauthorized rows from the structures opened, and by nothing else.**
+2. **Partial isolation made matters worse, and it is the design an implementer reaches for first.**
+   Scope-only partitioning examined **the most of any design** — replacing an index restriction
+   (`SEARCH … USING INDEX i_auth`) with a structural one (`SCAN p_org_a`) moved work from the index
+   into the scan without carrying the rest of the predicate. **An evaluation reporting only survivor
+   counts would have recorded it as an improvement.**
+3. **The staleness row is the finding.** The same materialised design, same structures, same query,
+   with only the clock moved, **returned 5 of 5 unauthorized rows at every collection size.** **No
+   TASK-0033 candidate ever returned an unauthorized row.** Physical isolation trades a *conservative*
+   failure — examine, then correctly reject — for a *leaking* one, because the rejection step was
+   what got traded away for the structural guarantee. **`U = 0` for a materialised structure is a
+   property of an instant, not of a design**, and should never be recorded without the materialisation
+   time it was measured at. **Accepted architecture already contains the controls that catch it** —
+   ADR-0020 §3.2's re-check against the kernel, §1's staleness threshold, abstention **A7** — which is
+   why the four enforcement points are not redundant. **No new rule is proposed;** whether those
+   controls are *prerequisites* for clearing such a design is referred.
+4. **The unmeasurable-stage problem has a structural answer, and it is deliberately not being
+   treated as an instrument reading.** MSG-0104 could not see inside FTS5's `MATCH` traversal.
+   Building that index **per partition** leaves the stage no unauthorized entry to reach. **Whether
+   that is admissible as E3 evidence is unruled, so the default is no** and the design stays NOT
+   CLEARED.
+
+**Nothing is CLEARED, and the two constraints this task could most easily have blurred both held.**
+**All nine MSG-0104 verdicts are reproduced verbatim** in MSG-0109 §7 rather than summarised, and
+**none was altered** — the new evidence concerns *isolation designs*, which are new candidates with
+their own rows. **MSG-0101 §1(1) is not reinterpreted:** every design serves **one logical
+projection**, and nothing here requires one physical index or one physical store.
+
+**The `NOT CLEARED` on the zero-`U` design is deliberate and is worth stating plainly**, because a
+`U = 0` row in a table invites the opposite reading: **E4 (log inspection) was not obtained**, the
+zero holds only at the materialisation instant, and clearing it would require an architecture decision
+MSG-0107b explicitly reserves. **Absence of evidence is not conformance** — EPA-0006 §4.6 S9.
+
+**Two instrument defects were found in this probe's own code and are recorded rather than fixed
+quietly**, because both are EPA-0006 §4.6 S5 happening in practice rather than in the abstract: **an
+outer `WHERE` term written first is not evaluated first** — SQLite reorders freely, and the first run
+reported `U = 0` on a design whose structures held ten unauthorized rows — and **an instrument placed
+in a subquery's select list was elided entirely**, reporting `0` rows seen while the scan surfaced 22.
+**A zero from a conveniently placed instrument is not evidence**, demonstrated against this probe.
+
+**Nothing was selected, adopted, recommended, installed or deployed.** No ADR was created, amended or
+proposed; **`git diff --name-only docs/` is empty**, ADR-0019 included, and no Arabic normalization
+rule was written or inferred. **No real corpus was entered**, Docker was not started, nothing was
+installed. **EPA-0006 gained an additive, declared §4.8** and no existing sentence of it was changed.
+**Three questions are referred and none blocks anything** (MSG-0109 §9): whether partition **routing**
+examines anything (default: routing must be *computed* from the subject's entitlements, never
+*discovered* by enumerating structures), what **staleness bound** if any permits clearing a
+temporally materialised structure, and whether **structural confinement** is admissible **E3**
+evidence. **No implementation task is READY and no engine is CLEARED.**
+
+> **Superseded — the position after TASK-0034, retained.** The paragraphs below were written when the
+> strict Shape-1 criterion had just been made testable and its three questions were freshly surfaced.
+> **The second of those questions — Q2, whether strict Shape-1 constrains physical organisation — has
+> now been measured** by TASK-0035, though **not decided**: MSG-0107b ruled it in scope and this task
+> produced the evidence. **Everything else they say still holds exactly**, including the bar of zero,
+> the asymmetry rule, and the class-K withdrawal.
+
+**Current position, 2026-08-23 after TASK-0034 (superseded, retained): no task is READY, and the
+boundary is a criterion that now has a number — with three questions attached that only the
+Architecture Lead can answer.**
 
 TASK-0034 executed MSG-0105 §3–§5 and is **COMPLETE** — **7/7 acceptance criteria MET**, each mapped to
 evidence in **MSG-0107** §6. Being documentary it produced **no test count and claims none**. It was run

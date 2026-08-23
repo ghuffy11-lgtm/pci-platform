@@ -604,6 +604,100 @@ passes it is not a criterion.**
 
 ---
 
+### 4.8 Physical projection isolation — patterns, and what they measured (TASK-0035, MSG-0107b)
+
+**Added 2026-08-23 by TASK-0035. Additive and declared: nothing in §4.1–§4.7 is deleted or
+reworded, and no class verdict changes.** This section records what physical isolation is, which
+conjuncts it can and cannot discharge, and what it measured on the one reachable engine. **It
+selects, adopts, recommends, installs and deploys nothing, amends no ADR, and clears nothing.**
+Authority: **MSG-0107b**. Full evidence: **MSG-0109**; harness and captured output at
+`implementation/probes/TASK-0035/`.
+
+**MSG-0107b §1 is the ruling this section serves:** physical projection isolation **is** part of
+strict Shape-1 *where necessary to guarantee the engine does not examine unauthorized content*, and
+**query-time predicates alone are insufficient unless execution evidence demonstrates they genuinely
+prevent examination** — **not disqualified in principle, only unproven.**
+
+**Logical and physical stay distinct.** Every design below serves **one logical projection**.
+**MSG-0101 §1(1) is unchanged and is not reinterpreted**: *"one projection index"* means one
+**logical** projection, and nothing here requires one physical index or one physical store.
+
+#### The refinement rule, from which the patterns follow
+
+> A physical partitioning **discharges** a conjunct only if the partition key **refines** it — every
+> row in a partition agreeing on that conjunct's truth value for every subject routed to it. A key
+> that merely *correlates* with a conjunct discharges nothing.
+
+**The four §3 constraints do not split evenly under that rule.** Scope, classification and lifecycle
+state are discrete and refine cleanly. **Audience refines at the cost of replication** — one
+structure per token, a chunk stored once per token it carries. **Effectivity-at-answer-time does not
+refine at all without fixing a time**, being a two-sided range with an open upper bound; it can be
+refined only *as of an instant*, and **that refinement decays from the instant onward.** This is the
+difficulty §4.7 Q2 recorded in advance, now with a measurement attached.
+
+#### Pattern catalogue
+
+| | Pattern | Conjunct discharged |
+|---|---|---|
+| **I0** | no isolation — one shared structure | none |
+| **I1** | scope / tenant partitioning | 1 |
+| **I2** | discrete-attribute partitioning — classification, lifecycle state | 2a, 4 |
+| **I3** | entitlement-token partitioning — one structure per audience token | 2b, **with replication** |
+| **I4** | temporal materialisation — the structure holds only what is effective at an instant | 3, **with a decay term** |
+| **I5** | per-principal materialisation | 1, 2a, 2b, 4 — **not measured** |
+| **I6** | per-partition secondary structures — lexical or vector index built per partition | **none by itself**; it extends existing confinement into the secondary structure |
+
+**I6 is the one most easily omitted, and omitting it undoes the rest**: a perfectly partitioned base
+paired with **one global lexical or vector index** puts the traversal back over a structure spanning
+every authorization scope, which §4.6 S6/E1 makes disqualifying regardless of any counter.
+
+#### What was measured (class R test subject; MSG-0109 §5)
+
+`U` = unauthorized units examined, maximum across three instrument placements (§4.6 S7):
+
+| Design | Patterns | M=50 | M=500 | M=5000 | E1 structure invariant | Verdict |
+|---|---|---|---|---|---|---|
+| P0 | I0 | 20 | 200 | 2000 | VIOLATED | NOT CLEARED |
+| P1 | I1 | **40** | **400** | **4000** | VIOLATED | NOT CLEARED |
+| P2 | I1+I2 | 20 | 200 | 2000 | VIOLATED | NOT CLEARED |
+| P3 | I1+I2+I3 | 10 | 100 | 1000 | VIOLATED | NOT CLEARED |
+| P4 | +I4 | **0** | **0** | **0** | **holds** | **NOT CLEARED** — E4 not obtained; zero holds at the materialisation instant only |
+| P5 | P4+I6 | **0** | **0** | **0** | **holds** | **NOT CLEARED** — E3 argued from construction, not instrumented |
+| P4S | P4 after the clock moved | 5 | 50 | 500 | VIOLATED | **NOT CLEARED** — and it **returned** unauthorized rows |
+| NC | negative control | 50 | 500 | 5000 | VIOLATED | **DISQUALIFIED** — the control fails, so the run is valid (§4.6 S8) |
+
+**Four results carry beyond this engine.**
+
+1. **`U` equals the number of unauthorized rows the routed structures still contain.** Two
+   independent measurements — counting stored rows, and counting engine calls inside each structure's
+   own scan — agree at every design and every collection size. **Isolation reduces `U` exactly
+   insofar as it removes unauthorized rows from the structures opened, and by nothing else.**
+2. **Partial isolation can make matters worse.** **P1, scope-only, examined the most of any
+   design** — replacing an index restriction (`SEARCH … USING INDEX i_auth`) with a structural one
+   (`SCAN p_org_a`) moved work from the index into the scan without carrying the rest of the
+   predicate. An evaluation reporting only survivor counts would have recorded it as an improvement.
+3. **Temporal materialisation changes the failure mode from conservative to leaking.** Where
+   examine-then-reject examines unauthorized rows and correctly discards them, a stale materialised
+   structure **returns** them: **5 of 5 results, at every collection size.** No TASK-0033 candidate
+   ever returned an unauthorized row. **ADR-0020 §3.2's post-retrieval re-check against the kernel,
+   §1's staleness threshold and abstention A7 are what catch this** — which is why the enforcement
+   points are not redundant here. **No new rule is proposed;** whether they are *prerequisites* for
+   clearing an I4 design is referred (MSG-0109 §9 Q5).
+4. **I6 offers a structural answer to the opaque-stage problem, and it is not an instrument
+   reading.** MSG-0104 could not see inside the FTS5 `MATCH` traversal. Building that index **per
+   partition** means the stage has no unauthorized entry to reach. **Whether that is admissible as
+   E3 evidence is unruled, and until it is, the default is no** (MSG-0109 §9 Q6). A cost worth
+   planning for: **splitting one lexical index splits its scoring statistics**, so cross-partition
+   score comparison is not simply a sort — an observation from construction, **unmeasured**.
+
+**Nothing is CLEARED, no class verdict moves, and all nine MSG-0104 verdicts stand unchanged.**
+Classes **S and V remain unreachable** on the authoring host and **K remains unmeasured** — for K the
+point sharpened by this evidence is that **RLS is enforcement, not isolation**: it decides where the
+rule is written, not what the traversal opens, which is the same gap §4.3's withdrawn *"conforms
+structurally"* claim rested on.
+
+---
+
 ## 5. Candidate technology classes against Approach C (MSG-0098 item 1)
 
 **Approach C is settled and is treated here as a constraint, not an option** (EPA-0005 §5; MSG-0092): a
