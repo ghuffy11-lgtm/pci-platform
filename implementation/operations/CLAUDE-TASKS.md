@@ -47,6 +47,7 @@ Only the architecture lead may authorize new work, mark a task READY, or change 
 | TASK-0035 | **Physical projection isolation evaluation against strict Shape-1** | **COMPLETE** — 2026-08-23; **8/8 acceptance items discharged** | MSG-0107b AUTHORIZED, MSG-0105 (strict Shape-1), MSG-0104 evidence, EPA-0006 classes | 2026-08-23 — **probe built and executed**: **8 isolation designs × 3 collection sizes** plus a staleness measurement, class-R test subject, negative control **failed as required**; **`U` reaches ZERO only when the routed structures contain no unauthorized row**, and a **stale materialised structure RETURNS unauthorized rows (5 of 5)**; **nothing CLEARED**, all nine MSG-0104 verdicts **reproduced unchanged**; `git diff --name-only docs/` **empty**; **MSG-0109** | none — **no task is READY.** MSG-0107b §5 requires stopping at evidence; **selection remains a later Architecture Lead decision.** Three non-blocking questions referred in MSG-0109 §9 — partition **routing**, the **staleness bound** for a temporally materialised structure, and whether **structural confinement** is admissible **E3** evidence | Claude Code |
 | TASK-0036 | **Encode Q4/Q5/Q6 as strict Shape-1 clearance gates in the EPA-0006 probe spec** | **COMPLETE** — 2026-08-23; **8/8 acceptance criteria MET** | MSG-0110 DECIDED, MSG-0109 (TASK-0035 evidence), TASK-0034 criterion | 2026-08-23 — **EPA-0006 §4.9** added: **G-Q4** (routing computed from the subject's entitlements, and routing itself measured), **G-Q5** (temporal materialisation needs **BOTH** a bounded re-materialisation interval **and** a demonstrated kernel re-check), **G-Q6** (opaque-stage confinement needs **execution** evidence; construction-only is rejected). Documentary — **no test count and none claimed**; **no probe re-run**. **272 insertions, 0 deletions**, one file; `git diff --name-only docs/` **empty**; **MSG-0112** | none — **no task is READY.** MSG-0110 §6 requires stopping at the evidence-instrument update and the COMMS record. **Nothing CLEARED**; all nine MSG-0104 verdicts and all eight TASK-0035 design verdicts reproduced unchanged. **One non-blocking question referred — Q7**: **no numeric staleness threshold exists anywhere in the accepted set** (ADR-0020 leaves it under *Deliberately not decided here*), so G-Q5's bounded-interval limb is **structural, not numeric**; **no number was chosen** | Claude Code |
 | TASK-0037 | **Version-transition freshness and stale-version fail-closed evidence** | **COMPLETE** — 2026-08-23; **8/8 acceptance criteria MET** | MSG-0113 DECIDED, EPA-0006 §4.9 gates, TASK-0033/0035 probe harnesses | 2026-08-23 — **probe built and executed**: **8 designs × 11 scenarios × 3 collection sizes**, two instrument placements each; negative control **failed as required**; **all eight MSG-0113 §3 evidence items demonstrated**; **`git diff --name-only docs/` empty**; **EPA-0006 §4.10** added (122 insertions / 0 deletions); **MSG-0115** | none — **no task is READY.** MSG-0113 §5 requires stopping at evidence and clearance status. **Nothing CLEARED** — 7 NOT CLEARED, 1 DISQUALIFIED. **The discriminator fired**: the two timer-only designs returned the **superseded** version before the periodic refresh and the correct one after — a fixed-time test alone would have cleared them. **Version identity alone changed nothing** (two designs differing only in it have identical grids). **The faked kernel re-check is demonstrated to be a no-op** — `kept 4/4` and leaked, where the real one `kept 0/4` and abstained — so **G-Q5.2c is satisfied for the first time**. **`U` = 4 for both**, which is the sharpest instrument finding: **a non-zero count identical between two designs conceals opposite security outcomes**. **The 11/11 design is still NOT CLEARED** on E2, E4 and unmeasured G-Q4. **No numeric threshold introduced.** Three non-blocking questions referred in MSG-0115 §10 — **Q8** (is the mandatory §3 point-2 re-check itself examination?), **Q9** (sharpens §4.7 Q3), **Q10** (MSG-0113/ADR-0018 terminology) | Claude Code |
+| TASK-0038 | **Kernel-constrained retrieval / non-divergent projection evidence** | **READY** | MSG-0116a+b DECIDED (Q8/Q9/Q10), MSG-0115 evidence, EPA-0006 gates | — | none — **evidence and clearance status only**; **U=0, E1–E4 and strict Shape-1 not relaxed**; nothing selected | Claude Code |
 | TASK-0002 | Make test entry points shell-independent | **ABORTED** | — | 2026-08-19 | none — premise disproven by measurement | — |
 
 **TASK-0019 is COMPLETE (2026-08-21).** It was authorized by MSG-0050, reconciled into this queue in `39eabdb`, and executed by a supervisor-started session on its scheduled 06:37:13Z cycle. It was maintenance/audit work only, not a new product work package.
@@ -658,6 +659,9 @@ READY means *authorized to attempt*, never *authorized to force*. A READY task w
 | MSG-0112 | Record + referral | **OPEN** | Claude Code | Architecture lead | **TASK-0036 execution record — the three rulings are now testable gates.** **8/8 acceptance criteria MET**; documentary, so **no test count and none claimed**, and **neither probe was re-run**. **EPA-0006 §4.9** encodes MSG-0110 by quotation, not paraphrase. **G-Q4** — the routed set is a function of the **subject's entitlements alone**, **does not vary with collection contents** (differential test), involves **no catalogue enumeration** (E1-class evidence covering the **routing phase**), and **routing-phase units count toward `U`** — closing the gap that routing *feels* like it happens before retrieval when **choosing which structures to open is part of resolving the query**. Records the design consequence: a partition **naming scheme** encoding authorization attributes turns the engine's catalogue into a **directory of other subjects' attributes**, so the name must be **computed and resolved by exact key**, never **found** by scanning — **two behaviourally identical implementations, only one of which passes**. **G-Q5** — **the conjunction IS the gate**: condition 1 bounds *how long* the structure may be wrong, condition 2 catches a hit that is wrong anyway, **and neither substitutes for the other**. **The sharpest limb is G-Q5.2b**: a "re-check" reading the **stale copy's own columns re-checks the stale data against itself and is a no-op** — it would have passed every row of P4S while that design returned 5 of 5 unauthorized rows; **G-Q5.2c** applies §4.6 S5's asymmetry — a re-check observed running but never observed **rejecting** has demonstrated that it runs, not that it works. **G-Q6** — the construction-only proposition is **recorded as rejected**, because the argument assumes the stage cannot reach outside its structure and **that assumption is itself an engine property**; global term dictionaries, shared doc-id maps, corpus-wide statistics and global ANN graphs are each **a path out of the confinement the argument does not see**. **All three are NECESSARY and none is SUFFICIENT** — §4.6 S6's E1–E4 remains the bar. **Nothing CLEARED**; **nine MSG-0104 verdicts and eight TASK-0035 design verdicts reproduced unchanged**, and **no figure is new**. **`git diff --name-only docs/` empty**; **272 insertions, 0 deletions**; `### 4.9` written **exactly once**. **One question referred — Q7**: **VERIFIED that no numeric staleness threshold exists anywhere in the accepted set** — ADR-0020 §1 names it, and ADR-0020's ***Deliberately not decided here*** calls it *"an operational parameter, tuned with real evidence"* — so **G-Q5.1 is a structural gate and says so**, and **no number was chosen**, since choosing one would invent the tolerance MSG-0110 §3 forbids. **It blocks nothing** — the structural gate **fails P4S by demonstration**. Also records, without acting on it, that **WP-0009 §6.2's A-STACK row-chain stops at TASK-0033** and does not carry TASK-0034/0035/0036 | 2026-08-23 |
 | MSG-0113 | Decision | DECIDED | Architecture lead | Claude Code | **Q7 resolved as a version-transition freshness/security requirement, NOT an elapsed-time SLA.** When a policy is **updated, approved, revoked or superseded**, the prior version **must not be used for employee answers once the change is recorded**; if the current approved version cannot be established or made available, the system **must abstain** rather than answer stale. Mechanism: the **kernel record is authoritative**; the **transition itself** invalidates the retrievable prior version rather than a periodic timer; retrieval resolves against the current version; **unavailable new version ⇒ abstain**; the kernel re-check stays mandatory against authoritative state; and **any physical/partitioned representation must carry version identity — physical isolation does not excuse stale-version use**. **No numeric threshold introduced**; a time bound may be evaluated only if an architecture needs one as enforcement, never as a replacement. **Evidence must distinguish transition-triggered freshness from periodic re-materialisation — a fixed-time pass alone establishes nothing.** All verdicts unchanged; nothing selected | 2026-08-23 |
 | MSG-0114 | Record | **OPEN** | Claude Code | Architecture lead | **TASK-0037 reconciled as the single READY task** — produce execution evidence for version-transition freshness and stale-version fail-closed behaviour, covering update/approve/revoke/supersede and the unavailable-new-version abstention case. Records why Q7's reframing retires the numeric question: **a timer measures how long ago a structure was rebuilt; the requirement is whether the authoritative version changed**, which a timer cannot observe. Carries the discriminator into the task as the thing most likely to be got wrong — **a design re-materialising every N seconds passes a naive V1→V2 test by waiting**, so the fixture must test at a moment a timer would not have fired, such that a periodic design fails and a transition-triggered one passes. Also ties MSG-0113 §2(6) to TASK-0035's leaking-failure evidence | 2026-08-23 |
+| MSG-0116a | Decision | DECIDED | Architecture lead | Claude Code | **Rulings on Q8/Q9/Q10** (`-rulings-q8-q10.md`). **Q8 — NO**, the mandatory §3 point-2 kernel re-check is not "examination" **provided** it reads only authorization/version/lifecycle metadata and not unauthorized content; it is **mandatory**, must consult **authoritative current state not a materialized copy**, and **the measured kernel-read count is not by itself a Shape-1 violation**. **Q9 — Q3 stays open and the bar is not relaxed**: a non-zero result is not acceptable merely for being invariant with collection size, no engine may be chosen assuming an unmeasured kernel join fixes it, and **if nothing satisfies the gates the project returns to Q3** rather than relaxing Shape-1. **Q10 — currently effective version only**: APPROVED-but-not-PUBLISHED is not answerable, withdrawn/superseded are not current, unavailable ⇒ abstain, and **the citation must identify the actual current version**. No ADR modified; nothing selected | 2026-08-23 |
+| MSG-0116b | Decision | DECIDED | Architecture lead | Claude Code | **Rulings on Q8/Q9/Q10** (`-q8-q10-rulings.md`) — **agrees with MSG-0116a on all three and on the next action**, and adds the operative constraints. **Q8**: the re-check **must be instrumented separately from retrieval-content examination**, evidence must show it reads **only authoritative kernel facts**, and **a purported re-check that reads content-bearing data from an unauthorized candidate is examination and fails Shape-1**; **no clearance follows** — E1–E4 and G-Q4/G-Q5/G-Q6/G-Q7 remain independently necessary. **Q9**: records that **A6 passed freshness yet stayed NOT CLEARED** (E2 failed, E4 not obtained, G-Q4 not measured). **Q10**: any formal lifecycle change **remains an ADR question**. Complementary to 0116a, not contradictory | 2026-08-23 |
+| MSG-0117 | Record | **OPEN** | Claude Code | Architecture lead | **TASK-0038 reconciled as the single READY task, and a seventh number collision recorded.** **Two lead-authored files claim MSG-0116** — the MSG-0020 shape, and MSG-0020's pair **contradicted**, so agreement was verified clause by clause before queueing rather than assumed. **They agree on all three rulings and the next action**; no stop fired. **They are not interchangeable** — 0116a carries the kernel-read-count and citation-version points, 0116b the separate-instrumentation requirement and the no-clearance-follows warning — so **the task section carries the union and links both**. Neither renamed, per MSG-0058 F4; **neither was registered in either index** until now | 2026-08-23 |
 | MSG-0115 | Record + referrals | **OPEN** | Claude Code | Architecture lead | **TASK-0037 execution record — the freshness mechanism is measured, and nothing is cleared.** **8/8 acceptance criteria MET**; **a real probe ran** — **8 designs × 11 scenarios × 3 collection sizes**, two instrument placements each, on **SQLite 3.51.3 via `node:sqlite`** (class **R** test subject, the only engine reachable — `docker` is not on this runner's PATH), `:memory:` only, no install, no network, no corpus, **no wall-clock read and no timing figure produced**. The **mandatory negative control failed** — NC returned a superseded version in **12 cases** — so the run is valid; **the adversarial precondition also caught a real fixture defect** and correctly declared the first draft VOID. **Two terminology reconciliations were taken from the accepted ADRs rather than invented**: MSG-0113's *"revoked"* is ADR-0018 §2's **WITHDRAWN** (no `REVOKED` state exists), and *"the current approved version"* is read as ADR-0018's **PUBLISHED and effective** version, since `APPROVED (not yet published)` is **not answerable** — both strict, both fail-closed. **The discriminator MSG-0113 §3 demands was built and it fired**: S2 and S3 are the **same recorded transition** queried before and after the periodic timer, and the two timer-only designs **returned the superseded version before the timer and the correct one after** — *"made correct by waiting, not by the transition."* **Five results carry beyond the engine.** **Version identity is necessary and nowhere near sufficient** — the two designs differing **only** in whether the structure carries it have **identical grids**; carrying it without consulting the kernel changes nothing, and a design carrying none **cannot name the version it answered from**, defeating ADR-0018 §1's citation rule independently. **"Answered nothing" is not "abstained"** — one design returned an **empty ANSWER** where abstention was required, and on the kernel-unreachable case **answered correctly by luck**; ADR-0017 §5 classifies abstentions A1–A7 and an empty answer is none of them. **The faked re-check is a no-op, now demonstrated rather than predicted** — against the same change, the kernel re-check `kept 0/4` and abstained while the self re-check `kept 4/4` and **returned four chunks of a reclassified version**, with the same structures, the same plan and the **same `U`**; **G-Q5.2c is satisfied for the first time** (a re-check observed to **REJECT**). **`U` cannot distinguish a leaking design from a conservative one** — those two designs both report **`U` = 4 at every size**, which **extends §4.6 S5**: the asymmetry rule warns a *zero* count can be a placement artefact; here a *non-zero* count identical between two designs conceals **opposite** security outcomes. **And "`U` = 0 is a property of an instant" is not only about time** — in the decisive scenario **no time passes at all**, an authorization attribute changes in the kernel, and **no timer would have caught it**, corroborating §4.8 finding 1 in a second fixture. **A hook is only as complete as the set of changes it is wired to**, so MSG-0113 §2(2) and §2(5) are **not alternatives**. **Nothing is CLEARED** — 7 NOT CLEARED, 1 DISQUALIFIED; **the design meeting BOTH G-Q5 conditions and every G-Q7 requirement (11/11) is still NOT CLEARED** on **E2** (`U` = 4 > 0), **E4** (not obtained) and **G-Q4** (not measured) — §4.9's *"necessary, never sufficient"* demonstrated in practice. **All nine MSG-0104 and all eight TASK-0035 verdicts reproduced unchanged; neither prior probe modified or re-run**; **`git diff --name-only docs/` empty**; **EPA-0006 §4.10 added, 122 insertions / 0 deletions**; **no numeric threshold introduced** — the bound exhibited is a **fixture constant** whose magnitude **G-Q5.1a** expressly does not judge. **Three questions referred, none blocking**: **Q8** whether the mandatory §3 point-2 re-check is itself *examination* (its kernel reads are **bounded by `k` and invariant with `N`**), **Q9** sharpening §4.7 Q3 with the new evidence, **Q10** the MSG-0113/ADR-0018 terminology mismatch | 2026-08-23 |
 | MSG-0099 | Record | **CLOSED** 2026-08-23 — discharged by execution (MSG-0100); the distinction it asked for is recorded in WP-0009 §6.2, the architecture README and MSG-0100 §5, and its warning held — no unmeasured figure appears in the delivered record | Claude Code | Architecture lead | **TASK-0032 reconciled as the single READY task.** Records that this is **not a re-run of TASK-0026**: that task evaluated stack **shape** (Approaches A/B/C) and produced EPA-0005; this evaluates **technology classes** against the now-settled Approach C and against ADR-0020 **as amended by AMD-01**, neither of which existed then. **Both are labelled "A-STACK" in WP-0009 §6.2**, where A-STACK already reads EXECUTED — the label reuse is flagged so the record is not read as one task run twice, and the task is told to distinguish the rows rather than overwrite. Also flags the likeliest failure mode: a technology comparison invites throughput, latency, memory and recall numbers, **none of which has been measured here** | 2026-08-23 |
 | MSG-0096 | Record | **CLOSED** 2026-08-23 — discharged by execution (MSG-0097) | Claude Code | Architecture lead | **TASK-0031 reconciled as the single READY task** to apply AMD-01 in place, per MSG-0095 §5. Three edits and nothing else: hunk 1 at the end of ADR-0020 §4, hunk 2 as one Traceability row, and a concise header note naming AMD-01 and MSG-0095. **Wording is taken verbatim from AMD-01** rather than retyped, since transcription drift in an accepted ADR is the failure this must not introduce. The task edits an **accepted, promoted** ADR — authorized here and only here — and its recovery procedure warns that re-running against an already-amended file would insert the clause twice | 2026-08-23 |
@@ -3429,3 +3433,129 @@ Record the starting HEAD in checkpoint 1 and re-check before every push.
 
 Check which records and probe artefacts already exist before writing. **Do not re-run the TASK-0033 or
 TASK-0035 cases** — their evidence stands and is committed; this task adds transition cases.
+
+---
+
+## TASK-0038 — kernel-constrained retrieval / non-divergent projection evidence
+
+**Priority:** 1 | **Status:** **READY** | **Owner:** Claude Code
+**Depends on:** MSG-0116a **and** MSG-0116b (Q8/Q9/Q10 rulings); MSG-0115 (TASK-0037 evidence); EPA-0006 §4.6–§4.10 gates
+**Next eligible task:** none — both rulings require stopping at evidence and clearance status
+**Type:** evidence probe — **selects nothing, deploys nothing**
+
+**Specification — TWO files are numbered MSG-0116, both authoritative, read BOTH:**
+
+- [`MSG-0116-architecture-lead-rulings-q8-q10.md`](../comms/MSG-0116-architecture-lead-rulings-q8-q10.md) — **MSG-0116a**
+- [`MSG-0116-architecture-lead-q8-q10-rulings.md`](../comms/MSG-0116-architecture-lead-q8-q10-rulings.md) — **MSG-0116b**
+
+> **They agree on all three rulings and on the next action** — checked clause by clause before this task
+> was queued — so **no stop condition fired**, unlike the MSG-0020 pair which contradicted. **They are
+> not interchangeable**: each carries constraints the other omits, and **everything below is the
+> union.** Neither was renamed, per MSG-0058 F4. Recorded in MSG-0117.
+
+### Q8 — the kernel re-check is not "examination", under conditions
+
+**Both rule NO**: the mandatory ADR-0020 §3 point-2 re-check does not violate strict Shape-1 **provided
+it reads only authoritative authorization / version / lifecycle metadata and does not inspect
+unauthorized content.**
+
+**From MSG-0116a:** the re-check is **mandatory**, must consult **authoritative current state rather
+than a materialized copy**, and **the existing measured kernel-read count is not by itself a Shape-1
+violation** — the boundary is content examination, not a bounded metadata lookup. A failing candidate
+must be **rejected or abstained before its content is used**.
+
+**From MSG-0116b, and this is the operative addition:** the re-check **must be instrumented separately
+from retrieval-content examination**, and **evidence must demonstrate it reads only the authoritative
+kernel facts required to authorize the candidate**. **If a purported re-check reads content-bearing
+data from an unauthorized candidate, that is examination and fails Shape-1.**
+
+**Also from MSG-0116b: no clearance follows from Q8.** **E1–E4 and G-Q4 / G-Q5 / G-Q6 / G-Q7 remain
+independently necessary.** Q8 removes an apparent conflict between AMD-01 and ADR-0020 §3; it clears
+nothing.
+
+### Q9 — the bar is not relaxed
+
+**Both rule: do not lower it.** `U = 0` and E1–E4 stand. Specifically (MSG-0116a):
+
+- **Do not treat a non-zero result as acceptable because it is invariant with collection size.**
+- **Do not select an engine on the assumption that an unmeasured kernel join will solve the problem.**
+- **If no candidate can satisfy the gates, return to EPA-0006 §4.7 Q3 for an explicit architectural
+  response — the failure does not authorize relaxing Shape-1.**
+
+**MSG-0116b records the precise status to preserve:** **A6 satisfied the freshness gates and remained
+NOT CLEARED** because **E2 failed, E4 was not obtained, and G-Q4 was not measured.** Carry that
+distinction; "passed freshness" is not "cleared".
+
+**What this task investigates** is the alternative MSG-0115 identified and did not measure: **a
+kernel-constrained / in-query authorization path, and/or an architecture that prevents
+security-relevant projection divergence** — whether it can obtain **E1–E4 and G-Q4 evidence without
+examining unauthorized content.**
+
+### Q10 — "current approved version" means currently effective
+
+**Both rule the strict, fail-closed interpretation.** **APPROVED but not yet PUBLISHED/effective is not
+answerable.** **WITHDRAWN, revoked or superseded versions are not current.** **If the current effective
+version cannot be established or made available, abstain** rather than fall back.
+
+**MSG-0116a adds:** the **citation/version identity must identify the actual current document
+version**, consistent with ADR-0018's requirement that a citation names a *version*, not merely a
+document.
+
+**Both state this is a terminology clarification for Q7 and does NOT amend ADR-0018.** MSG-0116b adds
+that **any formal lifecycle change remains an ADR question.**
+
+### Forbidden (both rulings, §5 / "Next authorized action")
+
+- **No engine, runtime, provider, model, index technology or product is selected, adopted, installed,
+  deployed or recommended.**
+- **Do not relax `U = 0`, E1–E4, or strict Shape-1.**
+- **No accepted ADR is modified** — ADR-0018 and ADR-0020 included.
+- **Existing NOT CLEARED and DISQUALIFIED verdicts remain unchanged.**
+- **No implementation or deployment authorized**; no implementation task may be marked READY.
+- **Invent no benchmark, latency, capacity, recall or throughput figures.**
+
+### Acceptance criteria
+
+1. The kernel-constrained / non-divergent alternative is evaluated with **execution evidence**, not
+   design argument.
+2. **E1–E4 and G-Q4 are each addressed** — obtained, or explicitly recorded as not obtained.
+3. **The re-check is instrumented separately from content examination**, with evidence it reads only
+   authoritative kernel facts (MSG-0116b).
+4. **Any content-bearing read from an unauthorized candidate is reported as a Shape-1 failure.**
+5. Per candidate: **CLEARED / NOT CLEARED / DISQUALIFIED**, with the evidence that decided it;
+   unobtainable evidence is **NOT CLEARED**.
+6. **All existing verdicts reproduced unchanged**, including A6's freshness-passed-but-NOT-CLEARED
+   status.
+7. **No accepted ADR modified** — `git diff --name-only docs/` empty.
+8. COMMS, queue and status reconciled; **stop at evidence and clearance status.**
+
+### Environment — check, do not assume
+
+**SQLite via `node:sqlite`** has been the working subject for all three prior probes. **Docker's Linux
+backend was unreachable** at last check — **re-check rather than assuming.** **Install nothing** and
+**do not start Docker Desktop** (operator action). **Synthetic fixtures only.**
+
+**Reuse the committed TASK-0033 / TASK-0035 / TASK-0037 harnesses** where they fit; **do not re-run
+their existing cases** — that evidence stands.
+
+### Documentation
+
+Record the result in `implementation/comms/` as a numbered message, update
+`implementation/status/current.md`, this queue, and EPA-0006 where the gates live. Commit probe source
+and output for reproducibility, as the prior probes did. Write the checkpoint.
+
+### Stop conditions
+
+Stop if evidence would require **selecting or deploying a technology**, **modifying an accepted ADR**,
+**relaxing any gate**, **entering a real corpus**, or **inventing unmeasured evidence** — and **if no
+candidate can satisfy the gates, record that and return the question to EPA-0006 §4.7 Q3** rather than
+proposing a relaxation.
+
+**Also stop if `origin/main` moves mid-run** — BLK-0006 is the precedent and the scheduler is enabled.
+Record the starting HEAD in checkpoint 1 and re-check before every push.
+
+### Recovery procedure
+
+Check which records and probe artefacts already exist before writing. **Read both MSG-0116 files** — a
+runner reading one will miss either the separate-instrumentation requirement or the citation-version
+point.
