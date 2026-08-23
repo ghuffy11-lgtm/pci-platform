@@ -1,17 +1,30 @@
 # ADR-0020 AMD-01 — Proposed amendment: pre-constrained retrieval as an engine-selection and gate criterion
 
-**Status:** **PROPOSED — for Architecture Lead review. NOT APPLIED.**
-**Date:** 2026-08-22
+**Status:** **ACCEPTED (MSG-0095) and APPLIED IN PLACE** — 2026-08-23, commit
+`a1be892178dea11d62dee6693c7c8d7d80798e43`, by TASK-0031.
+**Applied to:** `docs/decisions/ADR-0020-retrieval-projection-and-index-boundary.md` — **both hunks**,
+plus the header note MSG-0095 required. That ADR is now the authoritative text; **this file is the
+proposal record and is no longer the operative copy.**
+**Date:** 2026-08-22 (drafted) · 2026-08-23 (accepted and applied)
+
+> **The status line this replaces, retained:** "**PROPOSED — for Architecture Lead review. NOT
+> APPLIED.**" True from drafting until MSG-0095 ruled on it.
 **Drafted by:** Claude Code — TASK-0030, under MSG-0092 §3 and §5
 **Amends (if accepted):** `docs/decisions/ADR-0020-retrieval-projection-and-index-boundary.md` — **ACCEPTED**, promoted by MSG-0071
 **Work package:** WP-0009 — Employee Policy Assistant
 **Scope:** one insertion at the end of ADR-0020 §4, plus one optional traceability row
 **Selects:** nothing — no retrieval engine, index engine, embedding model, framework, runtime, or provider
 
-> **This file is a draft for review. The accepted ADR-0020 is unmodified.** Applying an amendment to a
-> promoted ADR is the Architecture Lead's act, exactly as promotion was (TASK-0025 / MSG-0073).
-> MSG-0092 §5 is explicit: *"stop before applying the amendment unless a subsequent explicit
-> authorization permits acceptance."* This session stopped.
+> **Superseded 2026-08-23 — the boundary described below was real, was respected, and has since been
+> passed by explicit authorization.** MSG-0095 is the "subsequent explicit authorization" MSG-0092 §5
+> anticipated: it accepted this amendment **with the optional traceability row** and directed that it
+> be applied **in place**. TASK-0031 applied it. **ADR-0020 is now modified, and that is authorized.**
+> The paragraph below is retained as the record of why TASK-0030 stopped where it did.
+>
+> > **This file is a draft for review. The accepted ADR-0020 is unmodified.** Applying an amendment to a
+> > promoted ADR is the Architecture Lead's act, exactly as promotion was (TASK-0025 / MSG-0073).
+> > MSG-0092 §5 is explicit: *"stop before applying the amendment unless a subsequent explicit
+> > authorization permits acceptance."* This session stopped.
 
 ---
 
@@ -163,6 +176,16 @@ rather than a clarification; hunk 1 still removes the main ambiguity without it,
 
 ## 8. One question for the Architecture Lead — a convention, not a blocker
 
+> **ANSWERED 2026-08-23 by MSG-0095: option (a), in place.** The Lead directed that the amendment be
+> applied in place with "a concise amendment note in its header identifying AMD-01 and MSG-0095", and
+> explicitly declined (b): *"Do not create a superseding ADR."* The note applied reads
+> `**Amended:** 2026-08-23 — AMD-01 (MSG-0095), applied in place: §4 engine-selection criterion`.
+>
+> **This is the repository's first amendment of an accepted ADR, so it is now the precedent** — for an
+> *additive clarification that changes no substantive policy*. It is not authority to edit a promoted
+> ADR in any other circumstance: MSG-0095 §3 authorizes "acceptance/application of AMD-01 only".
+> The section below is retained as the record of the choice that was open.
+
 **There is no precedent in this repository for amending an already-accepted ADR.** ADR-0015 and
 ADR-0016 carry `**Supersedes:**` lines, but those record *promotion of a draft*, not amendment of an
 accepted record. Two conventions are available and the choice is the Lead's:
@@ -185,4 +208,9 @@ forbids.
 - **It writes no Arabic normalization rule.** ADR-0019's §6 deferral is unchanged, and the n=1 Arabic
   evidence does not become production corpus evidence.
 - **It marks no implementation task READY**, and starts none of T-A, T-B, T-D, T-E or T-0.
-- **It modifies no file under `docs/`.**
+- ~~**It modifies no file under `docs/`.**~~ **No longer true, and deliberately not deleted.** As
+  drafted this file modified nothing under `docs/`; **on application under MSG-0095 it modified exactly
+  one file** — `docs/decisions/ADR-0020-retrieval-projection-and-index-boundary.md`, in three places,
+  with **15 insertions and 0 deletions**. Every other bullet in this section still holds: **no engine,
+  index technology, embedding model, framework, runtime or provider is selected**, no generic stack ADR
+  was created, ADR-0019's §6 Arabic deferral is untouched, and **no implementation task is READY.**

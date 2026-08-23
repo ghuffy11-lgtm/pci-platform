@@ -2,7 +2,9 @@
 
 **Active Work Package:** WP-0001 — PCI Kernel Foundation
 **Status:** **COMPLETE** — declared by the architecture lead 2026-08-19 (MSG-0020(b), resolved by MSG-0022 / MSG-0023, TASK-0009)
-**Last Updated:** 2026-08-23 UTC — **AMD-01 ACCEPTED (MSG-0095)** with the traceability row, to be applied **in place**; that settles AMD-01 §8 as option (a), the repository's first amendment of an accepted ADR. **TASK-0031 READY** — three edits, wording verbatim from AMD-01, `docs/decisions/` limited to ADR-0020. No engine or technology selected; ADR-0019 untouched. Scheduler Disabled.
+**Last Updated:** 2026-08-23 UTC — **TASK-0031 COMPLETE (MSG-0097): ADR-0020 AMD-01 is APPLIED**, commit `a1be892`, tree clean. **7/7 criteria**; `docs/decisions/` changed in **one file only**, **15 insertions / 0 deletions**. AMD-01 §8 settled as option (a) — the repository's **first amendment of an accepted ADR**. **No task is READY**; the ADR set is complete and stable. No engine or technology selected; ADR-0019 untouched. Scheduler Disabled.
+
+> **The line this replaces, retained:** "**AMD-01 ACCEPTED (MSG-0095)** with the traceability row, to be applied **in place**; that settles AMD-01 §8 as option (a), the repository's first amendment of an accepted ADR. **TASK-0031 READY** — three edits, wording verbatim from AMD-01, `docs/decisions/` limited to ADR-0020. No engine or technology selected; ADR-0019 untouched. Scheduler Disabled." True until the next supervisor cycle started that task and completed it the same morning.
 
 > **The line this replaces, retained:** "**EPA-0005 ACCEPTED (MSG-0092)**: three §9.1 constraints settled, **Approach C** chosen for the runtime seam, **no generic stack ADR**. Recorded in EPA-0005's header; **not promoted** — promotion is the Lead's act. **TASK-0030 READY** — draft the minimum ADR-0020 clarification as an engine-selection gate, **then stop before applying**. Nine selection categories stay open; ADR-0019 deferral unchanged. Scheduler Disabled." True until the next supervisor cycle started that task and completed it the same day.
 
@@ -127,6 +129,7 @@ message on 2026-08-20 under MSG-0041 (MSG-0042) — the fifth.
 | TASK-0028 | A-SURVEY Arabic follow-up (n=1) — inspect `Arabic.pdf` | **COMPLETE** (2026-08-22) — 9/9, MSG-0087; **OCR-derived (ABBYY FineReader) — the class D14 rejects** | TASK-0027, MSG-0085 ✅ | Claude Code |
 | TASK-0029 | A-SURVEY Arabic text-native follow-up (n=1) | **COMPLETE** (2026-08-22) — 11/11, MSG-0089; **text-native and D14-admissible**; **Arabic stored in visual order** | TASK-0028, MSG-0088 ✅ | Claude Code |
 | TASK-0030 | Draft the minimum ADR-0020 clarification — pre-constrained retrieval as an engine-selection gate | **COMPLETE** (2026-08-22) — **7/7 criteria**; `ADR-0020-AMD-01` **PROPOSED, NOT applied**; **MSG-0094** | EPA-0005 ACCEPTED (MSG-0092) ✅ | Claude Code |
+| TASK-0031 | Apply ADR-0020 AMD-01 in place | **COMPLETE** (2026-08-23) — **7/7 criteria**; applied in `a1be892`, **15 insertions / 0 deletions**, one file under `docs/decisions/`; **MSG-0097** | AMD-01 ACCEPTED (MSG-0095) ✅ | Claude Code |
 | TASK-0002 | Make test entry points shell-independent | **ABORTED** | — | — |
 
 > **Reconciled 2026-08-22 by TASK-0030 — additive and declared.** The three rows above were missing:
@@ -145,8 +148,82 @@ boundary**, not at an empty queue.
 > been executed and is COMPLETE (MSG-0055). MSG-0051 §C is fully discharged: C1–C5 by MSG-0052,
 > C6–C7 by MSG-0053.
 
-**Current position, 2026-08-22 after TASK-0030: no task is READY, and the boundary is a draft the
-Architecture Lead has not yet reviewed.**
+**Current position, 2026-08-23 after TASK-0031: no task is READY, and for the first time the boundary
+is not a document awaiting review — the architecture record is settled and the queue is simply
+empty.**
+
+TASK-0031 executed MSG-0095 and is **COMPLETE** — **7/7 acceptance criteria MET**, each mapped to
+evidence in **MSG-0097** §3. Being documentary it produced **no test count and claims none**.
+
+**ADR-0020 is amended, and this is the first time this repository has edited an accepted, promoted
+ADR.** Every prior task in WP-0009 was forbidden to; MSG-0095 §3 authorizes *"acceptance/application
+of AMD-01 only"*, so the prohibition stands everywhere else. Three edits went in, with the wording
+taken **verbatim** from AMD-01 rather than retyped — transcription drift inside an accepted ADR being
+the one failure this task could not be allowed to introduce:
+
+1. **Hunk 1**, the 148-word engine-selection and gate-evidence clause, at the **end of §4** after
+   *"An exclusion cannot fail open; a filter can."*
+2. **Hunk 2**, one **Traceability** row tracing the new text to MSG-0092 §1(1)/§3 and EPA-0005 §3.3.
+3. **The header note** — `**Amended:** 2026-08-23 — AMD-01 (MSG-0095), applied in place: §4
+   engine-selection criterion`.
+
+**The verification came out stronger than the criterion asked for, and the reason is worth keeping.**
+`git diff --stat` reads **15 insertions, 0 deletions**. The task's own check anticipated a modified
+header line — it allowed "no substantive deletions (**header line change aside**)" — but the note was
+added as a **new** line instead of rewriting one, so **no existing line changed anywhere in the
+file**. The practical consequence is that the four enforcement points, §3's closing line, §4's
+existing text and its MSG-0062 §7.6 block quote, §5's fail-closed rule and three named side channels,
+§6's Restricted carve-out and its three obligations, §7's *"No index technology, embedding model,
+vector store, or search engine is selected here"*, Consequences and *Deliberately not decided here*
+are **byte-identical** to the promoted copy — not "reviewed and found equivalent", but untouched.
+
+**The real hazard was double application, and it was checked before acting rather than after.**
+Re-running this task against an already-amended ADR would insert hunk 1 **twice**, and a duplicated
+clause in an ADR whose whole purpose is removing ambiguity is worse than a missing one — `CLAUDE.md`
+recovery rule (f) in its sharpest form. The amendment was verified **absent three ways** first (§4
+ended at the quoted sentence; the Traceability table had 11 rows and no engine row; the header had no
+`Amended:` line), with a fourth signal agreeing — no `TASK-0031.md` checkpoint existed. After
+applying, each of the four new markers occurs **exactly once**.
+
+**AMD-01 §8 is settled: option (a), in place.** The repository had **no precedent** for amending an
+accepted ADR — ADR-0015 and ADR-0016 carry `Supersedes:` lines, but those record promotion of a
+*draft*, not amendment of an *accepted record*. MSG-0095 chose (a) and explicitly declined (b):
+*"Do not create a superseding ADR."* **That is now the precedent — for an additive clarification that
+changes no substantive policy, and for nothing wider.**
+
+**Nothing was selected, and the amendment says so in its own second paragraph:** *"This criterion
+selects no engine and rules none in."* A search of the whole amended file for twenty product names —
+search engines, vector stores, model runtimes, frameworks, datastores — returns **no matches**. All
+nine MSG-0092 §4 categories remain open, ADR-0019's §6 Arabic deferral and its production-evidence
+gate are untouched, no Arabic normalization rule was written, ADR-0017/0018/0019/0021/0022 were not
+touched at all, and **no implementation task was marked READY**.
+
+**Two runner limits were recorded rather than routed around**, and a future session will hit both.
+**`git fetch` is off the Bash allowlist** and was refused, exactly as the queue section's *Known
+runner limit* note predicts — so the `origin/main` comparison quoted in MSG-0097 §4 is the local
+remote-tracking ref, and it is reported as such. The stronger evidence arrived afterwards: **the push
+was accepted**, which a mid-run move would have turned into a rejected non-fast-forward. **`python`
+is also off the allowlist**, along with compound shell forms using redirection or process
+substitution, so the intended file-level `diff` of the two hunks could not run; the comparison was
+done with the permitted file tools and the applying commit's diff is left as re-readable evidence
+rather than asking anyone to take it on trust.
+
+**What is now open is only the next authorization.** The queue is empty **by design** — TASK-0031's
+own section names its next eligible task as *"none — no implementation is authorized by MSG-0095"* —
+so the supervisor idling on `no READY task` is correct behaviour, not a stall. WP-0009 still reads
+`DEFINED — NOT AUTHORIZED FOR IMPLEMENTATION`, and the three open items in its §8 (the T-D/T-E
+interim mitigation, PR3's owner and date, and the planning relationship) are unchanged by this task.
+
+> **Superseded — the position after TASK-0030, retained.** The paragraphs below were written while
+> the amendment was a draft awaiting review. **That boundary has been passed**: MSG-0095 reviewed and
+> accepted it, and TASK-0031 applied it. Their account of *what* the amendment says and *why* it was
+> needed is still exact and is the best short explanation in the repository; only the "PROPOSED and
+> NOT applied" state has changed. **Both items they refer to the Lead are now discharged** — the
+> amendment convention was ruled by MSG-0095, and the criterion-scope conflict was fixed exactly as
+> recommended, TASK-0031's criterion 4 reading `git diff --name-only docs/decisions/`.
+
+**Current position, 2026-08-22 after TASK-0030 (superseded, retained): no task is READY, and the
+boundary is a draft the Architecture Lead has not yet reviewed.**
 
 TASK-0030 executed MSG-0092 §3 and is **COMPLETE** — **7/7 acceptance criteria MET**, each mapped to
 evidence in **MSG-0094** §7. Being documentary it produced **no test count and claims none**.
@@ -1466,8 +1543,32 @@ both tables index it, and both were updated in the same commit as the record.
 
 ## Next Action
 
-**TASK-0031 is READY and is the single READY task: apply ADR-0020 AMD-01 in place. It is the only thing
-MSG-0095 authorizes.**
+**No task is READY, and the next action is the Architecture Lead's: authorize one.**
+
+**TASK-0031 is COMPLETE (2026-08-23, MSG-0097).** ADR-0020 AMD-01 is **APPLIED** — applying commit
+`a1be892`, tree clean, **7/7 acceptance criteria MET**, `docs/decisions/` changed in **one file** at
+**15 insertions / 0 deletions**. That was the only thing MSG-0095 authorized, so **the queue is now
+empty by design**, and the supervisor reporting `no READY task` is correct behaviour rather than a
+stall.
+
+**Nothing downstream became executable.** No engine, index technology, embedding model, framework,
+runtime or provider is selected; ADR-0019's §6 Arabic deferral and its production-evidence gate stand;
+WP-0009 still reads `DEFINED — NOT AUTHORIZED FOR IMPLEMENTATION`; **T-0 and T-A…T-I remain
+unauthorized.**
+
+> **Do not re-run TASK-0031.** Re-running it against the now-amended ADR would insert hunk 1 **twice**,
+> and a duplicated clause in an ADR that exists to remove ambiguity is worse than a missing one. Each
+> of the four applied markers currently occurs **exactly once** — verify that before believing any
+> record that says otherwise.
+
+**Three open items in WP-0009 §8 are unchanged by this task** and are still the Lead's: the T-D/T-E
+interim mitigation, PR3's owner and date for the identity provider, and how WP-0009 relates to the
+`PLAN-WP-0001` planning entries.
+
+> **Historical — the position while TASK-0031 was READY and unexecuted, retained.** Everything below
+> described the task to be done. **It has been done**, exactly as described and within the boundary it
+> names. The account of *what* was accepted and *why* is still the clearest short statement of it in
+> this file, which is why it is retained rather than deleted.
 
 ### What was accepted
 
