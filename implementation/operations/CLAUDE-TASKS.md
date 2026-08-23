@@ -42,7 +42,7 @@ Only the architecture lead may authorize new work, mark a task READY, or change 
 | TASK-0030 | **Draft the minimum ADR-0020 clarification — pre-constrained retrieval as an engine-selection gate** | **COMPLETE** | EPA-0005 ACCEPTED (MSG-0092), ADR-0020 accepted | 2026-08-22 — **7/7 acceptance criteria MET**; `ADR-0020-AMD-01` drafted **PROPOSED** and **NOT applied**, `git diff --name-only docs/` **empty**; **MSG-0094** | none — **no task is READY**. The Lead reviews AMD-01 before anything is applied; applying it needs an explicit authorization (MSG-0092 §5) | Claude Code |
 | TASK-0031 | **Apply ADR-0020 AMD-01 in place** — accepted by MSG-0095 | **COMPLETE** | AMD-01 ACCEPTED (MSG-0095), TASK-0030 COMPLETE | 2026-08-23 — **7/7 acceptance criteria MET**; applied in `a1be892`; `git diff --name-only docs/decisions/` named **ADR-0020 only**, **15 insertions / 0 deletions**; **MSG-0097** | none — **no task is READY**. The ADR set is complete and stable; the next authorization is the Lead's | Claude Code |
 | TASK-0032 | **A-STACK technology evaluation and implementation planning (bounded)** | **COMPLETE** | MSG-0098 AUTHORIZED, EPA-0005 ACCEPTED (MSG-0092), ADR-0020+AMD-01 applied | 2026-08-23 — **7/7 acceptance criteria MET**; **`EPA-0006`** delivered **PROPOSED and selecting nothing**; `git diff --name-only docs/decisions/` **empty**; **MSG-0100** | none — **no task is READY**. Selection remains open, so MSG-0098 requires stopping for the Lead; five non-blocking referrals in MSG-0100 §10 | Claude Code |
-| TASK-0033 | **Bounded retrieval-engine conformance probe** (evaluation only) | **READY** | MSG-0101 AUTHORIZED, EPA-0006 (TASK-0032), ADR-0020+AMD-01 | — | **Tier 2/3 execution evidence is gated**: Docker engine not reachable — see the task section; NOT CLEARED is the correct outcome, never assumed conformance | Claude Code |
+| TASK-0033 | **Bounded retrieval-engine conformance probe** (evaluation only) | **READY** — one run **stopped before starting**, 2026-08-23 (MSG-0103) | MSG-0101 AUTHORIZED, EPA-0006 (TASK-0032), ADR-0020+AMD-01 | 2026-08-23 — **not executed**; runner stopped at the mid-run `origin/main` move, **no probe run, no verdict, no `EPA-0007`**, MSG-0103 | **Run it — the stopping condition was transient and has cleared.** **Correction, read before scoping: Tier 2/3 are NOT gated for class R** — `sqlite3` the CLI is absent but **SQLite 3.51.3 + FTS5 is embedded in Node** (`node:sqlite`), with `EXPLAIN QUERY PLAN` and counter instrumentation, needing no install/PATH/network/Docker (MSG-0103 §3). Classes S/V stay unreachable, K unmeasured; **NOT CLEARED remains the right outcome wherever evidence is absent** | Claude Code |
 | TASK-0002 | Make test entry points shell-independent | **ABORTED** | — | 2026-08-19 | none — premise disproven by measurement | — |
 
 **TASK-0019 is COMPLETE (2026-08-21).** It was authorized by MSG-0050, reconciled into this queue in `39eabdb`, and executed by a supervisor-started session on its scheduled 06:37:13Z cycle. It was maintenance/audit work only, not a new product work package.
@@ -2522,6 +2522,21 @@ confusing given EPA-0005 already occupies that ground.
 **Specification:** [`MSG-0101-architecture-lead-ruling-next-retrieval-conformance-probe.md`](../comms/MSG-0101-architecture-lead-ruling-next-retrieval-conformance-probe.md)
 §2–§4, **plus** EPA-0006 §4.4 (the tiered evidence model), **plus this section.**
 
+> **Run history — one attempt, stopped before it started (2026-08-23, MSG-0103).** A supervisor-started
+> runner (pid 15500) held the lock for this task from **06:37:18Z**. At **06:39:24Z** a concurrent
+> interactive session committed `55a617c` — **this section's own reconciliation** — moving `HEAD` and
+> `origin/main` under the running session. **Both the global abort rule and this section's own *"stop if
+> `origin/main` moves mid-run"* fired, and the run stopped.**
+>
+> **Nothing was executed and there is nothing to resume.** No probe harness, no fixture, no query, **no
+> candidate evaluated, no `CLEARED`/`DISQUALIFIED`/`NOT CLEARED` verdict**, no `EPA-0007`, no ADR
+> touched. The task is at its starting line. **Recovery rule (f) — do not re-run anything on the
+> strength of that checkpoint, because nothing ran.**
+>
+> **The stopping condition was transient and has cleared:** `HEAD` and `origin/main` both read
+> `55a617c`. **The next supervisor cycle should simply run this task.** The run did leave one thing
+> behind — the environment correction below, which changes what the probe can prove.
+
 ---
 
 ### ⚠ Environment: the execution tiers are gated, and this was verified before the task was queued
@@ -2545,6 +2560,44 @@ Bash reported no Docker and no Python at all. That was a **PATH artefact, not a 
 are installed. The same shape of error appeared in TASK-0029, where fonts were "absent" because the
 search looked in decompressed streams rather than the plain body. **Disbelieve a suspicious absence and
 check a second way.**
+
+> ### ⚠ Correction, 2026-08-23 — additive and declared (MSG-0103 §3). Read this before scoping the probe.
+>
+> **The block above is retained unchanged as the record of what was found, but two of its conclusions
+> do not hold, and one of them would misdirect the whole task.**
+>
+> **1. `sqlite3   absent` is right about the tool and wrong about the engine.** The `sqlite3` **CLI** is
+> genuinely not installed. But SQLite is an *embedded* engine, and it is **compiled into the Node
+> runtime the same table records as `available`** — reachable through the built-in **`node:sqlite`**
+> module with **no installation, no `PATH` change, no network access and no Docker**. VERIFIED
+> 2026-08-23 by a supervisor-started session:
+>
+> ```text
+> node:sqlite OK · sqlite version 3.51.3 · FTS5 available
+> DatabaseSync.function typeof: function
+> EXPLAIN QUERY PLAN -> {"detail":"SEARCH c USING INDEX i_scope (scope=? AND eff_from<?)"}
+> ```
+>
+> **2. So "Tier 2 and Tier 3 cannot be run here" is false for class R.** Tier 2 (k-completeness under
+> adversarial selectivity) needs only a synthetic collection and a constrained top-`k` query, which an
+> in-process engine supplies completely. Tier 3 — **the tier EPA-0006 §4.4 calls the one that *"actually
+> discharges AMD-01's selection criterion"*** — is available in both its forms: `EXPLAIN QUERY PLAN`
+> returns structured plan rows, and `DatabaseSync.prototype.function` permits registering the
+> authorization predicate as a user-defined SQL function, so **the number of rows the engine actually
+> examines can be counted directly.** That is the Shape-1-versus-Shape-3 discriminator.
+>
+> **This is exactly the near-miss above, one level down** — an absence from `PATH` read as an absence
+> from the machine — which is worth noticing, because the lesson was already written on the page.
+>
+> **The correction is narrow, and the rest of the block stands.** **Classes S and V remain unreachable**
+> (containerised; the `docker` CLI is not usable from the runner), **class K remains unmeasured** (no
+> PostgreSQL), and **acceptance criterion 6 still cannot be settled for S or V**, because SQLite has no
+> approximate vector index and strategy-switching is a property of engines that do. **`NOT CLEARED`
+> remains the correct outcome everywhere the evidence is genuinely absent** — the plan line above is
+> **capability evidence and explicitly not a conformance verdict.** No candidate has been probed.
+>
+> **Do not inherit any of this.** Re-verify it in your own session, and re-check Docker too — an
+> operator may have started Docker Desktop in the interval.
 
 **What follows for this task:**
 
