@@ -2,7 +2,7 @@
 
 **Active Work Package:** WP-0001 — PCI Kernel Foundation
 **Status:** **COMPLETE** — declared by the architecture lead 2026-08-19 (MSG-0020(b), resolved by MSG-0022 / MSG-0023, TASK-0009)
-**Last Updated:** 2026-08-23 UTC — **TASK-0036 COMPLETE (8/8)**: MSG-0110's three rulings are now **testable clearance gates** in **EPA-0006 §4.9** — **G-Q4** (routing computed, and routing itself measured), **G-Q5** (**both** bounded re-materialisation **and** a demonstrated kernel re-check), **G-Q6** (opaque-stage confinement needs **execution** evidence; construction-only rejected). **All three are necessary, none sufficient.** **Nothing cleared, nothing selected, no ADR changed** — `git diff --name-only docs/` empty, **272 insertions / 0 deletions**. **One question referred (Q7)**: **no numeric staleness threshold exists anywhere in the accepted set**, so G-Q5's bounded limb is **structural, not numeric** — **no number was chosen**. **MSG-0112.**
+**Last Updated:** 2026-08-23 UTC — **MSG-0113 resolves Q7 as a version-transition requirement, not an elapsed-time SLA**: once a change **is recorded** the prior version must not answer, and an unavailable current version means **abstain**. **Physical isolation does not excuse stale-version use.** **No numeric threshold introduced.** **TASK-0037 READY** — execution evidence for update/approve/revoke/supersede plus the abstention case, **distinguishing transition-triggered freshness from periodic re-materialisation**. Nothing cleared or selected.
 
 > **The line this replaces, retained:** "**MSG-0110 rules TASK-0035's three referrals, all fail-closed**: routing computed from the subject's own entitlements; temporal materialisation **NOT CLEARED unless bounded re-materialisation AND a demonstrated §3.2 kernel re-check**; **construction alone cannot satisfy E3**. **TASK-0036 READY** — encode Q4/Q5/Q6 as testable clearance gates in the EPA-0006 probe spec. **Nothing cleared, nothing selected, no ADR changed.**" True when written; **the task it announced has now run**, started by the supervisor cycle at **13:17:18Z** and completed the same afternoon. **The subtlety MSG-0111 §4 flagged turned out to be the real one** — the numeric threshold is absent from the accepted set, verified rather than assumed — and **the task referred it instead of choosing a value**, exactly as instructed.
 
@@ -1289,7 +1289,7 @@ carry explicit supersession notes, with no supervisor behaviour, permission, or 
 C4 and C5 — no action, deliberately. **C6 (a bounded proof of MSG-0049 option B) and C7 (the next
 work package) remain the Lead's to decide and are not self-authorized.**
 
-**Open messages:** MSG-0060, MSG-0081, MSG-0084, MSG-0087, MSG-0089, MSG-0090 (SCOPED), MSG-0091, MSG-0093, MSG-0096, MSG-0097, MSG-0099, MSG-0100, MSG-0103, MSG-0104, MSG-0106, MSG-0107a, MSG-0108, MSG-0109 and MSG-0111. All are records or referrals; **none blocks TASK-0036**. Two disambiguation forms exist for shared numbers — see the COMMS register header.
+**Open messages:** MSG-0060, MSG-0081, MSG-0084, MSG-0087, MSG-0089, MSG-0090 (SCOPED), MSG-0091, MSG-0093, MSG-0096, MSG-0097, MSG-0099, MSG-0100, MSG-0103, MSG-0104, MSG-0106, MSG-0107a, MSG-0108, MSG-0109, MSG-0111, MSG-0112 and MSG-0114. All are records or referrals; **none blocks TASK-0037**. **Q7 is resolved by MSG-0113.**
 
 **MSG-0094 is the TASK-0030 execution record**, and it is OPEN for a reason rather than as housekeeping:
 it carries **a drafted amendment the Architecture Lead has not reviewed**. The one decision it asks for
