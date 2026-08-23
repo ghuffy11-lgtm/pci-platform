@@ -1,6 +1,6 @@
 # MSG-0102 — TASK-0033 Reconciled; the Probe's Execution Tiers Are Gated
 
-**Status:** **OPEN** — informational, with one operator action that would widen what the probe can prove
+**Status:** **CLOSED** 2026-08-23 — the reconciliation stands, but **§2's environment finding was WRONG and is superseded by MSG-0103**: SQLite is embedded in the Node runtime via `node:sqlite`, so Tier 2/3 were runnable all along. TASK-0033 is COMPLETE (MSG-0104).
 **Raised:** 2026-08-23
 **Raised by:** Claude Code (interactive session, COMMS)
 **Type:** Queue reconciliation + environment finding
@@ -98,3 +98,47 @@ actually measures, with method and evidence, and **vendor claims cited as claims
 - **The scheduler is enabled again** (`Ready`), so a supervisor cycle can now take TASK-0033 without a
   manual trigger — and the BLK-0009 concurrency discipline applies again to anyone editing the tree.
 - No blocker open. No implementation task authorized or READY.
+
+---
+
+## CORRECTED and CLOSED — 2026-08-23
+
+**§2's environment finding was wrong, and the error was mine.** The correction is **MSG-0103**, raised
+by the TASK-0033 runner; the probe then ran and its result is **MSG-0104**.
+
+**What was wrong.** §2 concluded that Tier 2 and Tier 3 evidence *"cannot be run here right now"*
+because Docker's Linux backend was unreachable and `psql`, `sqlite3` and `java` were absent. The Docker
+part is accurate. **The conclusion drawn from it is not.**
+
+**SQLite is not only a CLI.** It is an *embedded* engine, and it is **compiled into the Node.js runtime
+that §2's own table lists as available**, reachable through the built-in `node:sqlite` module with no
+dependency, no install, and no network. A genuine relational engine — with lexical search, index
+selection, `EXPLAIN QUERY PLAN` output and row counters — was on this machine the entire time.
+
+**So Tiers 2 and 3 were runnable, and the probe ran them.** They are the tiers that decided the
+outcome.
+
+### Why this matters more than an ordinary mistake
+
+**§3 of this very record warned against exactly this error**, in these words: *"disbelieve a suspicious
+absence and check a second way."* It was written about Docker and Python appearing absent through a
+`PATH` artefact — and then, in the same table, `sqlite3` returning nothing was read as SQLite being
+absent from the machine.
+
+**Stating a lesson is not applying it.** The runner's framing is the right one to keep: the lesson is
+easier to state than to apply, and a warning written for one instance does not automatically transfer
+to the next line of the same table.
+
+**The practical harm was bounded but real.** Left uncorrected, the next runner would have scoped the
+probe around a false constraint and recorded `NOT CLEARED` for want of evidence it could have obtained
+— an answer that looks identical to a genuine one.
+
+### Status
+
+**CLOSED** — the reconciliation this record performed stands (TASK-0033 was correctly queued as the
+single READY task), its §2 environment finding is **superseded by MSG-0103**, and the task it queued is
+**COMPLETE** (MSG-0104, 8/8 criteria). **Nothing here awaits anyone.**
+
+**The operator action §5 suggested — starting Docker Desktop — is still optional and still not a
+blocker**, and it is now less significant than it appeared: it would widen the *classes* of engine
+testable, not enable execution evidence as such.
