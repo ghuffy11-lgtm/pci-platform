@@ -44,6 +44,7 @@ Only the architecture lead may authorize new work, mark a task READY, or change 
 | TASK-0032 | **A-STACK technology evaluation and implementation planning (bounded)** | **COMPLETE** | MSG-0098 AUTHORIZED, EPA-0005 ACCEPTED (MSG-0092), ADR-0020+AMD-01 applied | 2026-08-23 — **7/7 acceptance criteria MET**; **`EPA-0006`** delivered **PROPOSED and selecting nothing**; `git diff --name-only docs/decisions/` **empty**; **MSG-0100** | none — **no task is READY**. Selection remains open, so MSG-0098 requires stopping for the Lead; five non-blocking referrals in MSG-0100 §10 | Claude Code |
 | TASK-0033 | **Bounded retrieval-engine conformance probe** (evaluation only) | **COMPLETE** — 2026-08-23, second run; **8/8 acceptance criteria MET** | MSG-0101 AUTHORIZED, EPA-0006 (TASK-0032), ADR-0020+AMD-01 | 2026-08-23 — **probe built and executed**: **24 candidate executions across 6 fixtures**, all three tiers; **nothing CLEARED**; `git diff --name-only docs/decisions/` **empty**; **MSG-0104** | none — **no task is READY**. **Verdict NOT CLEARED for the one reachable engine** (class R, SQLite 3.51.3 via `node:sqlite`), decided at **Tier 3**: unauthorized rows examined grow linearly with the collection under every index design, because the multi-valued audience conjunct cannot be pushed into the index. **Class D DISQUALIFIED and demonstrated** by the negative control failing Tier 2. **Classes S/V/K NOT CLEARED — zero execution evidence** (`docker` CLI unreachable, no PostgreSQL). One **non-blocking** clarification referred to the Lead in MSG-0104 §8 | Claude Code |
 | TASK-0034 | **Update the retrieval-engine criterion and probe spec for strict Shape-1** | **COMPLETE** — 2026-08-23; **7/7 acceptance criteria MET** | MSG-0105 DECIDED, MSG-0104 (probe evidence), ADR-0020+AMD-01 | 2026-08-23 — **EPA-0006 §4.6** (criterion + probe spec) and **§4.7** (three questions, none decided) added; **all nine MSG-0104 verdicts reproduced unchanged**; `git diff --name-only docs/` **empty**; **MSG-0107** | none — **no task is READY**. **The bar is ZERO unauthorized units examined**, invariant with collection size, evidenced by **traversal-bounding plan evidence** and not by counters alone — counters prove failure, never success. **Nothing became CLEARED**; the rejected materialization-only reading is recorded as rejected; EPA-0006 §4.3's class-K *"CONFORMS structurally"* claim is **withdrawn** while its **NOT CLEARED** verdict stands. **Three non-blocking questions referred** in MSG-0107 §7, led by **whether strict Shape-1 implies physical organisation of the projection** | Claude Code |
+| TASK-0035 | **Physical projection isolation evaluation against strict Shape-1** | **READY** | MSG-0107b AUTHORIZED, MSG-0105 (strict Shape-1), MSG-0104 evidence, EPA-0006 classes | — | none — **evidence and verdicts only**; no engine, technology or physical implementation selected; **MSG-0104 verdicts must not be relabelled** | Claude Code |
 | TASK-0002 | Make test entry points shell-independent | **ABORTED** | — | 2026-08-19 | none — premise disproven by measurement | — |
 
 **TASK-0019 is COMPLETE (2026-08-21).** It was authorized by MSG-0050, reconciled into this queue in `39eabdb`, and executed by a supervisor-started session on its scheduled 06:37:13Z cycle. It was maintenance/audit work only, not a new product work package.
@@ -646,7 +647,9 @@ READY means *authorized to attempt*, never *authorized to force*. A READY task w
 | MSG-0104 | Record | **OPEN** | Claude Code | Architecture lead | **TASK-0033 execution record — the probe ran and cleared nothing.** **SQLite 3.51.3 via `node:sqlite`** exercised as a **test subject only**: 3 query shapes plus a non-conforming negative control, 2 index designs, 3 collection sizes — **24 candidate executions across 6 fixtures**, all three EPA-0006 §4.4 tiers. **Tier 1 and Tier 2 passed; Tier 3 decided against the candidate**: every shape examines a **non-zero number of unauthorized rows growing linearly with the collection**, bounded by index coverage rather than by the authorization predicate, **while returning results indistinguishable from a perfectly conforming engine's** — AMD-01's central claim demonstrated empirically. Verdicts: SQLite C1/C2/C3 **NOT CLEARED**; class D post-filter **DISQUALIFIED**; classes S/V/K **NOT CLEARED** with zero execution evidence; class H **DISQUALIFIED** under ADR-0022 §1. Probe source and output committed for reproducibility. **No engine adopted; no ADR touched** | 2026-08-23 |
 | MSG-0105 | Decision | DECIDED | Architecture lead | Claude Code | **Strict Shape-1 selected: "examines nothing unauthorized."** The engine **must not examine, retrieve, inspect, or otherwise process** content the requesting user is not authorized to access; **authorization must constrain the candidate set before retrieval/search occurs**. Preventing unauthorized content from being materialized or returned **after examination is not sufficient**. **MSG-0104 §6.3's weaker "materializes no unauthorized content" reading is explicitly REJECTED**, and all MSG-0104 verdicts stand unchanged. **An interpretation of AMD-01's existing gate — not a weakening, and not a policy change.** Existing evidence **must not be relabelled** as conformance under the rejected reading. Authorizes a bounded criterion/probe-spec task; **no engine selected, adopted, installed or deployed** | 2026-08-23 |
 | MSG-0106 | Record | **OPEN** | Claude Code | Architecture lead | **TASK-0034 reconciled as the single READY task** — update the retrieval-engine criterion and probe specification to test **strict Shape-1** explicitly. Carries two constraints the task could otherwise blur: **MSG-0104's verdicts must be reproduced unchanged**, and this is an **evidence-instrument** update, **not an ADR amendment**. Surfaces one consequence **without deciding it**: where a single index spans multiple authorization scopes, a scan may examine unauthorized entries even with a correct predicate — so whether strict Shape-1 is satisfiable by query-time predicates alone, or implies something about how the projection is **physically organised**, is a real question interacting with MSG-0101 §1(1)'s "one **logical** projection". Also repairs a ledger gap: **MSG-0103 and MSG-0104 had register rows but no ledger rows** | 2026-08-23 |
-| MSG-0107 | Record + referrals | **OPEN** | Claude Code | Architecture lead | **TASK-0034 execution record — the criterion and probe specification now test strict Shape-1.** **7/7 acceptance criteria MET**; documentary, so **no test count and none claimed**. **EPA-0006 §4.6** states the criterion in testable form: **the passing bar is ZERO unauthorized units examined**, shown **invariant across at least three collection sizes** — growth with `N` rather than with selectivity being the signature of a traversal bounded by **index coverage** instead of **authorization**. Five unit kinds are defined (**U4** term postings / vector-index nodes and **U5** buffers, caches and log lines are the additions, the latter from ADR-0020 §6.2 carrying **no authorization exception**). **Four evidence classes are all required for CLEARED**, led by **E1 traversal-bounding plan evidence**, because of the **asymmetry rule: counters can prove failure but never success** — a zero count observes only the point where the instrument sits, so **a plan showing a scan over a structure spanning authorization scopes is disqualifying regardless of any counter**. **An unmeasurable stage is NOT CLEARED by rule** rather than by the writer's care, closing the FTS5 gap MSG-0104 flagged; instrument placement must be recorded and the **maximum** count reported as a lower bound (MSG-0104 §4.2's identical-plan 2000-vs-1000 result is the precedent); the **negative control is mandatory or the run is void**. **The rejected "materializes no unauthorized content" reading is recorded as rejected**, carrying its worked example — **C1 met that line exactly, zero bodies materialized, while examining 1000 unauthorized rows at M=5000, and remains NOT CLEARED.** **All nine MSG-0104 verdicts are reproduced verbatim and unchanged.** **One claim is WITHDRAWN and it is not a verdict**: EPA-0006 §4.3's class-K *"CONFORMS structurally"*, since its argument reasons from the **result set** — precisely the rejected reading — while **class K's verdict stays NOT CLEARED**; the withdrawal removes a conformance claim and creates none. **§4.7 surfaces three questions and decides none**: whether "examine" reaches index metadata (**default: the strict reading**, fail-closed); **whether strict Shape-1 is satisfiable by query-time predicates alone or implies physical organisation of the projection** — MSG-0106 §4's question, interacting with MSG-0101 §1(1)'s *logical* projection and sharpened by the point that **effectivity is a continuous open-ended range and audience a multi-valued set overlap, so not every conjunct partitions**; and what follows if **no class can reach zero**. **`git diff --name-only docs/` empty** — no accepted ADR touched, ADR-0019 included. **Nothing selected, adopted, installed or deployed; the probe was NOT re-run and no figure in the record is new; no implementation task marked READY.** The run **stops for the Lead** | TASK-0034 |
+| MSG-0107a | Record + referrals | **OPEN** | Claude Code | Architecture lead | **TASK-0034 execution record — the criterion and probe specification now test strict Shape-1.** **7/7 acceptance criteria MET**; documentary, so **no test count and none claimed**. **EPA-0006 §4.6** states the criterion in testable form: **the passing bar is ZERO unauthorized units examined**, shown **invariant across at least three collection sizes** — growth with `N` rather than with selectivity being the signature of a traversal bounded by **index coverage** instead of **authorization**. Five unit kinds are defined (**U4** term postings / vector-index nodes and **U5** buffers, caches and log lines are the additions, the latter from ADR-0020 §6.2 carrying **no authorization exception**). **Four evidence classes are all required for CLEARED**, led by **E1 traversal-bounding plan evidence**, because of the **asymmetry rule: counters can prove failure but never success** — a zero count observes only the point where the instrument sits, so **a plan showing a scan over a structure spanning authorization scopes is disqualifying regardless of any counter**. **An unmeasurable stage is NOT CLEARED by rule** rather than by the writer's care, closing the FTS5 gap MSG-0104 flagged; instrument placement must be recorded and the **maximum** count reported as a lower bound (MSG-0104 §4.2's identical-plan 2000-vs-1000 result is the precedent); the **negative control is mandatory or the run is void**. **The rejected "materializes no unauthorized content" reading is recorded as rejected**, carrying its worked example — **C1 met that line exactly, zero bodies materialized, while examining 1000 unauthorized rows at M=5000, and remains NOT CLEARED.** **All nine MSG-0104 verdicts are reproduced verbatim and unchanged.** **One claim is WITHDRAWN and it is not a verdict**: EPA-0006 §4.3's class-K *"CONFORMS structurally"*, since its argument reasons from the **result set** — precisely the rejected reading — while **class K's verdict stays NOT CLEARED**; the withdrawal removes a conformance claim and creates none. **§4.7 surfaces three questions and decides none**: whether "examine" reaches index metadata (**default: the strict reading**, fail-closed); **whether strict Shape-1 is satisfiable by query-time predicates alone or implies physical organisation of the projection** — MSG-0106 §4's question, interacting with MSG-0101 §1(1)'s *logical* projection and sharpened by the point that **effectivity is a continuous open-ended range and audience a multi-valued set overlap, so not every conjunct partitions**; and what follows if **no class can reach zero**. **`git diff --name-only docs/` empty** — no accepted ADR touched, ADR-0019 included. **Nothing selected, adopted, installed or deployed; the probe was NOT re-run and no figure in the record is new; no implementation task marked READY.** The run **stops for the Lead** | TASK-0034 |
+| MSG-0107b | Decision | AUTHORIZED | Architecture lead | Claude Code | **Physical projection isolation is part of strict Shape-1 where necessary** to guarantee the engine does not examine unauthorized content. **Query-time predicates alone are insufficient unless execution evidence demonstrates they genuinely prevent examination** — predicates are not disqualified in principle, only unproven without evidence. Authorizes **TASK-0035**: define technology-agnostic isolation patterns, evaluate each EPA-0006 class against strict Shape-1, **distinguish logical projection from physical organization** and **do not reinterpret MSG-0101 §1(1) as requiring one physical index or store**, produce evidence on examination-before-retrieval, identify what needs execution evidence versus documentation, **preserve MSG-0104 verdicts without relabelling**, and record disqualifiers and gaps. **The SQLite result is evidence against the tested configuration, not proof that all relational engines fail.** **Nothing selected or deployed**; stop at evidence | 2026-08-23 |
+| MSG-0108 | Record | **OPEN** | Claude Code | Architecture lead | **TASK-0035 reconciled as the single READY task, and a numbering collision recorded.** **Two files are numbered MSG-0107** — the TASK-0034 execution record (**0107a**) and the physical-isolation authorization (**0107b**). **Complementary, not contradictory**, so no stop fired; disambiguated as a/b, **neither renamed** per MSG-0058 F4, and **0107b was unregistered in both indexes** until now. This is the **sixth** number collision (MSG-0020, 0033, 0046, 0056, 0107) and the first between a **lead-authored decision and a runner-authored record** — the two authorship paths do not see each other's numbering. Task section carries the ruling that answers MSG-0106 §4, the **zero** bar from TASK-0034, and the instruction that the SQLite result does not condemn its class | 2026-08-23 |
 | MSG-0099 | Record | **CLOSED** 2026-08-23 — discharged by execution (MSG-0100); the distinction it asked for is recorded in WP-0009 §6.2, the architecture README and MSG-0100 §5, and its warning held — no unmeasured figure appears in the delivered record | Claude Code | Architecture lead | **TASK-0032 reconciled as the single READY task.** Records that this is **not a re-run of TASK-0026**: that task evaluated stack **shape** (Approaches A/B/C) and produced EPA-0005; this evaluates **technology classes** against the now-settled Approach C and against ADR-0020 **as amended by AMD-01**, neither of which existed then. **Both are labelled "A-STACK" in WP-0009 §6.2**, where A-STACK already reads EXECUTED — the label reuse is flagged so the record is not read as one task run twice, and the task is told to distinguish the rows rather than overwrite. Also flags the likeliest failure mode: a technology comparison invites throughput, latency, memory and recall numbers, **none of which has been measured here** | 2026-08-23 |
 | MSG-0096 | Record | **CLOSED** 2026-08-23 — discharged by execution (MSG-0097) | Claude Code | Architecture lead | **TASK-0031 reconciled as the single READY task** to apply AMD-01 in place, per MSG-0095 §5. Three edits and nothing else: hunk 1 at the end of ADR-0020 §4, hunk 2 as one Traceability row, and a concise header note naming AMD-01 and MSG-0095. **Wording is taken verbatim from AMD-01** rather than retyped, since transcription drift in an accepted ADR is the failure this must not introduce. The task edits an **accepted, promoted** ADR — authorized here and only here — and its recovery procedure warns that re-running against an already-amended file would insert the clause twice | 2026-08-23 |
 | MSG-0074 | Record | **CLOSED** | Claude Code | Architecture lead | **TASK-0025 queue reconciliation.** Reconciled as the single READY task after verifying prerequisites individually. **No separate TASK-0025 specification file exists** — MSG-0073 plus the queue section are the specification, and the section records the promotion convention verified from the ADR-0015 precedent and the lead's own ADR-0017 promotion. **The gap did not recur this time** in one respect: the authorization arrived with no colliding sibling file. **The queue gap itself did recur** — the **eighth** occurrence. **Discharged by execution 2026-08-21** — TASK-0025 ran against this reconciliation and is COMPLETE (MSG-0075); because the repair landed before the next cycle, the task was already the single READY task when the run started and the Supervisor never idled on it | 2026-08-21 |
@@ -2961,3 +2964,134 @@ Record the starting HEAD in checkpoint 1 and re-check before every push.
 
 Check which records already exist before writing. **Do not re-run the probe** — TASK-0033 is closed and
 its evidence stands; this task changes the criterion, not the measurements.
+
+---
+
+## TASK-0035 — physical projection isolation evaluation against strict Shape-1
+
+**Priority:** 1 | **Status:** **READY** | **Owner:** Claude Code
+**Depends on:** MSG-0107b AUTHORIZED; MSG-0105 (strict Shape-1); MSG-0104 (probe evidence); TASK-0034 criterion; EPA-0006 classes
+**Next eligible task:** none — MSG-0107b §5 requires stopping at evidence; **selection remains a later Architecture Lead decision**
+**Type:** architecture / evidence evaluation — **selects nothing, deploys nothing**
+
+**Specification:** [`MSG-0107-physical-projection-isolation-evaluation-authorization.md`](../comms/MSG-0107-physical-projection-isolation-evaluation-authorization.md)
+(**MSG-0107b** — see the numbering note below), **plus this section.**
+
+> **Two files are numbered MSG-0107.** `-task-0034-execution-record.md` (**MSG-0107a**, the TASK-0034
+> record) and `-physical-projection-isolation-evaluation-authorization.md` (**MSG-0107b**, this task's
+> authority). **They are complementary, not contradictory** — different subjects entirely — so no stop
+> condition applies, as with the MSG-0056 pair. **Neither was renamed**, per MSG-0058 F4. **This task's
+> authority is MSG-0107b.** Recorded in MSG-0108.
+
+### The ruling this task evaluates
+
+> **Physical projection isolation/partitioning is part of the strict Shape-1 requirement where
+> necessary to guarantee that the retrieval engine does not examine unauthorized content.**
+>
+> **Query-time predicates alone are insufficient unless execution evidence demonstrates that they
+> genuinely prevent examination of unauthorized candidates.**
+
+**This answers the question MSG-0106 §4 surfaced and deliberately did not decide.** The answer is that
+physical isolation is in scope where needed — and, critically, that **predicates are not disqualified
+in principle**, only unproven without execution evidence.
+
+### Required work (MSG-0107b §2)
+
+1. **Define the physical-isolation patterns** relevant to the governed logical projection — for example
+   authorization-scope partitioning, or equivalent physical candidate-set separation — **without
+   assuming a particular technology.**
+2. **Evaluate each applicable EPA-0006 candidate class** against the strict Shape-1 requirement.
+3. **Distinguish logical projection from physical organization.** **Do not reinterpret MSG-0101 §1(1)
+   as requiring one physical index or one physical store** — it rules that "one projection index" means
+   one *logical* projection, and that ruling stands.
+4. **Produce evidence showing whether an architecture can prevent unauthorized candidates from being
+   examined before retrieval/search**, rather than merely preventing their return or materialization.
+5. **Identify what execution evidence is required to clear a candidate**, and **what cannot be
+   established from documentation alone.**
+6. **Preserve the MSG-0104 verdicts** unless new evidence actually meets the strict criterion. **Do not
+   relabel existing evidence.**
+7. **Record disqualifiers and remaining evidence gaps explicitly.**
+
+### Candidate scope (MSG-0107b §3)
+
+EPA-0006 classes as applicable: **relational/R** (already observed), **search/S**, **vector/V**,
+**kernel/K**, **lexical/L**, and any other class that can materially satisfy the governed retrieval
+boundary.
+
+> **The prior SQLite result is evidence against the tested configuration, not proof that all relational
+> engines fail.** MSG-0107b §3 says so explicitly. It remains **NOT CLEARED**, and the class is not
+> disqualified by it — a distinction the evaluation must hold, since the probe tested three query
+> shapes on one engine with two index designs, not a class.
+
+### The bar, from TASK-0034
+
+The criterion TASK-0034 produced makes strict Shape-1 testable and **the bar is zero** — zero
+unauthorized candidates examined. Use it; do not restate it more loosely, and do not introduce a
+tolerance the ruling does not contain.
+
+### Forbidden (MSG-0107b §4)
+
+- **No engine, runtime, provider, model, index technology, or physical implementation is selected.**
+- **No product implementation or deployment authorized.**
+- **No real or confidential corpus** — synthetic fixtures and execution evidence are preferred.
+- **Do not weaken ADR-0020 / AMD-01.** **Do not amend ADR-0019.**
+- **Do not create a new production architecture decision** merely to record evaluation findings, unless
+  separately authorized.
+- **Stop at evidence and recommendation / NOT CLEARED status.** Do not mark any implementation task
+  READY, and **do not self-authorize the next implementation or technology-selection step.**
+
+### Required output (MSG-0107b §5) — a numbered COMMS execution record carrying, per candidate
+
+- **candidate architecture / class**;
+- **physical-isolation strategy evaluated**;
+- **whether strict Shape-1 can be demonstrated**;
+- **evidence / instrumentation used**;
+- **limitations and unmeasured behaviour**;
+- **verdict: CLEARED / NOT CLEARED / DISQUALIFIED**;
+- an **explicit statement that no technology was selected or deployed.**
+
+### Verification
+
+Report only what was actually measured, with method — **invent no benchmark, latency, capacity, recall
+or throughput figures**, and cite vendor claims **as claims**. Where an engine cannot be executed,
+**say so and record NOT CLEARED**; absence of evidence is not conformance.
+
+Before completion verify and quote:
+
+```text
+git diff --name-only docs/decisions/   -> empty
+git status --porcelain                 -> empty after commit
+```
+
+**Reproduce the MSG-0104 verdict table unchanged**, and state explicitly which verdicts (if any) new
+evidence altered and why.
+
+### Environment note — check, do not assume
+
+**SQLite is available embedded in Node via `node:sqlite`** (MSG-0103), which is how TASK-0033 obtained
+Tier 2/3 evidence. **Docker Desktop is installed but its Linux backend was unreachable** at last check;
+**re-check rather than assuming either state** — an operator may have started it.
+
+**Install nothing.** No `docker pull`, no `npm install`, no `pip install`. **Do not start Docker
+Desktop** — that is an operator action.
+
+### Documentation
+
+Record the result in `implementation/comms/` as a numbered message, update
+`implementation/status/current.md`, this queue, and EPA-0006 where relevant. Write the checkpoint.
+
+### Stop conditions
+
+Stop if evaluation would require **selecting or deploying a technology**, **weakening AMD-01**,
+**amending an accepted ADR**, **entering a real corpus**, or **inventing unmeasured evidence** — and if
+clearing any candidate would require an architecture decision not yet made, **record the question and
+stop.**
+
+**Also stop if `origin/main` moves mid-run** — BLK-0006 is the precedent and the scheduler is enabled.
+Record the starting HEAD in checkpoint 1 and re-check before every push.
+
+### Recovery procedure
+
+Check which records already exist before writing. **Do not re-run the TASK-0033 probe** — its evidence
+stands and is committed; this task evaluates isolation strategies, and may extend the probe only where
+new evidence is actually needed.
