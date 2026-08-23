@@ -41,6 +41,7 @@ Only the architecture lead may authorize new work, mark a task READY, or change 
 | TASK-0029 | **A-SURVEY Arabic text-native follow-up (n=1)** | **COMPLETE** | TASK-0028 COMPLETE, MSG-0088 AUTHORIZED, MSG-0083 read grant | 2026-08-22 — 11/11 instructions, MSG-0089; **text-native and D14-ADMISSIBLE**; **Arabic stored in visual order — naive extraction reverses it** | none — two items referred, neither blocking | Claude Code |
 | TASK-0030 | **Draft the minimum ADR-0020 clarification — pre-constrained retrieval as an engine-selection gate** | **COMPLETE** | EPA-0005 ACCEPTED (MSG-0092), ADR-0020 accepted | 2026-08-22 — **7/7 acceptance criteria MET**; `ADR-0020-AMD-01` drafted **PROPOSED** and **NOT applied**, `git diff --name-only docs/` **empty**; **MSG-0094** | none — **no task is READY**. The Lead reviews AMD-01 before anything is applied; applying it needs an explicit authorization (MSG-0092 §5) | Claude Code |
 | TASK-0031 | **Apply ADR-0020 AMD-01 in place** — accepted by MSG-0095 | **COMPLETE** | AMD-01 ACCEPTED (MSG-0095), TASK-0030 COMPLETE | 2026-08-23 — **7/7 acceptance criteria MET**; applied in `a1be892`; `git diff --name-only docs/decisions/` named **ADR-0020 only**, **15 insertions / 0 deletions**; **MSG-0097** | none — **no task is READY**. The ADR set is complete and stable; the next authorization is the Lead's | Claude Code |
+| TASK-0032 | **A-STACK technology evaluation and implementation planning (bounded)** | **READY** | MSG-0098 AUTHORIZED, EPA-0005 ACCEPTED (MSG-0092), ADR-0020+AMD-01 applied | — | none — **evaluation and planning only**; **no production technology selection**, no implementation, no deployment | Claude Code |
 | TASK-0002 | Make test entry points shell-independent | **ABORTED** | — | 2026-08-19 | none — premise disproven by measurement | — |
 
 **TASK-0019 is COMPLETE (2026-08-21).** It was authorized by MSG-0050, reconciled into this queue in `39eabdb`, and executed by a supervisor-started session on its scheduled 06:37:13Z cycle. It was maintenance/audit work only, not a new product work package.
@@ -635,6 +636,8 @@ READY means *authorized to attempt*, never *authorized to force*. A READY task w
 | MSG-0094 | Record + decision request | **CLOSED** 2026-08-23 — **both referrals discharged**: the amendment convention was ruled by MSG-0095 (option (a), in place) and applied by TASK-0031; the criterion-scope conflict it flagged was fixed exactly as it recommended, TASK-0031's criterion 4 reading `git diff --name-only docs/decisions/` | Claude Code | Architecture lead | **TASK-0030 execution record — the ADR-0020 clarification is drafted and NOT applied.** **7/7 acceptance criteria MET**; documentary, so **no test count and none claimed**. Delivers **`ADR-0020-AMD-01`** in `implementation/decisions/` as **PROPOSED**; **`git diff --name-only docs/` empty** — the accepted, promoted ADR-0020 is **unmodified**, per MSG-0092 §5. **The "no amendment needed" outcome was tested against the accepted text and rejected on evidence**: §3.1/§4 state the *rule* unambiguously and are silent on two *consequences* — that it **disqualifies a retrieval engine** unable to constrain inside the query, and **what G3 inspects**, since a conforming and a retrieve-then-filter design return **byte-identical responses**. The amendment is **one 148-word insertion at the end of §4** plus an optional traceability row; **twelve candidate changes were considered and deliberately not made**, including §3's four points, §7 and *Deliberately not decided here* — because **a criterion is not a selection**. **Selects nothing**; all nine MSG-0092 §4 categories stay open; ADR-0017/0018/0019/0021/0022 untouched. **One convention question referred**: no precedent exists for amending an accepted ADR, so **no header change was drafted** rather than invent one. **`git fetch` remains off the allowlist** — recorded, not routed around | 2026-08-22 |
 | MSG-0095 | Decision | **DECIDED — §5 action discharged** 2026-08-23 by TASK-0031 (MSG-0097), applying commit `a1be892` | Architecture lead | Claude Code | **ADR-0020 AMD-01 ACCEPTED as drafted, with the optional traceability row included.** The amendment is the minimum clarification making an already-settled confidentiality rule **operationally testable during engine selection**; it changes no substantive policy. Closes two interpretation gaps: that an engine unable to apply authorization constraints **inside** the retrieval operation is **disqualified**, and that **G3 must inspect the query issued to the engine**, not only the returned response. "Over-fetch-then-filter" is consistent with MSG-0092 §1(1), already settled. **Apply in place** with a concise header note naming AMD-01 and MSG-0095 — settling AMD-01 §8 as option **(a)**; **no superseding ADR**. **Selects no engine, index technology, model, framework, runtime or provider**, and authorizes no implementation beyond applying the amendment | 2026-08-22 |
 | MSG-0097 | Record | **OPEN** | Claude Code | Architecture lead | **TASK-0031 execution record — AMD-01 is APPLIED.** **7/7 acceptance criteria MET**; documentary, so **no test count and none claimed**. Applying commit **`a1be892`**, tree clean. `git diff --name-only docs/decisions/` named **ADR-0020 and nothing else**, at **15 insertions / 0 deletions** — the header note was *added* rather than replacing a line, so every accepted semantic is **byte-identical** to the promoted copy. Each of the four new markers occurs **exactly once**, and the amendment was verified **absent three ways before** editing, because re-running would insert hunk 1 twice. **AMD-01 §8 settled as option (a)** — the repository's first amendment of an accepted ADR, and a precedent **only** for an additive clarification changing no substantive policy. **Selects nothing** — a search of the whole file for twenty product names returns none; all nine MSG-0092 §4 categories stay open; ADR-0019's Arabic deferral untouched; **no implementation task is READY**. Two runner limits recorded, not routed around: **`git fetch` and `python` are both off the allowlist** | 2026-08-23 |
+| MSG-0098 | Decision | AUTHORIZED | Architecture lead | Claude Code | **TASK-0032 authorized** — bounded **A-STACK technology evaluation and implementation planning**, as the next single READY task. May compare candidate technologies, record evidence and disqualifiers, define interfaces, and **recommend or explicitly preserve selection as open**. **Not authorized** to implement, deploy, or make a production technology selection. Binding: **Approach C** with the worker not an authorization authority; **ADR-0020 + AMD-01** — constraints inside the retrieval operation, retrieve-then-filter and over-fetch-then-filter disallowed; three local workloads required; conversation/audit storage separate with Restricted barred from logs; technology replaceable; **ADR-0019 untouched** and Arabic n=1 not production evidence. **Record missing evidence explicitly; invent no benchmarks, capacity figures, or corpus-scale findings.** Stop rather than cross the boundary | 2026-08-23 |
+| MSG-0099 | Record | **OPEN** | Claude Code | Architecture lead | **TASK-0032 reconciled as the single READY task.** Records that this is **not a re-run of TASK-0026**: that task evaluated stack **shape** (Approaches A/B/C) and produced EPA-0005; this evaluates **technology classes** against the now-settled Approach C and against ADR-0020 **as amended by AMD-01**, neither of which existed then. **Both are labelled "A-STACK" in WP-0009 §6.2**, where A-STACK already reads EXECUTED — the label reuse is flagged so the record is not read as one task run twice, and the task is told to distinguish the rows rather than overwrite. Also flags the likeliest failure mode: a technology comparison invites throughput, latency, memory and recall numbers, **none of which has been measured here** | 2026-08-23 |
 | MSG-0096 | Record | **CLOSED** 2026-08-23 — discharged by execution (MSG-0097) | Claude Code | Architecture lead | **TASK-0031 reconciled as the single READY task** to apply AMD-01 in place, per MSG-0095 §5. Three edits and nothing else: hunk 1 at the end of ADR-0020 §4, hunk 2 as one Traceability row, and a concise header note naming AMD-01 and MSG-0095. **Wording is taken verbatim from AMD-01** rather than retyped, since transcription drift in an accepted ADR is the failure this must not introduce. The task edits an **accepted, promoted** ADR — authorized here and only here — and its recovery procedure warns that re-running against an already-amended file would insert the clause twice | 2026-08-23 |
 | MSG-0074 | Record | **CLOSED** | Claude Code | Architecture lead | **TASK-0025 queue reconciliation.** Reconciled as the single READY task after verifying prerequisites individually. **No separate TASK-0025 specification file exists** — MSG-0073 plus the queue section are the specification, and the section records the promotion convention verified from the ADR-0015 precedent and the lead's own ADR-0017 promotion. **The gap did not recur this time** in one respect: the authorization arrived with no colliding sibling file. **The queue gap itself did recur** — the **eighth** occurrence. **Discharged by execution 2026-08-21** — TASK-0025 ran against this reconciliation and is COMPLETE (MSG-0075); because the repair landed before the next cycle, the task was already the single READY task when the run started and the Supervisor never idled on it | 2026-08-21 |
 | MSG-0051 | Record | CREATED — audit complete | Claude Code | Architecture lead | **TASK-0019 baseline audit.** Six documentary corrections applied with their authorities quoted; four record classes verified already correct; **§C refers seven items for decision**, led by the accepted WP-0001 work package still reading `Status: Ready for implementation` — the stop condition fired and that correction was **not** made | TASK-0019 |
@@ -2316,3 +2319,127 @@ set. Write the checkpoint.
 already-amended ADR would insert hunk 1 twice — a duplicated clause in an accepted ADR is far worse
 than a missing one, and `CLAUDE.md` recovery rule (f) applies with full force: never repeat an
 operation merely because a record says it was incomplete.
+
+---
+
+## TASK-0032 — A-STACK technology evaluation and implementation planning (bounded)
+
+**Priority:** 1 | **Status:** **READY** | **Owner:** Claude Code
+**Depends on:** MSG-0098 AUTHORIZED; EPA-0005 ACCEPTED (MSG-0092); ADR-0020 + AMD-01 applied (MSG-0095, TASK-0031)
+**Next eligible task:** none — MSG-0098 requires stopping for the Lead if selection remains open
+**Work package:** WP-0009 | **Type:** architecture evaluation and planning, **selects nothing**
+
+**Specification:** [`MSG-0098-wp-0009-a-stack-authorization.md`](../comms/MSG-0098-wp-0009-a-stack-authorization.md)
+**plus this section.** No separate `TASK-0032-*.md` file; the id was allocated at reconciliation and
+verified unused.
+
+> **This is not a re-run of TASK-0026.** That task evaluated **stack shape** — Approaches A/B/C — and
+> produced `EPA-0005`, which deliberately selected nothing. This task evaluates **technology classes**
+> *against* the now-settled **Approach C** and against **ADR-0020 as amended by AMD-01**, neither of
+> which existed when EPA-0005 was written. **Both are labelled "A-STACK" in WP-0009 §6.2**, where
+> A-STACK is already recorded EXECUTED; that label reuse is noted in MSG-0099 so the record is not read
+> as one task run twice.
+
+### Objective (MSG-0098)
+
+Compare candidate technologies, record evidence and disqualifiers, define interfaces, and **either
+produce a bounded recommendation or explicitly preserve selection as open.** Scope is **technology
+evaluation and implementation planning only.**
+
+### Binding architecture — these are settled and must be treated as constraints, not options
+
+- **Approach C** (EPA-0005 / MSG-0092): a governed application layer plus a **separate document/inference
+  worker behind an explicit contract**. **The worker is not an authorization authority.**
+- **ADR-0020 as amended by AMD-01**: authorization constraints must be applied **inside the retrieval
+  operation**. **Retrieve-then-filter and over-fetch-then-filter are disallowed**, and an engine that
+  cannot express such constraints in-query is **disqualified**. **G3 is evidenced against the query
+  issued to the engine, not the response returned.**
+- **Three local workloads remain required**: generation, multilingual embedding, entailment.
+- **Conversation and audit storage remain separate**; **Restricted passages must not enter ordinary
+  logs or telemetry.**
+- **Technology must remain replaceable** behind the defined capability boundaries.
+- **ADR-0019 remains untouched.** Arabic n=1 evidence is sufficient for bounded architecture testing
+  and **is not production corpus evidence**.
+
+### Required output — the six MSG-0098 items
+
+1. **Compare candidate technology classes against Approach C.**
+2. **Evaluate retrieval engines against ADR-0020 and AMD-01**, including whether each offers **genuine
+   pre-constrained retrieval** — the disqualifier is now explicit and testable, so apply it.
+3. **Evaluate local inference requirements** for generation, multilingual embedding, and entailment.
+4. **Cover** extraction/normalization, grounding validation, storage separation, logging restrictions,
+   and rebuild/replaceability implications.
+5. **Record missing evidence explicitly. Do not invent benchmarks, capacity figures, or corpus-scale
+   findings.**
+6. **Produce a bounded recommendation, or state explicitly that selection remains open.**
+
+> **On item 5, which is where this task is most likely to go wrong.** A technology comparison invites
+> throughput numbers, latency figures, memory footprints and recall scores. **None has been measured
+> here.** PR4 (inference runtime) and PR6 (host capacity) are recorded UNKNOWN, no corpus-scale survey
+> exists, and the Arabic evidence is n=1 on three producers. **A figure that was not measured must not
+> appear**, not as an estimate, a typical value, a vendor claim presented as fact, or a range. Cite
+> what a vendor claims *as a claim*, and mark what would need measuring.
+
+### Forbidden (MSG-0098)
+
+- **No production technology selection.** No implementation, no deployment.
+- **No specific retrieval engine, vector store, model, model-serving runtime, application runtime,
+  framework, or provider is selected** by the authorizing message — and none may be selected here.
+  A **recommendation** is permitted; an **adoption** is not.
+- **No accepted ADR may be changed** — ADR-0017…ADR-0022 including the newly amended ADR-0020.
+- **No new corpus or provider authorization** may be assumed or requested as a precondition to
+  finishing; record the need and continue with what is available.
+- **Do not mark any implementation task READY.**
+
+### Acceptance criteria
+
+1. All six required outputs are produced, each traceable to evidence or explicitly marked as
+   unevidenced.
+2. **The pre-constrained retrieval criterion is actually applied** to each candidate engine class, with
+   the disqualification reasoned rather than asserted.
+3. **No unmeasured figure appears as fact.**
+4. **No technology is selected or adopted**; any recommendation is labelled as such and its open
+   questions named.
+5. **No accepted ADR modified** — `git diff --name-only docs/decisions/` is empty.
+6. **No implementation task marked READY.**
+7. COMMS, queue and status reconciled; result reported and **stopped for the Lead if selection remains
+   open** (MSG-0098).
+
+### Verification
+
+Documentary — **no test count**; do not report one. Before completion, verify and quote:
+
+```text
+git diff --name-only docs/decisions/   -> empty
+git status --porcelain                 -> empty after commit
+```
+
+State explicitly which candidate classes were disqualified by the AMD-01 criterion and why.
+
+### Documentation
+
+Record the result in `implementation/comms/` as a numbered message, update
+`implementation/status/current.md`, this queue, and WP-0009 §6.2 — **distinguishing this evaluation from
+TASK-0026's shape evaluation** rather than overwriting that row. Write the checkpoint.
+
+### Checkpoint
+
+`implementation/operations/checkpoints/TASK-0032.md`, written **after** each operation is verified.
+
+### Stop conditions (MSG-0098, verbatim in substance)
+
+Stop rather than cross the boundary if **an accepted ADR would need changing**, **production technology
+would need selecting**, **product implementation would be required**, or **new corpus or provider
+authorization would be needed**.
+
+**Also stop if `origin/main` moves mid-run** — BLK-0006 is the precedent. Record the starting HEAD in
+checkpoint 1 and re-check before every push.
+
+> **Known runner limit.** `git fetch` is off the allowlist, so a mid-run move is detectable only when a
+> push is rejected. Record it and stop.
+
+### Recovery procedure
+
+Re-read MSG-0098 and check which records already exist before writing. **If an evaluation record
+already exists, do not write a second one** — two overlapping stack evaluations would be materially
+confusing given EPA-0005 already occupies that ground.
