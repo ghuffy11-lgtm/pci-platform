@@ -45,6 +45,7 @@ Only the architecture lead may authorize new work, mark a task READY, or change 
 | TASK-0033 | **Bounded retrieval-engine conformance probe** (evaluation only) | **COMPLETE** — 2026-08-23, second run; **8/8 acceptance criteria MET** | MSG-0101 AUTHORIZED, EPA-0006 (TASK-0032), ADR-0020+AMD-01 | 2026-08-23 — **probe built and executed**: **24 candidate executions across 6 fixtures**, all three tiers; **nothing CLEARED**; `git diff --name-only docs/decisions/` **empty**; **MSG-0104** | none — **no task is READY**. **Verdict NOT CLEARED for the one reachable engine** (class R, SQLite 3.51.3 via `node:sqlite`), decided at **Tier 3**: unauthorized rows examined grow linearly with the collection under every index design, because the multi-valued audience conjunct cannot be pushed into the index. **Class D DISQUALIFIED and demonstrated** by the negative control failing Tier 2. **Classes S/V/K NOT CLEARED — zero execution evidence** (`docker` CLI unreachable, no PostgreSQL). One **non-blocking** clarification referred to the Lead in MSG-0104 §8 | Claude Code |
 | TASK-0034 | **Update the retrieval-engine criterion and probe spec for strict Shape-1** | **COMPLETE** — 2026-08-23; **7/7 acceptance criteria MET** | MSG-0105 DECIDED, MSG-0104 (probe evidence), ADR-0020+AMD-01 | 2026-08-23 — **EPA-0006 §4.6** (criterion + probe spec) and **§4.7** (three questions, none decided) added; **all nine MSG-0104 verdicts reproduced unchanged**; `git diff --name-only docs/` **empty**; **MSG-0107** | none — **no task is READY**. **The bar is ZERO unauthorized units examined**, invariant with collection size, evidenced by **traversal-bounding plan evidence** and not by counters alone — counters prove failure, never success. **Nothing became CLEARED**; the rejected materialization-only reading is recorded as rejected; EPA-0006 §4.3's class-K *"CONFORMS structurally"* claim is **withdrawn** while its **NOT CLEARED** verdict stands. **Three non-blocking questions referred** in MSG-0107 §7, led by **whether strict Shape-1 implies physical organisation of the projection** | Claude Code |
 | TASK-0035 | **Physical projection isolation evaluation against strict Shape-1** | **COMPLETE** — 2026-08-23; **8/8 acceptance items discharged** | MSG-0107b AUTHORIZED, MSG-0105 (strict Shape-1), MSG-0104 evidence, EPA-0006 classes | 2026-08-23 — **probe built and executed**: **8 isolation designs × 3 collection sizes** plus a staleness measurement, class-R test subject, negative control **failed as required**; **`U` reaches ZERO only when the routed structures contain no unauthorized row**, and a **stale materialised structure RETURNS unauthorized rows (5 of 5)**; **nothing CLEARED**, all nine MSG-0104 verdicts **reproduced unchanged**; `git diff --name-only docs/` **empty**; **MSG-0109** | none — **no task is READY.** MSG-0107b §5 requires stopping at evidence; **selection remains a later Architecture Lead decision.** Three non-blocking questions referred in MSG-0109 §9 — partition **routing**, the **staleness bound** for a temporally materialised structure, and whether **structural confinement** is admissible **E3** evidence | Claude Code |
+| TASK-0036 | **Encode Q4/Q5/Q6 as strict Shape-1 clearance gates in the EPA-0006 probe spec** | **READY** | MSG-0110 DECIDED, MSG-0109 (TASK-0035 evidence), TASK-0034 criterion | — | none — **evidence-instrument update only**; no ADR change, no technology selected; **all verdicts preserved** | Claude Code |
 | TASK-0002 | Make test entry points shell-independent | **ABORTED** | — | 2026-08-19 | none — premise disproven by measurement | — |
 
 **TASK-0019 is COMPLETE (2026-08-21).** It was authorized by MSG-0050, reconciled into this queue in `39eabdb`, and executed by a supervisor-started session on its scheduled 06:37:13Z cycle. It was maintenance/audit work only, not a new product work package.
@@ -651,6 +652,8 @@ READY means *authorized to attempt*, never *authorized to force*. A READY task w
 | MSG-0107b | Decision | AUTHORIZED | Architecture lead | Claude Code | **Physical projection isolation is part of strict Shape-1 where necessary** to guarantee the engine does not examine unauthorized content. **Query-time predicates alone are insufficient unless execution evidence demonstrates they genuinely prevent examination** — predicates are not disqualified in principle, only unproven without evidence. Authorizes **TASK-0035**: define technology-agnostic isolation patterns, evaluate each EPA-0006 class against strict Shape-1, **distinguish logical projection from physical organization** and **do not reinterpret MSG-0101 §1(1) as requiring one physical index or store**, produce evidence on examination-before-retrieval, identify what needs execution evidence versus documentation, **preserve MSG-0104 verdicts without relabelling**, and record disqualifiers and gaps. **The SQLite result is evidence against the tested configuration, not proof that all relational engines fail.** **Nothing selected or deployed**; stop at evidence | 2026-08-23 |
 | MSG-0108 | Record | **OPEN** | Claude Code | Architecture lead | **TASK-0035 reconciled as the single READY task, and a numbering collision recorded.** **Two files are numbered MSG-0107** — the TASK-0034 execution record (**0107a**) and the physical-isolation authorization (**0107b**). **Complementary, not contradictory**, so no stop fired; disambiguated as a/b, **neither renamed** per MSG-0058 F4, and **0107b was unregistered in both indexes** until now. This is the **sixth** number collision (MSG-0020, 0033, 0046, 0056, 0107) and the first between a **lead-authored decision and a runner-authored record** — the two authorship paths do not see each other's numbering. Task section carries the ruling that answers MSG-0106 §4, the **zero** bar from TASK-0034, and the instruction that the SQLite result does not condemn its class | 2026-08-23 |
 | MSG-0109 | Record + referrals | **OPEN** | Claude Code | Architecture lead | **TASK-0035 execution record — physical isolation reaches zero, and the way it reaches it introduces a new failure.** **8/8 acceptance items discharged**; **a real probe ran** — 8 designs × 3 collection sizes on **SQLite 3.51.3 via `node:sqlite`** (class **R** test subject, the only engine reachable), plus a staleness measurement, `:memory:` only, no install, no network, no corpus. The **mandatory negative control failed** (0/5 at M=500 and M=5000), so the run is valid. **Seven technology-agnostic isolation patterns (I0–I6)** are defined from one rule: a partitioning discharges a conjunct **only if the key refines it**. **Scope, classification, lifecycle state and audience refine — audience only at the cost of replication; effectivity does not refine at all without fixing a time**, which is §4.7 Q2's difficulty with a measurement attached. **`U` = 20/200/2000 (no isolation), 40/400/4000 (scope only — the WORST, because a structural restriction replaced an index one without carrying the predicate), 20/200/2000, 10/100/1000, then ZERO** once effectivity is materialised. **`U` equals the number of unauthorized rows the routed structures still contain** — two independently measured quantities agreeing at every design and size. **The sharpest result is the staleness case: a materialised structure queried after the clock moves examines 5/50/500 unauthorized rows AND RETURNS 5 of 5 unauthorized rows** — no TASK-0033 candidate ever returned one. **Physical isolation trades a conservative failure (examine, reject) for a leaking one (return stale content)** unless ADR-0020 §3.2's kernel re-check, §1's staleness threshold and A7 actually run. **Per-partition lexical indexing answers MSG-0104's unmeasurable-FTS5 gap structurally rather than by instrument** — admissibility unruled, default **no**. **Nothing is CLEARED**; **all nine MSG-0104 verdicts reproduced verbatim and none altered**; **`git diff --name-only docs/` empty**; **TASK-0033's harness untouched**. **Three questions referred, none blocking**: partition **routing** (computed, never discovered), the **staleness bound** for a materialised structure, and whether **structural confinement** is admissible E3 evidence | 2026-08-23 |
+| MSG-0110 | Decision | DECIDED | Architecture lead | Claude Code | **Rules TASK-0035's three referrals, all fail-closed.** **Q4** — partition routing must be **computed from the requesting subject's own entitlements**, never by enumerating a catalogue whose identifiers or metadata encode other subjects' authorization attributes; **partition selection must not itself become an unauthorized examination step**; logical/physical distinction unchanged. **Q5** — a temporally materialised structure is **NOT CLEARED unless both** its re-materialisation interval is bounded per ADR-0020 §1 **and** the §3.2 post-retrieval kernel re-check is demonstrated to run; the TASK-0035 staleness evidence is **decisive against clearing a stale materialisation**; **no new numeric threshold is invented**. **Q6** — **construction alone cannot satisfy E3**; documentation of an intended boundary is not execution evidence of actual traversal, and the candidate stays NOT CLEARED until such evidence exists. **All nine verdicts unchanged; nothing cleared; nothing selected.** Authorizes TASK-0036 | 2026-08-23 |
+| MSG-0111 | Record | **OPEN** | Claude Code | Architecture lead | **TASK-0036 reconciled as the single READY task** — encode Q4/Q5/Q6 as explicit strict Shape-1 clearance gates in the EPA-0006 probe specification. Verified before queueing that both anchors MSG-0110 §3 relies on **exist in the accepted ADR**: §1's *"a stale index beyond threshold triggers abstention (A7), never a stale answer"* and §3.2's per-hit re-authorization. **Surfaces one subtlety without deciding it**: §1 names a *threshold* but this task may not fix its value, so if no numeric bound is fixed anywhere accepted, "bounded" is testable **structurally** — a bound exists, is enforced, triggers abstention — **but not numerically**; the task must say which it tests and **refer the gap rather than choose a number**, since choosing one would invent the tolerance MSG-0110 §3 forbids | 2026-08-23 |
 | MSG-0099 | Record | **CLOSED** 2026-08-23 — discharged by execution (MSG-0100); the distinction it asked for is recorded in WP-0009 §6.2, the architecture README and MSG-0100 §5, and its warning held — no unmeasured figure appears in the delivered record | Claude Code | Architecture lead | **TASK-0032 reconciled as the single READY task.** Records that this is **not a re-run of TASK-0026**: that task evaluated stack **shape** (Approaches A/B/C) and produced EPA-0005; this evaluates **technology classes** against the now-settled Approach C and against ADR-0020 **as amended by AMD-01**, neither of which existed then. **Both are labelled "A-STACK" in WP-0009 §6.2**, where A-STACK already reads EXECUTED — the label reuse is flagged so the record is not read as one task run twice, and the task is told to distinguish the rows rather than overwrite. Also flags the likeliest failure mode: a technology comparison invites throughput, latency, memory and recall numbers, **none of which has been measured here** | 2026-08-23 |
 | MSG-0096 | Record | **CLOSED** 2026-08-23 — discharged by execution (MSG-0097) | Claude Code | Architecture lead | **TASK-0031 reconciled as the single READY task** to apply AMD-01 in place, per MSG-0095 §5. Three edits and nothing else: hunk 1 at the end of ADR-0020 §4, hunk 2 as one Traceability row, and a concise header note naming AMD-01 and MSG-0095. **Wording is taken verbatim from AMD-01** rather than retyped, since transcription drift in an accepted ADR is the failure this must not introduce. The task edits an **accepted, promoted** ADR — authorized here and only here — and its recovery procedure warns that re-running against an already-amended file would insert the clause twice | 2026-08-23 |
 | MSG-0074 | Record | **CLOSED** | Claude Code | Architecture lead | **TASK-0025 queue reconciliation.** Reconciled as the single READY task after verifying prerequisites individually. **No separate TASK-0025 specification file exists** — MSG-0073 plus the queue section are the specification, and the section records the promotion convention verified from the ADR-0015 precedent and the lead's own ADR-0017 promotion. **The gap did not recur this time** in one respect: the authorization arrived with no colliding sibling file. **The queue gap itself did recur** — the **eighth** occurrence. **Discharged by execution 2026-08-21** — TASK-0025 ran against this reconciliation and is COMPLETE (MSG-0075); because the repair landed before the next cycle, the task was already the single READY task when the run started and the Supervisor never idled on it | 2026-08-21 |
@@ -3118,3 +3121,117 @@ Record the starting HEAD in checkpoint 1 and re-check before every push.
 Check which records already exist before writing. **Do not re-run the TASK-0033 probe** — its evidence
 stands and is committed; this task evaluates isolation strategies, and may extend the probe only where
 new evidence is actually needed.
+
+---
+
+## TASK-0036 — encode Q4/Q5/Q6 as strict Shape-1 clearance gates in the EPA-0006 probe specification
+
+**Priority:** 1 | **Status:** **READY** | **Owner:** Claude Code
+**Depends on:** MSG-0110 DECIDED; MSG-0109 (TASK-0035 evidence); TASK-0034 criterion; MSG-0105 strict Shape-1
+**Next eligible task:** none — MSG-0110 §6 requires stopping at the evidence-instrument update and the COMMS record
+**Type:** evidence-instrument update — **no ADR change, no technology selected**
+
+**Specification:** [`MSG-0110-architecture-lead-rulings-task-0035-referrals.md`](../comms/MSG-0110-architecture-lead-rulings-task-0035-referrals.md) §2–§6, **plus this section.**
+
+### The three rulings to encode
+
+**Q4 — partition routing must not itself examine.** *"Partition routing must be computed from the
+requesting subject's own entitlements. It must not discover partitions by enumerating a catalogue of
+structures whose identifiers or metadata may encode authorization attributes belonging to other
+subjects."* **Partition selection must not become an unauthorized examination step**, and the
+logical/physical distinction is unchanged — **this does not require one physical index or store.**
+
+**Q5 — temporal materialisation is NOT CLEARED unless both are demonstrated.** (1) its
+**re-materialisation interval is bounded** per ADR-0020 §1's staleness discipline, **and** (2) the
+**ADR-0020 §3.2 post-retrieval re-check against the kernel is demonstrated to run.** The TASK-0035
+staleness evidence is **decisive against clearing a stale materialisation** — after the clock moved the
+design examined unauthorized rows and **returned 5 of 5**. **No relaxation or new tolerance is
+authorized.**
+
+**Q6 — construction alone cannot satisfy E3.** Structural confinement *"may contribute to the evidence
+package only when the candidate provides demonstrable evidence that the stage genuinely cannot reach
+outside the confined structure."* **Documentation describing an intended partition boundary is not
+execution evidence of the engine's actual traversal boundary.** Until such evidence exists, the
+candidate remains **NOT CLEARED**.
+
+### Required work (MSG-0110 §6)
+
+1. **Make computed-only partition routing testable** — state what evidence shows routing was derived
+   from the subject's entitlements rather than by catalogue enumeration, and what would falsify it.
+2. **Make bounded re-materialisation plus a demonstrated kernel re-check a prerequisite** for clearing
+   temporal materialisation — both conditions, not either.
+3. **Require execution evidence for opaque-stage confinement**, not construction-only claims.
+4. **Preserve all existing verdicts.**
+5. **Stop at the evidence-instrument update and the COMMS execution record.**
+
+### Do not invent a staleness number
+
+MSG-0110 §3 is explicit: *"This ruling does not invent a new numeric staleness threshold; the existing
+ADR-0020 threshold remains authoritative."*
+
+**ADR-0020 §1 states the discipline** — *"a stale index beyond threshold triggers abstention (A7),
+never a stale answer"* — and **§3.2 states the re-check**: *"every hit is re-authorized against its
+version's classification…"*. **Reference them; do not restate them numerically.**
+
+> **One subtlety to surface rather than resolve.** ADR-0020 §1 names a *threshold* without this task
+> being authorized to fix its value. If no numeric bound is fixed anywhere in the accepted set, then
+> "bounded" can be tested **structurally** — that a bound exists, is enforced, and triggers abstention —
+> but **not numerically**. **Say which of those the gate actually tests**, and if a numeric value is
+> genuinely absent, **record it as a question for the Lead rather than choosing one.** Choosing one
+> would be inventing the tolerance MSG-0110 §3 forbids.
+
+### Forbidden (MSG-0110 §5)
+
+- **No candidate is cleared by this task**, and **no existing verdict may be altered** — TASK-0035's
+  nine MSG-0104 verdicts stand, and **SQLite/class-R configurations remain NOT CLEARED**.
+- **No engine, runtime, provider, model, index technology or physical implementation is selected.**
+- **No product implementation or deployment is authorized**, and no implementation task may be marked
+  READY.
+- **Do not change accepted ADR-0020** — or any accepted ADR, ADR-0019 included. This updates the
+  **probe specification and evidence gates**, which are instruments.
+- **Do not weaken strict Shape-1** or introduce a tolerance the rulings do not contain.
+
+### Acceptance criteria
+
+1. Q4, Q5 and Q6 each appear as an **explicit, testable clearance requirement**, quoting MSG-0110
+   rather than paraphrasing the rulings.
+2. For each, the specification says **what evidence counts, what falsifies it, and what "not
+   demonstrated" yields** — which is **NOT CLEARED**, never assumed conformance.
+3. **Q5 requires both conditions**; a specification that clears on one is wrong.
+4. **Q6 rejects construction-only claims** explicitly, so the weaker reading cannot return.
+5. **All existing verdicts reproduced unchanged.**
+6. **No accepted ADR modified** — `git diff --name-only docs/decisions/` is empty.
+7. Any unresolved question (see the staleness note) is **surfaced for the Lead, not decided**.
+8. COMMS, queue and status reconciled; stop and report.
+
+### Verification
+
+Documentary — **no test count** unless something was executed. Before completion verify and quote:
+
+```text
+git diff --name-only docs/decisions/   -> empty
+git status --porcelain                 -> empty after commit
+```
+
+**Reproduce the verdict table unchanged** and state explicitly that nothing was cleared.
+
+### Documentation
+
+Record the result in `implementation/comms/` as a numbered message, update
+`implementation/status/current.md`, this queue, and **EPA-0006** where it carries the §4.4 tier model
+and the evidence gates. Write the checkpoint.
+
+### Stop conditions
+
+Stop if encoding a gate **would require amending an accepted ADR**, **selecting a technology**,
+**fixing a numeric threshold not already accepted**, or **weakening strict Shape-1**. If a gate cannot
+be made testable without one of those, **record the question and stop** — that is the outcome the
+staleness note anticipates.
+
+**Also stop if `origin/main` moves mid-run** — BLK-0006 is the precedent and the scheduler is enabled.
+Record the starting HEAD in checkpoint 1 and re-check before every push.
+
+### Recovery procedure
+
+Check which records already exist before writing. **Do not re-run the TASK-0033 or TASK-0035 probes** —
+their evidence stands and is committed; this task changes the specification, not the measurements.
