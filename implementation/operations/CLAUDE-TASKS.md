@@ -43,6 +43,7 @@ Only the architecture lead may authorize new work, mark a task READY, or change 
 | TASK-0031 | **Apply ADR-0020 AMD-01 in place** — accepted by MSG-0095 | **COMPLETE** | AMD-01 ACCEPTED (MSG-0095), TASK-0030 COMPLETE | 2026-08-23 — **7/7 acceptance criteria MET**; applied in `a1be892`; `git diff --name-only docs/decisions/` named **ADR-0020 only**, **15 insertions / 0 deletions**; **MSG-0097** | none — **no task is READY**. The ADR set is complete and stable; the next authorization is the Lead's | Claude Code |
 | TASK-0032 | **A-STACK technology evaluation and implementation planning (bounded)** | **COMPLETE** | MSG-0098 AUTHORIZED, EPA-0005 ACCEPTED (MSG-0092), ADR-0020+AMD-01 applied | 2026-08-23 — **7/7 acceptance criteria MET**; **`EPA-0006`** delivered **PROPOSED and selecting nothing**; `git diff --name-only docs/decisions/` **empty**; **MSG-0100** | none — **no task is READY**. Selection remains open, so MSG-0098 requires stopping for the Lead; five non-blocking referrals in MSG-0100 §10 | Claude Code |
 | TASK-0033 | **Bounded retrieval-engine conformance probe** (evaluation only) | **COMPLETE** — 2026-08-23, second run; **8/8 acceptance criteria MET** | MSG-0101 AUTHORIZED, EPA-0006 (TASK-0032), ADR-0020+AMD-01 | 2026-08-23 — **probe built and executed**: **24 candidate executions across 6 fixtures**, all three tiers; **nothing CLEARED**; `git diff --name-only docs/decisions/` **empty**; **MSG-0104** | none — **no task is READY**. **Verdict NOT CLEARED for the one reachable engine** (class R, SQLite 3.51.3 via `node:sqlite`), decided at **Tier 3**: unauthorized rows examined grow linearly with the collection under every index design, because the multi-valued audience conjunct cannot be pushed into the index. **Class D DISQUALIFIED and demonstrated** by the negative control failing Tier 2. **Classes S/V/K NOT CLEARED — zero execution evidence** (`docker` CLI unreachable, no PostgreSQL). One **non-blocking** clarification referred to the Lead in MSG-0104 §8 | Claude Code |
+| TASK-0034 | **Update the retrieval-engine criterion and probe spec for strict Shape-1** | **READY** | MSG-0105 DECIDED, MSG-0104 (probe evidence), ADR-0020+AMD-01 | — | none — **criterion and spec only**; no engine selected, adopted or deployed; **existing evidence must not be relabelled** | Claude Code |
 | TASK-0002 | Make test entry points shell-independent | **ABORTED** | — | 2026-08-19 | none — premise disproven by measurement | — |
 
 **TASK-0019 is COMPLETE (2026-08-21).** It was authorized by MSG-0050, reconciled into this queue in `39eabdb`, and executed by a supervisor-started session on its scheduled 06:37:13Z cycle. It was maintenance/audit work only, not a new product work package.
@@ -641,6 +642,10 @@ READY means *authorized to attempt*, never *authorized to force*. A READY task w
 | MSG-0100 | Record + referrals | **OPEN** | Claude Code | Architecture lead | **TASK-0032 execution record — the bounded A-STACK technology evaluation is delivered and it selects nothing.** **7/7 acceptance criteria MET**; documentary, so **no test count and none claimed**. Deliverable **`EPA-0006`** in `implementation/architecture/`, **PROPOSED**. `git diff --name-only docs/decisions/` **empty**. **The AMD-01 criterion was applied to seven engine classes with reasoning, not assertion**: **post-filter-only (class D)** and **hosted/managed retrieval (class H)** are **DISQUALIFIED** — H twice over on **independent** grounds, since ADR-0022 §1 names *derived embeddings* explicitly, so relaxing one elimination would not revive the class. Classes **R/S/V/L are not disqualified and explicitly NOT cleared**; class **K** (retrieval computed against the kernel store) **conforms structurally** and is **entirely unmeasured**. **The sharpest finding: AMD-01's G3 evidence rule does not discharge AMD-01's engine-selection criterion** — a Shape-3 engine receives a conformant query and returns a correct response, so a query-shape check cannot detect it; **an engine exposing no plan or counter instrumentation cannot be cleared at all**. Also: **the four-part in-query predicate derived** (ADR-0018 §4's two-sided range with an open upper bound being the sharpest discriminator; **SUPERSEDED** the one lifecycle state that is a query predicate); **ADR-0016 RLS does not reach an external index**; **conformance for a relational engine is a property of the query plan**; **a strategy-switching engine is disqualified unless the strategy can be pinned**; **the retrieval port's signature is itself the control**; **no index-assigned identifier may appear in a citation**; **the verified append-only audit store is disqualified for conversation content**; **ADR-0020 §6.2 is a selection criterion on the engine and the serving runtime, not only a coding rule**. **Ten selections remain OPEN.** **No benchmark, capacity, latency, recall or corpus-scale figure appears anywhere in the record.** **ADR-0019 untouched, no normalization rule written or inferred**; MSG-0091's n=1 scoping respected. **No ADR created, amended or proposed**; **no implementation task marked READY**. **Five referrals, none blocking**; **the run stops for the Lead**, as MSG-0098 directs. **`git fetch` remains off the allowlist** — recorded, not routed around | 2026-08-23 |
 | MSG-0101 | Decision | AUTHORIZED | Architecture lead | Claude Code | **Rules MSG-0100's five referrals and authorizes TASK-0033.** (1) **"One projection index" means one *logical* projection** — a lexical+semantic pair may be evaluated only if both operate over the same governed projection and **each independently satisfies AMD-01**; **the fusion layer must never resolve authorization**. (2) **SUPERSEDED chunks not settled now** — exclusion is the safer implementation shape, **ADR-0018's audit/reconstruction semantics preserved**, the ADR not to be modified. (3) **Bounded conformance probe AUTHORIZED** — may name candidate engines **as test subjects only**; naming is not adoption. (4) **EPA-0006 §12.2 obligations accepted as implementation-planning constraints; no new ADR** — authorization context at the retrieval port and worker seam, **index identifiers must not be citation anchors**, audit store not reused for expiring conversation content. (5) **Corpus action remains the organization's**; no new corpus or survey task authorized | 2026-08-23 |
 | MSG-0102 | Record | **CLOSED** — environment finding superseded by MSG-0103 | Claude Code | Architecture lead | **TASK-0033 reconciled as the single READY task, with a verified environment finding.** The probe's **Tier 2/3 execution evidence is gated**: Docker Desktop is installed and its Windows services run, but **the Linux engine backend is not reachable** (`dockerDesktopLinuxEngine` pipe absent), and psql/sqlite3/java are absent while Python is installed but off PATH. **Starting Docker Desktop is an operator action and was not attempted**; installing engines is barred by MSG-0101 §4. **Tier 1 is available now**, and where Tier 2/3 cannot be obtained the answer is **NOT CLEARED, never assumed conformance**. Also records a near-miss: a first check through Git Bash reported no Docker and no Python **at all** — a **PATH artefact, not a machine fact** | 2026-08-23 |
+| MSG-0103 | Record | **OPEN** | Claude Code | Architecture lead | **TASK-0033 stopped at the mid-run repository-movement boundary, and corrected the probe environment.** The stop was correct — `origin/main` moved mid-run, BLK-0006's boundary. **The correction is the substantive part: MSG-0102 §2 was wrong.** SQLite is not only a CLI but an **embedded engine compiled into the Node runtime** that MSG-0102's own table listed as available, reachable via `node:sqlite` with no dependency, install or network — so a real relational engine with lexical search, `EXPLAIN QUERY PLAN` and counters was present all along, and **Tiers 2 and 3 were runnable**. Left uncorrected, the next runner would have scoped the probe around a false constraint. Same shape as the TASK-0029 error; **the lesson is easier to state than to apply** | 2026-08-23 |
+| MSG-0104 | Record | **OPEN** | Claude Code | Architecture lead | **TASK-0033 execution record — the probe ran and cleared nothing.** **SQLite 3.51.3 via `node:sqlite`** exercised as a **test subject only**: 3 query shapes plus a non-conforming negative control, 2 index designs, 3 collection sizes — **24 candidate executions across 6 fixtures**, all three EPA-0006 §4.4 tiers. **Tier 1 and Tier 2 passed; Tier 3 decided against the candidate**: every shape examines a **non-zero number of unauthorized rows growing linearly with the collection**, bounded by index coverage rather than by the authorization predicate, **while returning results indistinguishable from a perfectly conforming engine's** — AMD-01's central claim demonstrated empirically. Verdicts: SQLite C1/C2/C3 **NOT CLEARED**; class D post-filter **DISQUALIFIED**; classes S/V/K **NOT CLEARED** with zero execution evidence; class H **DISQUALIFIED** under ADR-0022 §1. Probe source and output committed for reproducibility. **No engine adopted; no ADR touched** | 2026-08-23 |
+| MSG-0105 | Decision | DECIDED | Architecture lead | Claude Code | **Strict Shape-1 selected: "examines nothing unauthorized."** The engine **must not examine, retrieve, inspect, or otherwise process** content the requesting user is not authorized to access; **authorization must constrain the candidate set before retrieval/search occurs**. Preventing unauthorized content from being materialized or returned **after examination is not sufficient**. **MSG-0104 §6.3's weaker "materializes no unauthorized content" reading is explicitly REJECTED**, and all MSG-0104 verdicts stand unchanged. **An interpretation of AMD-01's existing gate — not a weakening, and not a policy change.** Existing evidence **must not be relabelled** as conformance under the rejected reading. Authorizes a bounded criterion/probe-spec task; **no engine selected, adopted, installed or deployed** | 2026-08-23 |
+| MSG-0106 | Record | **OPEN** | Claude Code | Architecture lead | **TASK-0034 reconciled as the single READY task** — update the retrieval-engine criterion and probe specification to test **strict Shape-1** explicitly. Carries two constraints the task could otherwise blur: **MSG-0104's verdicts must be reproduced unchanged**, and this is an **evidence-instrument** update, **not an ADR amendment**. Surfaces one consequence **without deciding it**: where a single index spans multiple authorization scopes, a scan may examine unauthorized entries even with a correct predicate — so whether strict Shape-1 is satisfiable by query-time predicates alone, or implies something about how the projection is **physically organised**, is a real question interacting with MSG-0101 §1(1)'s "one **logical** projection". Also repairs a ledger gap: **MSG-0103 and MSG-0104 had register rows but no ledger rows** | 2026-08-23 |
 | MSG-0099 | Record | **CLOSED** 2026-08-23 — discharged by execution (MSG-0100); the distinction it asked for is recorded in WP-0009 §6.2, the architecture README and MSG-0100 §5, and its warning held — no unmeasured figure appears in the delivered record | Claude Code | Architecture lead | **TASK-0032 reconciled as the single READY task.** Records that this is **not a re-run of TASK-0026**: that task evaluated stack **shape** (Approaches A/B/C) and produced EPA-0005; this evaluates **technology classes** against the now-settled Approach C and against ADR-0020 **as amended by AMD-01**, neither of which existed then. **Both are labelled "A-STACK" in WP-0009 §6.2**, where A-STACK already reads EXECUTED — the label reuse is flagged so the record is not read as one task run twice, and the task is told to distinguish the rows rather than overwrite. Also flags the likeliest failure mode: a technology comparison invites throughput, latency, memory and recall numbers, **none of which has been measured here** | 2026-08-23 |
 | MSG-0096 | Record | **CLOSED** 2026-08-23 — discharged by execution (MSG-0097) | Claude Code | Architecture lead | **TASK-0031 reconciled as the single READY task** to apply AMD-01 in place, per MSG-0095 §5. Three edits and nothing else: hunk 1 at the end of ADR-0020 §4, hunk 2 as one Traceability row, and a concise header note naming AMD-01 and MSG-0095. **Wording is taken verbatim from AMD-01** rather than retyped, since transcription drift in an accepted ADR is the failure this must not introduce. The task edits an **accepted, promoted** ADR — authorized here and only here — and its recovery procedure warns that re-running against an already-amended file would insert the clause twice | 2026-08-23 |
 | MSG-0074 | Record | **CLOSED** | Claude Code | Architecture lead | **TASK-0025 queue reconciliation.** Reconciled as the single READY task after verifying prerequisites individually. **No separate TASK-0025 specification file exists** — MSG-0073 plus the queue section are the specification, and the section records the promotion convention verified from the ADR-0015 precedent and the lead's own ADR-0017 promotion. **The gap did not recur this time** in one respect: the authorization arrived with no colliding sibling file. **The queue gap itself did recur** — the **eighth** occurrence. **Discharged by execution 2026-08-21** — TASK-0025 ran against this reconciliation and is COMPLETE (MSG-0075); because the repair landed before the next cycle, the task was already the single READY task when the run started and the Supervisor never idled on it | 2026-08-21 |
@@ -2769,3 +2774,123 @@ checkpoint 1 and re-check before every push.
 Re-check Docker reachability by inspection before assuming either answer — **an operator may have
 started Docker Desktop in the interval**, which changes what evidence is obtainable. Check which records
 already exist before writing a second one.
+
+---
+
+## TASK-0034 — update the retrieval-engine criterion and probe specification for strict Shape-1
+
+**Priority:** 1 | **Status:** **READY** | **Owner:** Claude Code
+**Depends on:** MSG-0105 DECIDED; MSG-0104 (probe evidence); ADR-0020 as amended by AMD-01; EPA-0006 §4.4
+**Next eligible task:** none — MSG-0105 §4 requires the resulting criterion to be reconciled and executed under the normal COMMS gate before any implementation authorization
+**Type:** architecture / evidence-criterion update — **selects nothing, deploys nothing**
+
+**Specification:** [`MSG-0105-architecture-lead-shape-1-strict-ruling.md`](../comms/MSG-0105-architecture-lead-shape-1-strict-ruling.md) §3–§5, **plus this section.**
+
+### The ruling this task implements, quoted
+
+> **Strict Shape-1 is selected: "examines nothing unauthorized."** … the retrieval engine **must not
+> examine, retrieve, inspect, or otherwise process** content that the requesting user is not authorized
+> to access. **Authorization must constrain the candidate set before retrieval/search occurs.**
+>
+> It is **not sufficient** merely to prevent unauthorized content from being materialized or returned
+> after the engine has examined it.
+
+**The weaker interpretation proposed in MSG-0104 §6.3 — "materializes no unauthorized content" — is
+explicitly rejected as insufficient to clear Shape-1.**
+
+### Objective
+
+Update the **retrieval-engine evaluation criterion** and the **probe specification** so future
+conformance evidence **explicitly tests the strict requirement**: that authorization constrains the
+engine's candidate set *before* retrieval or search, not merely that unauthorized content is absent
+from the returned or materialized result.
+
+### Two things the task must get right
+
+**1. Existing evidence must not be relabelled.** MSG-0105 §3 is explicit. The MSG-0104 verdicts stand
+exactly as recorded — SQLite C1/C2/C3 **NOT CLEARED**; class D post-filter **DISQUALIFIED**; classes S,
+V, K **NOT CLEARED** pending execution evidence; class H **DISQUALIFIED** under ADR-0022 §1. **Nothing
+already measured may be re-presented as conformance under the rejected weaker reading**, and no verdict
+may be softened because a new criterion is being written.
+
+**2. This is an interpretation, not a weakening — and not a strengthening either.** MSG-0105 §3: *"This
+decision is an interpretation of AMD-01's existing Shape-1 gate. It does not authorize weakening AMD-01
+or changing the accepted confidentiality policy."* **The task therefore may not amend ADR-0020, AMD-01,
+or any accepted ADR** — it updates the *evaluation criterion and probe specification*, which are
+evidence instruments, not policy.
+
+### What the updated criterion must be able to decide
+
+The probe that has already run is the worked example of why this matters: it found an engine whose
+results were **indistinguishable from a perfectly conforming engine's**, while examining unauthorized
+rows in numbers **growing linearly with the collection**. So the criterion must specify:
+
+- **What observable establishes "examined nothing unauthorized"** — the measurement, not the intent.
+  MSG-0104's Tier 3 counters are the existing precedent for what such evidence looks like.
+- **What the passing threshold is.** Strict Shape-1 admits no non-zero allowance, so the criterion
+  should say plainly whether the bar is *zero unauthorized rows examined* and how that is demonstrated.
+- **How absence of evidence is recorded** — `NOT CLEARED`, per MSG-0101 §2 and as MSG-0104 applied it.
+- **What an engine must expose** for the question to be answerable at all: plan output, row counters,
+  instrumentation. An engine that cannot expose it cannot be cleared, which is itself a finding.
+
+> **One consequence worth surfacing rather than resolving.** Strict Shape-1 asks that unauthorized
+> content never be *examined*. Where a single index spans multiple authorization scopes, an index scan
+> may touch unauthorized entries even when the predicate is correct — which is what the probe measured.
+> **Whether the criterion can be satisfied by query-time predicates alone, or implies something about
+> how the projection is physically organised, is a real architectural question.** It interacts with
+> MSG-0101 §1(1)'s ruling that "one projection index" means one **logical** projection. **Surface it;
+> do not decide it** — deciding it would be an architecture change this task is not authorized to make.
+
+### Forbidden (MSG-0105 §5)
+
+- **No retrieval engine, runtime, or provider selected, adopted, recommended, installed, or deployed.**
+- **No product implementation authorized.**
+- **No weakening of ADR-0020 or AMD-01**, and **no amendment to any accepted ADR**.
+- **No amendment to ADR-0019.**
+- **No new production deployment authority.**
+- **Do not mark any implementation task READY.**
+
+### Acceptance criteria
+
+1. The criterion states the **strict** requirement in testable terms, quoting MSG-0105 rather than
+   paraphrasing it.
+2. The probe specification says **what must be measured**, **what evidence counts**, and **what the
+   passing bar is**, such that a future probe can return a defensible verdict.
+3. **The rejected weaker interpretation is recorded as rejected**, so it cannot quietly return.
+4. **All MSG-0104 verdicts are carried forward unchanged**; none is relabelled or softened.
+5. **No accepted ADR is modified** — `git diff --name-only docs/decisions/` is empty.
+6. Any architectural consequence of strict Shape-1 is **surfaced as a question for the Lead**, not
+   decided.
+7. COMMS, queue and status reconciled; result reported and stopped for the Lead.
+
+### Verification
+
+Documentary — **no test count**; do not report one. Before completion verify and quote:
+
+```text
+git diff --name-only docs/decisions/   -> empty
+git status --porcelain                 -> empty after commit
+```
+
+Confirm explicitly that the MSG-0104 verdict table is reproduced unchanged.
+
+### Documentation
+
+Record the result in `implementation/comms/` as a numbered message, update
+`implementation/status/current.md`, this queue, and EPA-0006 where it carries the §4.4 tier model.
+Write the checkpoint.
+
+### Stop conditions
+
+Stop if the updated criterion **cannot be stated without amending an accepted ADR**; if it would
+require **selecting or deploying an engine**; if it would require **weakening AMD-01**; or if satisfying
+strict Shape-1 provably **requires an architecture decision not yet made** — in that case record the
+question and stop, which is the outcome the boxed note above anticipates.
+
+**Also stop if `origin/main` moves mid-run** — BLK-0006 is the precedent and the scheduler is enabled.
+Record the starting HEAD in checkpoint 1 and re-check before every push.
+
+### Recovery procedure
+
+Check which records already exist before writing. **Do not re-run the probe** — TASK-0033 is closed and
+its evidence stands; this task changes the criterion, not the measurements.
