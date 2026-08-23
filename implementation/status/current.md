@@ -2,7 +2,9 @@
 
 **Active Work Package:** WP-0001 — PCI Kernel Foundation
 **Status:** **COMPLETE** — declared by the architecture lead 2026-08-19 (MSG-0020(b), resolved by MSG-0022 / MSG-0023, TASK-0009)
-**Last Updated:** 2026-08-23 UTC — **AMD-01 APPLIED IN PLACE** (TASK-0031, MSG-0097): only ADR-0020 changed in `docs/decisions/`, hunk 1 present exactly once, header note recorded. **MSG-0098 authorizes TASK-0032** — bounded A-STACK **technology** evaluation against the settled Approach C and the amended ADR-0020; **selects nothing**, invents no benchmarks. Not a re-run of TASK-0026 (MSG-0099). Scheduler Disabled.
+**Last Updated:** 2026-08-23 UTC — **TASK-0032 COMPLETE (MSG-0100)**: the bounded A-STACK **technology** evaluation delivered **`EPA-0006`** — **PROPOSED, and it selects nothing.** The AMD-01 criterion was applied to **seven engine classes with reasoning**; **post-filter-only** and **hosted/managed retrieval** are **DISQUALIFIED**, the rest **not disqualified and explicitly not cleared**. **No benchmark, capacity, latency or corpus figure appears anywhere in it.** **No ADR created, amended or proposed; ADR-0019 untouched; no task READY.** Selection remains open, so the run **stops for the Lead**, as MSG-0098 directs. Scheduler recorded Disabled — **verify directly**, since this run was supervisor-started.
+
+> **The line this replaces, retained:** "**AMD-01 APPLIED IN PLACE** (TASK-0031, MSG-0097): only ADR-0020 changed in `docs/decisions/`, hunk 1 present exactly once, header note recorded. **MSG-0098 authorizes TASK-0032** — bounded A-STACK **technology** evaluation against the settled Approach C and the amended ADR-0020; **selects nothing**, invents no benchmarks. Not a re-run of TASK-0026 (MSG-0099). Scheduler Disabled." True until the supervisor cycle at 05:57:17Z started that task and completed it the same morning.
 
 > **The line this replaces, retained:** "**AMD-01 ACCEPTED (MSG-0095)** with the traceability row, to be applied **in place**; that settles AMD-01 §8 as option (a), the repository's first amendment of an accepted ADR. **TASK-0031 READY** — three edits, wording verbatim from AMD-01, `docs/decisions/` limited to ADR-0020. No engine or technology selected; ADR-0019 untouched. Scheduler Disabled." True until the next supervisor cycle started that task and completed it the same morning.
 
@@ -130,6 +132,7 @@ message on 2026-08-20 under MSG-0041 (MSG-0042) — the fifth.
 | TASK-0029 | A-SURVEY Arabic text-native follow-up (n=1) | **COMPLETE** (2026-08-22) — 11/11, MSG-0089; **text-native and D14-admissible**; **Arabic stored in visual order** | TASK-0028, MSG-0088 ✅ | Claude Code |
 | TASK-0030 | Draft the minimum ADR-0020 clarification — pre-constrained retrieval as an engine-selection gate | **COMPLETE** (2026-08-22) — **7/7 criteria**; `ADR-0020-AMD-01` **PROPOSED, NOT applied**; **MSG-0094** | EPA-0005 ACCEPTED (MSG-0092) ✅ | Claude Code |
 | TASK-0031 | Apply ADR-0020 AMD-01 in place | **COMPLETE** (2026-08-23) — **7/7 criteria**; applied in `a1be892`, **15 insertions / 0 deletions**, one file under `docs/decisions/`; **MSG-0097** | AMD-01 ACCEPTED (MSG-0095) ✅ | Claude Code |
+| TASK-0032 | A-STACK **technology** evaluation and implementation planning (bounded) | **COMPLETE** (2026-08-23) — **7/7 criteria**; **`EPA-0006`** delivered **PROPOSED, selecting nothing**; `git diff --name-only docs/decisions/` **empty**; **MSG-0100** | MSG-0098 AUTHORIZED, EPA-0005 ACCEPTED, ADR-0020+AMD-01 applied ✅ | Claude Code |
 | TASK-0002 | Make test entry points shell-independent | **ABORTED** | — | — |
 
 > **Reconciled 2026-08-22 by TASK-0030 — additive and declared.** The three rows above were missing:
@@ -148,7 +151,93 @@ boundary**, not at an empty queue.
 > been executed and is COMPLETE (MSG-0055). MSG-0051 §C is fully discharged: C1–C5 by MSG-0052,
 > C6–C7 by MSG-0053.
 
-**Current position, 2026-08-23 after TASK-0031: no task is READY, and for the first time the boundary
+**Current position, 2026-08-23 after TASK-0032: no task is READY, and the boundary is back to being a
+document awaiting review — but a different kind of document, and the difference matters.**
+
+TASK-0032 executed MSG-0098 and is **COMPLETE** — **7/7 acceptance criteria MET**, each mapped to evidence
+in **MSG-0100** §3. Being documentary it produced **no test count and claims none**. It was run by a
+supervisor-started session (`runner.lock` pid 16664, acquired 05:57:17Z) against starting `HEAD = dfc7822`.
+
+**The deliverable is [`EPA-0006`](../architecture/EPA-0006-assistant-technology-evaluation.md) — PROPOSED,
+and it selects nothing.** `git diff --name-only docs/decisions/` is **empty**: the accepted ADR set,
+including the ADR-0020 amended a few hours earlier by TASK-0031, is untouched.
+
+**This is not a re-run of TASK-0026, and the label makes that worth stating in the status file too.** Both
+tasks are called "A-STACK" and WP-0009 §6.2 lists A-STACK once, already reading EXECUTED. TASK-0026 asked
+what **shape** the stack should be — one runtime or two — and produced EPA-0005. TASK-0032 asked which
+**technology classes** fit *inside* the settled shape. **Neither of its two inputs existed when EPA-0005 was
+written**: Approach C was chosen by MSG-0092 *after* EPA-0005 was delivered, and AMD-01 was applied on the
+morning of this run. The distinction is now recorded in three places — WP-0009 §6.2, the architecture
+README, and MSG-0100 §5 — so it survives without the conversation that produced it.
+
+**The amendment applied yesterday morning was used, and it did the work it was written to do.** ADR-0020 §4
+as amended disqualifies an engine that can only match or rank first and exclude afterwards, *"including
+over-fetching a wider candidate set and discarding the surplus, at any layer."* Applied to seven candidate
+classes with reasoning rather than assertion: **post-filter-only similarity search is DISQUALIFIED**
+directly, needing no test; **hosted and managed retrieval services are DISQUALIFIED twice over on
+independent grounds** — ADR-0022 §1 names *derived embeddings* explicitly, so relaxing one elimination would
+not revive the class. **Relational engines, search engines with filtered kNN, purpose-built vector stores
+and lexical-only engines are NOT disqualified and are explicitly NOT cleared**, because each is a *class*
+within which conforming and non-conforming members both exist. **Retrieval computed against the kernel store
+conforms structurally** — the candidate set *is* an authorized query result, so there is no wider set to
+over-fetch from — **and its cost is entirely unmeasured.**
+
+**The finding most likely to change what an implementer does is that AMD-01 carries two obligations and they
+are easy to conflate.** An engine that accepts the fully constrained query and then satisfies it by
+**over-fetching internally** receives a **conformant query** and returns a **correct response**. G3 inspects
+the query. **So G3 evidence cannot tell that engine apart from a conforming one**, and a project collecting
+only G3 evidence will believe the engine is cleared when it is not. Engine clearance needs execution
+evidence of its own — a query plan, engine counters, and an inspection of the engine's own logs — and
+**an engine that exposes none of that cannot be cleared at all.** **This is not a defect in AMD-01 and no
+amendment is proposed:** AMD-01 states both obligations; it simply does not say that the second fails to
+discharge the first, because it is answering a different question.
+
+**Nine further findings sit behind it**, and EPA-0006 §14 states, one by one, why **none of the ten requires
+an ADR change** — naming the accepted section each already follows from, which is the check against the
+record having quietly amended architecture. The four with the most consequence: **the retrieval port's
+signature is itself the control** — a port typed `search(queryText, k)` makes the conforming design
+*unrepresentable* and has mandated post-filtering, so authorization context must be a **required** parameter
+with no unconstrained variant, including at the Approach C worker seam; **no index-assigned identifier may
+ever appear in a citation**, because ADR-0020 §1 requires a rebuild be a no-op with respect to answers and a
+rebuild that reassigns identifiers would silently invalidate every citation already issued; **the kernel's
+verified append-only audit store is disqualified for conversation content**, by the very property that makes
+it good audit storage — append-only and ADR-0021 §3's *"expiry actually deletes"* cannot both hold; and
+**ADR-0020 §6.2's logging prohibition is a selection criterion on the index engine and the model serving
+runtime**, not only a coding rule, since a serving runtime that logs prompts logs policy passages and an
+engine's slow-query log is not exempt because the application wrote nothing.
+
+**The failure mode MSG-0099 predicted did not occur, and that is the part worth checking rather than
+trusting.** A technology comparison invites throughput, latency, memory and recall figures. **None appears
+anywhere in EPA-0006** — not as an estimate, a typical value, a range, or a vendor claim presented as fact.
+**PR4 is NOT MET, PR6 is UNKNOWN, no benchmark has ever been run here, and A-SURVEY has run only at n=1,
+three times, on three producers.** Where a number does appear it is a **count derived from ADR text with the
+derivation shown**: at least three model invocations on the critical path of one English answer — embed the
+question, generate, entail — with a cross-language answer adding at least one more. **Product naming was
+held to two places and disclaimed**, because the discriminating property is filter *execution strategy*,
+which is not reliably determinable from documentation and was not determinable at all from that session;
+recording one would have been the vendor-claim-as-fact the authorization forbids.
+
+**Nothing was selected.** Ten selections are recorded OPEN with what would close each. **ADR-0019 is
+untouched and no Arabic normalization rule was written, inferred, or proposed** — MSG-0091's scoping holds,
+and the one n=1 observation that bears on it (detached diacritics) is recorded as **input to** the deferred
+rule and explicitly not as any part of it. **No ADR was created, amended, or proposed**, and EPA-0006 §12.3
+recommends against a new one for the reason EPA-0005 §9.3 gave. **No implementation task is READY.**
+
+**Five items are referred to the Architecture Lead and none blocks anything** (MSG-0100 §10). The one with
+the most leverage: **the engine conformance probe is the only substantial piece of evidence in the whole
+evaluation that is not blocked on the organization or the operator.** Everything else — corpus scale, format
+mix, the organization's own authoring toolchain, D14 exposure, PR4, PR6 — waits on someone outside this
+repository. It is named as a sequencing observation and is **explicitly not proposed as a task, marked
+READY, or self-authorized.**
+
+> **The position after TASK-0031, retained.** "**Current position, 2026-08-23 after TASK-0031: no task is
+> READY, and for the first time the boundary is not a document awaiting review — the architecture record is
+> settled and the queue is simply empty.**" True when written, at ~08:11Z. The very next supervisor cycle
+> authorized and ran TASK-0032, so the queue is again empty — but the boundary has moved back to a
+> document: **EPA-0006 awaits the Lead's reading.** Everything the paragraphs below say about **TASK-0031
+> and the amendment** remains exact and is unchanged by this task.
+
+**Position after TASK-0031 (superseded, retained): no task is READY, and for the first time the boundary
 is not a document awaiting review — the architecture record is settled and the queue is simply
 empty.**
 
