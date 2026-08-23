@@ -5,6 +5,7 @@
 **Date:** 2026-08-21
 **Proposed by:** Claude Code — TASK-0024 (A-ADR), under MSG-0068a and MSG-0068b
 **Accepted by:** Architecture Lead — MSG-0071
+**Amended:** 2026-08-23 — AMD-01 (MSG-0095), applied in place: §4 engine-selection criterion
 **Work package:** WP-0009 — Employee Policy Assistant
 **Surface:** WP-0009 §7, surface 4 (`REQUIRED`)
 **Settles:** MSG-0062 **§7.6** (Restricted documents; no retrieve-then-suppress), MSG-0056a **D2**
@@ -64,6 +65,19 @@ Per MSG-0062 §7.6:
 
 Retrieving broadly and filtering afterwards is a **gate failure**, not a style preference — however
 correct the resulting response happens to look. **An exclusion cannot fail open; a filter can.**
+
+**Consequence for engine selection, and for what the gate inspects.** This rule is a **selection
+criterion**, not only a description of correct behaviour. A retrieval or index engine may be adopted
+only if authorization-relevant constraints can be expressed and applied **within the retrieval
+operation itself**, so that unauthorized content is never a candidate under §3.1. An engine that can
+only match or rank first and exclude afterwards — including over-fetching a wider candidate set and
+discarding the surplus, **at any layer, including inside the retrieval component** — does not satisfy
+§3.1 and is **disqualified**. **G3 is therefore evidenced against the query actually issued to the
+engine, not against the response returned to the caller**, because a conforming and a
+retrieve-then-filter design can return identical responses.
+
+**This criterion selects no engine and rules none in.** It states the bar a candidate must clear;
+selection remains open exactly as recorded in §7 and in *Deliberately not decided here*.
 
 ### 5. Denial fails closed, with the side channels named and closed
 
@@ -204,6 +218,7 @@ than "in the corpus like everything else".
 | Restricted rule and its carve-out; local ≠ safe | `docs/security/data-classification.md` |
 | Isolation demonstrated by test | SPEC-0010 |
 | `/data/docker` boundary | Bootstrap contract v0.2; MSG-0006 |
+| Pre-constrained retrieval as an **engine-selection criterion**; G3 evidenced at the query | MSG-0092 **§1(1)** and **§3**; EPA-0005 §3.3 (ACCEPTED) |
 
 ## Deliberately not decided here
 
