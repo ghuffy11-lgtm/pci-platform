@@ -475,6 +475,14 @@ corroborating.
 measurement, not evidence of absence**. Under this criterion that distinction no longer depends on the
 writer's care: **an unmeasurable stage yields NOT CLEARED by rule.**
 
+> **Three further clearance conditions were added 2026-08-23 by TASK-0036 (MSG-0110), and this table
+> is unchanged by them.** §4.9 states **how E3 is discharged for an opaque stage** — by execution
+> evidence, **never by construction** (**G-Q6**) — and adds two prerequisites this table does not
+> carry: **G-Q4**, that partition routing be computed from the subject's entitlements and be itself
+> measured, and **G-Q5**, that a temporally materialised structure demonstrate **both** a bounded
+> re-materialisation interval **and** a working ADR-0020 §3 point-2 kernel re-check. **All three are
+> necessary and none is sufficient** — E1–E4 above remain the clearance bar.
+
 #### S7 — Instrument placement, and reporting the maximum
 
 Because counts are position-dependent (S5), a probe **must**:
@@ -547,6 +555,13 @@ burden **regardless of what its documentation asserts**, and regardless of how w
 **MSG-0105 §5 and MSG-0106 §4 both require these be surfaced rather than answered.** Deciding any of
 them would be an architecture change TASK-0034 is not authorized to make. **§4.6 is operable without any
 of them being answered** — each carries a stated fail-closed default.
+
+> **Question numbering, recorded 2026-08-23 by TASK-0036 so the sequence is not restarted.** This
+> section holds **Q1–Q3** and they are **still open**. **Q4, Q5 and Q6** were raised by MSG-0109 §9
+> and **have since been RULED by MSG-0110** — they are encoded as clearance gates in **§4.9**, not
+> here. **Q7**, the *numeric* staleness bound, is raised in **§4.9** and is open. **The next free
+> number is Q8.** This note changes none of the three questions below; **Q2 in particular remains
+> open** — TASK-0035 produced evidence for it (§4.8) and MSG-0110 did not rule it.
 
 #### Q1 — Does "examine" reach index metadata, or only passage content?
 
@@ -695,6 +710,263 @@ Classes **S and V remain unreachable** on the authoring host and **K remains unm
 point sharpened by this evidence is that **RLS is enforcement, not isolation**: it decides where the
 rule is written, not what the traversal opens, which is the same gap §4.3's withdrawn *"conforms
 structurally"* claim rested on.
+
+---
+
+### 4.9 Three clearance gates: routing, temporal materialisation, opaque-stage confinement (TASK-0036, MSG-0110)
+
+**Added 2026-08-23 by TASK-0036. Additive and declared: nothing in §4.1–§4.8 is deleted or
+reworded, and no verdict changes.** This section converts the Architecture Lead's rulings on
+**Q4**, **Q5** and **Q6** — MSG-0109's three referrals — into **explicit, testable clearance
+requirements**. Authority: **MSG-0110 §2–§6**.
+
+**This is an evidence instrument, not policy.** It **amends no ADR**, weakens nothing, invents no
+threshold, and **selects, adopts, recommends, installs and deploys no engine.** MSG-0110 §5 is
+explicit that no candidate is cleared by the ruling and that *"no engine, runtime, provider, model,
+index technology, or physical implementation is selected."*
+
+**All three rulings are fail-closed, and all three are NECESSARY conditions, never sufficient ones.**
+Passing a gate below moves a candidate no closer to CLEARED on its own. **§4.6 S6 still governs
+clearance**: E1 + E2 + E3 + E4 all obtained, `U = 0` at every measured collection size, invariant
+with `N`. The gates here are additional hurdles placed in front of that bar, not alternative routes
+to it.
+
+#### G-Q4 — partition routing must be computed, and routing itself is measured
+
+> Partition routing must be computed from the requesting subject's own entitlements. It must not
+> discover partitions by enumerating a catalogue of structures whose identifiers or metadata may
+> encode authorization attributes belonging to other subjects.
+>
+> For strict Shape-1, partition selection itself must not become an unauthorized examination step.
+> The logical/physical distinction remains unchanged: this does not require one physical index or
+> store.
+>
+> — **MSG-0110 §2**
+
+**Why this gate is easy to omit, and worth saying before the requirements:** routing *feels* like a
+step that happens **before** retrieval, so a specification that measures "the query" naturally starts
+counting after the structures have been chosen. **MSG-0110 §2 closes that gap by making selection
+part of what must not examine.** §4.6 S4 already counts every unit the engine touches *"while
+resolving the query"*, and **choosing which structures to open is part of resolving it.**
+
+**What must be shown — all four:**
+
+| | Requirement | Evidence that counts |
+|---|---|---|
+| **G-Q4.1** | **The routed set is a function of the subject's entitlements alone.** Its inputs are the requesting subject's entitlement set and the query parameters — and nothing else | The routing step's actual inputs, exhibited: a trace, a call record, or an execution log showing the derivation. **A description of the intended function is not the function** — Q6's rule applies here too |
+| **G-Q4.2** | **The routed set does not vary with collection contents.** Adding, removing or repopulating structures belonging to other subjects changes neither the set of structures opened nor the number of units read during routing | **A differential test.** Run the same subject and query against collections that differ **only** in other subjects' partitions. Identical routed set, identical routing-phase read count. **A difference is decisive failure** |
+| **G-Q4.3** | **No catalogue enumeration.** The engine does not scan, list, or range-read a catalogue, system table, directory, alias map, or manifest of structures in order to decide which to open | **E1-class evidence** — plan, explain output, or engine trace — covering the **routing phase**, not only the retrieval phase. A plan showing a scan over a structure catalogue is **disqualifying on the same reasoning §4.6 S6/E1 applies to a data scan** |
+| **G-Q4.4** | **Routing-phase units are counted in `U`.** Any unit read while selecting structures is subject to §4.6 S4 and is included in the candidate's `U`, at the placement rules of S7 | Counters instrumented **at the routing step specifically**, with placement recorded. A probe that instruments only the retrieval step has **not measured this gate** and must say so |
+
+**What falsifies it.** Any one of: a routing decision that reads a catalogue row describing a
+structure the subject is not entitled to; a routed set that changes when only other subjects'
+partitions change; a routing implementation that first opens a structure and then decides whether it
+was the right one; or an engine that exposes no observability over its routing phase at all.
+
+**Not demonstrated yields NOT CLEARED** — never assumed conformance, and never a pass by default
+(§4.6 S9).
+
+> **A design consequence worth stating, because it is where this gate bites in practice.** A partition
+> **naming scheme** that encodes authorization attributes — the `p_org_a_internal_published` form
+> TASK-0035's own probe used (§4.8; MSG-0109 §5.2) — turns the engine's structure catalogue into a
+> **directory of other subjects' authorization attributes**. Under G-Q4 the *name* must be **computed**
+> from the requesting subject's entitlements and resolved by **exact key**; it must not be **found** by
+> scanning that catalogue for names that look applicable. **The two implementations are behaviourally
+> identical and only one satisfies the gate**, which is precisely why G-Q4.3 demands plan or trace
+> evidence rather than a description.
+
+> **One boundary this gate does NOT cross, stated so it cannot drift.** MSG-0110 §2 keeps the
+> logical/physical distinction unchanged, and so does this gate: **it does not require one physical
+> index or one physical store**, and **MSG-0101 §1(1) is not reinterpreted** — *"one projection index"*
+> still means one **logical** projection (§4.5, §4.8).
+
+> **An open interaction, surfaced and NOT decided.** Whether an **exact-key catalogue lookup** of an
+> already-computed structure name is itself an examination depends on §4.7 **Q1** — whether *"examine"*
+> reaches metadata — which is unruled. MSG-0109 §9 Q4 records that the two questions are related but
+> distinct: Q1 concerns index entries describing **chunks**, this concerns identifiers describing
+> **structures**. **Until Q1 is ruled the criterion takes its stated fail-closed default** (§4.7 Q1,
+> §4.6 S4): the strict reading, and a routing read of a catalogue entry describing a structure the
+> subject is not entitled to **counts**. **That default can only withhold clearance, never grant it**,
+> so the gate is operable now.
+
+#### G-Q5 — temporal materialisation requires BOTH conditions, and one of them is only testable structurally
+
+> A temporally materialised structure is NOT CLEARED unless **both** conditions are demonstrated:
+>
+> 1. its re-materialisation interval is bounded in accordance with the already-accepted staleness
+>    discipline in ADR-0020 §1; **and**
+> 2. the ADR-0020 §3.2 post-retrieval re-check against the kernel is demonstrated to run.
+>
+> The TASK-0035 staleness evidence is decisive against clearing a stale materialisation: after the
+> clock moved, the design examined unauthorized rows and returned 5 of 5 unauthorized rows. No
+> relaxation or new tolerance is authorized. This ruling does not invent a new numeric staleness
+> threshold; the existing ADR-0020 threshold remains authoritative.
+>
+> — **MSG-0110 §3**
+
+**The conjunction is the gate. A specification that clears an I4 design on either condition alone is
+wrong**, and would silently restore the failure §4.8 measured — `U` = 5/50/500 **and 5 of 5
+unauthorized rows returned.** Condition 1 bounds *how long* the structure may be wrong; condition 2
+catches a hit that is wrong *anyway*. **Neither substitutes for the other**, because a bound that has
+not yet elapsed does not make the materialisation correct, and a re-check that runs does not make an
+unbounded staleness window acceptable.
+
+**Applies to:** any design using pattern **I4** (temporal materialisation), and to any other design
+whose partition invariant is **true only as of an instant** rather than by construction. §4.8's
+refinement rule identifies these: **effectivity-at-answer-time does not refine without fixing a
+time**, and *"that refinement decays from the instant onward."*
+
+##### Condition 1 — bounded re-materialisation. **This gate is STRUCTURAL, not numeric.**
+
+**Stated plainly, because MSG-0111 §4 required this task to say which of the two it tests:** the
+accepted architecture **names** a staleness threshold and **deliberately declines to fix its value.**
+
+- **ADR-0020 §1** — *"a stale index beyond threshold triggers abstention (A7), never a stale answer"*.
+- **ADR-0020, *Deliberately not decided here*** — *"**The staleness threshold that triggers A7** — an
+  operational parameter, tuned with real evidence."*
+
+**Verified by TASK-0036, not assumed:** a case-insensitive search for `stale` across the whole
+authoritative `docs/` tree returns those two lines as the only ones bearing on the bound, and **no
+numeric value is fixed anywhere in the accepted set.**
+
+**Consequence: condition 1 is testable structurally — that a bound exists, is enforced, and its
+breach triggers abstention — and it is NOT testable numerically.** The two are materially different
+gates: the first asks whether the mechanism is present, the second whether the window is short
+enough. **Only the first is available**, and **choosing a number would invent the tolerance MSG-0110
+§3 forbids.** The numeric gap is referred to the Architecture Lead as **Q7** below.
+
+| | Requirement | Evidence that counts |
+|---|---|---|
+| **G-Q5.1a** | **A bound exists and has a configured value** | The configured value, exhibited. **Its magnitude is not judged by this gate** — no value passes or fails here |
+| **G-Q5.1b** | **The bound is enforced against a clock the candidate does not control** | Staleness computed from a trusted time source and the materialisation instant; not from the materialised structure's own contents |
+| **G-Q5.1c** | **Breach triggers abstention A7, never a degraded answer** | **A behavioural test.** Advance the clock past the bound and issue the query. **Abstention A7 is the only passing outcome.** An answer returned — of any quality, with any warning attached — **fails** |
+| **G-Q5.1d** | **Every `U = 0` measurement records its materialisation instant** | §4.8 finding 3: *"`U = 0` for a materialised structure is a property of an instant, not of a design."* A zero reported without the instant it was taken at **is not interpretable and does not count** |
+
+##### Condition 2 — the post-retrieval kernel re-check, demonstrated to run
+
+**ADR-0020 §3 enforcement point 2**, quoted: *"**Post-retrieval re-check** — every hit is
+re-authorized against its version's classification and audience before entering evidence selection."*
+
+> **A label note, so a reader does not go looking for a heading that does not exist.** MSG-0110 §3 and
+> MSG-0111 cite this as **"§3.2"**. ADR-0020 §3 is a numbered list, not a subsectioned one: **"§3.2"
+> means §3's second enumerated enforcement point**, quoted above. The anchor is real and was verified
+> in the accepted, promoted copy.
+
+| | Requirement | Evidence that counts |
+|---|---|---|
+| **G-Q5.2a** | **The re-check runs on every hit** — not sampled, not cached, not skipped when the materialisation is believed fresh | Execution evidence that it executed for each hit in the result set |
+| **G-Q5.2b** | **It re-authorizes against the KERNEL**, which is the truth, and not against the materialised structure's own columns | **This is the limb most easily faked and it is the one that matters.** A "re-check" reading the stale copy's own attributes **re-checks the stale data against itself and is a no-op** — it would have passed every row of TASK-0035's P4S while that design returned 5 of 5 unauthorized rows |
+| **G-Q5.2c** | **It is demonstrated to REJECT, not merely to execute** | **An adversarial test.** Materialise; change the authorization facts in the kernel so a materialised hit becomes unauthorized; query. **The hit must be rejected.** §4.6 S5's asymmetry applies directly: a re-check observed running but never observed rejecting has demonstrated **that it runs**, not **that it works** |
+
+**What falsifies G-Q5 as a whole.** Any of: no bound configured; a bound not enforced; a stale query
+answered rather than abstained; a re-check that reads the materialised copy rather than the kernel; a
+re-check never demonstrated to reject; or a `U = 0` claim carrying no materialisation instant.
+
+**Not demonstrated yields NOT CLEARED.** And satisfying **both** conditions still yields **NOT
+CLEARED** unless §4.6 S6's E1–E4 are independently obtained — **G-Q5 is a prerequisite, not a
+clearance.**
+
+#### G-Q6 — opaque-stage confinement requires execution evidence; construction alone is rejected
+
+> **Ruling: REJECT the proposed default that construction alone can satisfy E3.**
+>
+> Structural confinement alone is not sufficient E3 evidence for an opaque/unmeasurable stage. It may
+> contribute to the evidence package only when the candidate provides demonstrable evidence that the
+> stage genuinely cannot reach outside the confined structure.
+>
+> Documentation describing an intended partition boundary is not execution evidence of the engine's
+> actual traversal boundary. Until such evidence exists, the candidate remains NOT CLEARED.
+>
+> — **MSG-0110 §4**
+
+**The weaker reading is recorded as rejected so it cannot quietly return** — the same discipline §4.6
+S2 applies to the materialization reading. **The rejected proposition:** *"the structure the opaque
+stage traverses contains only authorized entries, therefore the stage examined nothing unauthorized."*
+**That is an argument from construction, and MSG-0110 §4 rejects it as sufficient.** It is not
+worthless — it *may contribute* — but it does not discharge **E3** by itself, and a candidate resting
+on it stays **NOT CLEARED**.
+
+**Why the argument is not enough, stated once so the gate is not read as pedantry:** it assumes the
+stage cannot reach outside its own structure, and **that assumption is itself an engine property**
+(MSG-0109 §9 Q6). Real opaque stages routinely consult things outside the structure they nominally
+traverse — a global term dictionary, a shared document-id map, a corpus-wide statistics table, a
+global ANN graph or centroid set. **Each is a path out of the confinement that the construction
+argument does not see.**
+
+| | Requirement | Evidence that counts |
+|---|---|---|
+| **G-Q6.1** | **Execution evidence of the actual traversal boundary** | Engine-internal trace, per-structure I/O accounting, handle- or file-level read counters, or an engine-exposed counter **taken from inside the stage** — showing which structures the stage actually read |
+| **G-Q6.2** | **Demonstration that the stage cannot reach outside**, not merely that it did not on one run | Evidence about the mechanism: that the stage's reachable set is the confined structure. **§4.6 S5 applies** — an observation of non-reaching is a zero count, and a zero count proves only what crossed the instrument |
+| **G-Q6.3** | **No shared out-of-partition structure is consulted** | Explicit evidence that global term dictionaries, shared doc-id maps, corpus-wide scoring statistics, global ANN graphs and centroid structures are **either absent or themselves per-partition**. **§4.8 I6 is the pattern; §6.2 records the class-V form of the failure**: *"A global ANN graph traversed with a filter is Shape 3 by construction, whatever the API calls it"* |
+| **G-Q6.4** | **Structural confinement, where offered, is labelled as a CONTRIBUTOR** | It may appear in the evidence package; it may not appear as the discharge of E3. A record presenting it as E3 has misreported |
+
+**What falsifies it.** Documentation-only or construction-only claims; any evidence the stage reads a
+structure spanning partitions; an engine exposing no observability into the stage at all — which
+§4.6 S10 already makes disqualifying in its own right.
+
+**Not demonstrated yields NOT CLEARED for that candidate**, which is §4.6 S6/E3 unchanged: *"never a
+pass by default."*
+
+> **A cost this gate does not price, carried forward from §4.8 and still unmeasured.** Building a
+> lexical or vector index per partition **splits its scoring statistics**, so cross-partition score
+> comparison is not simply a sort. **That is an observation from construction; no figure is claimed
+> and none was measured** (§4.8; MSG-0109 §5.5, §5.6).
+
+#### Applying the three gates to what has already been measured — nothing moves
+
+**Every verdict in this record is unchanged by this section.** The gates are applied below to the
+TASK-0035 designs to show what they would have required; **each design's verdict is the one §4.8
+already recorded, and none is relabelled.**
+
+| Design | G-Q4 routing | G-Q5 both conditions | G-Q6 opaque stage | **Verdict (unchanged)** |
+|---|---|---|---|---|
+| **P0** | n/a — no partitioning | n/a | not reached | **NOT CLEARED** |
+| **P1** | **not measured** — routing was computed in the harness, never instrumented | n/a | not reached | **NOT CLEARED** |
+| **P2** | **not measured** | n/a | not reached | **NOT CLEARED** |
+| **P3** | **not measured** | n/a | not reached | **NOT CLEARED** |
+| **P4** | **not measured** | **neither condition demonstrated** — no bound configured, no kernel re-check present in the fixture | n/a (pure relational) | **NOT CLEARED** — E4 also not obtained |
+| **P5** | **not measured** | **neither condition demonstrated** | **FAILS G-Q6** — E3 argued from construction, exactly the reading MSG-0110 §4 rejects | **NOT CLEARED** |
+| **P4S** | **not measured** | **fails both limbs by demonstration** — the clock moved past no bound, no abstention occurred, and 5 of 5 unauthorized rows were **returned** | n/a | **NOT CLEARED** |
+| **NC** | n/a | n/a | n/a | **DISQUALIFIED** — negative control, failed as required (§4.6 S8) |
+
+**Two things this table establishes that are worth more than the cells.**
+
+1. **P4S is now a demonstrated gate failure rather than only an alarming measurement.** Under G-Q5 the
+   design does not merely look bad — it **fails a named clearance condition**, and it fails the limb
+   that was already accepted architecture before the probe ran.
+2. **"Not measured" is not a defect in TASK-0035 and is not being recorded as one.** G-Q4 did not
+   exist when that probe ran; **the honest entry is that routing was never instrumented**, and under
+   §4.6 S9 the consequence of unobtained evidence is the verdict those designs already carry.
+
+**The nine MSG-0104 class and candidate verdicts are unchanged and are reproduced in full in
+MSG-0112 §6.** **Nothing in this section clears anything.** SQLite and every class-R configuration
+remain **NOT CLEARED**; classes **S**, **V** and **K** remain **NOT CLEARED** with no execution
+evidence; class **D** and class **H** remain **DISQUALIFIED**.
+
+#### Q7 — the numeric staleness bound. Surfaced for the Architecture Lead, deliberately NOT decided
+
+**Numbering:** §4.7 holds **Q1–Q3**; MSG-0109 §9 raised **Q4–Q6**, now ruled by MSG-0110 and encoded
+above. **Q7 is the next free number**, allocated here and verified unused.
+
+**The question.** ADR-0020 §1 makes a bound authoritative and ADR-0020's *Deliberately not decided
+here* leaves its **value** to operations, *"tuned with real evidence."* **G-Q5.1 therefore tests that a
+bound exists and is enforced; it cannot test whether the window is short enough.** Is the structural
+gate the intended standing state, or should a numeric bound be fixed — and if so, by whom and in which
+record?
+
+**What this task did NOT do, and why.** It did not choose a number. MSG-0110 §3 states *"This ruling
+does not invent a new numeric staleness threshold"*, and fixing one here would amend an accepted ADR
+by implication — a stop condition under this task's own section and under CLAUDE.md's authority rule.
+
+**Default until ruled: the structural gate, as written above.** It is a real gate — it fails P4S by
+demonstration — and it is **strictly stronger than the construction-only evidence G-Q6 rejects**.
+**This blocks nothing:** a probe can run G-Q4, G-Q5 and G-Q6 today and return defensible verdicts with
+Q7 still open.
+
+**One observation offered as input to that ruling and explicitly not as any part of it:** the tolerable
+window is a function of how fast the authorization facts actually change, which is **corpus and
+organizational evidence this project does not yet have** — PR5 is met only at n=1 (WP-0009 §8). **No
+figure, range, or typical value is proposed**, consistent with §2.1.
 
 ---
 

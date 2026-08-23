@@ -2,7 +2,9 @@
 
 **Active Work Package:** WP-0001 — PCI Kernel Foundation
 **Status:** **COMPLETE** — declared by the architecture lead 2026-08-19 (MSG-0020(b), resolved by MSG-0022 / MSG-0023, TASK-0009)
-**Last Updated:** 2026-08-23 UTC — **MSG-0110 rules TASK-0035's three referrals, all fail-closed**: routing computed from the subject's own entitlements; temporal materialisation **NOT CLEARED unless bounded re-materialisation AND a demonstrated §3.2 kernel re-check**; **construction alone cannot satisfy E3**. **TASK-0036 READY** — encode Q4/Q5/Q6 as testable clearance gates in the EPA-0006 probe spec. **Nothing cleared, nothing selected, no ADR changed.**
+**Last Updated:** 2026-08-23 UTC — **TASK-0036 COMPLETE (8/8)**: MSG-0110's three rulings are now **testable clearance gates** in **EPA-0006 §4.9** — **G-Q4** (routing computed, and routing itself measured), **G-Q5** (**both** bounded re-materialisation **and** a demonstrated kernel re-check), **G-Q6** (opaque-stage confinement needs **execution** evidence; construction-only rejected). **All three are necessary, none sufficient.** **Nothing cleared, nothing selected, no ADR changed** — `git diff --name-only docs/` empty, **272 insertions / 0 deletions**. **One question referred (Q7)**: **no numeric staleness threshold exists anywhere in the accepted set**, so G-Q5's bounded limb is **structural, not numeric** — **no number was chosen**. **MSG-0112.**
+
+> **The line this replaces, retained:** "**MSG-0110 rules TASK-0035's three referrals, all fail-closed**: routing computed from the subject's own entitlements; temporal materialisation **NOT CLEARED unless bounded re-materialisation AND a demonstrated §3.2 kernel re-check**; **construction alone cannot satisfy E3**. **TASK-0036 READY** — encode Q4/Q5/Q6 as testable clearance gates in the EPA-0006 probe spec. **Nothing cleared, nothing selected, no ADR changed.**" True when written; **the task it announced has now run**, started by the supervisor cycle at **13:17:18Z** and completed the same afternoon. **The subtlety MSG-0111 §4 flagged turned out to be the real one** — the numeric threshold is absent from the accepted set, verified rather than assumed — and **the task referred it instead of choosing a value**, exactly as instructed.
 
 > **The line this replaces, retained:** "**MSG-0107b answers the question MSG-0106 surfaced**: physical projection isolation **is** part of strict Shape-1 where necessary, and **query-time predicates alone are insufficient unless execution evidence proves they prevent examination** — not disqualified in principle, only unproven. **TASK-0035 READY**: evaluate isolation strategies per EPA-0006 class; **the bar is zero**; the SQLite result condemns the tested configuration, **not the class**. Sixth number collision recorded (MSG-0107a/b). Nothing selected or deployed." True when written; **the task it announced has now run**, started by the supervisor cycle at **09:57:18Z** and completed the same afternoon. **Its two constraints both held**: MSG-0104's verdicts are reproduced verbatim and none was altered, and **nothing was selected or deployed**. **The "condemns the configuration, not the class" instruction was load-bearing and is now evidenced** — the same class-R engine that was NOT CLEARED under a shared structure reached `U = 0` under a partitioned one.
 
@@ -144,6 +146,7 @@ message on 2026-08-20 under MSG-0041 (MSG-0042) — the fifth.
 | TASK-0033 | Bounded retrieval-engine conformance probe (evaluation only) | **COMPLETE** (2026-08-23, run 2) — **8/8 criteria**; probe executed, **24 candidate runs across 6 fixtures**, all three tiers; **nothing CLEARED** — class R **NOT CLEARED** at Tier 3, class D **DISQUALIFIED** and demonstrated, classes S/V/K **NOT CLEARED** with zero evidence; `git diff --name-only docs/decisions/` **empty**; **MSG-0104**. Run 1 (MSG-0103) stopped before starting and is retained as history | MSG-0101 AUTHORIZED, EPA-0006, ADR-0020+AMD-01 ✅ | Claude Code |
 | TASK-0034 | Update the retrieval-engine criterion and probe specification for strict Shape-1 | **COMPLETE** (2026-08-23) — **7/7 criteria**; **`EPA-0006` §4.6 and §4.7** added, all changes additive and declared; **the bar is ZERO unauthorized units examined**; **all nine MSG-0104 verdicts reproduced unchanged** and **nothing became CLEARED**; `git diff --name-only docs/` **empty**; **MSG-0107** | MSG-0105 DECIDED, MSG-0104, ADR-0020+AMD-01 ✅ | Claude Code |
 | TASK-0035 | Physical projection isolation evaluation against strict Shape-1 | **COMPLETE** (2026-08-23) — **8/8 acceptance items**; **a probe ran**: 8 isolation designs × 3 collection sizes plus a staleness measurement, negative control **failed as required**; **`U` = 0 reached only where the routed structures hold no unauthorized row**; **a stale materialised structure RETURNS unauthorized rows**; **nothing CLEARED**, all nine MSG-0104 verdicts **unchanged**; `git diff --name-only docs/` **empty**; **MSG-0109** | MSG-0107b AUTHORIZED, MSG-0105, MSG-0104, EPA-0006 ✅ | Claude Code |
+| TASK-0036 | Encode Q4/Q5/Q6 as strict Shape-1 clearance gates in the EPA-0006 probe specification | **COMPLETE** (2026-08-23) — **8/8 acceptance criteria**; **`EPA-0006` §4.9** added with **G-Q4 / G-Q5 / G-Q6**, each quoting MSG-0110; **all three necessary, none sufficient**; documentary — **no test count and none claimed**, **no probe re-run**; **272 insertions / 0 deletions**; `git diff --name-only docs/` **empty**; **nothing CLEARED** and **all nine MSG-0104 plus all eight TASK-0035 verdicts reproduced unchanged**; **Q7 referred — no numeric staleness threshold exists in the accepted set, and none was invented**; **MSG-0112** | MSG-0110 DECIDED, MSG-0109, TASK-0034 criterion ✅ | Claude Code |
 | TASK-0002 | Make test entry points shell-independent | **ABORTED** | — | — |
 
 > **Reconciled 2026-08-22 by TASK-0030 — additive and declared.** The three rows above were missing:
@@ -162,9 +165,98 @@ boundary**, not at an empty queue.
 > been executed and is COMPLETE (MSG-0055). MSG-0051 §C is fully discharged: C1–C5 by MSG-0052,
 > C6–C7 by MSG-0053.
 
-**Current position, 2026-08-23 after TASK-0035: no task is READY, and for the first time in this
-sequence the boundary is not a document or a criterion — it is a measured result the Architecture
-Lead has to decide what to do with.**
+**Current position, 2026-08-23 after TASK-0036: no task is READY, and the boundary is a question the
+accepted architecture deliberately left open — a threshold that is named but has no value.**
+
+TASK-0036 executed MSG-0110 §6 and is **COMPLETE** — **8/8 acceptance criteria MET**, each mapped to
+evidence in **MSG-0112** §9. Being documentary it produced **no test count and claims none**, and
+**neither the TASK-0033 nor the TASK-0035 probe was re-run**. It was run by a supervisor-started
+session (`runner.lock` pid 25120, acquired 13:17:18Z) against starting `HEAD = f984b9c`, **unchanged
+at commit time**.
+
+**The deliverable is `EPA-0006` §4.9 — MSG-0110's three rulings converted into clearance gates that a
+probe can actually run.** **The change to EPA-0006 is purely additive — 272 insertions, 0 deletions**,
+with no existing sentence deleted or reworded, and **`git diff --name-only docs/` is empty**, stronger
+than the acceptance criterion's `docs/decisions/` check.
+
+**The single most important structural point about the three gates is that none of them is a route to
+clearance.** **G-Q4**, **G-Q5** and **G-Q6** are **necessary conditions placed in front of** the
+existing bar; **§4.6 S6 still governs** — E1 + E2 + E3 + E4 all obtained, `U = 0` at every measured
+collection size, invariant with `N`. A candidate passing all three is no closer to CLEARED than
+before.
+
+**Three things the gates make testable that were not testable before.**
+
+1. **Routing is now inside the measurement, and it was outside it by default.** Routing *feels* like a
+   step that happens **before** retrieval, so a probe naturally starts counting after the structures
+   are chosen — which is exactly how partition selection escapes scrutiny. **G-Q4 counts
+   routing-phase units toward `U`** and demands plan or trace evidence over the routing phase, not
+   only the retrieval phase. **The differential test is the sharp instrument**: run the same subject
+   and query against collections differing **only** in other subjects' partitions, and the routed set
+   and routing read-count must be identical.
+2. **The `p_org_a_internal_published` naming scheme TASK-0035's own probe used is the thing G-Q4
+   catches.** A partition name that encodes authorization attributes turns the engine's structure
+   catalogue into **a directory of other subjects' authorization attributes**. The name must be
+   **computed** from the requesting subject's entitlements and resolved by **exact key** — never
+   **found** by scanning that catalogue. **The two implementations are behaviourally identical**, which
+   is why the gate demands evidence rather than a description.
+3. **G-Q5.2b is the limb most easily faked, and it is the one that decides the outcome.** A
+   "re-check" that reads the **stale copy's own columns** re-checks the stale data against itself and
+   is **a no-op** — it would have passed every row of P4S while that design **returned 5 of 5
+   unauthorized rows**. The re-check must run **against the kernel**, and **G-Q5.2c** requires it be
+   demonstrated to **reject**, not merely to execute: §4.6 S5's asymmetry rule applied directly, since
+   a re-check observed running but never observed rejecting has shown **that it runs**, not **that it
+   works**.
+
+**The conjunction in G-Q5 is the gate, and a specification clearing on one condition would have been
+wrong in a way that is easy to miss.** Condition 1 bounds *how long* the structure may be wrong;
+condition 2 catches a hit that is wrong anyway. **Neither substitutes for the other** — a bound that
+has not yet elapsed does not make a materialisation correct, and a re-check that runs does not make an
+unbounded staleness window acceptable.
+
+**The finding that shaped the task is an absence, and it was verified rather than assumed.** MSG-0111
+§4 anticipated it: **no numeric staleness threshold exists anywhere in the accepted set.** A search for
+`stale` across the whole authoritative `docs/` tree returns two lines that bear on it, both in
+ADR-0020 — §1's *"a stale index beyond threshold triggers abstention (A7), never a stale answer"*, and,
+under ***Deliberately not decided here***, *"**The staleness threshold that triggers A7** — an
+operational parameter, tuned with real evidence."* **So the accepted architecture names the threshold
+and declines to fix its value.**
+
+**G-Q5.1 is therefore written as a STRUCTURAL gate and says so in its own text** — a bound exists, is
+enforced against a clock the candidate does not control, and its breach triggers **abstention A7**,
+with **an answer of any quality failing**. It **cannot** test whether the window is short enough.
+**No number was chosen**, because MSG-0110 §3 forbids inventing one and fixing a value here would amend
+an accepted ADR by implication. **The gap is referred as Q7, and it blocks nothing**: the structural
+gate **fails P4S by demonstration**, and is strictly stronger than the construction-only evidence G-Q6
+rejects.
+
+**Nothing is CLEARED and no verdict moved.** The **nine** MSG-0104 verdicts and the **eight**
+TASK-0035 design verdicts are reproduced unchanged in MSG-0112 §6, and **no figure in the record is
+new** — every number is transcribed from MSG-0109, whose harness at `implementation/probes/TASK-0035/`
+is untouched. **Two things the gates add to that table without changing it:** **P4S is now a
+demonstrated failure of a named clearance condition** rather than only an alarming measurement, and
+**"not measured" for G-Q4 is recorded as an honest gap, not as a defect in TASK-0035** — G-Q4 did not
+exist when that probe ran.
+
+**Nothing was selected, adopted, recommended, installed or deployed.** No ADR was created, amended or
+proposed; **`git diff --name-only docs/` is empty**, ADR-0019 and ADR-0020 included. **No numeric
+threshold of any kind was fixed**, and no benchmark, latency, capacity or recall figure appears
+anywhere. **No implementation task is READY.**
+
+**One documentation gap is recorded rather than acted on** (MSG-0112 §10): **WP-0009 §6.2's A-STACK
+row-chain stops at TASK-0033** and does not carry TASK-0034, TASK-0035 or TASK-0036. WP-0009 lives in
+the authoritative `docs/` tree and this task's documentation requirement names EPA-0006, the queue,
+status and COMMS — **not the work package** — so closing it needs its own authorization. **It blocks
+nothing:** the queue and the MSG series are the authoritative record of what those tasks did.
+
+> **Superseded — the position after TASK-0035, retained.** The paragraphs below were written when
+> TASK-0035's three referrals were fresh and unruled. **All three have since been ruled by MSG-0110
+> and encoded as gates by TASK-0036.** Everything they say about **what was measured** stands exactly
+> — the table, the four findings, the two instrument defects — and **none of their numbers changed.**
+
+**Current position, 2026-08-23 after TASK-0035 (superseded, retained): no task is READY, and for the
+first time in this sequence the boundary is not a document or a criterion — it is a measured result
+the Architecture Lead has to decide what to do with.**
 
 TASK-0035 executed MSG-0107b and is **COMPLETE** — **8/8 acceptance items discharged**, each mapped to
 evidence in **MSG-0109** §10. It was run by a supervisor-started session (`runner.lock` pid 26532,
