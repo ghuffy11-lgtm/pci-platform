@@ -1,0 +1,350 @@
+==============================================================================
+TASK-0033 — bounded retrieval-engine conformance probe (EVALUATION ONLY)
+==============================================================================
+engine under test : SQLite 3.51.3 (embedded, node:sqlite)
+node              : v24.15.0
+
+--- The authorization predicate used for EVERY candidate (criterion 2) ---
+c.scope = :scope
+  AND c.state = 'PUBLISHED'
+  AND c.eff_from <= :T
+  AND (c.eff_to IS NULL OR c.eff_to > :T)
+  AND c.classification IN ('PUBLIC','INTERNAL')
+  AND EXISTS (SELECT 1 FROM chunk_audience ca
+              WHERE ca.chunk_id = c.id AND ca.audience IN ('staff','all-employees'))
+bound: :scope="org-a"  :T=1700000000  :q="leave"  :k=5
+
+------------------------------------------------------------------------------
+FIXTURE  index=partial  M=50 unauthorized · 8 authorized · 58 chunks total
+------------------------------------------------------------------------------
+precondition (unconstrained lexical top-5): ids=[9,10,11,12,13] authorized-among-them=0 -> ADVERSARIAL, as required
+
+[C1] returned=5/5 k-complete=true unauthorized-returned=0
+      result set          : [1,2,3,4,5]
+      tier-3 rank calls   : 8  (unauthorized bodies materialised: 0)
+      tier-3 seen calls   : 38  (unauthorized rows examined: 30)
+      plan                : SEARCH c USING INDEX i_auth (scope=? AND state=? AND eff_from<?)
+      plan                : SEARCH ca EXISTS USING COVERING INDEX i_aud (chunk_id=? AND audience=?)
+      plan                : USE TEMP B-TREE FOR ORDER BY
+
+[C2] returned=5/5 k-complete=true unauthorized-returned=0
+      result set          : [1,2,3,4,5]
+      tier-3 rank calls   : 0  (unauthorized bodies materialised: 0)
+      tier-3 seen calls   : 38  (unauthorized rows examined: 30)
+      plan                : SEARCH c USING INDEX i_auth (scope=? AND state=? AND eff_from<?)
+      plan                : SCAN fts VIRTUAL TABLE INDEX 0:=M1
+      plan                : SEARCH ca EXISTS USING COVERING INDEX i_aud (chunk_id=? AND audience=?)
+      plan                : USE TEMP B-TREE FOR ORDER BY
+
+[C3] returned=5/5 k-complete=true unauthorized-returned=0
+      result set          : [1,2,3,4,5]
+      tier-3 rank calls   : 0  (unauthorized bodies materialised: 0)
+      tier-3 seen calls   : 38  (unauthorized rows examined: 30)
+      plan                : SEARCH c USING INDEX i_auth (scope=? AND state=? AND eff_from<?)
+      plan                : SCAN fts VIRTUAL TABLE INDEX 0:=M1
+      plan                : SEARCH ca EXISTS USING COVERING INDEX i_aud (chunk_id=? AND audience=?)
+      plan                : USE TEMP B-TREE FOR ORDER BY
+
+[NC] returned=5/5 k-complete=true unauthorized-returned=0
+      result set          : [1,2,3,4,5]
+      tier-3 rank calls   : 58  (unauthorized bodies materialised: 50)
+      tier-3 seen calls   : 0  (unauthorized rows examined: 0)
+      plan                : SCAN c
+      plan                : USE TEMP B-TREE FOR ORDER BY
+      note                : application-side filter applied to 58 fetched rows
+
+------------------------------------------------------------------------------
+FIXTURE  index=partial  M=500 unauthorized · 8 authorized · 508 chunks total
+------------------------------------------------------------------------------
+precondition (unconstrained lexical top-5): ids=[9,10,11,12,13] authorized-among-them=0 -> ADVERSARIAL, as required
+
+[C1] returned=5/5 k-complete=true unauthorized-returned=0
+      result set          : [1,2,3,4,5]
+      tier-3 rank calls   : 8  (unauthorized bodies materialised: 0)
+      tier-3 seen calls   : 308  (unauthorized rows examined: 300)
+      plan                : SEARCH c USING INDEX i_auth (scope=? AND state=? AND eff_from<?)
+      plan                : SEARCH ca EXISTS USING COVERING INDEX i_aud (chunk_id=? AND audience=?)
+      plan                : USE TEMP B-TREE FOR ORDER BY
+
+[C2] returned=5/5 k-complete=true unauthorized-returned=0
+      result set          : [1,2,3,4,5]
+      tier-3 rank calls   : 0  (unauthorized bodies materialised: 0)
+      tier-3 seen calls   : 308  (unauthorized rows examined: 300)
+      plan                : SEARCH c USING INDEX i_auth (scope=? AND state=? AND eff_from<?)
+      plan                : SCAN fts VIRTUAL TABLE INDEX 0:=M1
+      plan                : SEARCH ca EXISTS USING COVERING INDEX i_aud (chunk_id=? AND audience=?)
+      plan                : USE TEMP B-TREE FOR ORDER BY
+
+[C3] returned=5/5 k-complete=true unauthorized-returned=0
+      result set          : [1,2,3,4,5]
+      tier-3 rank calls   : 0  (unauthorized bodies materialised: 0)
+      tier-3 seen calls   : 308  (unauthorized rows examined: 300)
+      plan                : SEARCH c USING INDEX i_auth (scope=? AND state=? AND eff_from<?)
+      plan                : SCAN fts VIRTUAL TABLE INDEX 0:=M1
+      plan                : SEARCH ca EXISTS USING COVERING INDEX i_aud (chunk_id=? AND audience=?)
+      plan                : USE TEMP B-TREE FOR ORDER BY
+
+[NC] returned=0/5 k-complete=false unauthorized-returned=0
+      result set          : []
+      tier-3 rank calls   : 508  (unauthorized bodies materialised: 500)
+      tier-3 seen calls   : 0  (unauthorized rows examined: 0)
+      plan                : SCAN c
+      plan                : USE TEMP B-TREE FOR ORDER BY
+      note                : application-side filter applied to 200 fetched rows
+
+------------------------------------------------------------------------------
+FIXTURE  index=partial  M=5000 unauthorized · 8 authorized · 5008 chunks total
+------------------------------------------------------------------------------
+precondition (unconstrained lexical top-5): ids=[9,10,11,12,13] authorized-among-them=0 -> ADVERSARIAL, as required
+
+[C1] returned=5/5 k-complete=true unauthorized-returned=0
+      result set          : [1,2,3,4,5]
+      tier-3 rank calls   : 8  (unauthorized bodies materialised: 0)
+      tier-3 seen calls   : 3008  (unauthorized rows examined: 3000)
+      plan                : SEARCH c USING INDEX i_auth (scope=? AND state=? AND eff_from<?)
+      plan                : SEARCH ca EXISTS USING COVERING INDEX i_aud (chunk_id=? AND audience=?)
+      plan                : USE TEMP B-TREE FOR ORDER BY
+
+[C2] returned=5/5 k-complete=true unauthorized-returned=0
+      result set          : [1,2,3,4,5]
+      tier-3 rank calls   : 0  (unauthorized bodies materialised: 0)
+      tier-3 seen calls   : 3008  (unauthorized rows examined: 3000)
+      plan                : SEARCH c USING INDEX i_auth (scope=? AND state=? AND eff_from<?)
+      plan                : SCAN fts VIRTUAL TABLE INDEX 0:=M1
+      plan                : SEARCH ca EXISTS USING COVERING INDEX i_aud (chunk_id=? AND audience=?)
+      plan                : USE TEMP B-TREE FOR ORDER BY
+
+[C3] returned=5/5 k-complete=true unauthorized-returned=0
+      result set          : [1,2,3,4,5]
+      tier-3 rank calls   : 0  (unauthorized bodies materialised: 0)
+      tier-3 seen calls   : 3008  (unauthorized rows examined: 3000)
+      plan                : SEARCH c USING INDEX i_auth (scope=? AND state=? AND eff_from<?)
+      plan                : SCAN fts VIRTUAL TABLE INDEX 0:=M1
+      plan                : SEARCH ca EXISTS USING COVERING INDEX i_aud (chunk_id=? AND audience=?)
+      plan                : USE TEMP B-TREE FOR ORDER BY
+
+[NC] returned=0/5 k-complete=false unauthorized-returned=0
+      result set          : []
+      tier-3 rank calls   : 5008  (unauthorized bodies materialised: 5000)
+      tier-3 seen calls   : 0  (unauthorized rows examined: 0)
+      plan                : SCAN c
+      plan                : USE TEMP B-TREE FOR ORDER BY
+      note                : application-side filter applied to 200 fetched rows
+
+------------------------------------------------------------------------------
+FIXTURE  index=covering  M=50 unauthorized · 8 authorized · 58 chunks total
+------------------------------------------------------------------------------
+precondition (unconstrained lexical top-5): ids=[9,10,11,12,13] authorized-among-them=0 -> ADVERSARIAL, as required
+
+[C1] returned=5/5 k-complete=true unauthorized-returned=0
+      result set          : [1,2,3,4,5]
+      tier-3 rank calls   : 8  (unauthorized bodies materialised: 0)
+      tier-3 seen calls   : 18  (unauthorized rows examined: 10)
+      plan                : SEARCH c USING INDEX i_auth (scope=? AND state=? AND classification=? AND eff_from<?)
+      plan                : SEARCH ca EXISTS USING COVERING INDEX i_aud (chunk_id=? AND audience=?)
+      plan                : USE TEMP B-TREE FOR ORDER BY
+
+[C2] returned=5/5 k-complete=true unauthorized-returned=0
+      result set          : [1,2,3,4,5]
+      tier-3 rank calls   : 0  (unauthorized bodies materialised: 0)
+      tier-3 seen calls   : 28  (unauthorized rows examined: 20)
+      plan                : SEARCH c USING COVERING INDEX i_auth (scope=? AND state=? AND classification=? AND eff_from<?)
+      plan                : SCAN fts VIRTUAL TABLE INDEX 0:=M1
+      plan                : SEARCH ca EXISTS USING COVERING INDEX i_aud (chunk_id=? AND audience=?)
+      plan                : USE TEMP B-TREE FOR ORDER BY
+
+[C3] returned=5/5 k-complete=true unauthorized-returned=0
+      result set          : [1,2,3,4,5]
+      tier-3 rank calls   : 0  (unauthorized bodies materialised: 0)
+      tier-3 seen calls   : 18  (unauthorized rows examined: 10)
+      plan                : SEARCH c USING COVERING INDEX i_auth (scope=? AND state=? AND classification=? AND eff_from<?)
+      plan                : SCAN fts VIRTUAL TABLE INDEX 0:=M1
+      plan                : SEARCH ca EXISTS USING COVERING INDEX i_aud (chunk_id=? AND audience=?)
+      plan                : USE TEMP B-TREE FOR ORDER BY
+
+[NC] returned=5/5 k-complete=true unauthorized-returned=0
+      result set          : [1,2,3,4,5]
+      tier-3 rank calls   : 58  (unauthorized bodies materialised: 50)
+      tier-3 seen calls   : 0  (unauthorized rows examined: 0)
+      plan                : SCAN c
+      plan                : USE TEMP B-TREE FOR ORDER BY
+      note                : application-side filter applied to 58 fetched rows
+
+------------------------------------------------------------------------------
+FIXTURE  index=covering  M=500 unauthorized · 8 authorized · 508 chunks total
+------------------------------------------------------------------------------
+precondition (unconstrained lexical top-5): ids=[9,10,11,12,13] authorized-among-them=0 -> ADVERSARIAL, as required
+
+[C1] returned=5/5 k-complete=true unauthorized-returned=0
+      result set          : [1,2,3,4,5]
+      tier-3 rank calls   : 8  (unauthorized bodies materialised: 0)
+      tier-3 seen calls   : 108  (unauthorized rows examined: 100)
+      plan                : SEARCH c USING INDEX i_auth (scope=? AND state=? AND classification=? AND eff_from<?)
+      plan                : SEARCH ca EXISTS USING COVERING INDEX i_aud (chunk_id=? AND audience=?)
+      plan                : USE TEMP B-TREE FOR ORDER BY
+
+[C2] returned=5/5 k-complete=true unauthorized-returned=0
+      result set          : [1,2,3,4,5]
+      tier-3 rank calls   : 0  (unauthorized bodies materialised: 0)
+      tier-3 seen calls   : 208  (unauthorized rows examined: 200)
+      plan                : SEARCH c USING COVERING INDEX i_auth (scope=? AND state=? AND classification=? AND eff_from<?)
+      plan                : SCAN fts VIRTUAL TABLE INDEX 0:=M1
+      plan                : SEARCH ca EXISTS USING COVERING INDEX i_aud (chunk_id=? AND audience=?)
+      plan                : USE TEMP B-TREE FOR ORDER BY
+
+[C3] returned=5/5 k-complete=true unauthorized-returned=0
+      result set          : [1,2,3,4,5]
+      tier-3 rank calls   : 0  (unauthorized bodies materialised: 0)
+      tier-3 seen calls   : 108  (unauthorized rows examined: 100)
+      plan                : SEARCH c USING COVERING INDEX i_auth (scope=? AND state=? AND classification=? AND eff_from<?)
+      plan                : SCAN fts VIRTUAL TABLE INDEX 0:=M1
+      plan                : SEARCH ca EXISTS USING COVERING INDEX i_aud (chunk_id=? AND audience=?)
+      plan                : USE TEMP B-TREE FOR ORDER BY
+
+[NC] returned=0/5 k-complete=false unauthorized-returned=0
+      result set          : []
+      tier-3 rank calls   : 508  (unauthorized bodies materialised: 500)
+      tier-3 seen calls   : 0  (unauthorized rows examined: 0)
+      plan                : SCAN c
+      plan                : USE TEMP B-TREE FOR ORDER BY
+      note                : application-side filter applied to 200 fetched rows
+
+------------------------------------------------------------------------------
+FIXTURE  index=covering  M=5000 unauthorized · 8 authorized · 5008 chunks total
+------------------------------------------------------------------------------
+precondition (unconstrained lexical top-5): ids=[9,10,11,12,13] authorized-among-them=0 -> ADVERSARIAL, as required
+
+[C1] returned=5/5 k-complete=true unauthorized-returned=0
+      result set          : [1,2,3,4,5]
+      tier-3 rank calls   : 8  (unauthorized bodies materialised: 0)
+      tier-3 seen calls   : 1008  (unauthorized rows examined: 1000)
+      plan                : SEARCH c USING INDEX i_auth (scope=? AND state=? AND classification=? AND eff_from<?)
+      plan                : SEARCH ca EXISTS USING COVERING INDEX i_aud (chunk_id=? AND audience=?)
+      plan                : USE TEMP B-TREE FOR ORDER BY
+
+[C2] returned=5/5 k-complete=true unauthorized-returned=0
+      result set          : [1,2,3,4,5]
+      tier-3 rank calls   : 0  (unauthorized bodies materialised: 0)
+      tier-3 seen calls   : 2008  (unauthorized rows examined: 2000)
+      plan                : SEARCH c USING COVERING INDEX i_auth (scope=? AND state=? AND classification=? AND eff_from<?)
+      plan                : SCAN fts VIRTUAL TABLE INDEX 0:=M1
+      plan                : SEARCH ca EXISTS USING COVERING INDEX i_aud (chunk_id=? AND audience=?)
+      plan                : USE TEMP B-TREE FOR ORDER BY
+
+[C3] returned=5/5 k-complete=true unauthorized-returned=0
+      result set          : [1,2,3,4,5]
+      tier-3 rank calls   : 0  (unauthorized bodies materialised: 0)
+      tier-3 seen calls   : 1008  (unauthorized rows examined: 1000)
+      plan                : SEARCH c USING COVERING INDEX i_auth (scope=? AND state=? AND classification=? AND eff_from<?)
+      plan                : SCAN fts VIRTUAL TABLE INDEX 0:=M1
+      plan                : SEARCH ca EXISTS USING COVERING INDEX i_aud (chunk_id=? AND audience=?)
+      plan                : USE TEMP B-TREE FOR ORDER BY
+
+[NC] returned=0/5 k-complete=false unauthorized-returned=0
+      result set          : []
+      tier-3 rank calls   : 5008  (unauthorized bodies materialised: 5000)
+      tier-3 seen calls   : 0  (unauthorized rows examined: 0)
+      plan                : SCAN c
+      plan                : USE TEMP B-TREE FOR ORDER BY
+      note                : application-side filter applied to 200 fetched rows
+
+==============================================================================
+TIER 2 — k-completeness and result-set invariance as M grows
+==============================================================================
+
+index coverage = partial
+  C1: k-complete at every M = true · result set invariant = true · returned unauthorized = false
+        M=  50 -> [1,2,3,4,5]
+        M= 500 -> [1,2,3,4,5]
+        M=5000 -> [1,2,3,4,5]
+  C2: k-complete at every M = true · result set invariant = true · returned unauthorized = false
+        M=  50 -> [1,2,3,4,5]
+        M= 500 -> [1,2,3,4,5]
+        M=5000 -> [1,2,3,4,5]
+  C3: k-complete at every M = true · result set invariant = true · returned unauthorized = false
+        M=  50 -> [1,2,3,4,5]
+        M= 500 -> [1,2,3,4,5]
+        M=5000 -> [1,2,3,4,5]
+  NC: k-complete at every M = false · result set invariant = false · returned unauthorized = false
+        M=  50 -> [1,2,3,4,5]
+        M= 500 -> []
+        M=5000 -> []
+
+index coverage = covering
+  C1: k-complete at every M = true · result set invariant = true · returned unauthorized = false
+        M=  50 -> [1,2,3,4,5]
+        M= 500 -> [1,2,3,4,5]
+        M=5000 -> [1,2,3,4,5]
+  C2: k-complete at every M = true · result set invariant = true · returned unauthorized = false
+        M=  50 -> [1,2,3,4,5]
+        M= 500 -> [1,2,3,4,5]
+        M=5000 -> [1,2,3,4,5]
+  C3: k-complete at every M = true · result set invariant = true · returned unauthorized = false
+        M=  50 -> [1,2,3,4,5]
+        M= 500 -> [1,2,3,4,5]
+        M=5000 -> [1,2,3,4,5]
+  NC: k-complete at every M = false · result set invariant = false · returned unauthorized = false
+        M=  50 -> [1,2,3,4,5]
+        M= 500 -> []
+        M=5000 -> []
+
+==============================================================================
+TIER 3 — unauthorized rows the engine actually examined, by index coverage
+==============================================================================
+
+  cand  index      M     examined  unauth-examined  ranked  unauth-BODIES-materialised
+  C1    partial      50        38               30       8                          0
+  C1    partial     500       308              300       8                          0
+  C1    partial    5000      3008             3000       8                          0
+  C2    partial      50        38               30       0                          0
+  C2    partial     500       308              300       0                          0
+  C2    partial    5000      3008             3000       0                          0
+  C3    partial      50        38               30       0                          0
+  C3    partial     500       308              300       0                          0
+  C3    partial    5000      3008             3000       0                          0
+  NC    partial      50         0                0      58                         50
+  NC    partial     500         0                0     508                        500
+  NC    partial    5000         0                0    5008                       5000
+  C1    covering     50        18               10       8                          0
+  C1    covering    500       108              100       8                          0
+  C1    covering   5000      1008             1000       8                          0
+  C2    covering     50        28               20       0                          0
+  C2    covering    500       208              200       0                          0
+  C2    covering   5000      2008             2000       0                          0
+  C3    covering     50        18               10       0                          0
+  C3    covering    500       108              100       0                          0
+  C3    covering   5000      1008             1000       0                          0
+  NC    covering     50         0                0      58                         50
+  NC    covering    500         0                0     508                        500
+  NC    covering   5000         0                0    5008                       5000
+
+==============================================================================
+CRITERION 6 — does the strategy switch with authorization selectivity, and can it be pinned?
+==============================================================================
+
+BEFORE ANALYZE (no statistics — the optimizer is guessing)
+  highly selective : ["SEARCH c USING INDEX i_auth (scope=? AND state=? AND eff_from<?)","SEARCH ca EXISTS USING COVERING INDEX i_aud (chunk_id=? AND audience=?)","USE TEMP B-TREE FOR ORDER BY"]
+  broad            : ["SEARCH c USING INDEX i_auth (scope=? AND state=? AND eff_from<?)","SEARCH ca EXISTS USING COVERING INDEX i_aud (chunk_id=? AND audience=?)","USE TEMP B-TREE FOR ORDER BY"]
+
+AFTER ANALYZE (real statistics — this is where a cost-based optimizer may switch)
+  highly selective : ["SEARCH c USING INDEX i_auth (scope=? AND state=? AND eff_from<?)","SEARCH ca EXISTS USING COVERING INDEX i_aud (chunk_id=? AND audience=?)","USE TEMP B-TREE FOR ORDER BY"]
+  broad            : ["SEARCH c USING INDEX i_auth (scope=? AND state=? AND eff_from<?)","SEARCH ca EXISTS USING COVERING INDEX i_aud (chunk_id=? AND audience=?)","USE TEMP B-TREE FOR ORDER BY"]
+  strategy differs between selectivities: false
+
+PINNING — can the strategy be forced, independent of the optimizer?
+  INDEXED BY i_auth accepted : ["SEARCH c USING INDEX i_auth (scope=? AND state=? AND eff_from<?)","SEARCH ca EXISTS USING COVERING INDEX i_aud (chunk_id=? AND audience=?)","USE TEMP B-TREE FOR ORDER BY"]
+  pinned query still correct : returned=5/5 unauthorized=0
+  INDEXED BY i_unusable (same table, useless here) ACCEPTED : ["SCAN c USING INDEX i_unusable","SEARCH ca EXISTS USING COVERING INDEX i_aud (chunk_id=? AND audience=?)","USE TEMP B-TREE FOR ORDER BY"]
+  -> the pin is advisory: the engine accepted a plan that does not restrict on authorization
+
+SAME SQL, PLAN FORCED AWAY FROM THE AUTHORIZATION INDEX (EPA-0006 finding 2)
+  probe_seen is written as the FIRST conjunct here, so it counts rows the engine
+  reaches before the authorization predicate is applied — a row census, not a survivor count.
+  optimizer-chosen : plan=["SEARCH c USING INDEX i_auth (scope=? AND state=? AND eff_from<?)","SEARCH ca EXISTS USING COVERING INDEX i_aud (chunk_id=? AND audience=?)","USE TEMP B-TREE FOR ORDER BY"]
+  optimizer-chosen : returned=5/5 unauthorized-returned=0 rows-reached=3008 (unauthorized: 3000) unauthorized-bodies=0
+  NOT INDEXED    : plan=["SCAN c","SEARCH ca EXISTS USING COVERING INDEX i_aud (chunk_id=? AND audience=?)","USE TEMP B-TREE FOR ORDER BY"]
+  NOT INDEXED    : returned=5/5 unauthorized-returned=0 rows-reached=5008 (unauthorized: 5000) unauthorized-bodies=0
+
+==============================================================================
+END OF PROBE — no engine selected, adopted, recommended, or deployed.
+==============================================================================

@@ -42,7 +42,7 @@ Only the architecture lead may authorize new work, mark a task READY, or change 
 | TASK-0030 | **Draft the minimum ADR-0020 clarification — pre-constrained retrieval as an engine-selection gate** | **COMPLETE** | EPA-0005 ACCEPTED (MSG-0092), ADR-0020 accepted | 2026-08-22 — **7/7 acceptance criteria MET**; `ADR-0020-AMD-01` drafted **PROPOSED** and **NOT applied**, `git diff --name-only docs/` **empty**; **MSG-0094** | none — **no task is READY**. The Lead reviews AMD-01 before anything is applied; applying it needs an explicit authorization (MSG-0092 §5) | Claude Code |
 | TASK-0031 | **Apply ADR-0020 AMD-01 in place** — accepted by MSG-0095 | **COMPLETE** | AMD-01 ACCEPTED (MSG-0095), TASK-0030 COMPLETE | 2026-08-23 — **7/7 acceptance criteria MET**; applied in `a1be892`; `git diff --name-only docs/decisions/` named **ADR-0020 only**, **15 insertions / 0 deletions**; **MSG-0097** | none — **no task is READY**. The ADR set is complete and stable; the next authorization is the Lead's | Claude Code |
 | TASK-0032 | **A-STACK technology evaluation and implementation planning (bounded)** | **COMPLETE** | MSG-0098 AUTHORIZED, EPA-0005 ACCEPTED (MSG-0092), ADR-0020+AMD-01 applied | 2026-08-23 — **7/7 acceptance criteria MET**; **`EPA-0006`** delivered **PROPOSED and selecting nothing**; `git diff --name-only docs/decisions/` **empty**; **MSG-0100** | none — **no task is READY**. Selection remains open, so MSG-0098 requires stopping for the Lead; five non-blocking referrals in MSG-0100 §10 | Claude Code |
-| TASK-0033 | **Bounded retrieval-engine conformance probe** (evaluation only) | **READY** — one run **stopped before starting**, 2026-08-23 (MSG-0103) | MSG-0101 AUTHORIZED, EPA-0006 (TASK-0032), ADR-0020+AMD-01 | 2026-08-23 — **not executed**; runner stopped at the mid-run `origin/main` move, **no probe run, no verdict, no `EPA-0007`**, MSG-0103 | **Run it — the stopping condition was transient and has cleared.** **Correction, read before scoping: Tier 2/3 are NOT gated for class R** — `sqlite3` the CLI is absent but **SQLite 3.51.3 + FTS5 is embedded in Node** (`node:sqlite`), with `EXPLAIN QUERY PLAN` and counter instrumentation, needing no install/PATH/network/Docker (MSG-0103 §3). Classes S/V stay unreachable, K unmeasured; **NOT CLEARED remains the right outcome wherever evidence is absent** | Claude Code |
+| TASK-0033 | **Bounded retrieval-engine conformance probe** (evaluation only) | **COMPLETE** — 2026-08-23, second run; **8/8 acceptance criteria MET** | MSG-0101 AUTHORIZED, EPA-0006 (TASK-0032), ADR-0020+AMD-01 | 2026-08-23 — **probe built and executed**: **24 candidate executions across 6 fixtures**, all three tiers; **nothing CLEARED**; `git diff --name-only docs/decisions/` **empty**; **MSG-0104** | none — **no task is READY**. **Verdict NOT CLEARED for the one reachable engine** (class R, SQLite 3.51.3 via `node:sqlite`), decided at **Tier 3**: unauthorized rows examined grow linearly with the collection under every index design, because the multi-valued audience conjunct cannot be pushed into the index. **Class D DISQUALIFIED and demonstrated** by the negative control failing Tier 2. **Classes S/V/K NOT CLEARED — zero execution evidence** (`docker` CLI unreachable, no PostgreSQL). One **non-blocking** clarification referred to the Lead in MSG-0104 §8 | Claude Code |
 | TASK-0002 | Make test entry points shell-independent | **ABORTED** | — | 2026-08-19 | none — premise disproven by measurement | — |
 
 **TASK-0019 is COMPLETE (2026-08-21).** It was authorized by MSG-0050, reconciled into this queue in `39eabdb`, and executed by a supervisor-started session on its scheduled 06:37:13Z cycle. It was maintenance/audit work only, not a new product work package.
@@ -2514,10 +2514,62 @@ confusing given EPA-0005 already occupies that ground.
 
 ## TASK-0033 — bounded retrieval-engine conformance probe (evaluation only)
 
-**Priority:** 1 | **Status:** **READY** | **Owner:** Claude Code
+**Priority:** 1 | **Status:** **COMPLETE** (2026-08-23, second run — MSG-0104) | **Owner:** Claude Code
 **Depends on:** MSG-0101 AUTHORIZED; EPA-0006 (TASK-0032); ADR-0020 as amended by AMD-01; ADR-0018
 **Next eligible task:** none — MSG-0101 §5 permits no second READY task, and requires stopping after the result
 **Type:** evaluation probe — **adopts nothing, deploys nothing**
+
+> ### Result — 2026-08-23, run 2 (MSG-0104). **The probe ran. It cleared nothing.**
+>
+> Executed by a supervisor-started session (`runner.lock` pid **16300**, acquired **06:57:18Z**) against
+> starting `HEAD = e7aef44`, which **did not move for the whole run**. **8/8 acceptance criteria MET.**
+>
+> **What ran:** the one reachable engine — **SQLite 3.51.3, embedded in the Node runtime via
+> `node:sqlite`**, a genuine class-**R** member and a **test subject only** — in **three query shapes**
+> plus a **deliberately non-conforming negative control**, against a synthetic in-memory adversarial
+> fixture. **24 candidate executions across 6 fixtures** (2 index designs × M ∈ {50, 500, 5000}), plus
+> **6 adversarial-precondition checks**, all three EPA-0006 §4.4 tiers. **No install, no network, no
+> Docker, no corpus, no file left behind.**
+>
+> **Tier 1 PASSED** — all four EPA-0006 §3 constraints expressible in one query, including the
+> open-ended temporal range and the multi-valued set overlap. **Tier 2 PASSED** for the three shapes,
+> k-complete and result-set-invariant as M grows — **and the negative control FAILED it**, which is what
+> makes the passes worth anything: a post-filter design returned **correct results at M=50 and nothing
+> at all at M=500 and M=5000**, never once returning an unauthorized row. **It looks right on a small
+> collection and degrades into empty answers as the collection grows.**
+>
+> **Tier 3 decided the outcome, against the candidate.** Every tested shape makes the engine examine
+> **unauthorized rows in a number growing linearly with the collection** — **3000 of 5000** with a
+> partial index, **1000 of 5000 even with the widest index** — because the **multi-valued audience
+> conjunct cannot be pushed into the index**, while returning results **indistinguishable from a
+> conforming engine's**. **EPA-0006 findings 1 and 2 are now demonstrated by measurement, not asserted:**
+> the same SQL and same engine, plan forced away from the authorization index, reached **5008** rows
+> instead of **3008** and returned the **identical correct answer**.
+>
+> **Verdicts:** **NOT CLEARED** for all three tested shapes (Tier 3) · **class D DISQUALIFIED and
+> demonstrated** (Tier 2) · **classes S, V and K NOT CLEARED with zero execution evidence** — the
+> `docker` CLI is unreachable from this runner and there is no PostgreSQL · **class H DISQUALIFIED** on
+> ADR-0022 §1, needing no test. **Nothing is CLEARED, and under MSG-0101 §2 that is the required
+> outcome wherever the evidence does not positively establish Shape 1.**
+>
+> **Nothing selected, adopted, installed or deployed. No accepted ADR modified** (`git diff --name-only
+> docs/decisions/` **empty**). **No implementation task authorized. No `EPA-0007` created** — the queue's
+> Documentation section asks for a numbered COMMS message, and MSG-0101 §1(4) authorizes no new ADR.
+> **No benchmark, latency, capacity, recall or timing figure appears anywhere**; every number is a count
+> the probe emitted, reproducible via `implementation/probes/TASK-0033/probe.mjs`.
+>
+> **One non-blocking clarification is referred** (MSG-0104 §8): EPA-0006 §4.1 defines Shape 1 as *"the
+> engine only ever examines chunks that satisfy it"*, and **no engine can satisfy that strictly** —
+> evaluating a predicate *is* examining and rejecting candidates. The measurable line may instead be
+> *"materializes no unauthorized passage content"*, which **C1 held and the control failed**. **Only the
+> Lead can settle which line AMD-01 intends; until then NOT CLEARED stands.**
+>
+> **Two self-corrections are recorded rather than tidied away**, both in MSG-0104: a pinning test that
+> concluded *"the pin is enforced by the engine"* was **wrong** — it named an index on a different
+> table, so the failure was name resolution — and the corrected test **reversed the finding**
+> (`INDEXED BY` **accepts** a pin that performs no authorization restriction). And the FTS5 candidates'
+> *"0 unauthorized bodies"* is **absence of instrument, not absence of materialization**; body
+> materialization is **UNMEASURED** for the lexical half.
 
 **Specification:** [`MSG-0101-architecture-lead-ruling-next-retrieval-conformance-probe.md`](../comms/MSG-0101-architecture-lead-ruling-next-retrieval-conformance-probe.md)
 §2–§4, **plus** EPA-0006 §4.4 (the tiered evidence model), **plus this section.**
@@ -2536,6 +2588,12 @@ confusing given EPA-0005 already occupies that ground.
 > **The stopping condition was transient and has cleared:** `HEAD` and `origin/main` both read
 > `55a617c`. **The next supervisor cycle should simply run this task.** The run did leave one thing
 > behind — the environment correction below, which changes what the probe can prove.
+>
+> **DISCHARGED — that prediction held.** The next supervisor cycle (pid **16300**, 06:57:18Z) ran the
+> task to completion against `HEAD = e7aef44`, which did not move. **The environment correction below
+> was re-verified in that session rather than inherited, and it was correct**: all three tiers were
+> obtained against a class-R subject with no install, no PATH change, no network and no Docker. See the
+> **Result** block above and **MSG-0104**. **This run-history note is retained as the record of run 1.**
 
 ---
 
