@@ -1092,6 +1092,193 @@ a probe instrumenting only retrieval to say.
 
 ---
 
+### 4.11 Kernel-constrained retrieval and non-divergent projection: what was measured (TASK-0038, MSG-0116a+b)
+
+**Added 2026-08-23 by TASK-0038. Additive and declared: nothing in §4.1–§4.10 is deleted or
+reworded, and no verdict changes.** This section records what the **kernel-constrained / in-query
+authorization** alternative and the **non-divergent projection** alternative actually did when
+measured — the alternative **MSG-0115 identified and explicitly did not measure**. **It amends no
+ADR, invents no threshold, and selects, adopts, recommends, installs and deploys no engine.**
+Authority: **MSG-0116a §2–§6 and MSG-0116b**, which agree on all three rulings. Full evidence:
+**MSG-0118**; harness and captured output at `implementation/probes/TASK-0038/`.
+
+**Both rulings forbid the shortcut this section could otherwise be read as taking.** MSG-0116a:
+*"Do not select an engine on the assumption that an unmeasured kernel join or equivalent mechanism
+will solve the problem."* MSG-0116b: **no clearance follows from Q8** — *"E1–E4 and
+G-Q4/G-Q5/G-Q6/G-Q7 remain independently necessary."* **Nothing below clears anything.**
+
+#### The instrument Q8 requires, and why one counter could not have delivered it
+
+**MSG-0116b's operative addition is a requirement on the apparatus, not on the architecture:** the
+re-check *"must be instrumented **separately** from retrieval-content examination, and evidence must
+demonstrate that it reads **only** the authoritative kernel facts required to authorize the
+candidate."* **MSG-0116a supplies the complementary half:** *"the existing measured kernel-read
+count is **not, by itself, a Shape-1 violation**."*
+
+**Together they fix the instrument: three counters, never one.**
+
+| | Counter | What it counts | How the rulings treat it |
+|---|---|---|---|
+| **`U`** | retrieval-path units (§4.6 S4), **including routing-phase units** (G-Q4.4) | unauthorized units examined while resolving the query | the strict Shape-1 bar, unchanged |
+| **`KR.meta`** | the re-check's reads of authoritative authorization / version / lifecycle metadata | bounded by the candidate count, **invariant with `N`** | **permitted by Q8**; **not added to `U`** (MSG-0116a) |
+| **`KR.content`** | content-bearing data read by the re-check | any such read **from an unauthorized candidate** | **a Shape-1 FAILURE** (MSG-0116b) |
+
+**The separation is not bookkeeping, and the probe demonstrates why.** Designs **K0** and **K6**
+differ in exactly one property — whether the re-check reads the candidate's body before authorizing
+it. They have **the same `U`, the same `Ustruct`, the same plan, the same routed set, the same
+answers and the same 7-scenario grid.** **Every other measurement in the probe is identical.** The
+**only** instrument that separates them is `KR.content`, which fires **12 times against unauthorized
+candidates** for K6 and **zero** for K0. **Without MSG-0116b's separate-instrumentation requirement
+the two designs are indistinguishable**, and the probe would have reported the violating one as
+clean.
+
+#### G-Q7.8 — the re-check is a control-plane lookup, and must be shown to be one
+
+**This is Q8 encoded as a testable condition. It adds no new obligation to any ADR**; it states what
+evidence discharges the obligation ADR-0020 §3 point 2 already imposes.
+
+| | Requirement | Evidence that counts |
+|---|---|---|
+| **G-Q7.8a** | **The re-check is instrumented separately** from retrieval-content examination | Two distinct counters, whose separation is exhibited. A single combined figure **has not measured this** |
+| **G-Q7.8b** | **It reads only authoritative kernel authorization / version / lifecycle metadata** | The field set it may read, **exhibited and closed**; a read outside that set is a failure, not a note |
+| **G-Q7.8c** | **It reads no content-bearing data from an unauthorized candidate** | **MSG-0116b: "that is examination and fails Shape-1."** The candidate must be **rejected or abstained before its content is used** (MSG-0116a) |
+| **G-Q7.8d** | **It consults authoritative current state, not a materialized copy** | **G-Q5.2b unchanged.** The no-op limb §4.9 identified and MSG-0115 §6 F3 demonstrated |
+| **G-Q7.8e** | **Its kernel-read count is reported, and is not read as a violation** | **MSG-0116a in terms.** Report it; do not treat it as `U` |
+
+**Not demonstrated yields NOT CLEARED.** And **satisfying all five clears nothing** — Q8 removes an
+apparent conflict between AMD-01 and ADR-0020 §3; **E1–E4 and G-Q4…G-Q7 remain independently
+necessary.**
+
+#### What was measured (class R test subject; MSG-0118 §5)
+
+**9 designs × 7 scenarios × 3 collection sizes**, two instrument placements each, plus a
+placement-independent structural measure. **The behavioural grid was identical at M=50, M=500 and
+M=5000** — checked, not assumed.
+
+`U` = unauthorized units examined, maximum across placements, over all scenarios.
+`Ustruct` = unauthorized **versions present in the structures the traversal opens** — placement-independent.
+
+| Design | Mechanism | Grid | `U` (50/500/5000) | `Ustruct`@5000 | E1 strict | G-Q4 | **Verdict** |
+|---|---|---|---|---|---|---|---|
+| **K0** | materialised copy; predicate on the copy; kernel re-check after | 6/7 | 4 / 4 / 4 | 2 | HOLDS | MET | **NOT CLEARED** |
+| **K1** | in-query kernel join, **collection-driven** | 7/7 | 56 / 506 / 5006 | 5003 | VIOLATED | n/a | **NOT CLEARED** |
+| **K2** | in-query kernel join, **entitlement-driven** | 7/7 | 53 / 503 / 5003 | 5003 | VIOLATED | n/a | **NOT CLEARED** |
+| **K3** | **kernel-side authorization edge**, exact-key routed, co-written with the facts | 7/7 | 22 / 214 / 2143 | 2143 | VIOLATED | MET | **NOT CLEARED** |
+| **K4** | K3, **open-ended effectivity limb only** | **3/7** | **0 / 0 / 0** | 714 | VIOLATED | MET | **NOT CLEARED** |
+| **K5** | K0 but **routing by catalogue enumeration** | 6/7 | 7 / 7 / 7 | 2 | HOLDS | **FAILED** | **DISQUALIFIED** |
+| **K6** | K0 but the **re-check reads the candidate body** | 6/7 | 4 / 4 / 4 | 2 | HOLDS | MET | **DISQUALIFIED** |
+| **K7** | **physically partitioned authoritative store**, both limbs | 7/7 | 8 / 72 / 715 | 2143 | **HOLDS** | MET | **NOT CLEARED** |
+| **K8** | K7 with the bounded limb **forced onto the `eff_to` index** | **7/7** | **0 / 0 / 0** | 2143 | **HOLDS** | MET | **NOT CLEARED** |
+| **NC** | negative control — rank first, authorize after | 2/7 | 56 / 506 / 5006 | 5003 | VIOLATED | n/a | **DISQUALIFIED** |
+
+**Both validity gates passed.** The adversarial precondition held at all three sizes
+(`authorized-among-them = 0`), and **the negative control failed in 15 of 21 cases**, so the run is
+valid (§4.6 S8).
+
+#### Six results carry beyond this engine
+
+**1. Removing the copy fixes divergence and does nothing whatever for Shape-1.** K1 and K2 hold no
+copy at all — the authorization facts are joined from the authoritative kernel inside the retrieval
+operation — so they answer **7/7** and cannot go stale. **Their `U` is the largest in the table and
+grows linearly with `N`.** *Non-divergence and non-examination are independent properties, and the
+kernel join buys only the first.* **This is the direct answer to the question MSG-0115 referred**,
+and it is the answer both rulings warned against assuming the other way.
+
+**2. The four discrete conjuncts refine perfectly; effectivity is the entire residual.** K3's
+residual at M=5000 is **2142 units, composed exclusively of the three effectivity failure modes** —
+714 expired, 714 not-yet-effective-open, 714 not-yet-effective-bounded. **Not one wrong-scope,
+wrong-audience, restricted-class or superseded version is examined at any size.** **§4.7 Q2 asked
+whether the conjuncts can be physically organised at all; for scope, classification, lifecycle state
+and audience the measured answer here is yes, cleanly** — and the co-written kernel edge is what does
+it. **Effectivity-at-answer-time remains the sharpest discriminator, exactly as §3 predicted.**
+
+**3. `U = 0` is purchasable by withholding authorized content, and a probe measuring only `U` would
+call that a success.** **K4 is the only design in four probes to reach zero at every collection size
+while scoring 3/7** — it withholds every version whose effectivity window is bounded, returning an
+**empty ANSWER** in two scenarios where an answer exists. That is EPA-0006 §3.3's **wrong-exclusive**
+defect: an availability failure, not a confidentiality one, and **invisible to `U` by construction.**
+**A clearance criterion that reads `U` without reading the served set can be satisfied by a design
+that answers nothing.**
+
+**4. A design can report `U = 0` while the structures it opens still hold unauthorized entries.**
+K4 and K8 both report zero; their `Ustruct` is **714** and **2143**. The seek bound skipped those
+rows, the counter never saw them, and **whether the engine read the index entries describing them is
+NOT OBSERVABLE through `node:sqlite`** — **U1 is not instrumentable on this test subject and this
+record says so rather than reporting a zero it cannot support.** **This is §4.6 S5's asymmetry rule
+meeting §4.6 S7's *"an in-query counter does not measure rows scanned at all"*, and it is why E1 is
+required rather than optional.**
+
+**5. And this is the uncomfortable one: on this engine, whether unauthorized content is examined is
+decided by the query planner.** **K7 and K8 have the same schema, the same data, the same indexes,
+the same query text apart from one `INDEXED BY` token, the same answers and the same 7/7 grid.**
+**`U` goes 715 → 0.** Both indexes exist on both designs; the optimiser chose the one that seeks on
+the *lower* effectivity bound and leaves every expired version exposed, **and the design had no way
+to tell.** **A `U = 0` measurement taken without pinning the plan is a measurement of one plan, not
+of a design** — and a plan is not stable across data volumes, statistics or engine versions.
+**Consequence for engine selection, offered as evidence and not as a rule:** an engine whose planner
+may silently substitute a traversal that examines unauthorized content places the Shape-1 property
+outside the architecture. **E1 is the only evidence class that can see this.**
+
+**6. The separately-instrumented re-check is the only thing that distinguishes a clean design from a
+violating one.** K0 and K6 agree on every other measurement the probe takes. **MSG-0116b's
+requirement is what makes Q8 falsifiable**, and result 5 above is why the ruling's own phrasing —
+*evidence must demonstrate* — is doing real work: without the separate counter, the violating design
+reports clean.
+
+**And one result that reproduces a prior finding in a third independent fixture.** K0's `U` is
+**0 in the steady state and non-zero in every scenario where an authorization fact changed at the
+query instant** — divergence with **zero elapsed time**, which no timer could catch. That is
+**§4.8 finding 1 and §4.10 finding 5, corroborated a third time.** The kernel re-check caught it
+every time (`kept 2/4`), which is **ADR-0020 §3's defence in depth working as specified** — and the
+re-check cannot reduce `U`, because by the time it runs the units have been examined.
+
+#### What this section does NOT establish
+
+- **Nothing is CLEARED.** Six designs **NOT CLEARED**, three **DISQUALIFIED**.
+- **E4 was NOT OBTAINED** for any design — `node:sqlite` exposes no engine log to inspect, unchanged
+  from TASK-0033/0035/0037. **No design could have been cleared here whatever `U` showed**, and that
+  is stated before the results table in the probe output so no row is misread.
+- **E3 is N/A for this fixture and the exemption is not transferable.** Every design is purely
+  relational; there is no FTS5 `MATCH`, no vector index and no ANN graph. **A real lexical or vector
+  stage reintroduces the opaque stage and G-Q6 applies unchanged**, construction arguments still
+  rejected.
+- **G-Q4 was measured for the first time** — the differential test of G-Q4.2 — and **K5 fails it
+  while returning exactly the answers K0 returns**, its routing reads scaling **12 → 76** with other
+  subjects' structures. **§4.9's *"behaviourally identical and only one satisfies the gate"* is now
+  demonstrated rather than predicted.**
+- **No numeric staleness threshold is introduced.** No benchmark, latency, capacity, recall or
+  throughput figure was produced.
+- **All prior verdicts are unchanged.** The nine MSG-0104 verdicts, the eight §4.8 design verdicts
+  and the eight §4.10 design verdicts stand, **A6's freshness-passed-but-NOT-CLEARED status
+  included** (MSG-0116b). **No prior probe was modified or re-run.**
+
+#### Q11 — does an exact-key seek into a scope-spanning structure violate E1? Surfaced, NOT decided
+
+**Numbering:** §4.7 holds Q1–Q3; Q4–Q6 are ruled and encoded in §4.9; **Q7 is ruled** (MSG-0113) with
+its numeric limb still open; **Q8, Q9 and Q10 are ruled** by MSG-0116a and MSG-0116b. **Q11 is the
+next free number**, allocated here and verified unused.
+
+**The question.** §4.6 S6/E1 requires the traversal be confined to *"a structure or region **every
+entry of which** satisfies the predicate"*, and states that *"a plan showing a scan **or seek** over
+a structure that spans authorization scopes is **disqualifying regardless of any counter**."* **Read
+strictly, an exact-key seek into a global table violates E1 even though it touches only an entitled
+row.** That reading decides **K3 and K4**, whose plans seek `k_authz_edge`, `k_version` and `k_chunk`
+by exact key and are recorded **VIOLATED** above; under the narrower *entries-touched* reading they
+would hold.
+
+**This probe reports both readings and adopts the strict one**, because it is **fail-closed** — it
+can only withhold clearance, never grant it — so **the criterion is operable now and Q11 blocks
+nothing.** **K7 and K8 satisfy E1 under BOTH readings**, by partitioning the version and chunk stores
+as well, so the question does not decide the strongest candidates.
+
+**The interaction worth stating:** Q11 is close to §4.7 **Q1** (does *"examine"* reach metadata?) and
+to §4.9's open note on exact-key **catalogue** lookups, but it is distinct from both — **Q1 concerns
+index entries describing chunks, §4.9's note concerns identifiers describing structures, and Q11
+concerns rows in a scope-spanning table reached by exact key.** All three currently take the same
+fail-closed default.
+
+---
+
 ## 5. Candidate technology classes against Approach C (MSG-0098 item 1)
 
 **Approach C is settled and is treated here as a constraint, not an option** (EPA-0005 §5; MSG-0092): a

@@ -2,7 +2,9 @@
 
 **Active Work Package:** WP-0001 — PCI Kernel Foundation
 **Status:** **COMPLETE** — declared by the architecture lead 2026-08-19 (MSG-0020(b), resolved by MSG-0022 / MSG-0023, TASK-0009)
-**Last Updated:** 2026-08-23 UTC — **TASK-0037 COMPLETE, nothing cleared**: every materialized design examined unauthorized rows once its copy diverged from the kernel, **including at zero elapsed time** — divergence, not staleness, is the mechanism. **MSG-0116a/b rule Q8/Q9/Q10** (they agree): the kernel re-check is **control-plane, not examination**, but must be **instrumented separately** and **clears nothing**; **the bar is not relaxed**; **currently-effective version only**. **TASK-0038 READY** — measure the kernel-constrained alternative MSG-0115 left unmeasured.
+**Last Updated:** 2026-08-24 UTC — **TASK-0038 COMPLETE, nothing cleared** (6 NOT CLEARED, 3 DISQUALIFIED). **The kernel-constrained alternative was measured and the answer is negative: removing the copy eliminates divergence entirely and does nothing whatever for strict Shape-1** — the designs holding no copy at all answer 7/7, cannot go stale, and carry the **largest `U` in the table, growing linearly with `N`**. **The four discrete conjuncts refine perfectly** — the residual is composed **entirely** of the three effectivity modes — so **§4.7 Q2's answer is yes for scope, classification, lifecycle state and audience**, and effectivity is the whole difficulty. **`U = 0` proved purchasable by withholding authorized content** (zero at every size, **3/7** grid, an empty ANSWER where an answer exists). **And the sharpest result: two designs differing by ONE `INDEXED BY` token — same schema, data, indexes, answers and grid — measure `U` = 715 and 0**, so on this engine class **whether unauthorized content is examined is decided by the query planner**, which is not part of the architecture. **No task is READY**; MSG-0116a §3 already names the next step — **no candidate satisfied the gates, so the question returns to EPA-0006 §4.7 Q3**, and **the failure does not authorize relaxing Shape-1**. **One non-blocking question referred — Q11.**
+
+> **The line this replaces, retained:** "**TASK-0037 COMPLETE, nothing cleared**: every materialized design examined unauthorized rows once its copy diverged from the kernel, **including at zero elapsed time** — divergence, not staleness, is the mechanism. **MSG-0116a/b rule Q8/Q9/Q10** (they agree): the kernel re-check is **control-plane, not examination**, but must be **instrumented separately** and **clears nothing**; **the bar is not relaxed**; **currently-effective version only**. **TASK-0038 READY** — measure the kernel-constrained alternative MSG-0115 left unmeasured." True when written; **the task it announced has now run**, started by the supervisor cycle at **20:27:17Z** and completed across local midnight. **Its framing was confirmed and then sharpened**: divergence is indeed the mechanism, and removing it turns out to be **necessary and nowhere near sufficient**. **MSG-0116b's separate-instrumentation requirement was the load-bearing instruction** — two designs agreed on `U`, the plan, the routed set, the answers and the whole grid, and **only the separately-counted re-check distinguished the clean one from the one reading unauthorized content**. A runner reading only MSG-0116a would have built one counter and reported the violating design as clean.
 
 > **The line this replaces, retained:** "**MSG-0113 resolves Q7 as a version-transition requirement, not an elapsed-time SLA**: once a change **is recorded** the prior version must not answer, and an unavailable current version means **abstain**. **Physical isolation does not excuse stale-version use.** **No numeric threshold introduced.** **TASK-0037 READY** — execution evidence for update/approve/revoke/supersede plus the abstention case, **distinguishing transition-triggered freshness from periodic re-materialisation**. Nothing cleared or selected." True when written; **the task it announced has now run**, started by the supervisor cycle at **18:57:17Z** and completed the same evening. **The discriminator it insisted on was the load-bearing instruction and it earned its place** — two designs would have passed a fixed-time test and were caught only because the probe queried at an instant no timer had reached. **Its "nothing cleared or selected" expectation held**, and for a sharper reason than expected: the design that met **every** freshness requirement is still NOT CLEARED, because freshness is a prerequisite and not the bar.
 
@@ -150,6 +152,7 @@ message on 2026-08-20 under MSG-0041 (MSG-0042) — the fifth.
 | TASK-0035 | Physical projection isolation evaluation against strict Shape-1 | **COMPLETE** (2026-08-23) — **8/8 acceptance items**; **a probe ran**: 8 isolation designs × 3 collection sizes plus a staleness measurement, negative control **failed as required**; **`U` = 0 reached only where the routed structures hold no unauthorized row**; **a stale materialised structure RETURNS unauthorized rows**; **nothing CLEARED**, all nine MSG-0104 verdicts **unchanged**; `git diff --name-only docs/` **empty**; **MSG-0109** | MSG-0107b AUTHORIZED, MSG-0105, MSG-0104, EPA-0006 ✅ | Claude Code |
 | TASK-0036 | Encode Q4/Q5/Q6 as strict Shape-1 clearance gates in the EPA-0006 probe specification | **COMPLETE** (2026-08-23) — **8/8 acceptance criteria**; **`EPA-0006` §4.9** added with **G-Q4 / G-Q5 / G-Q6**, each quoting MSG-0110; **all three necessary, none sufficient**; documentary — **no test count and none claimed**, **no probe re-run**; **272 insertions / 0 deletions**; `git diff --name-only docs/` **empty**; **nothing CLEARED** and **all nine MSG-0104 plus all eight TASK-0035 verdicts reproduced unchanged**; **Q7 referred — no numeric staleness threshold exists in the accepted set, and none was invented**; **MSG-0112** | MSG-0110 DECIDED, MSG-0109, TASK-0034 criterion ✅ | Claude Code |
 | TASK-0037 | Version-transition freshness and stale-version fail-closed evidence | **COMPLETE** (2026-08-23) — **8/8 acceptance criteria**; **a probe ran**: 8 designs × 11 scenarios × 3 collection sizes, two instrument placements each; negative control **failed as required** and the adversarial precondition **voided this probe's own first fixture**; **all eight MSG-0113 §3 evidence items demonstrated**; **nothing CLEARED** — 7 NOT CLEARED, 1 DISQUALIFIED; **the discriminator fired** on the timer-only designs; **the faked kernel re-check demonstrated to be a no-op**; **`U` = 4 for both the leaking and the conservative design**; **no numeric threshold introduced**; `git diff --name-only docs/` **empty**; EPA-0006 **§4.10** added, **122 insertions / 0 deletions**; all nine MSG-0104 and eight TASK-0035 verdicts **unchanged**; **MSG-0115** | MSG-0113 DECIDED, EPA-0006 §4.9, TASK-0033/0035 harnesses ✅ | Claude Code |
+| TASK-0038 | Kernel-constrained retrieval / non-divergent projection evidence | **COMPLETE** (2026-08-24) — **8/8 acceptance criteria**; **a probe ran**: 9 designs × 7 scenarios × 3 collection sizes, two instrument placements **plus a placement-independent structural measure**; adversarial precondition held and the negative control **failed in 15 of 21 cases**; **nothing CLEARED** — 6 NOT CLEARED, 3 DISQUALIFIED; **the referred question answered negatively — removing the copy eliminates divergence and does nothing for Shape-1**; **the four discrete conjuncts refine perfectly and effectivity is the entire residual**; **`U = 0` shown purchasable by withholding authorized content**; **two designs differing by one `INDEXED BY` token measure `U` = 715 and 0**, so the planner decides examination on this engine class; **G-Q4 measured for the first time** and failed by a design returning identical answers; **E4 NOT OBTAINED**; **two defects in the probe's own apparatus caught and fixed before any result was reported**; `git diff --name-only docs/` **empty**; EPA-0006 **§4.11** added, **187 insertions / 0 deletions**; all prior verdicts **unchanged**; **MSG-0118** | MSG-0116a+b DECIDED, MSG-0115, EPA-0006 §4.6–§4.10 ✅ | Claude Code |
 | TASK-0002 | Make test entry points shell-independent | **ABORTED** | — | — |
 
 > **Reconciled 2026-08-22 by TASK-0030 — additive and declared.** The three rows above were missing:
@@ -168,8 +171,41 @@ boundary**, not at an empty queue.
 > been executed and is COMPLETE (MSG-0055). MSG-0051 §C is fully discharged: C1–C5 by MSG-0052,
 > C6–C7 by MSG-0053.
 
-**Current position, 2026-08-23 after TASK-0037: no task is READY, and the boundary is the one MSG-0113
-§5 drew — evidence exists, clearance does not, and what happens next is the Architecture Lead's.**
+**Current position, 2026-08-24 after TASK-0038: no task is READY. The evidence Q9 asked for now
+exists, no candidate satisfied the gates, and MSG-0116a §3 already names what follows — the question
+returns to EPA-0006 §4.7 Q3, and the failure does not authorize relaxing Shape-1.**
+
+TASK-0038 executed MSG-0116a and MSG-0116b and is **COMPLETE** — **8/8 acceptance criteria MET**, each
+mapped to evidence in **MSG-0118** §6. It was run by a supervisor-started session (`runner.lock` pid
+23788, acquired 20:27:17Z) against starting `HEAD = d0cb38e`. **That starting HEAD is not the one the
+session first observed**: `HEAD` moved from `fb2d127` to `d0cb38e` during the startup checklist, the
+move was diagnosed as the concurrent interactive COMMS session committing its own TASK-0038
+reconciliation, and **the distinction mattered** — before the move TASK-0038 was READY only in an
+**uncommitted working tree**, which BLK-0009's resolution records as a thing not to execute on. The
+run began only after the queue said READY in the **committed** state.
+
+**A probe was built and executed** — `implementation/probes/TASK-0038/probe.mjs` (1,376 lines) with its
+550-line captured output, both committed as re-readable evidence. **The TASK-0033, TASK-0035 and
+TASK-0037 harnesses were neither modified nor re-run**, and no figure of theirs was re-measured.
+
+**189 measured cases** — 9 designs × 7 scenarios × 3 collection sizes — plus a G-Q4 differential run
+and a residual-composition pass. **Nothing was selected, adopted, installed or deployed; no accepted
+ADR was modified; no numeric threshold was introduced; and no benchmark, latency, capacity, recall or
+throughput figure was produced.**
+
+**Two defects in the probe's own apparatus were found and fixed before any result was reported**, and
+both are recorded rather than quietly corrected because each would have produced a false clean bill of
+health. The E1 check matched **table names** against a plan that prints **aliases**, and had reported
+`HOLDS` for a design whose plan scans the entire collection. And the counters, being SQL functions,
+fire at **row access** — with a non-uniform placement one design reported `U = 0` that became **715**
+once the placement was made uniform. The second defect is why the probe now also carries **`Ustruct`**,
+a placement-independent measure, and why it states plainly that **`U1` index-entry reads are not
+instrumentable through `node:sqlite`** instead of reporting a zero it cannot support.
+
+> **The paragraph this replaces, retained:** "**Current position, 2026-08-23 after TASK-0037: no task
+> is READY, and the boundary is the one MSG-0113 §5 drew — evidence exists, clearance does not, and
+> what happens next is the Architecture Lead's.**" True when written, and still the shape of the
+> position; TASK-0038 has since run and the boundary is now MSG-0116a §6 and MSG-0116b's.
 
 TASK-0037 executed MSG-0113 §2–§5 and is **COMPLETE** — **8/8 acceptance criteria MET**, each mapped to
 evidence in **MSG-0115** §11. It was run by a supervisor-started session (`runner.lock` pid 27556,

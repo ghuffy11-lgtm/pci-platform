@@ -1,0 +1,550 @@
+====================================================================================================
+TASK-0038 — KERNEL-CONSTRAINED RETRIEVAL / NON-DIVERGENT PROJECTION PROBE
+====================================================================================================
+Authority : MSG-0116a AND MSG-0116b (both DECIDED, both authoritative) · MSG-0117 · TASK-0038
+Subject   : SQLite 3.51.3 via node:sqlite — EPA-0006 class R TEST SUBJECT, not a selection
+Runtime   : Node v24.15.0
+
+SELECTS NOTHING · ADOPTS NOTHING · INSTALLS NOTHING · DEPLOYS NOTHING · AMENDS NO ADR
+No numeric staleness threshold is proposed. No benchmark, latency, capacity, recall or
+throughput figure is produced. No wall-clock is read; the clock is a fixture integer.
+
+====================================================================================================
+VALIDITY GATE 1 — the adversarial precondition (EPA-0006 §4.6 S8)
+====================================================================================================
+The UNCONSTRAINED top-k must contain NO authorized chunk. If one appears the fixture is not
+adversarial, the measurement is meaningless, and the run is VOID.
+
+  M=   50  unconstrained top-6 -> authorized-among-them=0  -> ADVERSARIAL, as required
+  M=  500  unconstrained top-6 -> authorized-among-them=0  -> ADVERSARIAL, as required
+  M= 5000  unconstrained top-6 -> authorized-among-them=0  -> ADVERSARIAL, as required
+
+====================================================================================================
+VALIDITY GATE 2 — the mandatory negative control (EPA-0006 §4.6 S8)
+====================================================================================================
+  NC failed its grade in 15 of 21 cases; it returned unauthorized content in 0 cases.
+  The control FAILS as required — the run is VALID.
+
+====================================================================================================
+SECTION 1 — behavioural grid: answers correctly, abstains correctly, or fails
+====================================================================================================
+Grid identical at M=50 / 500 / 5000? -> CONFIRMED (checked, not assumed)
+
+  design    S1    S2    S3    S4    S5    S6    S7   grid
+----------------------------------------------------------------------------------------------------
+  K0      PASS  PASS  PASS  PASS  FAIL  PASS  PASS   6/7
+  K1      PASS  PASS  PASS  PASS  PASS  PASS  PASS   7/7
+  K2      PASS  PASS  PASS  PASS  PASS  PASS  PASS   7/7
+  K3      PASS  PASS  PASS  PASS  PASS  PASS  PASS   7/7
+  K4      FAIL  FAIL  FAIL  PASS  FAIL  PASS  PASS   3/7
+  K5      PASS  PASS  PASS  PASS  FAIL  PASS  PASS   6/7
+  K6      PASS  PASS  PASS  PASS  FAIL  PASS  PASS   6/7
+  K7      PASS  PASS  PASS  PASS  PASS  PASS  PASS   7/7
+  K8      PASS  PASS  PASS  PASS  PASS  PASS  PASS   7/7
+  NC      FAIL  FAIL  FAIL  PASS  FAIL  FAIL  PASS   2/7
+
+  S1  steady state — no transition                         expected: answer the authorized set (V1 open-ended + V3 bounded)
+  S2  RECLASSIFICATION of V1, zero elapsed time            expected: V1 withheld; V3 still answered
+  S3  AUDIENCE reassignment of V1, zero elapsed time       expected: V1 withheld; V3 still answered
+  S4  WITHDRAWN recorded for V1 and V3                     expected: abstain — nothing authorized remains
+  S5  SUPERSESSION recorded — V2 published, V1 superseded  expected: answer V2 and V3; never V1
+  S6  EFFECTIVITY EXPIRY — no transition at all, only the clock expected: V3 withheld once its window closes; V1 still answered
+  S7  KERNEL UNREACHABLE                                   expected: ABSTAIN A7 — never fall back to the prior version
+
+====================================================================================================
+SECTION 2 — U: unauthorized units examined (EPA-0006 §4.6 S3/S4/S7)
+====================================================================================================
+Maximum across the two instrument placements, union'd with routing-phase units (G-Q4.4),
+taken over ALL scenarios. §4.6 S7: a LOWER BOUND, never "the" number.
+CLEARED requires U = 0 at every measured N, shown invariant with N.
+
+  design      M=50     M=500    M=5000  growth
+----------------------------------------------------------------------------------------------------
+  K0             4         4         4  invariant with N
+  K1            56       506      5006  GROWS with N
+  K2            53       503      5003  GROWS with N
+  K3            22       214      2143  GROWS with N
+  K4             0         0         0  ZERO at every size
+  K5             7         7         7  invariant with N
+  K6             4         4         4  invariant with N
+  K7             8        72       715  GROWS with N
+  K8             0         0         0  ZERO at every size
+  NC            56       506      5006  GROWS with N
+
+====================================================================================================
+SECTION 2b — Ustruct: unauthorized versions PRESENT in the structures opened
+====================================================================================================
+WHY THIS TABLE EXISTS, AND WHY THE ONE ABOVE CANNOT BE READ WITHOUT IT.
+
+§4.6 S5: "A zero count is not conclusive. It proves only that nothing unauthorized crossed
+THE POINT WHERE THE INSTRUMENT SITS ... an instrument written into a WHERE clause is
+STRUCTURALLY INCAPABLE of observing" index entries scanned before that point.
+
+This probe's counters are SQL functions. They fire at ROW ACCESS, after SQLite has already
+used the indexable terms to bound the seek. So U1 -- INDEX-ENTRY READS -- IS NOT
+INSTRUMENTABLE through node:sqlite, and no zero above should be read as covering it.
+
+Ustruct is placement-independent: it counts unauthorized versions PRESENT in the structures
+the traversal opens. It cannot be moved by moving an instrument.
+
+  design    Ustruct@50   Ustruct@500  Ustruct@5000   U@5000  reading
+----------------------------------------------------------------------------------------------------
+  K0                 2             2             2        4  both non-zero — consistent
+  K1                53           503          5003     5006  both non-zero — consistent
+  K2                53           503          5003     5003  both non-zero — consistent
+  K3                22           214          2143     2143  both non-zero — consistent
+  K4                 7            71           714        0  U = 0 BUT THE STRUCTURE IS NOT CLEAN — the seek skipped what the counter cannot see
+  K5                 2             2             2        7  both non-zero — consistent
+  K6                 2             2             2        4  both non-zero — consistent
+  K7                22           214          2143      715  both non-zero — consistent
+  K8                22           214          2143        0  U = 0 BUT THE STRUCTURE IS NOT CLEAN — the seek skipped what the counter cannot see
+  NC                53           503          5003     5006  both non-zero — consistent
+
+THE FINDING THIS TABLE CARRIES, stated plainly because it decides two verdicts:
+a design can report U = 0 at every collection size while the structures it opens still HOLD
+unauthorized entries. The seek bound skipped them; the counter never saw them; and whether
+the engine read the index entries describing them is NOT OBSERVABLE on this test subject.
+§4.6 S6 requires E1 for exactly this reason -- "an in-query counter does not measure rows
+scanned at all. The PLAN is the evidence for scan extent" (§4.6 S7).
+
+====================================================================================================
+SECTION 3 — the ADR-0020 §3 point-2 re-check, INSTRUMENTED SEPARATELY (MSG-0116b)
+====================================================================================================
+MSG-0116b: "Its implementation must be instrumented separately from retrieval-content
+examination, and evidence must demonstrate that it reads only the authoritative kernel facts
+required to authorize the candidate."
+MSG-0116a: "The existing measured kernel-read count is therefore not, by itself, a Shape-1
+violation; the security boundary is the content examination."
+
+  design  calls  KR.meta  KR.content  rejected  kept   Shape-1 status
+----------------------------------------------------------------------------------------------------
+  K0         25      168           0        12    12   clean — authoritative metadata only
+  K1         14       98           0         0    14   clean — authoritative metadata only
+  K2         14       98           0         0    14   clean — authoritative metadata only
+  K3         14       98           0         0    14   clean — authoritative metadata only
+  K4          6       42           0         0     6   clean — authoritative metadata only
+  K5         25      168           0        12    12   clean — authoritative metadata only
+  K6         25      168          24        12    12   FAILS — 12 content-bearing reads from UNAUTHORIZED candidates
+  K7         14       98           0         0    14   clean — authoritative metadata only
+  K8         14       98           0         0    14   clean — authoritative metadata only
+  NC          6       42           0         6     0   clean — authoritative metadata only
+
+  Totals are over all seven scenarios at M=500.
+  The field set the re-check may read, closed by construction:
+    version_id, scope, cls, state, eff_from, eff_to, audiences
+  KR.meta counts one read per field consulted, so it is bounded by 7 x candidates and is
+  invariant with N -- which is the measurement MSG-0116a's ruling turns on.
+
+====================================================================================================
+SECTION 4 — G-Q4: routing computed, and routing itself measured (EPA-0006 §4.9)
+====================================================================================================
+G-Q4.2 differential: the same subject and query against collections differing ONLY in OTHER
+subjects' structures. Identical routed set AND identical routing read count are required.
+
+  design  routed@0  routed@64  reads@0  reads@64  unauth   G-Q4
+----------------------------------------------------------------------------------------------------
+  K0             4          4        4         4       0   MET
+  K1    —         —          —        —         —          n/a — unrouted; opens one global structure
+  K2    —         —          —        —         —          n/a — unrouted; opens one global structure
+  K3             4          4        4         4       0   MET
+  K4             4          4        4         4       0   MET
+  K5             4          4       12        76      67   FAILED — routing reads 12->76; 67 catalogue rows describing structures the subject is not entitled to
+  K6             4          4        4         4       0   MET
+  K7             4          4        4         4       0   MET
+  K8             4          4        4         4       0   MET
+  NC    —         —          —        —         —          n/a — unrouted; opens one global structure
+
+====================================================================================================
+SECTION 5 — E1: traversal-bounding evidence (EPA-0006 §4.6 S6)
+====================================================================================================
+E1 requires the traversal be confined to "a structure or region EVERY ENTRY of which
+satisfies the predicate", and states that "a plan showing a scan OR SEEK over a structure
+that spans authorization scopes is disqualifying REGARDLESS OF ANY COUNTER".
+
+Two readings are reported, because they disagree and the disagreement decides three designs:
+  STRICT    — the structure-level reading, quoted above: any access to a structure that spans
+              authorization scopes violates E1, seek or scan. This is the FAIL-CLOSED default
+              and is the reading this record uses for its verdicts.
+  ENTRIES   — the narrower reading: an exact-key seek that touches only entitled entries does
+              not violate E1. NOT ADOPTED. Recorded because it is the reading an implementer
+              naturally reaches for, and it is referred as a question rather than settled here.
+
+  K0    STRICT HOLDS     ENTRIES holds    (M=5000, S1)
+          CO-ROUTINE x
+          COMPOUND QUERY
+          LEFT-MOST SUBQUERY
+          SCAN p_org_a_public_published_staff
+          UNION USING TEMP B-TREE
+          SCAN p_org_a_public_published_all_employees
+          UNION USING TEMP B-TREE
+          SCAN p_org_a_internal_published_staff
+          UNION USING TEMP B-TREE
+          SCAN p_org_a_internal_published_all_employees
+          SCAN x
+          USE TEMP B-TREE FOR ORDER BY
+
+  K1    STRICT VIOLATED  ENTRIES violated (M=5000, S1)
+        ! SCAN kc
+        ! SEARCH kv USING INDEX sqlite_autoindex_k_version_1 (version_id=?)
+        ! SEARCH kva EXISTS USING COVERING INDEX i_kva_token (token=? AND version_id=?)
+          USE TEMP B-TREE FOR ORDER BY
+        ! = touches a structure spanning authorization scopes
+
+  K2    STRICT VIOLATED  ENTRIES violated (M=5000, S1)
+          CO-ROUTINE x
+        ! SCAN kva
+        ! SEARCH kv USING INDEX sqlite_autoindex_k_version_1 (version_id=?)
+        ! SEARCH stok USING COVERING INDEX sqlite_autoindex_subject_token_1 (token=?)
+        ! SEARCH kc USING INDEX i_kchunk_ver (version_id=?)
+          USE TEMP B-TREE FOR DISTINCT
+          SCAN x
+          USE TEMP B-TREE FOR ORDER BY
+        ! = touches a structure spanning authorization scopes
+
+  K3    STRICT VIOLATED  ENTRIES holds    (M=5000, S1)
+          CO-ROUTINE x
+        ! SEARCH kedge USING COVERING INDEX i_edge (route_key=?)
+        ! SEARCH kv USING INDEX sqlite_autoindex_k_version_1 (version_id=?)
+        ! SEARCH kc USING INDEX i_kchunk_ver (version_id=?)
+          USE TEMP B-TREE FOR DISTINCT
+          SCAN x
+          USE TEMP B-TREE FOR ORDER BY
+        ! = touches a structure spanning authorization scopes
+
+  K4    STRICT VIOLATED  ENTRIES holds    (M=5000, S1)
+          CO-ROUTINE x
+        ! SEARCH kedge USING COVERING INDEX i_edge (route_key=? AND open_ended=? AND eff_from<?)
+        ! SEARCH kv USING INDEX sqlite_autoindex_k_version_1 (version_id=?)
+        ! SEARCH kc USING INDEX i_kchunk_ver (version_id=?)
+          USE TEMP B-TREE FOR DISTINCT
+          SCAN x
+          USE TEMP B-TREE FOR ORDER BY
+        ! = touches a structure spanning authorization scopes
+
+  K5    STRICT HOLDS     ENTRIES holds    (M=5000, S1)
+          CO-ROUTINE x
+          COMPOUND QUERY
+          LEFT-MOST SUBQUERY
+          SCAN p_org_a_public_published_staff
+          UNION USING TEMP B-TREE
+          SCAN p_org_a_public_published_all_employees
+          UNION USING TEMP B-TREE
+          SCAN p_org_a_internal_published_staff
+          UNION USING TEMP B-TREE
+          SCAN p_org_a_internal_published_all_employees
+          SCAN x
+          USE TEMP B-TREE FOR ORDER BY
+
+  K6    STRICT HOLDS     ENTRIES holds    (M=5000, S1)
+          CO-ROUTINE x
+          COMPOUND QUERY
+          LEFT-MOST SUBQUERY
+          SCAN p_org_a_public_published_staff
+          UNION USING TEMP B-TREE
+          SCAN p_org_a_public_published_all_employees
+          UNION USING TEMP B-TREE
+          SCAN p_org_a_internal_published_staff
+          UNION USING TEMP B-TREE
+          SCAN p_org_a_internal_published_all_employees
+          SCAN x
+          USE TEMP B-TREE FOR ORDER BY
+
+  K7    STRICT HOLDS     ENTRIES holds    (M=5000, S1)
+          CO-ROUTINE x
+          COMPOUND QUERY
+          LEFT-MOST SUBQUERY
+          SEARCH pv USING INDEX i_org_a_public_published_staff_vo (open_ended=? AND eff_from<?)
+          SEARCH pc USING INDEX i_org_a_public_published_staff_cv (version_id=?)
+          UNION USING TEMP B-TREE
+          SEARCH pv USING INDEX i_org_a_public_published_staff_vo (open_ended=? AND eff_from<?)
+          SEARCH pc USING INDEX i_org_a_public_published_staff_cv (version_id=?)
+          UNION USING TEMP B-TREE
+          SEARCH pv USING INDEX i_org_a_public_published_all_employees_vo (open_ended=? AND eff_from<?)
+          SEARCH pc USING INDEX i_org_a_public_published_all_employees_cv (version_id=?)
+          UNION USING TEMP B-TREE
+          SEARCH pv USING INDEX i_org_a_public_published_all_employees_vo (open_ended=? AND eff_from<?)
+          SEARCH pc USING INDEX i_org_a_public_published_all_employees_cv (version_id=?)
+          UNION USING TEMP B-TREE
+          SEARCH pv USING INDEX i_org_a_internal_published_staff_vo (open_ended=? AND eff_from<?)
+          SEARCH pc USING INDEX i_org_a_internal_published_staff_cv (version_id=?)
+          UNION USING TEMP B-TREE
+          SEARCH pv USING INDEX i_org_a_internal_published_staff_vo (open_ended=? AND eff_from<?)
+          SEARCH pc USING INDEX i_org_a_internal_published_staff_cv (version_id=?)
+          UNION USING TEMP B-TREE
+          SEARCH pv USING INDEX i_org_a_internal_published_all_employees_vo (open_ended=? AND eff_from<?)
+          SEARCH pc USING INDEX i_org_a_internal_published_all_employees_cv (version_id=?)
+          UNION USING TEMP B-TREE
+          SEARCH pv USING INDEX i_org_a_internal_published_all_employees_vo (open_ended=? AND eff_from<?)
+          SEARCH pc USING INDEX i_org_a_internal_published_all_employees_cv (version_id=?)
+          SCAN x
+          USE TEMP B-TREE FOR ORDER BY
+
+  K8    STRICT HOLDS     ENTRIES holds    (M=5000, S1)
+          CO-ROUTINE x
+          COMPOUND QUERY
+          LEFT-MOST SUBQUERY
+          SEARCH pv USING INDEX i_org_a_public_published_staff_vo (open_ended=? AND eff_from<?)
+          SEARCH pc USING INDEX i_org_a_public_published_staff_cv (version_id=?)
+          UNION USING TEMP B-TREE
+          SEARCH pv USING INDEX i_org_a_public_published_staff_vb (open_ended=? AND eff_to>?)
+          SEARCH pc USING INDEX i_org_a_public_published_staff_cv (version_id=?)
+          UNION USING TEMP B-TREE
+          SEARCH pv USING INDEX i_org_a_public_published_all_employees_vo (open_ended=? AND eff_from<?)
+          SEARCH pc USING INDEX i_org_a_public_published_all_employees_cv (version_id=?)
+          UNION USING TEMP B-TREE
+          SEARCH pv USING INDEX i_org_a_public_published_all_employees_vb (open_ended=? AND eff_to>?)
+          SEARCH pc USING INDEX i_org_a_public_published_all_employees_cv (version_id=?)
+          UNION USING TEMP B-TREE
+          SEARCH pv USING INDEX i_org_a_internal_published_staff_vo (open_ended=? AND eff_from<?)
+          SEARCH pc USING INDEX i_org_a_internal_published_staff_cv (version_id=?)
+          UNION USING TEMP B-TREE
+          SEARCH pv USING INDEX i_org_a_internal_published_staff_vb (open_ended=? AND eff_to>?)
+          SEARCH pc USING INDEX i_org_a_internal_published_staff_cv (version_id=?)
+          UNION USING TEMP B-TREE
+          SEARCH pv USING INDEX i_org_a_internal_published_all_employees_vo (open_ended=? AND eff_from<?)
+          SEARCH pc USING INDEX i_org_a_internal_published_all_employees_cv (version_id=?)
+          UNION USING TEMP B-TREE
+          SEARCH pv USING INDEX i_org_a_internal_published_all_employees_vb (open_ended=? AND eff_to>?)
+          SEARCH pc USING INDEX i_org_a_internal_published_all_employees_cv (version_id=?)
+          SCAN x
+          USE TEMP B-TREE FOR ORDER BY
+
+  NC    STRICT VIOLATED  ENTRIES violated (M=5000, S1)
+          CO-ROUTINE y
+        ! SCAN kc
+        ! SEARCH kv USING INDEX sqlite_autoindex_k_version_1 (version_id=?)
+          USE TEMP B-TREE FOR ORDER BY
+          SCAN y
+        ! = touches a structure spanning authorization scopes
+
+====================================================================================================
+SECTION 6 — evidence classes and VERDICTS (EPA-0006 §4.6 S6/S9)
+====================================================================================================
+E4 — log inspection — is NOT OBTAINABLE on this test subject: node:sqlite exposes no engine
+log, slow-query log or debug channel to inspect. Unchanged from TASK-0033/0035/0037.
+
+CONSEQUENCE, STATED BEFORE THE TABLE SO NO ROW BELOW IS MISREAD: no candidate can be CLEARED
+on this engine, whatever U turns out to be. §4.6 S6 — an absent evidence class yields NOT
+CLEARED, and §4.6 S9 — "NOT CLEARED is the required answer wherever evidence is absent."
+
+E3 — opaque-stage evidence: this fixture has NO opaque stage. Every design is purely
+relational, ranking runs in a probe-supplied SQL function whose every call is counted, and
+there is no FTS5 MATCH, no vector index and no ANN graph. E3 is recorded as N/A FOR THIS
+FIXTURE and is expressly NOT transferable: a real lexical or vector stage reintroduces the
+opaque stage and G-Q6 then applies unchanged, construction arguments still rejected.
+
+  design  E1(strict)  E2 U=0    E3       E4    G-Q4  grid  VERDICT
+----------------------------------------------------------------------------------------------------
+  K0           HOLDS      no   n/a  NOT OBT     MET   6/7  NOT CLEARED
+  K1        VIOLATED      no   n/a  NOT OBT     n/a   7/7  NOT CLEARED
+  K2        VIOLATED      no   n/a  NOT OBT     n/a   7/7  NOT CLEARED
+  K3        VIOLATED      no   n/a  NOT OBT     MET   7/7  NOT CLEARED
+  K4        VIOLATED     YES   n/a  NOT OBT     MET   3/7  NOT CLEARED
+  K5           HOLDS      no   n/a  NOT OBT  FAILED   6/7  DISQUALIFIED
+  K6           HOLDS      no   n/a  NOT OBT     MET   6/7  DISQUALIFIED
+  K7           HOLDS      no   n/a  NOT OBT     MET   7/7  NOT CLEARED
+  K8           HOLDS     YES   n/a  NOT OBT     MET   7/7  NOT CLEARED
+  NC        VIOLATED      no   n/a  NOT OBT     n/a   2/7  DISQUALIFIED
+
+  NC  DISQUALIFIED — Shape 2 by construction: it ranks the collection and authorizes after.
+  K5  DISQUALIFIED — G-Q4.3. It enumerates the structure catalogue and reads rows naming
+      partitions the subject is not entitled to. IT RETURNS EXACTLY THE ANSWERS K0 RETURNS.
+  K6  DISQUALIFIED — MSG-0116b. Its "re-check" reads content-bearing data from an
+      unauthorized candidate: "that is examination and fails Shape-1."
+  Every other design is NOT CLEARED. E4 is unobtainable here, so nothing could clear even if
+  U were zero — and for most of them U is not zero either.
+
+====================================================================================================
+SECTION 7 — divergence, measured: what the copy costs and what removing it buys
+====================================================================================================
+S2, S3 and S4 record an authorization change at TX and query at TX. ZERO time elapses; no
+timer could fire. The only question is whether retrieval still OPENS the affected rows --
+which is what U measures, and which the re-check cannot undo after the fact.
+
+  design     S1     S2     S3     S4     S5     S6     S7    (U at M=500)
+----------------------------------------------------------------------------------------------------
+  K0          0      2      2      4      2      2      0
+  K1        502    504    504    506    502    504      0
+  K2        501    502    502    503    501    502      0
+  K3        213    213    213    213    213    214      0
+  K4          0      0      0      0      0      0      0
+  K5          3      5      5      7      5      5      3
+  K6          0      2      2      4      2      2      0
+  K7         71     71     71     71     71     72      0
+  K8          0      0      0      0      0      0      0
+  NC        502    504    504    506    502    504      0
+
+  Per-scenario detail at M=500 — outcome, and whether the re-check had to rescue it:
+
+  K0 — materialised projection; predicate on the COPY; kernel re-check after
+      S1 PASS  U=    0  recheck kept 4/4  — answered all 4 authorized
+      S2 PASS  U=    2  recheck kept 2/4  — answered all 2 authorized
+      S3 PASS  U=    2  recheck kept 2/4  — answered all 2 authorized
+      S4 PASS  U=    4  recheck kept 0/4  abstained A2  — abstained A2
+      S5 FAIL  U=    2  recheck kept 2/4  — WITHHELD 2 of 4 authorized
+      S6 PASS  U=    2  recheck kept 2/4  — answered all 2 authorized
+      S7 PASS  U=    0  recheck kept 0/0  abstained A7  — abstained A7
+
+  K1 — in-query kernel join, COLLECTION-driven (k_chunk is the driving table)
+      S1 PASS  U=  502  recheck kept 4/4  — answered all 4 authorized
+      S2 PASS  U=  504  recheck kept 2/2  — answered all 2 authorized
+      S3 PASS  U=  504  recheck kept 2/2  — answered all 2 authorized
+      S4 PASS  U=  506  recheck kept 0/0  abstained A2  — abstained A2
+      S5 PASS  U=  502  recheck kept 4/4  — answered all 4 authorized
+      S6 PASS  U=  504  recheck kept 2/2  — answered all 2 authorized
+      S7 PASS  U=    0  recheck kept 0/0  abstained A7  — abstained A7
+
+  K2 — in-query kernel join, ENTITLEMENT-driven (the subject's tokens are the driving table)
+      S1 PASS  U=  501  recheck kept 4/4  — answered all 4 authorized
+      S2 PASS  U=  502  recheck kept 2/2  — answered all 2 authorized
+      S3 PASS  U=  502  recheck kept 2/2  — answered all 2 authorized
+      S4 PASS  U=  503  recheck kept 0/0  abstained A2  — abstained A2
+      S5 PASS  U=  501  recheck kept 4/4  — answered all 4 authorized
+      S6 PASS  U=  502  recheck kept 2/2  — answered all 2 authorized
+      S7 PASS  U=    0  recheck kept 0/0  abstained A7  — abstained A7
+
+  K3 — kernel-side authorization EDGE, exact-key routed, co-written with the facts
+      S1 PASS  U=  213  recheck kept 4/4  — answered all 4 authorized
+      S2 PASS  U=  213  recheck kept 2/2  — answered all 2 authorized
+      S3 PASS  U=  213  recheck kept 2/2  — answered all 2 authorized
+      S4 PASS  U=  213  recheck kept 0/0  abstained A2  — abstained A2
+      S5 PASS  U=  213  recheck kept 4/4  — answered all 4 authorized
+      S6 PASS  U=  214  recheck kept 2/2  — answered all 2 authorized
+      S7 PASS  U=    0  recheck kept 0/0  abstained A7  — abstained A7
+
+  K4 — K3 restricted to the OPEN-ENDED effectivity limb only
+      S1 FAIL  U=    0  recheck kept 2/2  — WITHHELD 2 of 4 authorized
+      S2 FAIL  U=    0  recheck kept 0/0  EMPTY ANSWER  — returned nothing where an answer exists
+      S3 FAIL  U=    0  recheck kept 0/0  EMPTY ANSWER  — returned nothing where an answer exists
+      S4 PASS  U=    0  recheck kept 0/0  abstained A2  — abstained A2
+      S5 FAIL  U=    0  recheck kept 2/2  — WITHHELD 2 of 4 authorized
+      S6 PASS  U=    0  recheck kept 2/2  — answered all 2 authorized
+      S7 PASS  U=    0  recheck kept 0/0  abstained A7  — abstained A7
+
+  K5 — K0 but routing by CATALOGUE ENUMERATION
+      S1 PASS  U=    3  recheck kept 4/4  — answered all 4 authorized
+      S2 PASS  U=    5  recheck kept 2/4  — answered all 2 authorized
+      S3 PASS  U=    5  recheck kept 2/4  — answered all 2 authorized
+      S4 PASS  U=    7  recheck kept 0/4  abstained A2  — abstained A2
+      S5 FAIL  U=    5  recheck kept 2/4  — WITHHELD 2 of 4 authorized
+      S6 PASS  U=    5  recheck kept 2/4  — answered all 2 authorized
+      S7 PASS  U=    3  recheck kept 0/0  abstained A7  — abstained A7
+
+  K6 — K0 but the re-check READS THE CANDIDATE BODY before authorizing it
+      S1 PASS  U=    0  recheck kept 4/4  — answered all 4 authorized
+      S2 PASS  U=    2  recheck kept 2/4  — answered all 2 authorized
+      S3 PASS  U=    2  recheck kept 2/4  — answered all 2 authorized
+      S4 PASS  U=    4  recheck kept 0/4  abstained A2  — abstained A2
+      S5 FAIL  U=    2  recheck kept 2/4  — WITHHELD 2 of 4 authorized
+      S6 PASS  U=    2  recheck kept 2/4  — answered all 2 authorized
+      S7 PASS  U=    0  recheck kept 0/0  abstained A7  — abstained A7
+
+  K7 — PHYSICALLY PARTITIONED AUTHORITATIVE STORE — versions AND chunks, both effectivity limbs
+      S1 PASS  U=   71  recheck kept 4/4  — answered all 4 authorized
+      S2 PASS  U=   71  recheck kept 2/2  — answered all 2 authorized
+      S3 PASS  U=   71  recheck kept 2/2  — answered all 2 authorized
+      S4 PASS  U=   71  recheck kept 0/0  abstained A2  — abstained A2
+      S5 PASS  U=   71  recheck kept 4/4  — answered all 4 authorized
+      S6 PASS  U=   72  recheck kept 2/2  — answered all 2 authorized
+      S7 PASS  U=    0  recheck kept 0/0  abstained A7  — abstained A7
+
+  K8 — K7 with the bounded limb FORCED onto the (open_ended, eff_to, eff_from) index
+      S1 PASS  U=    0  recheck kept 4/4  — answered all 4 authorized
+      S2 PASS  U=    0  recheck kept 2/2  — answered all 2 authorized
+      S3 PASS  U=    0  recheck kept 2/2  — answered all 2 authorized
+      S4 PASS  U=    0  recheck kept 0/0  abstained A2  — abstained A2
+      S5 PASS  U=    0  recheck kept 4/4  — answered all 4 authorized
+      S6 PASS  U=    0  recheck kept 2/2  — answered all 2 authorized
+      S7 PASS  U=    0  recheck kept 0/0  abstained A7  — abstained A7
+
+  NC — NEGATIVE CONTROL — rank the collection first, authorize afterwards
+      S1 FAIL  U=  502  recheck kept 0/1  EMPTY ANSWER  — returned nothing where an answer exists
+      S2 FAIL  U=  504  recheck kept 0/1  EMPTY ANSWER  — returned nothing where an answer exists
+      S3 FAIL  U=  504  recheck kept 0/1  EMPTY ANSWER  — returned nothing where an answer exists
+      S4 PASS  U=  506  recheck kept 0/1  abstained A2  — abstained A2
+      S5 FAIL  U=  502  recheck kept 0/1  EMPTY ANSWER  — returned nothing where an answer exists
+      S6 FAIL  U=  504  recheck kept 0/1  EMPTY ANSWER  — returned nothing where an answer exists
+      S7 PASS  U=    0  recheck kept 0/0  abstained A7  — abstained A7
+
+====================================================================================================
+SECTION 8 — the effectivity residual, isolated
+====================================================================================================
+K3, K4, K7 and K8 differ only in how effectivity is handled. Everything else -- the key, the
+co-writing with the authoritative facts, the routing, the re-check -- is identical.
+
+  K3  no effectivity refinement: both bounds evaluated as a residual predicate
+  K4  the OPEN-ENDED limb only: upper bound discharged structurally, lower bound seeked
+  K7  both limbs, over a physically partitioned authoritative store
+  K8  K7 with the bounded limb FORCED onto the (open_ended, eff_to, eff_from) index
+
+  design      U@M=50     U@M=500    U@M=5000  served set
+----------------------------------------------------------------------------------------------------
+  K3              22         214        2143  complete
+  K4               0           0           0  INCOMPLETE — 3/7 grid
+  K7               8          72         715  complete
+  K8               0           0           0  complete
+
+  Composition of the residual at M=5000, S1, by the reason the unit is unauthorized:
+
+    K3  total 2142
+          expired-effectivity          714
+          not-yet-effective-bounded    714
+          not-yet-effective-open       714
+
+    K4  total 0
+          (nothing unauthorized was examined)
+
+    K7  total 714
+          expired-effectivity          714
+
+    K8  total 0
+          (nothing unauthorized was examined)
+
+----------------------------------------------------------------------------------------------------
+WHAT THIS SECTION ESTABLISHES, and it is the sharpest result in this probe.
+----------------------------------------------------------------------------------------------------
+
+1. THE FOUR DISCRETE CONJUNCTS REFINE PERFECTLY; EFFECTIVITY IS THE WHOLE RESIDUAL.
+   K3's residual is composed ENTIRELY of the three effectivity failure modes. Not one
+   wrong-scope, wrong-audience, restricted-class or superseded version is examined at any
+   collection size. EPA-0006 §4.7 Q2 asked whether the conjuncts can be physically organised
+   at all; for scope, classification, lifecycle state and audience the measured answer here
+   is yes, cleanly, and the co-written kernel edge is what does it.
+
+2. TWO OF THE THREE EFFECTIVITY MODES CLOSE STRUCTURALLY; THE THIRD NEEDS THE RIGHT INDEX.
+   K7 eliminates both not-yet-effective modes and leaves only expired-effectivity. K8 --
+   which differs from K7 BY ONE TOKEN, an INDEXED BY hint -- eliminates that too.
+
+3. AND THAT IS THE UNCOMFORTABLE ONE. K7 and K8 have THE SAME SCHEMA, THE SAME DATA, THE
+   SAME INDEXES, THE SAME QUERY TEXT apart from the hint, THE SAME ANSWERS and THE SAME 7/7
+   grid. U goes 715 -> 0. Both indexes exist on both designs; the optimiser chose the one
+   that leaves expired versions exposed, and the design could not tell.
+
+   So on this test subject, WHETHER UNAUTHORIZED CONTENT IS EXAMINED IS DECIDED BY THE QUERY
+   PLANNER, which is not part of the architecture and is not stable across data volumes,
+   statistics or engine versions. A U = 0 measurement taken without pinning the plan is a
+   measurement of one plan, not of a design.
+
+   §4.6 S6/E1 is the only evidence class that can see this, and §4.6 S7 said it in advance:
+   "An in-query counter does not measure rows scanned at all. The PLAN is the evidence for
+   scan extent -- which is why E1 is required rather than optional."
+
+4. NOTHING HERE CLEARS K8. Its Ustruct is unchanged from K7 -- the partition still HOLDS
+   every expired version -- so its zero is a row-access zero whose index-entry behaviour is
+   not observable on this engine, and E4 is unobtainable regardless. K8 is NOT CLEARED.
+
+====================================================================================================
+SECTION 9 — boundaries, restated as facts about this run
+====================================================================================================
+  · Nothing was selected, adopted, recommended, installed or deployed.
+  · No accepted ADR was modified by this file, ADR-0018 and ADR-0020 included.
+  · U = 0, E1-E4 and strict Shape-1 were not relaxed. No gate was weakened.
+  · No prior verdict was relabelled. TASK-0033/0035/0037 were neither modified nor re-run.
+  · No numeric staleness threshold was proposed.
+  · No benchmark, latency, capacity, recall or throughput figure was produced or invented.
+  · Every database was :memory:; no file, no network, no corpus, no host change.
+  · The clock is a fixture integer; no wall-clock was read.
+
+====================================================================================================
+END OF PROBE OUTPUT
+====================================================================================================
