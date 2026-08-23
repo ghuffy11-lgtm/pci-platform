@@ -1,0 +1,541 @@
+====================================================================================================
+TASK-0037 — version-transition freshness and stale-version fail-closed probe (EVALUATION ONLY)
+====================================================================================================
+engine under test : SQLite 3.51.3 (embedded, node:sqlite)
+node              : v24.15.0
+EPA-0006 class    : R (relational). Classes S and V are unreachable on this host and K has no
+                    PostgreSQL here. This probe measures ONE class and claims nothing beyond it.
+
+--- Held constant across every design and scenario ---
+subject           : {"scope":"org-a","classifications":["PUBLIC","INTERNAL"],"audiences":["staff","all-employees"]}
+answerable state  : PUBLISHED   (ADR-0018 §2 — the ONLY answerable state)
+target policy     : POL-LEAVE, three versions V1/V2/V3, 4 chunks each
+physical design   : EPA-0006 §4.8 I1+I2+I3+I4, routed by exact key from the subject's entitlements
+k                 : 5
+
+--- Fixture clock (integers; no wall-clock is read and no timing is measured) ---
+projection first materialised at T_BUILD = 1699999900
+every transition RECORDED at            TX = 1700000000
+periodic re-materialisation interval     R = 3600   (FIXTURE CONSTANT)
+A6's configured staleness bound      BOUND = 600   (FIXTURE CONSTANT — magnitude NOT judged,
+                                                 NOT proposed and NOT recommended; EPA-0006 §4.9 G-Q5.1a)
+query delta with the timer NOT fired EARLY = 10
+query delta with the timer fired      LATE = 3610
+
+####################################################################################################
+FIXTURE  M=50 unauthorized noise chunks · 12 policy chunks
+####################################################################################################
+precondition (unconstrained lexical top-5) : ids=[13,14,15,16,17] authorized-among-them=0 -> ADVERSARIAL, as required
+
+####################################################################################################
+FIXTURE  M=500 unauthorized noise chunks · 12 policy chunks
+####################################################################################################
+precondition (unconstrained lexical top-5) : ids=[13,14,15,16,17] authorized-among-them=0 -> ADVERSARIAL, as required
+
+--- S0: no transition — V1 published and effective   (query at now=1699999910) ---
+  [A0] ANSWER       versions=["V1"]         leak= 0 U=  508 kernel-reads=   9 mat@n/a         -> PASS
+        trace: kernel says current=V1 | re-check(kernel) kept 4/4
+  [A1] ANSWER       versions=["V1"]         leak= 0 U=    0 kernel-reads=   0 mat@1699999900  -> PASS
+  [A2] ANSWER       versions=["V1"]         leak= 0 U=    0 kernel-reads=   0 mat@1699999900  -> PASS
+  [A3] ANSWER       versions=["V1"]         leak= 0 U=    0 kernel-reads=   0 mat@1699999900  -> PASS
+  [A4] ANSWER       versions=["V1"]         leak= 0 U=    0 kernel-reads=   9 mat@1699999900  -> PASS
+        trace: kernel says current=V1 | re-check(kernel) kept 4/4
+  [A5] ANSWER       versions=["V1"]         leak= 0 U=    0 kernel-reads=   1 mat@1699999900  -> PASS
+        trace: kernel says current=V1 | re-check(self) kept 4/4
+  [A6] ANSWER       versions=["V1"]         leak= 0 U=    0 kernel-reads=   9 mat@1699999900  -> PASS
+        trace: kernel says current=V1 | re-check(kernel) kept 4/4
+  [NC] ANSWER       versions=["V1"]         leak= 0 U=    0 kernel-reads=   9 mat@1699999900  -> PASS
+        trace: kernel says current=V1 | re-check(kernel) kept 4/4
+
+--- S1: V2 APPROVED but NOT published (ADR-0018 §2: not answerable)   (query at now=1700000010) ---
+  [A0] ANSWER       versions=["V1"]         leak= 0 U=  508 kernel-reads=   9 mat@n/a         -> PASS
+        trace: kernel says current=V1 | re-check(kernel) kept 4/4
+  [A1] ANSWER       versions=["V1"]         leak= 0 U=    0 kernel-reads=   0 mat@1699999900  -> PASS
+  [A2] ANSWER       versions=["V1"]         leak= 0 U=    0 kernel-reads=   0 mat@1699999900  -> PASS
+  [A3] ANSWER       versions=["V1"]         leak= 0 U=    0 kernel-reads=   0 mat@1700000000  -> PASS
+  [A4] ANSWER       versions=["V1"]         leak= 0 U=    0 kernel-reads=   9 mat@1700000000  -> PASS
+        trace: kernel says current=V1 | re-check(kernel) kept 4/4
+  [A5] ANSWER       versions=["V1"]         leak= 0 U=    0 kernel-reads=   1 mat@1700000000  -> PASS
+        trace: kernel says current=V1 | re-check(self) kept 4/4
+  [A6] ANSWER       versions=["V1"]         leak= 0 U=    0 kernel-reads=   9 mat@1700000000  -> PASS
+        trace: kernel says current=V1 | re-check(kernel) kept 4/4
+  [NC] ANSWER       versions=["V1"]         leak= 0 U=    0 kernel-reads=   9 mat@1700000000  -> PASS
+        trace: kernel says current=V1 | re-check(kernel) kept 4/4
+
+--- S2: V2 PUBLISHED, V1 SUPERSEDED — queried BEFORE the periodic timer fires   (query at now=1700000010) ---
+  [A0] ANSWER       versions=["V2"]         leak= 0 U=  508 kernel-reads=   9 mat@n/a         -> PASS
+        trace: kernel says current=V2 | re-check(kernel) kept 4/4
+  [A1] ANSWER       versions=["V1"]         leak= 4 U=    4 kernel-reads=   0 mat@1699999900  -> LEAK(V1)
+  [A2] ANSWER       versions=["V1"]         leak= 4 U=    4 kernel-reads=   0 mat@1699999900  -> LEAK(V1)
+  [A3] ANSWER       versions=["V2"]         leak= 0 U=    0 kernel-reads=   0 mat@1700000000  -> PASS
+  [A4] ANSWER       versions=["V2"]         leak= 0 U=    0 kernel-reads=   9 mat@1700000000  -> PASS
+        trace: kernel says current=V2 | re-check(kernel) kept 4/4
+  [A5] ANSWER       versions=["V2"]         leak= 0 U=    0 kernel-reads=   1 mat@1700000000  -> PASS
+        trace: kernel says current=V2 | re-check(self) kept 4/4
+  [A6] ANSWER       versions=["V2"]         leak= 0 U=    0 kernel-reads=   9 mat@1700000000  -> PASS
+        trace: kernel says current=V2 | re-check(kernel) kept 4/4
+  [NC] ANSWER       versions=["V2"]         leak= 0 U=    0 kernel-reads=   9 mat@1700000000  -> PASS
+        trace: kernel says current=V2 | re-check(kernel) kept 4/4
+
+--- S3: the same transition — queried AFTER the periodic timer fires (the naive test)   (query at now=1700003610) ---
+  [A0] ANSWER       versions=["V2"]         leak= 0 U=  508 kernel-reads=   9 mat@n/a         -> PASS
+        trace: kernel says current=V2 | re-check(kernel) kept 4/4
+  [A1] ANSWER       versions=["V2"]         leak= 0 U=    0 kernel-reads=   0 mat@1700003610  -> PASS
+        trace: periodic refresh fired at 1700003610
+  [A2] ANSWER       versions=["V2"]         leak= 0 U=    0 kernel-reads=   0 mat@1700003610  -> PASS
+        trace: periodic refresh fired at 1700003610
+  [A3] ANSWER       versions=["V2"]         leak= 0 U=    0 kernel-reads=   0 mat@1700003610  -> PASS
+        trace: periodic refresh fired at 1700003610
+  [A4] ANSWER       versions=["V2"]         leak= 0 U=    0 kernel-reads=   9 mat@1700003610  -> PASS
+        trace: periodic refresh fired at 1700003610 | kernel says current=V2 | re-check(kernel) kept 4/4
+  [A5] ANSWER       versions=["V2"]         leak= 0 U=    0 kernel-reads=   1 mat@1700003610  -> PASS
+        trace: periodic refresh fired at 1700003610 | kernel says current=V2 | re-check(self) kept 4/4
+  [A6] ANSWER       versions=["V2"]         leak= 0 U=    0 kernel-reads=   9 mat@1700003610  -> PASS
+        trace: periodic refresh fired at 1700003610 | kernel says current=V2 | re-check(kernel) kept 4/4
+  [NC] ANSWER       versions=["V2"]         leak= 0 U=    0 kernel-reads=   9 mat@1700003610  -> PASS
+        trace: periodic refresh fired at 1700003610 | kernel says current=V2 | re-check(kernel) kept 4/4
+
+--- S4: V1 WITHDRAWN with no successor (ADR-0018 §2: dropped from the projection)   (query at now=1700000010) ---
+  [A0] ABSTAIN/A4   versions=[]             leak= 0 U=    0 kernel-reads=   1 mat@n/a         -> PASS
+        trace: kernel says current=NONE
+  [A1] ANSWER       versions=["V1"]         leak= 4 U=    4 kernel-reads=   0 mat@1699999900  -> LEAK(V1)
+  [A2] ANSWER       versions=["V1"]         leak= 4 U=    4 kernel-reads=   0 mat@1699999900  -> LEAK(V1)
+  [A3] ANSWER       versions=[]             leak= 0 U=    0 kernel-reads=   0 mat@1700000000  -> WRONG-OUTCOME
+        trace: routed set is empty
+  [A4] ABSTAIN/A4   versions=[]             leak= 0 U=    0 kernel-reads=   1 mat@1700000000  -> PASS
+        trace: kernel says current=NONE
+  [A5] ABSTAIN/A4   versions=[]             leak= 0 U=    0 kernel-reads=   1 mat@1700000000  -> PASS
+        trace: kernel says current=NONE
+  [A6] ABSTAIN/A4   versions=[]             leak= 0 U=    0 kernel-reads=   1 mat@1700000000  -> PASS
+        trace: kernel says current=NONE
+  [NC] ANSWER       versions=["V1"]         leak= 4 U=    4 kernel-reads=   1 mat@1700000000  -> LEAK(V1)
+        trace: kernel says current=NONE | FALLBACK to retained prior snapshot (no current version)
+
+--- S5: supersession chain — V2 already current, V3 published and V2 SUPERSEDED   (query at now=1700000010) ---
+  [A0] ANSWER       versions=["V3"]         leak= 0 U=  508 kernel-reads=   9 mat@n/a         -> PASS
+        trace: kernel says current=V3 | re-check(kernel) kept 4/4
+  [A1] ANSWER       versions=["V2"]         leak= 4 U=    4 kernel-reads=   0 mat@1699999900  -> LEAK(V2)
+  [A2] ANSWER       versions=["V2"]         leak= 4 U=    4 kernel-reads=   0 mat@1699999900  -> LEAK(V2)
+  [A3] ANSWER       versions=["V3"]         leak= 0 U=    0 kernel-reads=   0 mat@1700000000  -> PASS
+  [A4] ANSWER       versions=["V3"]         leak= 0 U=    0 kernel-reads=   9 mat@1700000000  -> PASS
+        trace: kernel says current=V3 | re-check(kernel) kept 4/4
+  [A5] ANSWER       versions=["V3"]         leak= 0 U=    0 kernel-reads=   1 mat@1700000000  -> PASS
+        trace: kernel says current=V3 | re-check(self) kept 4/4
+  [A6] ANSWER       versions=["V3"]         leak= 0 U=    0 kernel-reads=   9 mat@1700000000  -> PASS
+        trace: kernel says current=V3 | re-check(kernel) kept 4/4
+  [NC] ANSWER       versions=["V3"]         leak= 0 U=    0 kernel-reads=   9 mat@1700000000  -> PASS
+        trace: kernel says current=V3 | re-check(kernel) kept 4/4
+
+--- S6: V2 published but its chunks are ABSENT from retrieval (ingestion lag)   (query at now=1700000010) ---
+  [A0] ABSTAIN/A7   versions=[]             leak= 0 U=  508 kernel-reads=   1 mat@n/a         -> PASS
+        trace: kernel says current=V2 | re-check(kernel) kept 0/0 | no hit for current version V2
+  [A1] ANSWER       versions=["V1"]         leak= 4 U=    4 kernel-reads=   0 mat@1699999900  -> LEAK(V1)
+  [A2] ANSWER       versions=["V1"]         leak= 4 U=    4 kernel-reads=   0 mat@1699999900  -> LEAK(V1)
+  [A3] ANSWER       versions=[]             leak= 0 U=    0 kernel-reads=   0 mat@1700000000  -> WRONG-OUTCOME
+        trace: routed set is empty
+  [A4] ABSTAIN/A7   versions=[]             leak= 0 U=    0 kernel-reads=   1 mat@1700000000  -> PASS
+        trace: kernel says current=V2 | routed set is empty | re-check(kernel) kept 0/0 | no hit for current version V2
+  [A5] ABSTAIN/A7   versions=[]             leak= 0 U=    0 kernel-reads=   1 mat@1700000000  -> PASS
+        trace: kernel says current=V2 | routed set is empty | re-check(self) kept 0/0 | no hit for current version V2
+  [A6] ABSTAIN/A7   versions=[]             leak= 0 U=    0 kernel-reads=   1 mat@1700000000  -> PASS
+        trace: kernel says current=V2 | routed set is empty | re-check(kernel) kept 0/0 | no hit for current version V2
+  [NC] ANSWER       versions=["V1"]         leak= 4 U=    4 kernel-reads=   1 mat@1700000000  -> LEAK(V1)
+        trace: kernel says current=V2 | routed set is empty | re-check(kernel) kept 0/0 | no hit for current version V2 | FALLBACK to retained prior snapshot (current version unavailable)
+
+--- S7: the same transition, but the KERNEL IS UNREACHABLE at answer time   (query at now=1700000010) ---
+  [A0] ABSTAIN/A7   versions=[]             leak= 0 U=    0 kernel-reads=   0 mat@n/a         -> PASS
+        trace: kernel unreachable
+  [A1] ANSWER       versions=["V1"]         leak= 4 U=    4 kernel-reads=   0 mat@1699999900  -> LEAK(V1)
+  [A2] ANSWER       versions=["V1"]         leak= 4 U=    4 kernel-reads=   0 mat@1699999900  -> LEAK(V1)
+  [A3] ANSWER       versions=["V2"]         leak= 0 U=    0 kernel-reads=   0 mat@1700000000  -> WRONG-OUTCOME
+  [A4] ABSTAIN/A7   versions=[]             leak= 0 U=    0 kernel-reads=   0 mat@1700000000  -> PASS
+        trace: kernel unreachable
+  [A5] ABSTAIN/A7   versions=[]             leak= 0 U=    0 kernel-reads=   0 mat@1700000000  -> PASS
+        trace: kernel unreachable
+  [A6] ABSTAIN/A7   versions=[]             leak= 0 U=    0 kernel-reads=   0 mat@1700000000  -> PASS
+        trace: kernel unreachable
+  [NC] ANSWER       versions=["V1"]         leak= 4 U=    4 kernel-reads=   0 mat@1700000000  -> LEAK(V1)
+        trace: kernel unreachable | FALLBACK to retained prior snapshot (kernel unreachable)
+
+--- S8: NO version transition — the KERNEL authorization facts for V1 change (EPA-0006 §3.3)   (query at now=1700000010) ---
+  [A0] ABSTAIN/A7   versions=[]             leak= 0 U=  512 kernel-reads=   1 mat@n/a         -> PASS
+        trace: kernel says current=V1 | re-check(kernel) kept 0/0 | no hit for current version V1
+  [A1] ANSWER       versions=["V1"]         leak= 4 U=    4 kernel-reads=   0 mat@1699999900  -> LEAK(V1)
+  [A2] ANSWER       versions=["V1"]         leak= 4 U=    4 kernel-reads=   0 mat@1699999900  -> LEAK(V1)
+  [A3] ANSWER       versions=[]             leak= 0 U=    0 kernel-reads=   0 mat@1700000000  -> WRONG-OUTCOME
+        trace: routed set is empty
+  [A4] ABSTAIN/A7   versions=[]             leak= 0 U=    0 kernel-reads=   1 mat@1700000000  -> PASS
+        trace: kernel says current=V1 | routed set is empty | re-check(kernel) kept 0/0 | no hit for current version V1
+  [A5] ABSTAIN/A7   versions=[]             leak= 0 U=    0 kernel-reads=   1 mat@1700000000  -> PASS
+        trace: kernel says current=V1 | routed set is empty | re-check(self) kept 0/0 | no hit for current version V1
+  [A6] ABSTAIN/A7   versions=[]             leak= 0 U=    0 kernel-reads=   1 mat@1700000000  -> PASS
+        trace: kernel says current=V1 | routed set is empty | re-check(kernel) kept 0/0 | no hit for current version V1
+  [NC] ANSWER       versions=["V1"]         leak= 4 U=    4 kernel-reads=   1 mat@1700000000  -> LEAK(V1)
+        trace: kernel says current=V1 | routed set is empty | re-check(kernel) kept 0/0 | no hit for current version V1 | FALLBACK to retained prior snapshot (current version unavailable)
+
+--- S8b: the same authorization change, NOT wired to the invalidation hook (§3.2 re-check is the only control left)   (query at now=1700000010) ---
+  [A0] ABSTAIN/A7   versions=[]             leak= 0 U=  512 kernel-reads=   1 mat@n/a         -> PASS
+        trace: kernel says current=V1 | re-check(kernel) kept 0/0 | no hit for current version V1
+  [A1] ANSWER       versions=["V1"]         leak= 4 U=    4 kernel-reads=   0 mat@1699999900  -> LEAK(V1)
+  [A2] ANSWER       versions=["V1"]         leak= 4 U=    4 kernel-reads=   0 mat@1699999900  -> LEAK(V1)
+  [A3] ANSWER       versions=["V1"]         leak= 4 U=    4 kernel-reads=   0 mat@1699999900  -> LEAK(V1)
+  [A4] ABSTAIN/A7   versions=[]             leak= 0 U=    4 kernel-reads=   9 mat@1699999900  -> PASS
+        trace: kernel says current=V1 | re-check(kernel) kept 0/4 | no hit for current version V1
+  [A5] ANSWER       versions=["V1"]         leak= 4 U=    4 kernel-reads=   1 mat@1699999900  -> LEAK(V1)
+        trace: kernel says current=V1 | re-check(self) kept 4/4
+  [A6] ABSTAIN/A7   versions=[]             leak= 0 U=    4 kernel-reads=   9 mat@1699999900  -> PASS
+        trace: kernel says current=V1 | re-check(kernel) kept 0/4 | no hit for current version V1
+  [NC] ANSWER       versions=[]             leak= 0 U=    4 kernel-reads=   9 mat@1699999900  -> WRONG-OUTCOME
+        trace: kernel says current=V1 | re-check(kernel) kept 0/4 | no hit for current version V1 | FALLBACK to retained prior snapshot (current version unavailable)
+
+--- S9: no transition — the clock passes the configured staleness bound (G-Q5.1c)   (query at now=1700000800) ---
+  [A0] n/a — not materialised, so no staleness bound applies
+  [A1] ANSWER       versions=["V1"]         leak= 0 U=    0 kernel-reads=   0 mat@1699999900  -> WRONG-OUTCOME
+  [A2] ANSWER       versions=["V1"]         leak= 0 U=    0 kernel-reads=   0 mat@1699999900  -> WRONG-OUTCOME
+  [A3] ANSWER       versions=["V1"]         leak= 0 U=    0 kernel-reads=   0 mat@1699999900  -> WRONG-OUTCOME
+  [A4] ANSWER       versions=["V1"]         leak= 0 U=    0 kernel-reads=   9 mat@1699999900  -> WRONG-OUTCOME
+        trace: kernel says current=V1 | re-check(kernel) kept 4/4
+  [A5] ANSWER       versions=["V1"]         leak= 0 U=    0 kernel-reads=   1 mat@1699999900  -> WRONG-OUTCOME
+        trace: kernel says current=V1 | re-check(self) kept 4/4
+  [A6] ABSTAIN/A7   versions=[]             leak= 0 U=    0 kernel-reads=   0 mat@1699999900  -> PASS
+        trace: staleness 900 > bound 600
+  [NC] ANSWER       versions=["V1"]         leak= 0 U=    0 kernel-reads=   9 mat@1699999900  -> WRONG-OUTCOME
+        trace: kernel says current=V1 | re-check(kernel) kept 4/4
+
+####################################################################################################
+FIXTURE  M=5000 unauthorized noise chunks · 12 policy chunks
+####################################################################################################
+precondition (unconstrained lexical top-5) : ids=[13,14,15,16,17] authorized-among-them=0 -> ADVERSARIAL, as required
+
+====================================================================================================
+PASS / FAIL GRID    "." pass   "L" leaked a version the kernel does not authorize at answer time
+                    "X" wrong outcome (answered where abstention is required, or wrong version)
+                    "-" not applicable
+====================================================================================================
+
+  M=50
+  design  S0  S1  S2  S3  S4  S5  S6  S7  S8  S8b S9  
+  A0       .   .   .   .   .   .   .   .   .   .   -     10/10
+  A1       .   .   L   .   L   L   L   L   L   L   X     3/11
+  A2       .   .   L   .   L   L   L   L   L   L   X     3/11
+  A3       .   .   .   .   X   .   X   X   X   L   X     5/11
+  A4       .   .   .   .   .   .   .   .   .   .   X     10/11
+  A5       .   .   .   .   .   .   .   .   .   L   X     9/11
+  A6       .   .   .   .   .   .   .   .   .   .   .     11/11
+  NC       .   .   .   .   L   .   L   L   L   X   X     5/11
+
+  M=500
+  design  S0  S1  S2  S3  S4  S5  S6  S7  S8  S8b S9  
+  A0       .   .   .   .   .   .   .   .   .   .   -     10/10
+  A1       .   .   L   .   L   L   L   L   L   L   X     3/11
+  A2       .   .   L   .   L   L   L   L   L   L   X     3/11
+  A3       .   .   .   .   X   .   X   X   X   L   X     5/11
+  A4       .   .   .   .   .   .   .   .   .   .   X     10/11
+  A5       .   .   .   .   .   .   .   .   .   L   X     9/11
+  A6       .   .   .   .   .   .   .   .   .   .   .     11/11
+  NC       .   .   .   .   L   .   L   L   L   X   X     5/11
+
+  M=5000
+  design  S0  S1  S2  S3  S4  S5  S6  S7  S8  S8b S9  
+  A0       .   .   .   .   .   .   .   .   .   .   -     10/10
+  A1       .   .   L   .   L   L   L   L   L   L   X     3/11
+  A2       .   .   L   .   L   L   L   L   L   L   X     3/11
+  A3       .   .   .   .   X   .   X   X   X   L   X     5/11
+  A4       .   .   .   .   .   .   .   .   .   .   X     10/11
+  A5       .   .   .   .   .   .   .   .   .   L   X     9/11
+  A6       .   .   .   .   .   .   .   .   .   .   .     11/11
+  NC       .   .   .   .   L   .   L   L   L   X   X     5/11
+
+  design  description
+  A0      live kernel-backed store, no projection
+  A1      materialised+partitioned, NO version identity, periodic refresh only
+  A2      as A1 + version identity carried in the structure
+  A3      as A2 + transition-triggered re-materialisation
+  A4      as A3 + kernel consult and ADR-0020 §3.2 re-check against the KERNEL
+  A5      as A4 but the re-check reads the MATERIALISED COPY (G-Q5.2b faked limb)
+  A6      as A4 + a configured staleness bound enforced against an external clock
+  NC      NEGATIVE CONTROL — as A4 but falls back to the retained prior snapshot
+
+  scenario  description
+  S0        no transition — V1 published and effective
+  S1        V2 APPROVED but NOT published (ADR-0018 §2: not answerable)
+  S2        V2 PUBLISHED, V1 SUPERSEDED — queried BEFORE the periodic timer fires
+  S3        the same transition — queried AFTER the periodic timer fires (the naive test)
+  S4        V1 WITHDRAWN with no successor (ADR-0018 §2: dropped from the projection)
+  S5        supersession chain — V2 already current, V3 published and V2 SUPERSEDED
+  S6        V2 published but its chunks are ABSENT from retrieval (ingestion lag)
+  S7        the same transition, but the KERNEL IS UNREACHABLE at answer time
+  S8        NO version transition — the KERNEL authorization facts for V1 change (EPA-0006 §3.3)
+  S8b       the same authorization change, NOT wired to the invalidation hook (§3.2 re-check is the only control left)
+  S9        no transition — the clock passes the configured staleness bound (G-Q5.1c)
+
+====================================================================================================
+THE DISCRIMINATOR (MSG-0113 §3): transition-triggered freshness vs periodic re-materialisation
+S2 and S3 are THE SAME RECORDED TRANSITION. Only the query instant differs: in S2 the periodic
+timer has NOT fired, in S3 it has. A design that passes S3 but fails S2 was never made correct
+by the transition — it was made correct by waiting.
+====================================================================================================
+
+  design  S2 (timer NOT fired)          S3 (timer fired)              reading
+  A0      ANSWER ["V2"]                  ANSWER ["V2"]                 transition-triggered — correct before the timer could fire
+  A1      ANSWER ["V1"] LEAK             ANSWER ["V2"]                 DISCRIMINATED — a fixed-time test alone would have cleared it
+  A2      ANSWER ["V1"] LEAK             ANSWER ["V2"]                 DISCRIMINATED — a fixed-time test alone would have cleared it
+  A3      ANSWER ["V2"]                  ANSWER ["V2"]                 transition-triggered — correct before the timer could fire
+  A4      ANSWER ["V2"]                  ANSWER ["V2"]                 transition-triggered — correct before the timer could fire
+  A5      ANSWER ["V2"]                  ANSWER ["V2"]                 transition-triggered — correct before the timer could fire
+  A6      ANSWER ["V2"]                  ANSWER ["V2"]                 transition-triggered — correct before the timer could fire
+  NC      ANSWER ["V2"]                  ANSWER ["V2"]                 transition-triggered — correct before the timer could fire
+
+====================================================================================================
+U — unauthorized units EXAMINED during retrieval, by design (max over instrument placements)
+EPA-0006 §4.6 S3: CLEARED requires U = 0 at every measured N, shown invariant with N.
+S5 is used here because it is the scenario in which every design retrieves something.
+====================================================================================================
+
+  design  M=50      M=500     M=5000    invariant-with-N
+  A0             58       508      5008 NO — grows with N
+  A1              4         4         4 yes
+  A2              4         4         4 yes
+  A3              0         0         0 yes
+  A4              0         0         0 yes
+  A5              0         0         0 yes
+  A6              0         0         0 yes
+  NC              0         0         0 yes
+
+  The S5 slice above is NOT the whole story, and a verdict must not rest on it. EPA-0006 §4.6 S3
+  requires U = 0 at every measured N; a design with U = 0 in one scenario and U > 0 in another
+  has not met the bar. The maximum over ALL scenarios is therefore the figure that decides E2:
+
+  design  max-U over all scenarios          worst scenario(s)
+  A0      M=50:62  M=500:512  M=5000:5012    S8,S8b
+  A1      M=50:4  M=500:4  M=5000:4          S2,S4,S5,S6,S7,S8,S8b
+  A2      M=50:4  M=500:4  M=5000:4          S2,S4,S5,S6,S7,S8,S8b
+  A3      M=50:4  M=500:4  M=5000:4          S8b
+  A4      M=50:4  M=500:4  M=5000:4          S8b
+  A5      M=50:4  M=500:4  M=5000:4          S8b
+  A6      M=50:4  M=500:4  M=5000:4          S8b
+  NC      M=50:4  M=500:4  M=5000:4          S4,S6,S7,S8,S8b
+
+====================================================================================================
+ANSWERED-NOTHING vs ABSTAINED — they are different states and only one is fail-closed
+An empty answer is indistinguishable, to the employee, from "no policy covers this".
+====================================================================================================
+
+  design  cases where abstention was required and the design ANSWERED instead
+  A0      answered-empty: none                   answered-with-content: none
+  A1      answered-empty: none                   answered-with-content: S2,S4,S5,S6,S7,S8,S8b,S9
+  A2      answered-empty: none                   answered-with-content: S2,S4,S5,S6,S7,S8,S8b,S9
+  A3      answered-empty: S4,S6,S8               answered-with-content: S7,S8b,S9
+  A4      answered-empty: none                   answered-with-content: S9
+  A5      answered-empty: none                   answered-with-content: S8b,S9
+  A6      answered-empty: none                   answered-with-content: none
+  NC      answered-empty: S8b                    answered-with-content: S4,S6,S7,S8,S9
+
+====================================================================================================
+KERNEL READS during the answer path — max over placements, S5, counted at the HARNESS call site
+(EPA-0006 §4.6 S7: the placement is recorded; this is not an engine-internal counter)
+====================================================================================================
+
+  design  M=50      M=500     M=5000    invariant-with-N
+  A0              9         9         9 yes
+  A1              0         0         0 yes
+  A2              0         0         0 yes
+  A3              0         0         0 yes
+  A4              9         9         9 yes
+  A5              1         1         1 yes
+  A6              9         9         9 yes
+  NC              9         9         9 yes
+
+====================================================================================================
+MATERIALISATION INSTANT for every case at M=500 (EPA-0006 §4.9 G-Q5.1d: a U figure reported
+without the instant it was taken at is not interpretable and does not count)
+====================================================================================================
+
+  design  scenario  built-at     mat-at       rebuilds-after-build  U
+  A0      S0        n/a          n/a                             0  508
+  A0      S1        n/a          n/a                             0  508
+  A0      S2        n/a          n/a                             0  508
+  A0      S3        n/a          n/a                             0  508
+  A0      S4        n/a          n/a                             0  0
+  A0      S5        n/a          n/a                             0  508
+  A0      S6        n/a          n/a                             0  508
+  A0      S7        n/a          n/a                             0  0
+  A0      S8        n/a          n/a                             0  512
+  A0      S8b       n/a          n/a                             0  512
+  A1      S0        1699999900   1699999900                      0  0
+  A1      S1        1699999900   1699999900                      0  0
+  A1      S2        1699999900   1699999900                      0  4
+  A1      S3        1699999900   1700003610                      1  0
+  A1      S4        1699999900   1699999900                      0  4
+  A1      S5        1699999900   1699999900                      0  4
+  A1      S6        1699999900   1699999900                      0  4
+  A1      S7        1699999900   1699999900                      0  4
+  A1      S8        1699999900   1699999900                      0  4
+  A1      S8b       1699999900   1699999900                      0  4
+  A1      S9        1699999900   1699999900                      0  0
+  A2      S0        1699999900   1699999900                      0  0
+  A2      S1        1699999900   1699999900                      0  0
+  A2      S2        1699999900   1699999900                      0  4
+  A2      S3        1699999900   1700003610                      1  0
+  A2      S4        1699999900   1699999900                      0  4
+  A2      S5        1699999900   1699999900                      0  4
+  A2      S6        1699999900   1699999900                      0  4
+  A2      S7        1699999900   1699999900                      0  4
+  A2      S8        1699999900   1699999900                      0  4
+  A2      S8b       1699999900   1699999900                      0  4
+  A2      S9        1699999900   1699999900                      0  0
+  A3      S0        1699999900   1699999900                      0  0
+  A3      S1        1699999900   1700000000                      1  0
+  A3      S2        1699999900   1700000000                      1  0
+  A3      S3        1699999900   1700003610                      2  0
+  A3      S4        1699999900   1700000000                      1  0
+  A3      S5        1699999900   1700000000                      1  0
+  A3      S6        1699999900   1700000000                      1  0
+  A3      S7        1699999900   1700000000                      1  0
+  A3      S8        1699999900   1700000000                      1  0
+  A3      S8b       1699999900   1699999900                      0  4
+  A3      S9        1699999900   1699999900                      0  0
+  A4      S0        1699999900   1699999900                      0  0
+  A4      S1        1699999900   1700000000                      1  0
+  A4      S2        1699999900   1700000000                      1  0
+  A4      S3        1699999900   1700003610                      2  0
+  A4      S4        1699999900   1700000000                      1  0
+  A4      S5        1699999900   1700000000                      1  0
+  A4      S6        1699999900   1700000000                      1  0
+  A4      S7        1699999900   1700000000                      1  0
+  A4      S8        1699999900   1700000000                      1  0
+  A4      S8b       1699999900   1699999900                      0  4
+  A4      S9        1699999900   1699999900                      0  0
+  A5      S0        1699999900   1699999900                      0  0
+  A5      S1        1699999900   1700000000                      1  0
+  A5      S2        1699999900   1700000000                      1  0
+  A5      S3        1699999900   1700003610                      2  0
+  A5      S4        1699999900   1700000000                      1  0
+  A5      S5        1699999900   1700000000                      1  0
+  A5      S6        1699999900   1700000000                      1  0
+  A5      S7        1699999900   1700000000                      1  0
+  A5      S8        1699999900   1700000000                      1  0
+  A5      S8b       1699999900   1699999900                      0  4
+  A5      S9        1699999900   1699999900                      0  0
+  A6      S0        1699999900   1699999900                      0  0
+  A6      S1        1699999900   1700000000                      1  0
+  A6      S2        1699999900   1700000000                      1  0
+  A6      S3        1699999900   1700003610                      2  0
+  A6      S4        1699999900   1700000000                      1  0
+  A6      S5        1699999900   1700000000                      1  0
+  A6      S6        1699999900   1700000000                      1  0
+  A6      S7        1699999900   1700000000                      1  0
+  A6      S8        1699999900   1700000000                      1  0
+  A6      S8b       1699999900   1699999900                      0  4
+  A6      S9        1699999900   1699999900                      0  0
+  NC      S0        1699999900   1699999900                      0  0
+  NC      S1        1699999900   1700000000                      1  0
+  NC      S2        1699999900   1700000000                      1  0
+  NC      S3        1699999900   1700003610                      2  0
+  NC      S4        1699999900   1700000000                      1  4
+  NC      S5        1699999900   1700000000                      1  0
+  NC      S6        1699999900   1700000000                      1  4
+  NC      S7        1699999900   1700000000                      1  4
+  NC      S8        1699999900   1700000000                      1  4
+  NC      S8b       1699999900   1699999900                      0  4
+  NC      S9        1699999900   1699999900                      0  0
+
+====================================================================================================
+E1 — traversal-bounding evidence: the query plan actually used, S5 at M=500
+====================================================================================================
+
+  [A0]
+        SCAN c
+        SEARCH v USING INDEX sqlite_autoindex_k_version_1 (version_id=?)
+        SEARCH a EXISTS USING COVERING INDEX i_kaud (version_id=? AND audience=?)
+        USE TEMP B-TREE FOR ORDER BY
+
+  [A1]
+        CO-ROUTINE x
+        COMPOUND QUERY
+        LEFT-MOST SUBQUERY
+        SCAN p_org_a_internal_published_staff
+        UNION ALL
+        SCAN p_org_a_internal_published_all_employees
+        … 3 further plan rows
+
+  [A2]
+        CO-ROUTINE x
+        COMPOUND QUERY
+        LEFT-MOST SUBQUERY
+        SCAN p_org_a_internal_published_staff
+        UNION ALL
+        SCAN p_org_a_internal_published_all_employees
+        … 3 further plan rows
+
+  [A3]
+        CO-ROUTINE x
+        COMPOUND QUERY
+        LEFT-MOST SUBQUERY
+        SCAN p_org_a_internal_published_staff
+        UNION ALL
+        SCAN p_org_a_internal_published_all_employees
+        … 3 further plan rows
+
+  [A4]
+        CO-ROUTINE x
+        COMPOUND QUERY
+        LEFT-MOST SUBQUERY
+        SCAN p_org_a_internal_published_staff
+        UNION ALL
+        SCAN p_org_a_internal_published_all_employees
+        … 3 further plan rows
+
+  [A5]
+        CO-ROUTINE x
+        COMPOUND QUERY
+        LEFT-MOST SUBQUERY
+        SCAN p_org_a_internal_published_staff
+        UNION ALL
+        SCAN p_org_a_internal_published_all_employees
+        … 3 further plan rows
+
+  [A6]
+        CO-ROUTINE x
+        COMPOUND QUERY
+        LEFT-MOST SUBQUERY
+        SCAN p_org_a_internal_published_staff
+        UNION ALL
+        SCAN p_org_a_internal_published_all_employees
+        … 3 further plan rows
+
+  [NC]
+        CO-ROUTINE x
+        COMPOUND QUERY
+        LEFT-MOST SUBQUERY
+        SCAN p_org_a_internal_published_staff
+        UNION ALL
+        SCAN p_org_a_internal_published_all_employees
+        … 3 further plan rows
+
+====================================================================================================
+NEGATIVE CONTROL CHECK (EPA-0006 §4.6 S8) — if NC does not fail, the run is VOID
+====================================================================================================
+
+  NC failing cases  : 18 of 33
+  NC leaking cases  : 12  (S4:V1, S6:V1, S7:V1, S8:V1)
+  verdict           : the control FAILS as required — the run is VALID
+
+====================================================================================================
+MSG-0113 §3 EVIDENCE ITEMS — demonstrated, or explicitly recorded as not demonstrated
+====================================================================================================
+
+  §3.1  an approved-version transition V1 -> V2                                  S1/S2/S3 recorded a publish/supersede transition
+  §3.2  V1 is usable BEFORE the transition                                       S0
+  §3.3  after the transition is recorded, V1 is NOT usable                       S2 — per design; see the grid
+  §3.4  V2 is used when available                                                S2/S3 — per design
+  §3.5  if V2 is unavailable, retrieval/answering ABSTAINS                       S6 — per design
+  §3.6  revocation and supersession exercise the same fail-closed behaviour      S4 (WITHDRAWN) and S5 (supersession chain)
+  §3.7  the kernel re-check observes the authoritative lifecycle/version state   S8 — the re-check must REJECT (G-Q5.2c)
+  §3.8  a materialised/partitioned index does not permit stale V1 use after the transition S2 against the I1+I2+I3+I4 projection
+
+====================================================================================================
+END OF PROBE — no engine, runtime, provider, model, index technology or physical implementation
+selected, adopted, recommended, installed or deployed. No numeric staleness threshold is
+proposed. Verdicts are recorded in the COMMS execution record.
+====================================================================================================

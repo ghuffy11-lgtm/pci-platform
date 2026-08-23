@@ -866,6 +866,14 @@ re-check never demonstrated to reject; or a `U = 0` claim carrying no materialis
 CLEARED** unless §4.6 S6's E1–E4 are independently obtained — **G-Q5 is a prerequisite, not a
 clearance.**
 
+> **Forward reference added 2026-08-23 by TASK-0037, changing nothing above.** **MSG-0113 adds a
+> second, independent requirement on temporally materialised structures** — **version-transition
+> freshness**, encoded as **G-Q7** in **§4.10** — and **G-Q5.2b/G-Q5.2c are now demonstrated rather
+> than predicted** (MSG-0115 §6 F3). **The sentence immediately above is no longer only a
+> statement of principle:** a design has since met **both** G-Q5 conditions **and** every G-Q7
+> requirement, and is **NOT CLEARED** on E2 and E4. **A bounded, correctly re-checking materialisation
+> is still not a cleared one.**
+
 #### G-Q6 — opaque-stage confinement requires execution evidence; construction alone is rejected
 
 > **Ruling: REJECT the proposed default that construction alone can satisfy E3.**
@@ -967,6 +975,120 @@ Q7 still open.
 window is a function of how fast the authorization facts actually change, which is **corpus and
 organizational evidence this project does not yet have** — PR5 is met only at n=1 (WP-0009 §8). **No
 figure, range, or typical value is proposed**, consistent with §2.1.
+
+> **Q7 HAS SINCE BEEN RULED — added 2026-08-23 by TASK-0037, and nothing above is altered.**
+> **MSG-0113 resolves Q7 without fixing a number, by replacing the question:** freshness is a
+> **version-transition** property, not an elapsed-time SLA. *"When an authorized policy or procedure is
+> manually updated, approved, revoked, or superseded, the previous version must no longer be used for
+> employee answers once the change is recorded … If the current approved version cannot be established
+> or made available to retrieval, the system must abstain rather than answer from the stale version."*
+> **A timer measures how long ago a structure was rebuilt; the requirement is whether the authoritative
+> version changed, which a timer cannot observe.** **No numeric threshold is introduced**, and
+> **G-Q5.1 stands exactly as written above — structural, not numeric.** What MSG-0113 adds is a
+> **second, independent** requirement that a temporally materialised structure must also meet; it is
+> encoded in **§4.10**. **The question as posed above — whether a numeric bound should also be fixed,
+> and by whom — is not answered by MSG-0113 and remains open**, which is why this note is additive
+> rather than a deletion.
+
+---
+
+### 4.10 Version-transition freshness: the fail-closed requirement, and what was measured (TASK-0037, MSG-0113)
+
+**Added 2026-08-23 by TASK-0037. Additive and declared: nothing in §4.1–§4.9 is deleted or reworded,
+and no verdict changes.** This section encodes MSG-0113's version-transition requirement as testable
+conditions and records what a probe measured against them. **It amends no ADR, invents no threshold,
+and selects, adopts, recommends, installs and deploys no engine.** Authority: **MSG-0113 §2–§5**. Full
+evidence: **MSG-0115**; harness and captured output at `implementation/probes/TASK-0037/`.
+
+**Like §4.9's gates, everything here is NECESSARY and never SUFFICIENT.** **§4.6 S6 still governs
+clearance** — E1 + E2 + E3 + E4 all obtained, `U = 0` at every measured collection size, invariant with
+`N`. **The probe demonstrated this in practice rather than by assertion:** one design satisfied every
+condition below **and both G-Q5 conditions**, and is **NOT CLEARED**.
+
+#### G-Q7 — the six mechanism properties, from MSG-0113 §2
+
+| | Requirement | Evidence that counts |
+|---|---|---|
+| **G-Q7.1** | **The governance/kernel record is authoritative** for the current version and its lifecycle state | The answer path's actual source for currency, exhibited. A design that resolves currency from the projection has resolved it from a copy |
+| **G-Q7.2** | **A transition invalidates or supersedes the retrievable prior version AS PART OF the recorded transition** — not by a periodic timer | **The discriminator test below.** A design whose only mechanism is a timer fails, however short the interval |
+| **G-Q7.3** | **Retrieval resolves against the current version**; stale materialisation is **not authoritative** after the transition is recorded | The version identity of every chunk returned, checked against the kernel's current version at answer time |
+| **G-Q7.4** | **If the current version is unavailable to retrieval, the answer path ABSTAINS** | **An abstention, not an empty answer.** ADR-0017 §5 classifies abstentions **A1–A7**; an empty answer is none of them and is indistinguishable to the employee from *"no approved policy covers this"* |
+| **G-Q7.5** | **The kernel re-check remains mandatory** and is demonstrated **against the authoritative current state** | **§4.9 G-Q5.2b/G-Q5.2c unchanged** — against the kernel, and demonstrated to **reject** |
+| **G-Q7.6** | **Any physical or partitioned representation carries version/lifecycle identity sufficient to prove the candidate is current.** Physical isolation does not excuse stale-version use | The identity carried in the structure — **and evidence that something consults the authoritative record with it.** Carrying it and never consulting is measured below as changing **nothing** |
+
+**Also required, and it is the condition most easily satisfied by accident:** MSG-0113 §1's
+*"cannot be established"* limb. **A design that never asks the kernel cannot establish currency**, so
+it must abstain — even when its projection happens to be current. Answering correctly without being
+able to know it is correct **fails**.
+
+#### The discriminator, which is the whole test
+
+> *"Evidence must distinguish **transition-triggered** freshness from ordinary **periodic
+> re-materialization**. Passing a fixed-time test alone does not establish the requirement."*
+> — **MSG-0113 §3**
+
+**Method:** record one transition; query it **twice** — once at an instant when the periodic timer has
+**not** fired, once after it has. **A design that fails the first and passes the second was made
+correct by waiting, not by the transition.** A fixture that does not separate the two proves nothing
+however many cases it runs.
+
+#### What was measured (class R test subject; MSG-0115 §5)
+
+**8 designs × 11 scenarios × 3 collection sizes**, two instrument placements each. **The pass/fail
+grid was identical at M=50, M=500 and M=5000** — freshness behaviour is a property of the mechanism,
+not of collection size. **`U` is not**, and that difference is the point of the second table.
+
+| Design | Mechanism | Grid | `U` max over all scenarios (M=50/500/5000) | **Verdict** |
+|---|---|---|---|---|
+| **A0** | live kernel-backed store, no projection | 10/10 | **62 / 512 / 5012** — grows with `N` | **NOT CLEARED** — E1 fails (`SCAN` over a store spanning scopes); E4 not obtained |
+| **A1** | materialised, **no version identity**, periodic only | 3/11 | 4 / 4 / 4 | **NOT CLEARED** — returned a superseded version in 7 scenarios |
+| **A2** | **+ version identity**, periodic only | 3/11 | 4 / 4 / 4 | **NOT CLEARED** — **grid identical to A1** |
+| **A3** | + transition-triggered invalidation | 5/11 | 4 / 4 / 4 | **NOT CLEARED** — leaks where the hook is not wired; answers where abstention is required |
+| **A4** | + kernel consult and §3 point-2 re-check | 10/11 | 4 / 4 / 4 | **NOT CLEARED** — G-Q5 condition 2 met; condition 1 not; `U` > 0; E4 not obtained |
+| **A5** | as A4 but the re-check reads **the copy** | 9/11 | 4 / 4 / 4 | **NOT CLEARED** — **fails G-Q5.2b and G-Q5.2c by demonstration** |
+| **A6** | A4 + a configured staleness bound | **11/11** | 4 / 4 / 4 | **NOT CLEARED** — **both G-Q5 conditions met, and still not cleared**: `U` > 0, E4 not obtained, G-Q4 not measured |
+| **NC** | negative control — falls back to the prior snapshot | 5/11 | 4 / 4 / 4 | **DISQUALIFIED** — leaked a superseded version in **12 cases**; the control failed as required (§4.6 S8) |
+
+**Five results carry beyond this engine.**
+
+1. **Version identity is necessary and nowhere near sufficient.** **A1 and A2 differ in exactly that
+   property and their grids are identical.** G-Q7.6 is real, but the work is done by G-Q7.2/G-Q7.3 —
+   something must **consult** the authoritative record. **A design carrying no version identity also
+   cannot name the version it answered from**, which defeats ADR-0018 §1's *"a citation names a
+   document version, never a document"* independently of any freshness question.
+2. **"Answered nothing" is not "abstained".** A3 returned an **empty ANSWER** where abstention was
+   required, and on the kernel-unreachable case **answered correctly by luck** — its hook had fired,
+   and it had no way to know. **G-Q7.4 exists because an empty answer is a wrong answer to the
+   employee, not a safe one.**
+3. **The faked re-check is a no-op, now demonstrated.** A4 and A5 differ only in what the re-check
+   reads. Against the same change: A4 `kept 0/4` and abstained; **A5 `kept 4/4` and returned four
+   chunks of a version the kernel had reclassified.** Same structures, same plan, **same `U`**.
+   **§4.9 G-Q5.2c is satisfied for the first time here** — a re-check observed to **reject**.
+4. **`U` cannot distinguish a leaking design from a conservative one.** **A4 and A5 both report
+   `U` = 4 at every collection size, with identical plans — one abstains, the other leaks.**
+   **This extends §4.6 S5 in a direction it did not state:** the asymmetry rule warns that a *zero*
+   count can be an artefact of placement; here a *non-zero* count **identical between two designs
+   conceals opposite security outcomes.** Clearance can never rest on `U` alone.
+5. **"`U` = 0 is a property of an instant" is not only about time.** §4.8 finding 3 established that
+   for **effectivity decay**, where a clock moves. **In the decisive scenario here no time passes at
+   all** — an authorization attribute changes in the kernel and the routed structures immediately hold
+   unauthorized rows. **No timer would have caught it**, which is exactly why MSG-0113 replaced the
+   elapsed-time question. This **corroborates §4.8 finding 1** in a second, independent fixture.
+   **Whether an in-query join against the kernel would change it was NOT measured.**
+
+**A trap this section exists to close, stated plainly:** a design can be **wired to invalidate on
+lifecycle transitions** and still serve unauthorized content, because **a hook is only as complete as
+the set of changes it is wired to.** Delivered as a recorded transition, the change was caught by
+re-materialisation and the faked re-check was never tested; delivered as an attribute reassignment
+outside that set, **only the designs re-checking against the kernel survived.** **MSG-0113 §2(2) and
+§2(5) are therefore not alternatives.**
+
+**Nothing is CLEARED and no verdict moves.** The nine MSG-0104 verdicts and the eight §4.8 design
+verdicts are unchanged and reproduced in MSG-0115 §8; **neither prior probe was re-run and no figure
+of theirs is re-measured.** **No numeric staleness threshold is introduced** — A6's bound is a
+**fixture constant** exhibited because **G-Q5.1a** requires a bound to exist, and **its magnitude is
+not judged, proposed or recommended.** **G-Q4 was NOT MEASURED** by this probe, as **G-Q4.4** requires
+a probe instrumenting only retrieval to say.
 
 ---
 

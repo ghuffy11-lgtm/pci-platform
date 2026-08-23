@@ -2,7 +2,9 @@
 
 **Active Work Package:** WP-0001 — PCI Kernel Foundation
 **Status:** **COMPLETE** — declared by the architecture lead 2026-08-19 (MSG-0020(b), resolved by MSG-0022 / MSG-0023, TASK-0009)
-**Last Updated:** 2026-08-23 UTC — **MSG-0113 resolves Q7 as a version-transition requirement, not an elapsed-time SLA**: once a change **is recorded** the prior version must not answer, and an unavailable current version means **abstain**. **Physical isolation does not excuse stale-version use.** **No numeric threshold introduced.** **TASK-0037 READY** — execution evidence for update/approve/revoke/supersede plus the abstention case, **distinguishing transition-triggered freshness from periodic re-materialisation**. Nothing cleared or selected.
+**Last Updated:** 2026-08-23 UTC — **TASK-0037 COMPLETE (8/8): the freshness mechanism is now measured, and nothing is CLEARED.** A probe ran **8 designs × 11 scenarios × 3 collection sizes**; **the discriminator fired** — on the *same* recorded transition, the timer-only designs returned the **superseded** version before the periodic refresh and the correct one after. **Version identity alone changed nothing**; **a re-check reading the materialised copy is demonstrably a no-op** (`kept 4/4` and leaked, where the kernel re-check `kept 0/4` and abstained), satisfying **G-Q5.2c for the first time**; **both report `U` = 4**, so an identical non-zero count **conceals opposite security outcomes**. **The 11/11 design is still NOT CLEARED.** **No numeric threshold introduced; `docs/` untouched.** **Q8/Q9/Q10 referred, none blocking.**
+
+> **The line this replaces, retained:** "**MSG-0113 resolves Q7 as a version-transition requirement, not an elapsed-time SLA**: once a change **is recorded** the prior version must not answer, and an unavailable current version means **abstain**. **Physical isolation does not excuse stale-version use.** **No numeric threshold introduced.** **TASK-0037 READY** — execution evidence for update/approve/revoke/supersede plus the abstention case, **distinguishing transition-triggered freshness from periodic re-materialisation**. Nothing cleared or selected." True when written; **the task it announced has now run**, started by the supervisor cycle at **18:57:17Z** and completed the same evening. **The discriminator it insisted on was the load-bearing instruction and it earned its place** — two designs would have passed a fixed-time test and were caught only because the probe queried at an instant no timer had reached. **Its "nothing cleared or selected" expectation held**, and for a sharper reason than expected: the design that met **every** freshness requirement is still NOT CLEARED, because freshness is a prerequisite and not the bar.
 
 > **The line this replaces, retained:** "**MSG-0110 rules TASK-0035's three referrals, all fail-closed**: routing computed from the subject's own entitlements; temporal materialisation **NOT CLEARED unless bounded re-materialisation AND a demonstrated §3.2 kernel re-check**; **construction alone cannot satisfy E3**. **TASK-0036 READY** — encode Q4/Q5/Q6 as testable clearance gates in the EPA-0006 probe spec. **Nothing cleared, nothing selected, no ADR changed.**" True when written; **the task it announced has now run**, started by the supervisor cycle at **13:17:18Z** and completed the same afternoon. **The subtlety MSG-0111 §4 flagged turned out to be the real one** — the numeric threshold is absent from the accepted set, verified rather than assumed — and **the task referred it instead of choosing a value**, exactly as instructed.
 
@@ -147,6 +149,7 @@ message on 2026-08-20 under MSG-0041 (MSG-0042) — the fifth.
 | TASK-0034 | Update the retrieval-engine criterion and probe specification for strict Shape-1 | **COMPLETE** (2026-08-23) — **7/7 criteria**; **`EPA-0006` §4.6 and §4.7** added, all changes additive and declared; **the bar is ZERO unauthorized units examined**; **all nine MSG-0104 verdicts reproduced unchanged** and **nothing became CLEARED**; `git diff --name-only docs/` **empty**; **MSG-0107** | MSG-0105 DECIDED, MSG-0104, ADR-0020+AMD-01 ✅ | Claude Code |
 | TASK-0035 | Physical projection isolation evaluation against strict Shape-1 | **COMPLETE** (2026-08-23) — **8/8 acceptance items**; **a probe ran**: 8 isolation designs × 3 collection sizes plus a staleness measurement, negative control **failed as required**; **`U` = 0 reached only where the routed structures hold no unauthorized row**; **a stale materialised structure RETURNS unauthorized rows**; **nothing CLEARED**, all nine MSG-0104 verdicts **unchanged**; `git diff --name-only docs/` **empty**; **MSG-0109** | MSG-0107b AUTHORIZED, MSG-0105, MSG-0104, EPA-0006 ✅ | Claude Code |
 | TASK-0036 | Encode Q4/Q5/Q6 as strict Shape-1 clearance gates in the EPA-0006 probe specification | **COMPLETE** (2026-08-23) — **8/8 acceptance criteria**; **`EPA-0006` §4.9** added with **G-Q4 / G-Q5 / G-Q6**, each quoting MSG-0110; **all three necessary, none sufficient**; documentary — **no test count and none claimed**, **no probe re-run**; **272 insertions / 0 deletions**; `git diff --name-only docs/` **empty**; **nothing CLEARED** and **all nine MSG-0104 plus all eight TASK-0035 verdicts reproduced unchanged**; **Q7 referred — no numeric staleness threshold exists in the accepted set, and none was invented**; **MSG-0112** | MSG-0110 DECIDED, MSG-0109, TASK-0034 criterion ✅ | Claude Code |
+| TASK-0037 | Version-transition freshness and stale-version fail-closed evidence | **COMPLETE** (2026-08-23) — **8/8 acceptance criteria**; **a probe ran**: 8 designs × 11 scenarios × 3 collection sizes, two instrument placements each; negative control **failed as required** and the adversarial precondition **voided this probe's own first fixture**; **all eight MSG-0113 §3 evidence items demonstrated**; **nothing CLEARED** — 7 NOT CLEARED, 1 DISQUALIFIED; **the discriminator fired** on the timer-only designs; **the faked kernel re-check demonstrated to be a no-op**; **`U` = 4 for both the leaking and the conservative design**; **no numeric threshold introduced**; `git diff --name-only docs/` **empty**; EPA-0006 **§4.10** added, **122 insertions / 0 deletions**; all nine MSG-0104 and eight TASK-0035 verdicts **unchanged**; **MSG-0115** | MSG-0113 DECIDED, EPA-0006 §4.9, TASK-0033/0035 harnesses ✅ | Claude Code |
 | TASK-0002 | Make test entry points shell-independent | **ABORTED** | — | — |
 
 > **Reconciled 2026-08-22 by TASK-0030 — additive and declared.** The three rows above were missing:
@@ -165,8 +168,128 @@ boundary**, not at an empty queue.
 > been executed and is COMPLETE (MSG-0055). MSG-0051 §C is fully discharged: C1–C5 by MSG-0052,
 > C6–C7 by MSG-0053.
 
-**Current position, 2026-08-23 after TASK-0036: no task is READY, and the boundary is a question the
-accepted architecture deliberately left open — a threshold that is named but has no value.**
+**Current position, 2026-08-23 after TASK-0037: no task is READY, and the boundary is the one MSG-0113
+§5 drew — evidence exists, clearance does not, and what happens next is the Architecture Lead's.**
+
+TASK-0037 executed MSG-0113 §2–§5 and is **COMPLETE** — **8/8 acceptance criteria MET**, each mapped to
+evidence in **MSG-0115** §11. It was run by a supervisor-started session (`runner.lock` pid 27556,
+acquired 18:57:17Z) against starting `HEAD = 57732ac`, **unchanged at every push**. **This one is not
+documentary: a probe was built and executed** — `implementation/probes/TASK-0037/probe.mjs` with its
+541-line captured output are committed as re-readable evidence. **TASK-0033's and TASK-0035's harnesses
+were neither modified nor re-run**, and **no figure of theirs was re-measured.**
+
+**264 measured cases** — 8 designs × 11 scenarios × 3 collection sizes, less one not-applicable pair —
+each at **two instrument placements**. **The pass/fail grid is identical at M=50, M=500 and M=5000**:
+freshness behaviour is a property of the mechanism, not of collection size. **`U` is not**, and the gap
+between those two sentences is where the findings live.
+
+**Both validity gates passed, and one of them earned its keep by failing first.** The negative control
+**leaked a superseded version in 12 cases**, so the run is valid rather than merely green. And the
+**adversarial precondition caught a real defect in this probe's own first fixture** — the
+`expired-effectivity` cohort expired *after* the earliest query instant, so those chunks were still
+effective when queried — and **declared that run VOID instead of reporting its numbers.**
+
+**Two terminology points were settled from the accepted ADRs rather than invented, and both matter.**
+MSG-0113 requires *"revoked"* to be evidenced; **ADR-0018 §2 has no `REVOKED` state** — it has
+**WITHDRAWN**, *"dropped from the projection"* — so the probe exercises the accepted vocabulary. And
+MSG-0113's *"current approved version"* is read as ADR-0018's **PUBLISHED and effective** version,
+because **`APPROVED (not yet published)` is expressly not answerable**; the looser reading would
+license an answer the ADR forbids. **Both readings are fail-closed and need no ruling to operate**; the
+second is referred as **Q10** anyway, because a terminology mismatch between a ruling and an ADR is
+worth correcting in the record rather than in each reader's head.
+
+**The discriminator MSG-0113 §3 demanded was built, and it fired.** S2 and S3 are **the same recorded
+transition**, queried before and after the periodic timer. The two timer-only designs returned the
+**superseded** version at S2 and the correct one at S3 — **they were not made correct by the
+transition; they were made correct by waiting.** Had the probe tested only after the timer, both would
+have looked conforming. This is the single instruction most likely to have been got wrong, and it was
+carried through to the fixture design rather than assumed.
+
+**Five results carry beyond the one reachable engine.**
+
+1. **Version identity is necessary and nowhere near sufficient.** Two designs differ in **exactly** that
+   property and their grids are **identical** — 3/11 each, leaking in the same seven scenarios.
+   MSG-0113 §2(6) is real, but the work is done by §2(2) and §2(3): something must **consult** the
+   authoritative record. **And a design carrying no version identity cannot name the version it
+   answered from** — which defeats ADR-0018 §1's *"a citation names a document version, never a
+   document"* independently of any freshness question.
+2. **"Answered nothing" is not "abstained".** One design returned an **empty ANSWER** where abstention
+   was required, and on the kernel-unreachable case **answered correctly by luck** — its hook had
+   fired, and it had no way to know that. **ADR-0017 §5 classifies abstentions A1–A7 and an empty
+   answer is none of them**; to the employee it is indistinguishable from *"no approved policy covers
+   this"*. **MSG-0113 §1 requires abstention when the current version cannot be *established*, not
+   only when it is established to be missing.**
+3. **The faked re-check is a no-op — demonstrated, where it had only been predicted.** Two designs
+   differ only in what the re-check reads. Against the same change: the kernel re-check traces
+   `kept 0/4` and **abstains**; the self re-check traces `kept 4/4` and **returns four chunks of a
+   version the kernel had reclassified RESTRICTED**. **Same structures, same plan, same `U`.**
+   EPA-0006 §4.9 **G-Q5.2b** called this *"the limb most easily faked and the one that matters"* on the
+   strength of TASK-0035's P4S; it is now shown directly, and **G-Q5.2c is satisfied for the first time
+   in this repository** — a re-check observed to **REJECT**, not merely to run.
+4. **`U` cannot distinguish a leaking design from a conservative one.** Those two designs **both report
+   `U` = 4 at every collection size, with identical plans.** One abstains; the other leaks. **This
+   extends §4.6 S5 in a direction it did not state:** the asymmetry rule warns that a *zero* count can
+   be an artefact of instrument placement; here a **non-zero count identical between two designs
+   conceals opposite security outcomes.** Clearance can never rest on `U` alone — which §4.6 S6 already
+   required, now corroborated by measurement rather than argued.
+5. **"`U` = 0 is a property of an instant" is not only about time.** §4.8 finding 3 established that for
+   **effectivity decay**, where a clock moves. **In the decisive scenario here no time passes at all** —
+   an authorization attribute changes in the kernel and the routed structures immediately hold four
+   rows unauthorized at answer time. **No timer would have caught it**, which is precisely why MSG-0113
+   replaced the elapsed-time question instead of answering it. This **corroborates §4.8 finding 1** —
+   *"`U` equals the number of unauthorized rows the routed structures still contain"* — in a second,
+   independent fixture and for a different cause. **Whether an in-query kernel join would change it was
+   NOT measured, and no claim is made about it.**
+
+**One trap is worth stating on its own, because a design can fall into it while looking correct: a
+transition-triggered hook is only as complete as the set of changes it is wired to.** The same
+authorization change delivered as a *recorded transition* was caught by re-materialisation — and the
+faked re-check was never tested. Delivered as an *attribute reassignment* outside that set, **only the
+designs re-checking against the kernel survived.** **MSG-0113 §2(2) and §2(5) are therefore not
+alternatives**, and a probe testing only the first form would have reported the faked re-check as equal
+to the real one.
+
+**Nothing is CLEARED — 7 NOT CLEARED, 1 DISQUALIFIED — and the row most open to misreading is the one
+that passes everything.** One design scores **11/11**, meeting **both** G-Q5 conditions and every
+MSG-0113 §2 property: a bound that exists, is enforced against a clock it does not control, and whose
+breach produced **abstention A7 and no answer**; and a kernel re-check demonstrated to reject. **It is
+still NOT CLEARED** — on **E2** (`U` = 4 > 0, measured), **E4** (log inspection never obtained) and
+**G-Q4** (routing was not instrumented, so the gate is **not measured**, exactly as G-Q4.4 requires a
+probe to say). **This is §4.9's "necessary, never sufficient" demonstrated in practice rather than
+asserted**, and it is the most useful thing in the record for anyone tempted to read a full grid as a
+clearance.
+
+**All nine MSG-0104 verdicts and all eight TASK-0035 design verdicts are reproduced unchanged** in
+MSG-0115 §8. **Nothing was selected, adopted, recommended, installed or deployed.** No ADR was created,
+amended or proposed; **`git diff --name-only docs/` is empty**. **EPA-0006 gained an additive, declared
+§4.10 — 122 insertions, 0 deletions** — plus a forward-reference note at §4.9's G-Q5 and a note
+recording that **Q7 has since been ruled**; no existing sentence was deleted or reworded. **No numeric
+staleness threshold was introduced**: the bound exhibited is a **fixture constant**, shown because
+**G-Q5.1a** requires a bound to exist, and **its magnitude is expressly not judged, proposed or
+recommended**. **No real corpus was entered, nothing was installed, Docker Desktop was not started, no
+network was reached, and no wall-clock was read** — so **no timing, benchmark, capacity or recall
+figure appears anywhere.**
+
+**Three questions are referred and none blocks anything** (MSG-0115 §10). **Q8 has the most leverage:**
+the ADR-0020 §3 point-2 re-check is **mandatory**, and to run against the kernel it must read the
+authorization record of candidates that turn out to be unauthorized — so under §4.6 S4's strict default
+those reads are units examined. **The fail-closed default is to count them, and the probe reports them
+separately.** It blocks nothing today, because every design is already NOT CLEARED on independent
+grounds; **it becomes decisive the moment a design reaches `U` = 0 in retrieval.** The measured fact
+that bears on it: **those kernel reads are bounded by `k` and invariant with `N`** — one to resolve the
+current version, two per hit — **so whatever is ruled, this is not a collection-scale exposure.**
+**Q9 sharpens §4.7 Q3** rather than opening a new question, and **relaxing the bar is explicitly not
+proposed.** **No implementation task is READY and no engine is CLEARED.**
+
+> **Superseded — the position after TASK-0036, retained.** The paragraphs below were written when the
+> three clearance gates had just been encoded and Q7 was freshly referred. **Q7 has since been ruled by
+> MSG-0113** and the evidence it authorized is recorded above. **Everything they say about the gates
+> themselves stands exactly** — including that G-Q5.1 is structural rather than numeric, which
+> MSG-0113 confirmed by replacing the question rather than supplying a number.
+
+**Current position, 2026-08-23 after TASK-0036 (superseded, retained): no task is READY, and the
+boundary is a question the accepted architecture deliberately left open — a threshold that is named but
+has no value.**
 
 TASK-0036 executed MSG-0110 §6 and is **COMPLETE** — **8/8 acceptance criteria MET**, each mapped to
 evidence in **MSG-0112** §9. Being documentary it produced **no test count and claims none**, and
