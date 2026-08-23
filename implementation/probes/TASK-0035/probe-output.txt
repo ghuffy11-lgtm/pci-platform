@@ -1,0 +1,354 @@
+==============================================================================================
+TASK-0035 — physical projection isolation probe (EVALUATION ONLY)
+==============================================================================================
+engine under test : SQLite 3.51.3 (embedded, node:sqlite)
+node              : v24.15.0
+EPA-0006 class    : R (relational). Classes S and V are unreachable on this host; K has no
+                    PostgreSQL here. This probe measures ONE class and claims nothing beyond it.
+
+--- Subject and answer-time frame, held constant across every design ---
+subject           : {"scope":"org-a","classifications":["PUBLIC","INTERNAL"],"audiences":["staff","all-employees"]}
+answerable state  : PUBLISHED   (ADR-0018 §2 — SUPERSEDED is retained, not answerable)
+answer time T     : 1700000000
+k                 : 5   authorized chunks in fixture: 8
+
+##############################################################################################
+FIXTURE  M=50 unauthorized · 8 authorized · 58 chunks total · authorized-at-T=8
+##############################################################################################
+precondition (unconstrained lexical top-5) : ids=[9,10,11,12,13] authorized-among-them=0 -> ADVERSARIAL, as required
+
+[P0] structures created=1 routed-to=1  stored-rows=58
+      structure invariant : rows-in-routed-structures=58 unauthorized-among-them=50 -> VIOLATED
+      instrument=pre   unauthorized-examined=   20 rows-through-instrument=    28 unauth-BODIES-materialised=    0 returned=5/5 unauthorized-returned=0
+      instrument=post  unauthorized-examined=   10 rows-through-instrument=    18 unauth-BODIES-materialised=    0 returned=5/5 unauthorized-returned=0
+      U (max over placements, EPA-0006 §4.6 S7) = 20
+      result set          : [4,5,6,7,8]
+      plan                : SEARCH chunks USING INDEX i_auth (scope=? AND state=? AND cls=? AND eff_from<?)
+      plan                : SEARCH ca EXISTS USING COVERING INDEX i_aud (chunk_id=? AND audience=?)
+      plan                : USE TEMP B-TREE FOR GROUP BY
+      plan                : USE TEMP B-TREE FOR ORDER BY
+
+[P1] structures created=2 routed-to=1 rows-in-routed=48  stored-rows=58
+      structure invariant : rows-in-routed-structures=48 unauthorized-among-them=40 -> VIOLATED
+      instrument=pre   unauthorized-examined=   40 rows-through-instrument=    48 unauth-BODIES-materialised=    0 returned=5/5 unauthorized-returned=0
+      instrument=post  unauthorized-examined=   10 rows-through-instrument=    18 unauth-BODIES-materialised=    0 returned=5/5 unauthorized-returned=0
+      instrument=structure unauthorized-examined=   40 rows-through-instrument=    48 unauth-BODIES-materialised=    0 returned=5/5 unauthorized-returned=0
+      U (max over placements, EPA-0006 §4.6 S7) = 40
+      result set          : [4,5,6,7,8]
+      plan                : SCAN p_org_a
+      plan                : SEARCH ca EXISTS USING COVERING INDEX i_aud (chunk_id=? AND audience=?)
+      plan                : USE TEMP B-TREE FOR GROUP BY
+      plan                : USE TEMP B-TREE FOR ORDER BY
+
+[P2] structures created=4 routed-to=1 rows-in-routed=28  stored-rows=58
+      structure invariant : rows-in-routed-structures=28 unauthorized-among-them=20 -> VIOLATED
+      instrument=pre   unauthorized-examined=   20 rows-through-instrument=    28 unauth-BODIES-materialised=    0 returned=5/5 unauthorized-returned=0
+      instrument=post  unauthorized-examined=   10 rows-through-instrument=    18 unauth-BODIES-materialised=    0 returned=5/5 unauthorized-returned=0
+      instrument=structure unauthorized-examined=   20 rows-through-instrument=    28 unauth-BODIES-materialised=    0 returned=5/5 unauthorized-returned=0
+      U (max over placements, EPA-0006 §4.6 S7) = 20
+      result set          : [4,5,6,7,8]
+      plan                : SCAN p_org_a_internal_published
+      plan                : SEARCH ca EXISTS USING COVERING INDEX i_aud (chunk_id=? AND audience=?)
+      plan                : USE TEMP B-TREE FOR GROUP BY
+      plan                : USE TEMP B-TREE FOR ORDER BY
+
+[P3] structures created=6 routed-to=2 rows-in-routed=22  stored-rows=62
+      structure invariant : rows-in-routed-structures=22 unauthorized-among-them=10 -> VIOLATED
+      instrument=pre   unauthorized-examined=    0 rows-through-instrument=    12 unauth-BODIES-materialised=    0 returned=5/5 unauthorized-returned=0
+      instrument=post  unauthorized-examined=    0 rows-through-instrument=    12 unauth-BODIES-materialised=    0 returned=5/5 unauthorized-returned=0
+      instrument=structure unauthorized-examined=   10 rows-through-instrument=    22 unauth-BODIES-materialised=    0 returned=5/5 unauthorized-returned=0
+      U (max over placements, EPA-0006 §4.6 S7) = 10
+      result set          : [4,5,6,7,8]
+      plan                : CO-ROUTINE x
+      plan                : COMPOUND QUERY
+      plan                : LEFT-MOST SUBQUERY
+      plan                : SCAN p_org_a_internal_published_staff
+      plan                : UNION ALL
+      plan                : SCAN p_org_a_internal_published_all_employees
+      plan                : … 3 further plan rows
+
+[P4] structures created=6 routed-to=2 rows-in-routed=12  stored-rows=52
+      structure invariant : rows-in-routed-structures=12 unauthorized-among-them=0 -> HOLDS
+      instrument=pre   unauthorized-examined=    0 rows-through-instrument=    12 unauth-BODIES-materialised=    0 returned=5/5 unauthorized-returned=0
+      instrument=post  unauthorized-examined=    0 rows-through-instrument=    12 unauth-BODIES-materialised=    0 returned=5/5 unauthorized-returned=0
+      instrument=structure unauthorized-examined=    0 rows-through-instrument=    12 unauth-BODIES-materialised=    0 returned=5/5 unauthorized-returned=0
+      U (max over placements, EPA-0006 §4.6 S7) = 0
+      result set          : [4,5,6,7,8]
+      plan                : CO-ROUTINE x
+      plan                : COMPOUND QUERY
+      plan                : LEFT-MOST SUBQUERY
+      plan                : SCAN p_org_a_internal_published_staff
+      plan                : UNION ALL
+      plan                : SCAN p_org_a_internal_published_all_employees
+      plan                : … 3 further plan rows
+
+[P5] structures created=6 routed-to=2 rows-in-routed=12  stored-rows=52
+      structure invariant : rows-in-routed-structures=12 unauthorized-among-them=0 -> HOLDS
+      instrument=pre   unauthorized-examined=    0 rows-through-instrument=    12 unauth-BODIES-materialised=    0 returned=5/5 unauthorized-returned=0
+      instrument=structure unauthorized-examined=    0 rows-through-instrument=    12 unauth-BODIES-materialised=    0 returned=5/5 unauthorized-returned=0
+      U (max over placements, EPA-0006 §4.6 S7) = 0
+      result set          : [4,5,6,7,8]
+      plan                : CO-ROUTINE x
+      plan                : COMPOUND QUERY
+      plan                : LEFT-MOST SUBQUERY
+      plan                : SCAN fts_p_org_a_internal_published_staff VIRTUAL TABLE INDEX 0:M1
+      plan                : BLOOM FILTER ON c (id=?)
+      plan                : SEARCH c USING AUTOMATIC COVERING INDEX (id=?)
+      plan                : … 7 further plan rows
+
+[NC ] NEGATIVE CONTROL — post-filter over the shared structure (must fail; S8)
+      fetched=58 then filtered in application code
+      unauth-BODIES-materialised=50  returned=5/5 k-complete=true
+      result set          : [1,2,3,4,5]
+
+##############################################################################################
+FIXTURE  M=500 unauthorized · 8 authorized · 508 chunks total · authorized-at-T=8
+##############################################################################################
+precondition (unconstrained lexical top-5) : ids=[9,10,11,12,13] authorized-among-them=0 -> ADVERSARIAL, as required
+
+[P0] structures created=1 routed-to=1  stored-rows=508
+      structure invariant : rows-in-routed-structures=508 unauthorized-among-them=500 -> VIOLATED
+      instrument=pre   unauthorized-examined=  200 rows-through-instrument=   208 unauth-BODIES-materialised=    0 returned=5/5 unauthorized-returned=0
+      instrument=post  unauthorized-examined=  100 rows-through-instrument=   108 unauth-BODIES-materialised=    0 returned=5/5 unauthorized-returned=0
+      U (max over placements, EPA-0006 §4.6 S7) = 200
+      result set          : [4,5,6,7,8]
+      plan                : SEARCH chunks USING INDEX i_auth (scope=? AND state=? AND cls=? AND eff_from<?)
+      plan                : SEARCH ca EXISTS USING COVERING INDEX i_aud (chunk_id=? AND audience=?)
+      plan                : USE TEMP B-TREE FOR GROUP BY
+      plan                : USE TEMP B-TREE FOR ORDER BY
+
+[P1] structures created=2 routed-to=1 rows-in-routed=408  stored-rows=508
+      structure invariant : rows-in-routed-structures=408 unauthorized-among-them=400 -> VIOLATED
+      instrument=pre   unauthorized-examined=  400 rows-through-instrument=   408 unauth-BODIES-materialised=    0 returned=5/5 unauthorized-returned=0
+      instrument=post  unauthorized-examined=  100 rows-through-instrument=   108 unauth-BODIES-materialised=    0 returned=5/5 unauthorized-returned=0
+      instrument=structure unauthorized-examined=  400 rows-through-instrument=   408 unauth-BODIES-materialised=    0 returned=5/5 unauthorized-returned=0
+      U (max over placements, EPA-0006 §4.6 S7) = 400
+      result set          : [4,5,6,7,8]
+      plan                : SCAN p_org_a
+      plan                : SEARCH ca EXISTS USING COVERING INDEX i_aud (chunk_id=? AND audience=?)
+      plan                : USE TEMP B-TREE FOR GROUP BY
+      plan                : USE TEMP B-TREE FOR ORDER BY
+
+[P2] structures created=4 routed-to=1 rows-in-routed=208  stored-rows=508
+      structure invariant : rows-in-routed-structures=208 unauthorized-among-them=200 -> VIOLATED
+      instrument=pre   unauthorized-examined=  200 rows-through-instrument=   208 unauth-BODIES-materialised=    0 returned=5/5 unauthorized-returned=0
+      instrument=post  unauthorized-examined=  100 rows-through-instrument=   108 unauth-BODIES-materialised=    0 returned=5/5 unauthorized-returned=0
+      instrument=structure unauthorized-examined=  200 rows-through-instrument=   208 unauth-BODIES-materialised=    0 returned=5/5 unauthorized-returned=0
+      U (max over placements, EPA-0006 §4.6 S7) = 200
+      result set          : [4,5,6,7,8]
+      plan                : SCAN p_org_a_internal_published
+      plan                : SEARCH ca EXISTS USING COVERING INDEX i_aud (chunk_id=? AND audience=?)
+      plan                : USE TEMP B-TREE FOR GROUP BY
+      plan                : USE TEMP B-TREE FOR ORDER BY
+
+[P3] structures created=6 routed-to=2 rows-in-routed=112  stored-rows=512
+      structure invariant : rows-in-routed-structures=112 unauthorized-among-them=100 -> VIOLATED
+      instrument=pre   unauthorized-examined=    0 rows-through-instrument=    12 unauth-BODIES-materialised=    0 returned=5/5 unauthorized-returned=0
+      instrument=post  unauthorized-examined=    0 rows-through-instrument=    12 unauth-BODIES-materialised=    0 returned=5/5 unauthorized-returned=0
+      instrument=structure unauthorized-examined=  100 rows-through-instrument=   112 unauth-BODIES-materialised=    0 returned=5/5 unauthorized-returned=0
+      U (max over placements, EPA-0006 §4.6 S7) = 100
+      result set          : [4,5,6,7,8]
+      plan                : CO-ROUTINE x
+      plan                : COMPOUND QUERY
+      plan                : LEFT-MOST SUBQUERY
+      plan                : SCAN p_org_a_internal_published_staff
+      plan                : UNION ALL
+      plan                : SCAN p_org_a_internal_published_all_employees
+      plan                : … 3 further plan rows
+
+[P4] structures created=6 routed-to=2 rows-in-routed=12  stored-rows=412
+      structure invariant : rows-in-routed-structures=12 unauthorized-among-them=0 -> HOLDS
+      instrument=pre   unauthorized-examined=    0 rows-through-instrument=    12 unauth-BODIES-materialised=    0 returned=5/5 unauthorized-returned=0
+      instrument=post  unauthorized-examined=    0 rows-through-instrument=    12 unauth-BODIES-materialised=    0 returned=5/5 unauthorized-returned=0
+      instrument=structure unauthorized-examined=    0 rows-through-instrument=    12 unauth-BODIES-materialised=    0 returned=5/5 unauthorized-returned=0
+      U (max over placements, EPA-0006 §4.6 S7) = 0
+      result set          : [4,5,6,7,8]
+      plan                : CO-ROUTINE x
+      plan                : COMPOUND QUERY
+      plan                : LEFT-MOST SUBQUERY
+      plan                : SCAN p_org_a_internal_published_staff
+      plan                : UNION ALL
+      plan                : SCAN p_org_a_internal_published_all_employees
+      plan                : … 3 further plan rows
+
+[P5] structures created=6 routed-to=2 rows-in-routed=12  stored-rows=412
+      structure invariant : rows-in-routed-structures=12 unauthorized-among-them=0 -> HOLDS
+      instrument=pre   unauthorized-examined=    0 rows-through-instrument=    12 unauth-BODIES-materialised=    0 returned=5/5 unauthorized-returned=0
+      instrument=structure unauthorized-examined=    0 rows-through-instrument=    12 unauth-BODIES-materialised=    0 returned=5/5 unauthorized-returned=0
+      U (max over placements, EPA-0006 §4.6 S7) = 0
+      result set          : [4,5,6,7,8]
+      plan                : CO-ROUTINE x
+      plan                : COMPOUND QUERY
+      plan                : LEFT-MOST SUBQUERY
+      plan                : SCAN fts_p_org_a_internal_published_staff VIRTUAL TABLE INDEX 0:M1
+      plan                : BLOOM FILTER ON c (id=?)
+      plan                : SEARCH c USING AUTOMATIC COVERING INDEX (id=?)
+      plan                : … 7 further plan rows
+
+[NC ] NEGATIVE CONTROL — post-filter over the shared structure (must fail; S8)
+      fetched=200 then filtered in application code
+      unauth-BODIES-materialised=500  returned=0/5 k-complete=false
+      result set          : []
+
+##############################################################################################
+FIXTURE  M=5000 unauthorized · 8 authorized · 5008 chunks total · authorized-at-T=8
+##############################################################################################
+precondition (unconstrained lexical top-5) : ids=[9,10,11,12,13] authorized-among-them=0 -> ADVERSARIAL, as required
+
+[P0] structures created=1 routed-to=1  stored-rows=5008
+      structure invariant : rows-in-routed-structures=5008 unauthorized-among-them=5000 -> VIOLATED
+      instrument=pre   unauthorized-examined= 2000 rows-through-instrument=  2008 unauth-BODIES-materialised=    0 returned=5/5 unauthorized-returned=0
+      instrument=post  unauthorized-examined= 1000 rows-through-instrument=  1008 unauth-BODIES-materialised=    0 returned=5/5 unauthorized-returned=0
+      U (max over placements, EPA-0006 §4.6 S7) = 2000
+      result set          : [4,5,6,7,8]
+      plan                : SEARCH chunks USING INDEX i_auth (scope=? AND state=? AND cls=? AND eff_from<?)
+      plan                : SEARCH ca EXISTS USING COVERING INDEX i_aud (chunk_id=? AND audience=?)
+      plan                : USE TEMP B-TREE FOR GROUP BY
+      plan                : USE TEMP B-TREE FOR ORDER BY
+
+[P1] structures created=2 routed-to=1 rows-in-routed=4008  stored-rows=5008
+      structure invariant : rows-in-routed-structures=4008 unauthorized-among-them=4000 -> VIOLATED
+      instrument=pre   unauthorized-examined= 4000 rows-through-instrument=  4008 unauth-BODIES-materialised=    0 returned=5/5 unauthorized-returned=0
+      instrument=post  unauthorized-examined= 1000 rows-through-instrument=  1008 unauth-BODIES-materialised=    0 returned=5/5 unauthorized-returned=0
+      instrument=structure unauthorized-examined= 4000 rows-through-instrument=  4008 unauth-BODIES-materialised=    0 returned=5/5 unauthorized-returned=0
+      U (max over placements, EPA-0006 §4.6 S7) = 4000
+      result set          : [4,5,6,7,8]
+      plan                : SCAN p_org_a
+      plan                : SEARCH ca EXISTS USING COVERING INDEX i_aud (chunk_id=? AND audience=?)
+      plan                : USE TEMP B-TREE FOR GROUP BY
+      plan                : USE TEMP B-TREE FOR ORDER BY
+
+[P2] structures created=4 routed-to=1 rows-in-routed=2008  stored-rows=5008
+      structure invariant : rows-in-routed-structures=2008 unauthorized-among-them=2000 -> VIOLATED
+      instrument=pre   unauthorized-examined= 2000 rows-through-instrument=  2008 unauth-BODIES-materialised=    0 returned=5/5 unauthorized-returned=0
+      instrument=post  unauthorized-examined= 1000 rows-through-instrument=  1008 unauth-BODIES-materialised=    0 returned=5/5 unauthorized-returned=0
+      instrument=structure unauthorized-examined= 2000 rows-through-instrument=  2008 unauth-BODIES-materialised=    0 returned=5/5 unauthorized-returned=0
+      U (max over placements, EPA-0006 §4.6 S7) = 2000
+      result set          : [4,5,6,7,8]
+      plan                : SCAN p_org_a_internal_published
+      plan                : SEARCH ca EXISTS USING COVERING INDEX i_aud (chunk_id=? AND audience=?)
+      plan                : USE TEMP B-TREE FOR GROUP BY
+      plan                : USE TEMP B-TREE FOR ORDER BY
+
+[P3] structures created=6 routed-to=2 rows-in-routed=1012  stored-rows=5012
+      structure invariant : rows-in-routed-structures=1012 unauthorized-among-them=1000 -> VIOLATED
+      instrument=pre   unauthorized-examined=    0 rows-through-instrument=    12 unauth-BODIES-materialised=    0 returned=5/5 unauthorized-returned=0
+      instrument=post  unauthorized-examined=    0 rows-through-instrument=    12 unauth-BODIES-materialised=    0 returned=5/5 unauthorized-returned=0
+      instrument=structure unauthorized-examined= 1000 rows-through-instrument=  1012 unauth-BODIES-materialised=    0 returned=5/5 unauthorized-returned=0
+      U (max over placements, EPA-0006 §4.6 S7) = 1000
+      result set          : [4,5,6,7,8]
+      plan                : CO-ROUTINE x
+      plan                : COMPOUND QUERY
+      plan                : LEFT-MOST SUBQUERY
+      plan                : SCAN p_org_a_internal_published_staff
+      plan                : UNION ALL
+      plan                : SCAN p_org_a_internal_published_all_employees
+      plan                : … 3 further plan rows
+
+[P4] structures created=6 routed-to=2 rows-in-routed=12  stored-rows=4012
+      structure invariant : rows-in-routed-structures=12 unauthorized-among-them=0 -> HOLDS
+      instrument=pre   unauthorized-examined=    0 rows-through-instrument=    12 unauth-BODIES-materialised=    0 returned=5/5 unauthorized-returned=0
+      instrument=post  unauthorized-examined=    0 rows-through-instrument=    12 unauth-BODIES-materialised=    0 returned=5/5 unauthorized-returned=0
+      instrument=structure unauthorized-examined=    0 rows-through-instrument=    12 unauth-BODIES-materialised=    0 returned=5/5 unauthorized-returned=0
+      U (max over placements, EPA-0006 §4.6 S7) = 0
+      result set          : [4,5,6,7,8]
+      plan                : CO-ROUTINE x
+      plan                : COMPOUND QUERY
+      plan                : LEFT-MOST SUBQUERY
+      plan                : SCAN p_org_a_internal_published_staff
+      plan                : UNION ALL
+      plan                : SCAN p_org_a_internal_published_all_employees
+      plan                : … 3 further plan rows
+
+[P5] structures created=6 routed-to=2 rows-in-routed=12  stored-rows=4012
+      structure invariant : rows-in-routed-structures=12 unauthorized-among-them=0 -> HOLDS
+      instrument=pre   unauthorized-examined=    0 rows-through-instrument=    12 unauth-BODIES-materialised=    0 returned=5/5 unauthorized-returned=0
+      instrument=structure unauthorized-examined=    0 rows-through-instrument=    12 unauth-BODIES-materialised=    0 returned=5/5 unauthorized-returned=0
+      U (max over placements, EPA-0006 §4.6 S7) = 0
+      result set          : [4,5,6,7,8]
+      plan                : CO-ROUTINE x
+      plan                : COMPOUND QUERY
+      plan                : LEFT-MOST SUBQUERY
+      plan                : SCAN fts_p_org_a_internal_published_staff VIRTUAL TABLE INDEX 0:M1
+      plan                : BLOOM FILTER ON c (id=?)
+      plan                : SEARCH c USING AUTOMATIC COVERING INDEX (id=?)
+      plan                : … 7 further plan rows
+
+[NC ] NEGATIVE CONTROL — post-filter over the shared structure (must fail; S8)
+      fetched=200 then filtered in application code
+      unauth-BODIES-materialised=5000  returned=0/5 k-complete=false
+      result set          : []
+
+==============================================================================================
+P4S — the same physically materialised design, queried after time has passed
+==============================================================================================
+
+P4 stores only rows effective at the instant of materialisation. This asks what the
+structure contains once the answer time has moved past that instant — the only variable
+changed is the clock. Nothing here is a benchmark and no timing is measured.
+
+M=50  expiring-during-staleness cohort=5  delta=1000  authorized at build=13 at answer=8
+      structure invariant AT ANSWER TIME : rows-in-routed=17 unauthorized-among-them=5 -> VIOLATED
+      U (unauthorized examined at answer time) = 5  unauth-BODIES-materialised=5  returned=5/5 unauthorized-returned=5
+
+M=500  expiring-during-staleness cohort=50  delta=1000  authorized at build=58 at answer=8
+      structure invariant AT ANSWER TIME : rows-in-routed=62 unauthorized-among-them=50 -> VIOLATED
+      U (unauthorized examined at answer time) = 50  unauth-BODIES-materialised=50  returned=5/5 unauthorized-returned=5
+
+M=5000  expiring-during-staleness cohort=500  delta=1000  authorized at build=508 at answer=8
+      structure invariant AT ANSWER TIME : rows-in-routed=512 unauthorized-among-them=500 -> VIOLATED
+      U (unauthorized examined at answer time) = 500  unauth-BODIES-materialised=500  returned=5/5 unauthorized-returned=5
+
+==============================================================================================
+U — unauthorized units examined, by physical-isolation design and collection size
+EPA-0006 §4.6 S3: CLEARED requires U = 0 at every measured N, shown invariant with N
+==============================================================================================
+
+  design  M=50      M=500     M=5000    invariant-with-N  structure-invariant (E1)  reading
+  P0             20       200      2000 NO — grows        VIOLATED                  fails on both E1 and U
+  P1             40       400      4000 NO — grows        VIOLATED                  fails on both E1 and U
+  P2             20       200      2000 NO — grows        VIOLATED                  fails on both E1 and U
+  P3             10       100      1000 NO — grows        VIOLATED                  fails on both E1 and U
+  P4              0         0         0 yes               holds                     U=0 with E1 holding
+  P5              0         0         0 yes               holds                     U=0 with E1 holding
+  P4S             5        50       500 NO — grows        VIOLATED                  fails on both E1 and U
+  NC             50       500      5000 NO — grows        VIOLATED                  control — must fail, and does
+
+  design  meaning
+  P0      no isolation (shared structure)
+  P1      scope-partitioned
+  P2      discrete-conjunct partitioned (scope,class,state)
+  P3      + audience-partitioned
+  P4      + effectivity-materialised at T
+  P5      P4 with per-partition lexical index
+  P4S     P4 queried after staleness (delta>0)
+  NC      NEGATIVE CONTROL — post-filter
+
+==============================================================================================
+Physical cost of isolation — structures created and rows stored (fixture measurement only)
+==============================================================================================
+
+  design  M     structures  routed-to  rows-stored  rows-in-routed  stored/corpus-ratio
+  P0         50           1          1           58               -                1.00
+  P0        500           1          1          508               -                1.00
+  P0       5000           1          1         5008               -                1.00
+  P1         50           2          1           58              48                1.00
+  P1        500           2          1          508             408                1.00
+  P1       5000           2          1         5008            4008                1.00
+  P2         50           4          1           58              28                1.00
+  P2        500           4          1          508             208                1.00
+  P2       5000           4          1         5008            2008                1.00
+  P3         50           6          2           62              22                1.07
+  P3        500           6          2          512             112                1.01
+  P3       5000           6          2         5012            1012                1.00
+  P4         50           6          2           52              12                0.90
+  P4        500           6          2          412              12                0.81
+  P4       5000           6          2         4012              12                0.80
+  P5         50           6          2           52              12                0.90
+  P5        500           6          2          412              12                0.81
+  P5       5000           6          2         4012              12                0.80
+
+==============================================================================================
+END OF PROBE — no engine, technology or physical implementation selected, adopted,
+recommended, installed or deployed. Verdicts are recorded in the COMMS execution record.
+==============================================================================================
