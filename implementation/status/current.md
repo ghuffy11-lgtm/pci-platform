@@ -2,7 +2,9 @@
 
 **Active Work Package:** WP-0001 — PCI Kernel Foundation
 **Status:** **COMPLETE** — declared by the architecture lead 2026-08-19 (MSG-0020(b), resolved by MSG-0022 / MSG-0023, TASK-0009)
-**Last Updated:** 2026-08-24 UTC — **TASK-0038 COMPLETE, nothing cleared**: the kernel-constrained path **eliminates divergence and does nothing for strict Shape-1** — the designs holding no copy at all carry the **largest** `U`. **MSG-0119 rules Q11 strictly**, leaving **K7/K8 the only candidates whose E1 position is not in question**. **TASK-0039 READY** — close their E4, `U1` observability and plan-independence gaps; **unobtainable evidence ⇒ NOT CLEARED**, never an inferred pass.
+**Last Updated:** 2026-08-24 UTC — **TASK-0039 COMPLETE, nothing cleared: K7 and K8 are both NOT CLEARED, and the strongest candidates were not defeated by examining too much — they were defeated by the engine not being answerable.** **E4 is UNOBTAINABLE**, established by enumerating the binding and the build rather than inferred, with every tracing pragma **demonstrated inert against a nonexistent-pragma control**. **`U1` proved partially instrumentable after all**, reversing MSG-0118 — and what it measures is failure: **K7 and K8 visit the SAME number of index entries at every size while `U` reads 2857 versus 0**, so **K8 never examined less; it examined the same amount where a row-access counter cannot see it**. **`ANALYZE` alone flips K7's `U` from 2857 to 0** while entries visited go **up** by one, so on this engine `U` is a property of the statistics table, not of the design. **Plan-independence splits**: E1's **reachable-structure** limb **is** obtainable without trusting one plan (`setAuthorizer`), its **confinement** limb is not, and **`INDEXED BY` pins one limb only**. **No task is READY.** **The next action is the Architecture Lead's** — MSG-0119 requires the question return to **EPA-0006 §4.7 Q3**, and failure does **not** authorize weakening the gates. **One non-blocking question referred — Q12.**
+
+> **The line this replaces, retained:** "**TASK-0038 COMPLETE, nothing cleared**: the kernel-constrained path **eliminates divergence and does nothing for strict Shape-1** — the designs holding no copy at all carry the **largest** `U`. **MSG-0119 rules Q11 strictly**, leaving **K7/K8 the only candidates whose E1 position is not in question**. **TASK-0039 READY** — close their E4, `U1` observability and plan-independence gaps; **unobtainable evidence ⇒ NOT CLEARED**, never an inferred pass." True when written; **the task it announced has now run**, started by the supervisor cycle at **21:37:18Z** and completed across local midnight. **Its central instruction was the load-bearing one and it cut both ways.** *"Do not claim `U1 = 0` when the test subject cannot observe index-entry reads"* was written to prevent a false pass — and obeying it properly meant **first checking whether the subject really cannot observe them.** It can, in part: a placement four prior probes had not taken turned **the most promising `U = 0` in five probes into a rising lower bound on the same design.** **The instruction that was meant to stop an unsupported zero is what removed a supported-looking one.**
 
 > **The line this replaces, retained:** "**TASK-0037 COMPLETE, nothing cleared**: every materialized design examined unauthorized rows once its copy diverged from the kernel, **including at zero elapsed time** — divergence, not staleness, is the mechanism. **MSG-0116a/b rule Q8/Q9/Q10** (they agree): the kernel re-check is **control-plane, not examination**, but must be **instrumented separately** and **clears nothing**; **the bar is not relaxed**; **currently-effective version only**. **TASK-0038 READY** — measure the kernel-constrained alternative MSG-0115 left unmeasured." True when written; **the task it announced has now run**, started by the supervisor cycle at **20:27:17Z** and completed across local midnight. **Its framing was confirmed and then sharpened**: divergence is indeed the mechanism, and removing it turns out to be **necessary and nowhere near sufficient**. **MSG-0116b's separate-instrumentation requirement was the load-bearing instruction** — two designs agreed on `U`, the plan, the routed set, the answers and the whole grid, and **only the separately-counted re-check distinguished the clean one from the one reading unauthorized content**. A runner reading only MSG-0116a would have built one counter and reported the violating design as clean.
 
@@ -153,6 +155,7 @@ message on 2026-08-20 under MSG-0041 (MSG-0042) — the fifth.
 | TASK-0036 | Encode Q4/Q5/Q6 as strict Shape-1 clearance gates in the EPA-0006 probe specification | **COMPLETE** (2026-08-23) — **8/8 acceptance criteria**; **`EPA-0006` §4.9** added with **G-Q4 / G-Q5 / G-Q6**, each quoting MSG-0110; **all three necessary, none sufficient**; documentary — **no test count and none claimed**, **no probe re-run**; **272 insertions / 0 deletions**; `git diff --name-only docs/` **empty**; **nothing CLEARED** and **all nine MSG-0104 plus all eight TASK-0035 verdicts reproduced unchanged**; **Q7 referred — no numeric staleness threshold exists in the accepted set, and none was invented**; **MSG-0112** | MSG-0110 DECIDED, MSG-0109, TASK-0034 criterion ✅ | Claude Code |
 | TASK-0037 | Version-transition freshness and stale-version fail-closed evidence | **COMPLETE** (2026-08-23) — **8/8 acceptance criteria**; **a probe ran**: 8 designs × 11 scenarios × 3 collection sizes, two instrument placements each; negative control **failed as required** and the adversarial precondition **voided this probe's own first fixture**; **all eight MSG-0113 §3 evidence items demonstrated**; **nothing CLEARED** — 7 NOT CLEARED, 1 DISQUALIFIED; **the discriminator fired** on the timer-only designs; **the faked kernel re-check demonstrated to be a no-op**; **`U` = 4 for both the leaking and the conservative design**; **no numeric threshold introduced**; `git diff --name-only docs/` **empty**; EPA-0006 **§4.10** added, **122 insertions / 0 deletions**; all nine MSG-0104 and eight TASK-0035 verdicts **unchanged**; **MSG-0115** | MSG-0113 DECIDED, EPA-0006 §4.9, TASK-0033/0035 harnesses ✅ | Claude Code |
 | TASK-0038 | Kernel-constrained retrieval / non-divergent projection evidence | **COMPLETE** (2026-08-24) — **8/8 acceptance criteria**; **a probe ran**: 9 designs × 7 scenarios × 3 collection sizes, two instrument placements **plus a placement-independent structural measure**; adversarial precondition held and the negative control **failed in 15 of 21 cases**; **nothing CLEARED** — 6 NOT CLEARED, 3 DISQUALIFIED; **the referred question answered negatively — removing the copy eliminates divergence and does nothing for Shape-1**; **the four discrete conjuncts refine perfectly and effectivity is the entire residual**; **`U = 0` shown purchasable by withholding authorized content**; **two designs differing by one `INDEXED BY` token measure `U` = 715 and 0**, so the planner decides examination on this engine class; **G-Q4 measured for the first time** and failed by a design returning identical answers; **E4 NOT OBTAINED**; **two defects in the probe's own apparatus caught and fixed before any result was reported**; `git diff --name-only docs/` **empty**; EPA-0006 **§4.11** added, **187 insertions / 0 deletions**; all prior verdicts **unchanged**; **MSG-0118** | MSG-0116a+b DECIDED, MSG-0115, EPA-0006 §4.6–§4.10 ✅ | Claude Code |
+| TASK-0039 | K7/K8 remaining clearance evidence — E4, `U1` observability, plan-independence | **COMPLETE** (2026-08-24) — **8/8 acceptance criteria**; **a probe ran**: 2 designs × 6 configurations × 4 collection sizes × 2 distributions, three instrument variants per cell (**96 measurements**), plus an API enumeration, an opcode capture, an instrument calibration and a negative control; adversarial precondition held at all four sizes under both distributions and the negative control **failed 4 of 4**; **nothing CLEARED — K7 and K8 both NOT CLEARED**; **E4 established UNOBTAINABLE by enumeration, not inferred**, with every tracing pragma **demonstrated inert against a nonexistent-pragma control**; **`U1` proved partially instrumentable, reversing MSG-0118** — an index-cursor placement **calibrated exactly (302, 402) against a cohort known by construction on both plans**, showing **K7 and K8 visit the same entries at every size (10 / 74 / 717 / 2860) while `U` reads 2857 versus 0**, so **K8 never examined less**; **`ANALYZE` alone flips K7's `U` from 2857 to 0** while entries visited rise by one; **plan-independence splits** — E1's reachable-structure limb **obtained** independently of the optimizer via `setAuthorizer` (characterised, not assumed), its confinement limb **not**, and **`INDEXED BY` pins one limb only**; **G-Q4 MET 12/12**; **two defects in the probe's own apparatus caught before any result was reported**, one an assertion the output contradicted in the same line; `git diff --name-only docs/` **empty**; EPA-0006 **§4.12** added, **178 insertions / 0 deletions**; all prior verdicts **unchanged**, K3/K4 not re-run; **Q12 referred**; **MSG-0123** | MSG-0120 AUTHORIZED, MSG-0119 (strict Q11), MSG-0118, EPA-0006 §4.6–§4.11 ✅ | Claude Code |
 | TASK-0002 | Make test entry points shell-independent | **ABORTED** | — | — |
 
 > **Reconciled 2026-08-22 by TASK-0030 — additive and declared.** The three rows above were missing:
@@ -171,9 +174,89 @@ boundary**, not at an empty queue.
 > been executed and is COMPLETE (MSG-0055). MSG-0051 §C is fully discharged: C1–C5 by MSG-0052,
 > C6–C7 by MSG-0053.
 
-**Current position, 2026-08-24 after TASK-0038: no task is READY. The evidence Q9 asked for now
-exists, no candidate satisfied the gates, and MSG-0116a §3 already names what follows — the question
-returns to EPA-0006 §4.7 Q3, and the failure does not authorize relaxing Shape-1.**
+**Current position, 2026-08-24 after TASK-0039: no task is READY. Five probes have now cleared
+nothing, and this one changes what the Architecture Lead is deciding about.**
+
+TASK-0039 executed MSG-0120, with MSG-0119 binding, and is **COMPLETE** — **8/8 acceptance criteria
+MET**, each mapped to evidence in **MSG-0123** §8. It was run by a supervisor-started session
+(`runner.lock` pid 27076, acquired 21:37:18Z) against starting `HEAD = 7e1db67`, **unchanged at every
+push**. **No repository movement occurred during this run** — unlike TASK-0038, where `HEAD` moved
+inside the startup checklist.
+
+**A probe was built and executed** — `implementation/probes/TASK-0039/probe.mjs` with its captured
+output, both committed as re-readable evidence. **The TASK-0033, 0035, 0037 and 0038 harnesses were
+neither modified nor re-run**, TASK-0038's seven-scenario grid was not repeated, and **K3/K4 were not
+re-run** — they remain NOT CLEARED under MSG-0119's strict Q11 reading.
+
+**Verdicts: K7 NOT CLEARED, K8 NOT CLEARED.** All three gaps MSG-0120 named are closed, and two of
+them close against the candidates.
+
+**E4 is UNOBTAINABLE, and that was established rather than assumed.** No trace, profile or log API is
+bound by `node:sqlite`; the build carries neither `SQLITE_DEBUG`, nor `ENABLE_SQLLOG`, nor
+`ENABLE_STMT_SCANSTATUS`; `:memory:` leaves no file. **The check that makes this evidence rather than
+an impression is the control**: SQLite silently ignores an unrecognised pragma, so the probe ran a
+pragma that certainly does not exist alongside the tracing pragmas and found them **indistinguishable**.
+Without it, this probe could have reported E4 obtained from an instrument that was never running.
+
+**`U1` turned out to be partially instrumentable, which reverses MSG-0118's finding — and what it
+measures is failure.** A function on `open_ended`, the leading column of **both** candidate indexes,
+is evaluated from the **index cursor** and fires once per entry visited; it was calibrated against a
+cohort known by construction, on both candidate plans, and reproduced the constructed counts exactly
+before being used on anything. **K7 and K8 visit the same number of entries at every collection size
+— 10, 74, 717, 2860 — while `U` reads 7, 71, 714, 2857 for one and 0 for the other.** **MSG-0118's
+headline K7-vs-K8 result was correctly measured and meant something narrower than it looked: K8 did
+not examine less; it examined the same amount where a row-access counter is structurally unable to
+see it.** The engine's own bytecode shows why — `DeferredSeek`, then the residual read from the index
+cursor, then `Next`: the entry is rejected without the row ever being fetched.
+
+**And `ANALYZE` alone drives K7's `U` from 2857 to 0** while entries visited go **up** by one.
+`ANALYZE` writes statistics and touches no schema, data, index, query text or design. **The same
+candidate measured before and after routine maintenance receives opposite `U` readings.** §4.11's
+result 5 said the query planner decides; this says a maintenance command does.
+
+**Plan-independence splits, and the split is the useful part.** E1's *reachable-structure* limb **is**
+obtainable independently of the optimizer: `DatabaseSync.setAuthorizer` enumerates at compilation a
+**superset** of what any plan can open — for K7/K8 only routed partitions, no scope-spanning
+structure, identical under every configuration — and it **fails the negative control**, so it
+discriminates. It was **characterised, not assumed**: its callback count is invariant with collection
+size, so it is a compilation event and not a counter. E1's *confinement* limb is **not**
+plan-independent — two distinct version traversals per design across ordinary engine states — and
+**`INDEXED BY` pinned the bounded limb and not the rest**, K8's open limb still becoming a full
+partition scan after `ANALYZE`.
+
+**Two defects in the probe's own apparatus were found and corrected before any result was reported.**
+An index-entry column was **mislabelled** as counting unauthorized entries when the instrument cannot
+classify entries at all — its error direction was **overstatement**, so it was split into an
+engine-measured count and a deliberately generous derived bound. And the probe **asserted something
+its own output contradicted in the same line**, claiming the authorizer fires only at prepare time
+while printing 101 execution-phase callbacks; the assertion was replaced by a measurement that can
+tell the two possibilities apart.
+
+**Nothing was selected, adopted, installed or deployed; no accepted ADR was modified; no gate was
+relaxed; no numeric threshold was introduced; and no benchmark, latency, capacity, recall or
+throughput figure was produced.**
+
+**What the Architecture Lead now decides about has changed shape.** MSG-0119 already fixed the next
+step — failure returns the question to **EPA-0006 §4.7 Q3** and does not authorize weakening the
+gates. **The new input is that the strongest candidates did not fail on shape.** They failed because
+the engine cannot be asked: E4 is unavailable at all, and the one API that would settle `U1`
+outright, `sqlite3_stmt_scanstatus`, is absent from the build **and** unbound by the runtime.
+**EPA-0006 §4.6 S10 already holds that an engine which cannot be observed fails the burden AMD-01
+places on it**, and this is that rule biting. Offered as evidence and not as a recommendation, and
+naming no engine as a choice: the two properties that failed here are **observability properties of
+the engine**, not shape properties of the design.
+
+**One non-blocking question is referred — Q12**: must a probe take the index-cursor placement wherever
+the engine exposes one, and is a `U` taken only at row access sufficient for E2? It changes no verdict
+recorded anywhere, because §4.6 S5's asymmetry already means an omitted placement can only fail to
+detect a failure, never manufacture a pass.
+
+> **The paragraph this replaces, retained:** "**Current position, 2026-08-24 after TASK-0038: no task
+> is READY. The evidence Q9 asked for now exists, no candidate satisfied the gates, and MSG-0116a §3
+> already names what follows — the question returns to EPA-0006 §4.7 Q3, and the failure does not
+> authorize relaxing Shape-1.**" True when written, and **still true** — TASK-0039 has since run,
+> cleared nothing, and left the Q3 return exactly where MSG-0116a and MSG-0119 put it, with sharper
+> evidence about **why** nothing clears.
 
 TASK-0038 executed MSG-0116a and MSG-0116b and is **COMPLETE** — **8/8 acceptance criteria MET**, each
 mapped to evidence in **MSG-0118** §6. It was run by a supervisor-started session (`runner.lock` pid

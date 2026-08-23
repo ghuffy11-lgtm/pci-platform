@@ -1,0 +1,672 @@
+============================================================================================================
+TASK-0039 — K7/K8 REMAINING CLEARANCE EVIDENCE: E4 · U1 OBSERVABILITY · PLAN-INDEPENDENCE
+============================================================================================================
+Authority : MSG-0120 (AUTHORIZED) with MSG-0119 (strict Q11) BINDING · MSG-0122 · TASK-0039
+Subject   : SQLite 3.51.3 via node:sqlite — EPA-0006 class R TEST SUBJECT, not a selection
+Runtime   : Node v24.15.0
+
+SELECTS NOTHING · ADOPTS NOTHING · INSTALLS NOTHING · DEPLOYS NOTHING · AMENDS NO ADR
+No gate is relaxed. No numeric staleness threshold is proposed. No benchmark, latency,
+capacity, recall or throughput figure is produced. No wall clock is read.
+
+READ THIS BEFORE ANY TABLE BELOW:
+  * E4 is established UNOBTAINABLE on this test subject in section 2. NOTHING IN THIS RUN
+    COULD THEREFORE HAVE BEEN CLEARED, whatever any count shows. That is stated first so no
+    row is misread as a near-miss.
+  * U1 = 0 IS NEVER CLAIMED. Where an index-entry count appears it is a LOWER BOUND.
+  * K3 and K4 are NOT re-run and remain NOT CLEARED under MSG-0119's strict Q11 reading.
+  * TASK-0038's 7-scenario grid is NOT re-run. That evidence stands.
+
+============================================================================================================
+SECTION 1 — VALIDITY GATE 1: the adversarial precondition (EPA-0006 §4.6 S8)
+============================================================================================================
+The UNCONSTRAINED top-k must contain NO authorized chunk. If one appears, the fixture is not
+adversarial, every measurement below is meaningless, and the run is VOID.
+
+  skew=uniform        M=    50  unconstrained top-6 -> authorized-among-them=0  -> ADVERSARIAL, as required
+  skew=uniform        M=   500  unconstrained top-6 -> authorized-among-them=0  -> ADVERSARIAL, as required
+  skew=uniform        M=  5000  unconstrained top-6 -> authorized-among-them=0  -> ADVERSARIAL, as required
+  skew=uniform        M= 20000  unconstrained top-6 -> authorized-among-them=0  -> ADVERSARIAL, as required
+  skew=bounded-heavy  M=    50  unconstrained top-6 -> authorized-among-them=0  -> ADVERSARIAL, as required
+  skew=bounded-heavy  M=   500  unconstrained top-6 -> authorized-among-them=0  -> ADVERSARIAL, as required
+  skew=bounded-heavy  M=  5000  unconstrained top-6 -> authorized-among-them=0  -> ADVERSARIAL, as required
+  skew=bounded-heavy  M= 20000  unconstrained top-6 -> authorized-among-them=0  -> ADVERSARIAL, as required
+
+The cohort inside the subject's own partitions, counted from the fixture (not from the wheel).
+These are the numbers every index-entry and row count below must be checked against.
+
+  skew                M   inPart  authzd  expired  notYetB  notYetO
+  uniform            50       23       2        7        7        7
+  uniform           500      215       2       71       71       71
+  uniform          5000     2144       2      714      714      714
+  uniform         20000     8573       2     2857     2857     2857
+  bounded-heavy      50       31       2       12       12        5
+  bounded-heavy     500      281       2      112      112       55
+  bounded-heavy    5000     2781       2     1112     1112      555
+  bounded-heavy   20000    11114       2     4445     4445     2222
+
+  inPart  = versions resident in the subject's four partitions (PUBLISHED, right scope/class/audience)
+  authzd  = of those, authorized at the query instant
+  expired = eff_to already closed        -> BELOW  the i_<part>_vb seek start, ABOVE nothing
+  notYetB = bounded window, not yet open -> INSIDE the i_<part>_vb seek range, rejected by a residual
+  notYetO = open window, not yet open    -> OUTSIDE the i_<part>_vo seek range
+
+============================================================================================================
+SECTION 2 — GAP 1: E4, THE ENGINE LOG. Enumerated, not assumed.
+============================================================================================================
+EPA-0006 §4.6 S6/E4 requires LOG INSPECTION: "no unauthorized passage text in the engine's own
+logs" (§9.3; ADR-0020 §6.2, which carries no authorization exception). MSG-0120 requires this
+evidence be OBTAINED or EXPLICITLY ESTABLISHED AS UNOBTAINABLE, and forbids inferring it.
+
+2.1 — The reachable API surface, enumerated in this run.
+
+  DatabaseSync.prototype : aggregate, applyChangeset, close, constructor, createSession, createTagStore, enableDefensive, enableLoadExtension, exec, function, loadExtension, location, open, prepare, setAuthorizer
+  StatementSync.prototype: all, columns, constructor, get, iterate, run, setAllowBareNamedParameters, setAllowUnknownNamedParameters, setReadBigInts, setReturnArrays
+
+  Searched for a trace/profile/log hook: trace, profile, log, sqllog, stmtStatus, stmt_status, scanstatus, onTrace, setTrace, setProfile, errorLog
+  FOUND: NONE — no member of either prototype is a log, trace or profile hook.
+
+  sqlite3_trace_v2, sqlite3_profile, SQLITE_CONFIG_LOG and sqlite3_stmt_scanstatus are C-API
+  entry points. NONE of them is bound by node:sqlite, so none is reachable from this runner.
+  That is an observation about the BINDING, not a claim about SQLite.
+
+2.2 — Compile options, read from the engine.
+
+  DEBUG                      ABSENT    would enable PRAGMA vdbe_trace / vdbe_listing / parser_trace
+  ENABLE_SQLLOG              ABSENT    would write an SQL log via SQLITE_CONFIG_SQLLOG
+  ENABLE_STMT_SCANSTATUS     ABSENT    would expose PER-LOOP VISIT COUNTS — the ONE API that measures U1 directly
+  ENABLE_STAT4               ABSENT    would make the planner sensitive to BOUND PARAMETER VALUES
+  ENABLE_DBSTAT_VTAB         PRESENT   exposes the dbstat virtual table — per-b-tree page and cell counts
+
+  Full option list: 49 options; the five above were checked by exact match.
+
+2.3 — The tracing pragmas, attempted. AND THE TRAP IN READING THE RESULT.
+
+  SQLite SILENTLY IGNORES an unrecognised pragma. It does not raise. So "PRAGMA vdbe_trace=on
+  returned no error" is NOT evidence that tracing was enabled — it is evidence of nothing at
+  all. The control below is a pragma that certainly does not exist; if it behaves identically
+  to the tracing pragmas, then the tracing pragmas are equally inert.
+
+  PRAGMA vdbe_trace                             set-> []     read-back-> []    
+  PRAGMA vdbe_listing                           set-> []     read-back-> []    
+  PRAGMA parser_trace                           set-> []     read-back-> []    
+  PRAGMA sql_trace                              set-> []     read-back-> []    
+  PRAGMA stmt_scanstatus                        set-> []     read-back-> []    
+  PRAGMA this_pragma_certainly_does_not_exist   set-> []     read-back-> []       <- THE CONTROL
+
+  RESULT: every tracing pragma behaves EXACTLY as the pragma that does not exist. None was
+  enabled. Had this probe reported "tracing enabled, no unauthorized text seen", it would have
+  reported E4 obtained from an instrument that was never running.
+
+2.4 — Is there a log FILE to inspect?
+
+  db.location() for the ':memory:' database -> null
+  There is no database file, therefore no journal, no WAL and no engine-written file of any
+  kind to inspect. Nothing was installed and no file was created.
+
+2.5 — What CAN be scanned, and why scanning it is NOT E4.
+
+  Three engine-produced text surfaces ARE reachable: EXPLAIN QUERY PLAN details, EXPLAIN
+  opcode rows (including the p4 operand and comment fields, which is where an INLINED LITERAL
+  would appear), and error message text. Section 8 scans all three for unauthorized passage
+  text and reports the result.
+
+  THAT SCAN IS NOT E4 AND IS NOT OFFERED AS E4. E4 concerns the engine's OWN logs. These three
+  surfaces are outputs this probe requested, not a log the engine keeps; a clean scan of them
+  says nothing about what an engine with logging compiled in and enabled would write.
+
+  >> E4 VERDICT: NOT OBTAINABLE on this test subject, for the enumerated reason that node:sqlite
+     binds no trace, profile or log API; the engine is built without DEBUG, ENABLE_SQLLOG and
+     ENABLE_STMT_SCANSTATUS; every tracing pragma is inert and demonstrated inert against a
+     control; and there is no database file and so no engine-written file to read.
+
+     Per §4.6 S6 an absent evidence class yields NOT CLEARED. Per MSG-0120 it may NOT be
+     inferred. THEREFORE K7 AND K8 CANNOT BE CLEARED IN THIS RUN ON E4 ALONE, independently of
+     everything measured below. The rest of this probe still matters, because it decides
+     whether E4 is the ONLY thing missing — and section 4 shows it is not.
+
+============================================================================================================
+SECTION 3 — GAP 2: U1, INDEX-ENTRY EXAMINATION. Why the prior zero was a row-access zero.
+============================================================================================================
+EPA-0006 §4.6 S4 counts U1 — "reads an index entry or key during traversal" — as examining, and
+§4.7 Q1's fail-closed default keeps that reading until ruled. MSG-0118 recorded that U1 is not
+instrumentable through node:sqlite. MSG-0120 forbids reporting U1 = 0 on that basis.
+
+3.1 — The direct instrument is absent, and its absence is now a checked fact.
+
+  SQLITE_ENABLE_STMT_SCANSTATUS: ABSENT (section 2.2).
+  sqlite3_stmt_scanstatus() is the API that reports, per loop, the number of index entries
+  visited. It is the instrument that would settle U1 outright. It is not compiled in, and
+  node:sqlite binds no accessor for it in any case. BOTH would have to change.
+
+3.2 — What the engine itself shows about WHERE a row-access counter sits.
+
+  The bytecode below is the ACTUAL EXPLAIN output for the shape of K8's bounded limb. It is
+  engine-reported, not a description of what SQLite is believed to do.
+
+      0  Init           p1=  0 p2= 17 p3=  0             
+      1  OpenRead       p1=  0 p2=  2 p3=  0 4           
+      2  OpenRead       p1=  1 p2=  4 p3=  0 k(4,,,,)    
+      3  Integer        p1=  0 p2=  1 p3=  0             
+      4  Integer        p1=1000 p2=  2 p3=  0             
+      5  SeekGT         p1=  1 p2= 16 p3=  1 2           
+      6  IdxGT          p1=  1 p2= 16 p3=  1 1           
+      7  DeferredSeek   p1=  1 p2=  0 p3=  0             
+      8  Column         p1=  1 p2=  2 p3=  3             
+      9  Gt             p1=  4 p2= 15 p3=  3 BINARY-8    
+     10  Column         p1=  0 p2=  0 p3=  5             
+     11  Function       p1=  0 p2=  5 p3=  3 probe_ver(1)
+     12  IfNot          p1=  3 p2= 15 p3=  1             
+     13  Column         p1=  0 p2=  0 p3=  6             
+     14  ResultRow      p1=  6 p2=  1 p3=  0             
+     15  Next           p1=  1 p2=  6 p3=  0             
+     16  Halt           p1=  0 p2=  0 p3=  0             
+     17  Transaction    p1=  0 p2=  0 p3=  2 0           
+     18  Integer        p1=1000 p2=  4 p3=  0             
+     19  Goto           p1=  0 p2=  1 p3=  0             
+
+  Read it in order. Cursor 1 is the INDEX; cursor 0 is the TABLE.
+    SeekGT 1       — seek the INDEX cursor to the start of the range
+    IdxGT  1       — range-end test, ON THE INDEX
+    DeferredSeek 1 — the TABLE seek is DEFERRED. No row has been fetched yet.
+    Column 1 2     — read eff_from FROM THE INDEX CURSOR (cursor 1)
+    Gt     -> Next — FAILS THE RESIDUAL AND JUMPS STRAIGHT TO Next.
+                     The entry was visited. The table row was never touched.
+    Column 0 0     — only reached by entries that PASSED. This is where probe_ver fires.
+
+  THAT IS THE WHOLE FINDING, AND IT IS THE ENGINE'S OWN BYTECODE SAYING IT: a counter written
+  into the WHERE clause on a NON-INDEXED column cannot fire for an entry the residual rejects,
+  because the row is never read. EPA-0006 §4.6 S5 predicted exactly this — "a zero count proves
+  only that nothing unauthorized crossed the point where the instrument sits" — and here it is
+  demonstrated at opcode level rather than argued.
+
+============================================================================================================
+SECTION 4 — A NEW INSTRUMENT, AND ITS CALIBRATION AGAINST KNOWN TRUTH
+============================================================================================================
+open_ended is the LEADING column of BOTH candidate indexes, so a function applied to it is
+evaluated FROM THE INDEX CURSOR, before the deferred table seek. It therefore fires once per
+index entry visited inside the seek range.
+
+IT IS A LOWER BOUND ON U1. It does not see interior b-tree pages descended during the seek,
+pager reads, or any other loop. A POSITIVE VALUE IS CONCLUSIVE OF FAILURE (§4.6 S5); NO VALUE
+OF IT MAY BE READ AS U1 = 0, AND THIS PROBE NEVER SO READS IT.
+
+Calibration: a fixture whose in-range entry count is known BY CONSTRUCTION, run on BOTH
+candidate plans. If the instrument does not reproduce the known number exactly, it is not
+trustworthy and nothing below may rest on it.
+
+  Constructed cohort: expired=300 (eff_to closed), notYetBounded=400 (eff_from future), authorized=2
+
+  PLANNER CHOICE    plan: SEARCH cv USING INDEX i_cal_vo (open_ended=? AND eff_from<?)
+      index-cursor calls =   302   expected by construction =   302   EXACT — instrument TRUSTWORTHY
+      row-access calls   =   302   rows returned = 2
+      -> the LOWER bound is the seek; the other bound is a residual, and the 300 unauthorized entries it rejects were  row-accessed
+
+  PINNED  i_cal_vb  plan: SEARCH cv USING INDEX i_cal_vb (open_ended=? AND eff_to>?)
+      index-cursor calls =   402   expected by construction =   402   EXACT — instrument TRUSTWORTHY
+      row-access calls   =     2   rows returned = 2
+      -> the UPPER bound is the seek; the other bound is a residual, and the 400 unauthorized entries it rejects were NOT row-accessed
+
+  CALIBRATION PASSED on both plans. The instrument reproduces the constructed count exactly,
+  and it reproduces it under BOTH index choices — so it is not measuring one plan's artefact.
+
+  Note the row-access column in the pinned case. The design that examined 402 index entries
+  reported 2 row accesses. THAT IS THE SHAPE OF TASK-0038's K8 RESULT, reproduced on a
+  fixture small enough to check by hand.
+
+============================================================================================================
+SECTION 5 — GAP 3: IS THE EVIDENCE INDEPENDENT OF A SINGLE OBSERVED PLAN?
+============================================================================================================
+MSG-0120 §3 requires evidence independent of one observed optimizer plan where independence is
+required. One EXPLAIN QUERY PLAN is one observation: one fixture, one size, one distribution,
+one statistics state. This section varies all four, legally and without changing any design.
+
+Configurations (all are ordinary, supported engine states; none is exotic):
+  c1  baseline — no statistics collected
+  c2  automatic_index = off
+  c3  fresh connection, statement re-prepared 3x
+  c4  query instant shifted (parameter variation)
+  c5  after ANALYZE
+  c6  after ANALYZE + PRAGMA optimize
+
+Sizes: 50, 500, 5000, 20000   Distributions: uniform, bounded-heavy
+
+Columns:  U     = unauthorized units at the ROW-ACCESS placement (TASK-0038's placement, unchanged)
+          Nidx  = ENGINE-MEASURED count of entries visited by the version-traversal loops,
+                  from the calibrated index-cursor instrument. All entries, not just
+                  unauthorized ones — the instrument cannot classify them.
+          U1lb  = DERIVED conservative lower bound on UNAUTHORIZED entries visited,
+                  = max(0, Nidx - Amax), Amax = authorized-resident x limbs x chunks-per-version.
+                  A ZERO HERE MEANS "THIS BOUND PROVES NOTHING AT THIS SIZE". It is NOT U1 = 0.
+          ans   = authorized chunks answered in the steady state (an anchor, not a re-run)
+
+Nidx is measured; U1lb is arithmetic applied to it. The two are kept in separate columns so a
+later reader can see exactly which number the engine produced and which this probe derived.
+
+------------------------------------------------------------------------------------------------------------
+DESIGN K7 — PHYSICALLY PARTITIONED AUTHORITATIVE STORE — versions AND chunks, both effectivity limbs
+distribution: uniform
+------------------------------------------------------------------------------------------------------------
+  cfg       M      U   Nidx   U1lb  ans  version traversal (the loops that decide U and U1)
+  c1       50      7     10      0  4/4  8x SEEK i_<part>_vo (lower bound)
+  c1      500     71     74     62  4/4  8x SEEK i_<part>_vo (lower bound)
+  c1     5000    714    717    705  4/4  8x SEEK i_<part>_vo (lower bound)
+  c1    20000   2857   2860   2848  4/4  8x SEEK i_<part>_vo (lower bound)
+  c2       50      7     10      0  4/4  8x SEEK i_<part>_vo (lower bound)
+  c2      500     71     74     62  4/4  8x SEEK i_<part>_vo (lower bound)
+  c2     5000    714    717    705  4/4  8x SEEK i_<part>_vo (lower bound)
+  c2    20000   2857   2860   2848  4/4  8x SEEK i_<part>_vo (lower bound)
+  c3       50      7     10      0  4/4  8x SEEK i_<part>_vo (lower bound)
+  c3      500     71     74     62  4/4  8x SEEK i_<part>_vo (lower bound)
+  c3     5000    714    717    705  4/4  8x SEEK i_<part>_vo (lower bound)
+  c3    20000   2857   2860   2848  4/4  8x SEEK i_<part>_vo (lower bound)
+  c4       50      7     10      0  4/4  8x SEEK i_<part>_vo (lower bound)
+  c4      500     71     74     62  4/4  8x SEEK i_<part>_vo (lower bound)
+  c4     5000    714    717    705  4/4  8x SEEK i_<part>_vo (lower bound)
+  c4    20000   2857   2860   2848  4/4  8x SEEK i_<part>_vo (lower bound)
+  c5       50      0     11      0  4/4  2x SCAN q_<part>_v (whole partition) + 1x SEEK i_<part>_vb (upper bound) + 5x SEEK i_<part>_vo (lower bound)
+  c5      500      0     75     63  4/4  2x SCAN q_<part>_v (whole partition) + 1x SEEK i_<part>_vb (upper bound) + 5x SEEK i_<part>_vo (lower bound)
+  c5     5000      0    718    706  4/4  2x SCAN q_<part>_v (whole partition) + 1x SEEK i_<part>_vb (upper bound) + 5x SEEK i_<part>_vo (lower bound)
+  c5    20000      0   2861   2849  4/4  2x SCAN q_<part>_v (whole partition) + 1x SEEK i_<part>_vb (upper bound) + 5x SEEK i_<part>_vo (lower bound)
+  c6       50      0     11      0  4/4  2x SCAN q_<part>_v (whole partition) + 1x SEEK i_<part>_vb (upper bound) + 5x SEEK i_<part>_vo (lower bound)
+  c6      500      0     75     63  4/4  2x SCAN q_<part>_v (whole partition) + 1x SEEK i_<part>_vb (upper bound) + 5x SEEK i_<part>_vo (lower bound)
+  c6     5000      0    718    706  4/4  2x SCAN q_<part>_v (whole partition) + 1x SEEK i_<part>_vb (upper bound) + 5x SEEK i_<part>_vo (lower bound)
+  c6    20000      0   2861   2849  4/4  2x SCAN q_<part>_v (whole partition) + 1x SEEK i_<part>_vb (upper bound) + 5x SEEK i_<part>_vo (lower bound)
+
+------------------------------------------------------------------------------------------------------------
+DESIGN K7 — PHYSICALLY PARTITIONED AUTHORITATIVE STORE — versions AND chunks, both effectivity limbs
+distribution: bounded-heavy
+------------------------------------------------------------------------------------------------------------
+  cfg       M      U   Nidx   U1lb  ans  version traversal (the loops that decide U and U1)
+  c1       50     12     15      3  4/4  8x SEEK i_<part>_vo (lower bound)
+  c1      500    112    115    103  4/4  8x SEEK i_<part>_vo (lower bound)
+  c1     5000   1112   1115   1103  4/4  8x SEEK i_<part>_vo (lower bound)
+  c1    20000   4445   4448   4436  4/4  8x SEEK i_<part>_vo (lower bound)
+  c2       50     12     15      3  4/4  8x SEEK i_<part>_vo (lower bound)
+  c2      500    112    115    103  4/4  8x SEEK i_<part>_vo (lower bound)
+  c2     5000   1112   1115   1103  4/4  8x SEEK i_<part>_vo (lower bound)
+  c2    20000   4445   4448   4436  4/4  8x SEEK i_<part>_vo (lower bound)
+  c3       50     12     15      3  4/4  8x SEEK i_<part>_vo (lower bound)
+  c3      500    112    115    103  4/4  8x SEEK i_<part>_vo (lower bound)
+  c3     5000   1112   1115   1103  4/4  8x SEEK i_<part>_vo (lower bound)
+  c3    20000   4445   4448   4436  4/4  8x SEEK i_<part>_vo (lower bound)
+  c4       50     12     15      3  4/4  8x SEEK i_<part>_vo (lower bound)
+  c4      500    112    115    103  4/4  8x SEEK i_<part>_vo (lower bound)
+  c4     5000   1112   1115   1103  4/4  8x SEEK i_<part>_vo (lower bound)
+  c4    20000   4445   4448   4436  4/4  8x SEEK i_<part>_vo (lower bound)
+  c5       50      0     16      4  4/4  2x SCAN q_<part>_v (whole partition) + 1x SEEK i_<part>_vb (upper bound) + 5x SEEK i_<part>_vo (lower bound)
+  c5      500      0    116    104  4/4  2x SCAN q_<part>_v (whole partition) + 1x SEEK i_<part>_vb (upper bound) + 5x SEEK i_<part>_vo (lower bound)
+  c5     5000      0   1116   1104  4/4  2x SCAN q_<part>_v (whole partition) + 1x SEEK i_<part>_vb (upper bound) + 5x SEEK i_<part>_vo (lower bound)
+  c5    20000      0   4449   4437  4/4  2x SCAN q_<part>_v (whole partition) + 1x SEEK i_<part>_vb (upper bound) + 5x SEEK i_<part>_vo (lower bound)
+  c6       50      0     16      4  4/4  2x SCAN q_<part>_v (whole partition) + 1x SEEK i_<part>_vb (upper bound) + 5x SEEK i_<part>_vo (lower bound)
+  c6      500      0    116    104  4/4  2x SCAN q_<part>_v (whole partition) + 1x SEEK i_<part>_vb (upper bound) + 5x SEEK i_<part>_vo (lower bound)
+  c6     5000      0   1116   1104  4/4  2x SCAN q_<part>_v (whole partition) + 1x SEEK i_<part>_vb (upper bound) + 5x SEEK i_<part>_vo (lower bound)
+  c6    20000      0   4449   4437  4/4  2x SCAN q_<part>_v (whole partition) + 1x SEEK i_<part>_vb (upper bound) + 5x SEEK i_<part>_vo (lower bound)
+
+------------------------------------------------------------------------------------------------------------
+DESIGN K8 — K7 with the bounded limb PINNED to i_<part>_vb by INDEXED BY — one token's difference
+distribution: uniform
+------------------------------------------------------------------------------------------------------------
+  cfg       M      U   Nidx   U1lb  ans  version traversal (the loops that decide U and U1)
+  c1       50      0     10      0  4/4  4x SEEK i_<part>_vb (upper bound) + 4x SEEK i_<part>_vo (lower bound)
+  c1      500      0     74     62  4/4  4x SEEK i_<part>_vb (upper bound) + 4x SEEK i_<part>_vo (lower bound)
+  c1     5000      0    717    705  4/4  4x SEEK i_<part>_vb (upper bound) + 4x SEEK i_<part>_vo (lower bound)
+  c1    20000      0   2860   2848  4/4  4x SEEK i_<part>_vb (upper bound) + 4x SEEK i_<part>_vo (lower bound)
+  c2       50      0     10      0  4/4  4x SEEK i_<part>_vb (upper bound) + 4x SEEK i_<part>_vo (lower bound)
+  c2      500      0     74     62  4/4  4x SEEK i_<part>_vb (upper bound) + 4x SEEK i_<part>_vo (lower bound)
+  c2     5000      0    717    705  4/4  4x SEEK i_<part>_vb (upper bound) + 4x SEEK i_<part>_vo (lower bound)
+  c2    20000      0   2860   2848  4/4  4x SEEK i_<part>_vb (upper bound) + 4x SEEK i_<part>_vo (lower bound)
+  c3       50      0     10      0  4/4  4x SEEK i_<part>_vb (upper bound) + 4x SEEK i_<part>_vo (lower bound)
+  c3      500      0     74     62  4/4  4x SEEK i_<part>_vb (upper bound) + 4x SEEK i_<part>_vo (lower bound)
+  c3     5000      0    717    705  4/4  4x SEEK i_<part>_vb (upper bound) + 4x SEEK i_<part>_vo (lower bound)
+  c3    20000      0   2860   2848  4/4  4x SEEK i_<part>_vb (upper bound) + 4x SEEK i_<part>_vo (lower bound)
+  c4       50      0     10      0  4/4  4x SEEK i_<part>_vb (upper bound) + 4x SEEK i_<part>_vo (lower bound)
+  c4      500      0     74     62  4/4  4x SEEK i_<part>_vb (upper bound) + 4x SEEK i_<part>_vo (lower bound)
+  c4     5000      0    717    705  4/4  4x SEEK i_<part>_vb (upper bound) + 4x SEEK i_<part>_vo (lower bound)
+  c4    20000      0   2860   2848  4/4  4x SEEK i_<part>_vb (upper bound) + 4x SEEK i_<part>_vo (lower bound)
+  c5       50      0     10      0  4/4  1x SCAN q_<part>_v (whole partition) + 4x SEEK i_<part>_vb (upper bound) + 3x SEEK i_<part>_vo (lower bound)
+  c5      500      0     74     62  4/4  1x SCAN q_<part>_v (whole partition) + 4x SEEK i_<part>_vb (upper bound) + 3x SEEK i_<part>_vo (lower bound)
+  c5     5000      0    717    705  4/4  1x SCAN q_<part>_v (whole partition) + 4x SEEK i_<part>_vb (upper bound) + 3x SEEK i_<part>_vo (lower bound)
+  c5    20000      0   2860   2848  4/4  1x SCAN q_<part>_v (whole partition) + 4x SEEK i_<part>_vb (upper bound) + 3x SEEK i_<part>_vo (lower bound)
+  c6       50      0     10      0  4/4  1x SCAN q_<part>_v (whole partition) + 4x SEEK i_<part>_vb (upper bound) + 3x SEEK i_<part>_vo (lower bound)
+  c6      500      0     74     62  4/4  1x SCAN q_<part>_v (whole partition) + 4x SEEK i_<part>_vb (upper bound) + 3x SEEK i_<part>_vo (lower bound)
+  c6     5000      0    717    705  4/4  1x SCAN q_<part>_v (whole partition) + 4x SEEK i_<part>_vb (upper bound) + 3x SEEK i_<part>_vo (lower bound)
+  c6    20000      0   2860   2848  4/4  1x SCAN q_<part>_v (whole partition) + 4x SEEK i_<part>_vb (upper bound) + 3x SEEK i_<part>_vo (lower bound)
+
+------------------------------------------------------------------------------------------------------------
+DESIGN K8 — K7 with the bounded limb PINNED to i_<part>_vb by INDEXED BY — one token's difference
+distribution: bounded-heavy
+------------------------------------------------------------------------------------------------------------
+  cfg       M      U   Nidx   U1lb  ans  version traversal (the loops that decide U and U1)
+  c1       50      0     15      3  4/4  4x SEEK i_<part>_vb (upper bound) + 4x SEEK i_<part>_vo (lower bound)
+  c1      500      0    115    103  4/4  4x SEEK i_<part>_vb (upper bound) + 4x SEEK i_<part>_vo (lower bound)
+  c1     5000      0   1115   1103  4/4  4x SEEK i_<part>_vb (upper bound) + 4x SEEK i_<part>_vo (lower bound)
+  c1    20000      0   4448   4436  4/4  4x SEEK i_<part>_vb (upper bound) + 4x SEEK i_<part>_vo (lower bound)
+  c2       50      0     15      3  4/4  4x SEEK i_<part>_vb (upper bound) + 4x SEEK i_<part>_vo (lower bound)
+  c2      500      0    115    103  4/4  4x SEEK i_<part>_vb (upper bound) + 4x SEEK i_<part>_vo (lower bound)
+  c2     5000      0   1115   1103  4/4  4x SEEK i_<part>_vb (upper bound) + 4x SEEK i_<part>_vo (lower bound)
+  c2    20000      0   4448   4436  4/4  4x SEEK i_<part>_vb (upper bound) + 4x SEEK i_<part>_vo (lower bound)
+  c3       50      0     15      3  4/4  4x SEEK i_<part>_vb (upper bound) + 4x SEEK i_<part>_vo (lower bound)
+  c3      500      0    115    103  4/4  4x SEEK i_<part>_vb (upper bound) + 4x SEEK i_<part>_vo (lower bound)
+  c3     5000      0   1115   1103  4/4  4x SEEK i_<part>_vb (upper bound) + 4x SEEK i_<part>_vo (lower bound)
+  c3    20000      0   4448   4436  4/4  4x SEEK i_<part>_vb (upper bound) + 4x SEEK i_<part>_vo (lower bound)
+  c4       50      0     15      3  4/4  4x SEEK i_<part>_vb (upper bound) + 4x SEEK i_<part>_vo (lower bound)
+  c4      500      0    115    103  4/4  4x SEEK i_<part>_vb (upper bound) + 4x SEEK i_<part>_vo (lower bound)
+  c4     5000      0   1115   1103  4/4  4x SEEK i_<part>_vb (upper bound) + 4x SEEK i_<part>_vo (lower bound)
+  c4    20000      0   4448   4436  4/4  4x SEEK i_<part>_vb (upper bound) + 4x SEEK i_<part>_vo (lower bound)
+  c5       50      0     15      3  4/4  1x SCAN q_<part>_v (whole partition) + 4x SEEK i_<part>_vb (upper bound) + 3x SEEK i_<part>_vo (lower bound)
+  c5      500      0    115    103  4/4  1x SCAN q_<part>_v (whole partition) + 4x SEEK i_<part>_vb (upper bound) + 3x SEEK i_<part>_vo (lower bound)
+  c5     5000      0   1115   1103  4/4  1x SCAN q_<part>_v (whole partition) + 4x SEEK i_<part>_vb (upper bound) + 3x SEEK i_<part>_vo (lower bound)
+  c5    20000      0   4448   4436  4/4  1x SCAN q_<part>_v (whole partition) + 4x SEEK i_<part>_vb (upper bound) + 3x SEEK i_<part>_vo (lower bound)
+  c6       50      0     15      3  4/4  1x SCAN q_<part>_v (whole partition) + 4x SEEK i_<part>_vb (upper bound) + 3x SEEK i_<part>_vo (lower bound)
+  c6      500      0    115    103  4/4  1x SCAN q_<part>_v (whole partition) + 4x SEEK i_<part>_vb (upper bound) + 3x SEEK i_<part>_vo (lower bound)
+  c6     5000      0   1115   1103  4/4  1x SCAN q_<part>_v (whole partition) + 4x SEEK i_<part>_vb (upper bound) + 3x SEEK i_<part>_vo (lower bound)
+  c6    20000      0   4448   4436  4/4  1x SCAN q_<part>_v (whole partition) + 4x SEEK i_<part>_vb (upper bound) + 3x SEEK i_<part>_vo (lower bound)
+
+============================================================================================================
+SECTION 6 — HOW MANY DISTINCT PLANS DID EACH DESIGN PRODUCE?
+============================================================================================================
+This is the question gap 3 actually asks. A design that produces ONE plan across every legal
+configuration has evidence that is not an artefact of one observation. A design that produces
+more than one has evidence that IS.
+
+Reported at two granularities, because INDEXED BY pins ONE limb of ONE table and leaves the
+rest of the plan to the optimizer. The VERSION TRAVERSAL is the security-relevant part: it is
+what decides which version entries are visited, and therefore what U and U1 can be.
+
+  K7: 2 distinct FULL plan(s) and 2 distinct VERSION TRAVERSAL(s) across 48 measurements
+     traversal 1: 8x SEEK i_<part>_vo (lower bound)
+             seen in 32 cells: unifo/c1/M=50, unifo/c1/M=500, unifo/c1/M=5000, unifo/c1/M=20000, unifo/c2/M=50, unifo/c2/M=500, …
+             configurations: c1, c2, c3, c4
+             U    over those cells = 7, 12, 71, 112, 714, 1112, 2857, 4445
+             Nidx over those cells = 10, 15, 74, 115, 717, 1115, 2860, 4448
+             U1lb over those cells = 0, 3, 62, 103, 705, 1103, 2848, 4436
+     traversal 2: 2x SCAN q_<part>_v (whole partition) + 1x SEEK i_<part>_vb (upper bound) + 5x SEEK i_<part>_vo (lower bound)
+             seen in 16 cells: unifo/c5/M=50, unifo/c5/M=500, unifo/c5/M=5000, unifo/c5/M=20000, unifo/c6/M=50, unifo/c6/M=500, …
+             configurations: c5, c6
+             U    over those cells = 0
+             Nidx over those cells = 11, 16, 75, 116, 718, 1116, 2861, 4449
+             U1lb over those cells = 0, 4, 63, 104, 706, 1104, 2849, 4437
+
+  K8: 2 distinct FULL plan(s) and 2 distinct VERSION TRAVERSAL(s) across 48 measurements
+     traversal 1: 4x SEEK i_<part>_vb (upper bound) + 4x SEEK i_<part>_vo (lower bound)
+             seen in 32 cells: unifo/c1/M=50, unifo/c1/M=500, unifo/c1/M=5000, unifo/c1/M=20000, unifo/c2/M=50, unifo/c2/M=500, …
+             configurations: c1, c2, c3, c4
+             U    over those cells = 0
+             Nidx over those cells = 10, 15, 74, 115, 717, 1115, 2860, 4448
+             U1lb over those cells = 0, 3, 62, 103, 705, 1103, 2848, 4436
+     traversal 2: 1x SCAN q_<part>_v (whole partition) + 4x SEEK i_<part>_vb (upper bound) + 3x SEEK i_<part>_vo (lower bound)
+             seen in 16 cells: unifo/c5/M=50, unifo/c5/M=500, unifo/c5/M=5000, unifo/c5/M=20000, unifo/c6/M=50, unifo/c6/M=500, …
+             configurations: c5, c6
+             U    over those cells = 0
+             Nidx over those cells = 10, 15, 74, 115, 717, 1115, 2860, 4448
+             U1lb over those cells = 0, 3, 62, 103, 705, 1103, 2848, 4436
+
+  Transfer-licence failures (instrument moved the seek): 0 of 96 measurements.
+  Signature instability across fresh re-prepares: 0 of 96 measurements.
+
+============================================================================================================
+SECTION 7 — E1 WITHOUT THE OPTIMIZER: the authorizer as a second, independent instrument
+============================================================================================================
+EXPLAIN QUERY PLAN reports what the optimizer CHOSE. sqlite3_set_authorizer — bound by this
+Node build as DatabaseSync.setAuthorizer — fires during STATEMENT PREPARATION and reports every
+(table, column) the statement MAY read, before and independently of any plan choice.
+
+That makes it a genuinely plan-independent E1 instrument for ONE limb of E1: WHICH STRUCTURES
+ARE REACHABLE. It reports a SUPERSET of what any plan opens, which is the fail-closed direction —
+if no scope-spanning structure appears in the superset, no plan can open one.
+
+IT DOES NOT MEASURE HOW MUCH IS TRAVERSED. It cannot count entries, it cannot see the index
+choice, and it says nothing about U or U1. It closes the "which structures" limb of gap 3 and
+leaves the "how much" limb exactly where section 6 leaves it.
+
+  K7: 8 distinct tables reachable, reported at statement compilation
+      q_org_a_internal_published_all_employees_c, q_org_a_internal_published_all_employees_v, q_org_a_internal_published_staff_c, q_org_a_internal_published_staff_v, q_org_a_public_published_all_employees_c, q_org_a_public_published_all_employees_v, q_org_a_public_published_staff_c, q_org_a_public_published_staff_v
+      scope-spanning structures among them: NONE   <- every reachable structure is a routed partition
+      M=   500  callbacks at prepare= 101 at first step= 101  tables reported=8
+      M=  5000  callbacks at prepare= 101 at first step= 101  tables reported=8
+      -> counts are INVARIANT with collection size, so this is a COMPILATION event
+         (the statement is compiled a second time on first step; both compilations report the same set),
+         NOT a per-entry counter. It cannot measure U or U1 and is not used to.
+
+  K8: 8 distinct tables reachable, reported at statement compilation
+      q_org_a_internal_published_all_employees_c, q_org_a_internal_published_all_employees_v, q_org_a_internal_published_staff_c, q_org_a_internal_published_staff_v, q_org_a_public_published_all_employees_c, q_org_a_public_published_all_employees_v, q_org_a_public_published_staff_c, q_org_a_public_published_staff_v
+      scope-spanning structures among them: NONE   <- every reachable structure is a routed partition
+      M=   500  callbacks at prepare= 101 at first step= 101  tables reported=8
+      M=  5000  callbacks at prepare= 101 at first step= 101  tables reported=8
+      -> counts are INVARIANT with collection size, so this is a COMPILATION event
+         (the statement is compiled a second time on first step; both compilations report the same set),
+         NOT a per-entry counter. It cannot measure U or U1 and is not used to.
+
+  NC: 2 distinct tables reachable, reported at statement compilation
+      k_chunk, k_version
+      scope-spanning structures among them: k_chunk, k_version   <- E1 VIOLATED, plan-independently
+      M=   500  callbacks at prepare=  20 at first step=  20  tables reported=2
+      M=  5000  callbacks at prepare=  20 at first step=  20  tables reported=2
+      -> counts are INVARIANT with collection size, so this is a COMPILATION event
+         (the statement is compiled a second time on first step; both compilations report the same set),
+         NOT a per-entry counter. It cannot measure U or U1 and is not used to.
+
+============================================================================================================
+SECTION 8 — G-Q4, RE-MEASURED ACROSS CONFIGURATIONS (§4.9 G-Q4.1–G-Q4.4)
+============================================================================================================
+G-Q4.2 requires that the routed set and the routing-phase read count NOT vary when collections
+differ ONLY in other subjects' structures. TASK-0038 measured this once. Gap 3 asks whether
+the evidence survives configuration change, so it is re-run across every configuration.
+
+  design  cfg                others=0              others=64  verdict
+  K7      c1            set=4 reads=4          set=4 reads=4  IDENTICAL — G-Q4.2 MET
+  K7      c2            set=4 reads=4          set=4 reads=4  IDENTICAL — G-Q4.2 MET
+  K7      c3            set=4 reads=4          set=4 reads=4  IDENTICAL — G-Q4.2 MET
+  K7      c4            set=4 reads=4          set=4 reads=4  IDENTICAL — G-Q4.2 MET
+  K7      c5            set=4 reads=4          set=4 reads=4  IDENTICAL — G-Q4.2 MET
+  K7      c6            set=4 reads=4          set=4 reads=4  IDENTICAL — G-Q4.2 MET
+  K8      c1            set=4 reads=4          set=4 reads=4  IDENTICAL — G-Q4.2 MET
+  K8      c2            set=4 reads=4          set=4 reads=4  IDENTICAL — G-Q4.2 MET
+  K8      c3            set=4 reads=4          set=4 reads=4  IDENTICAL — G-Q4.2 MET
+  K8      c4            set=4 reads=4          set=4 reads=4  IDENTICAL — G-Q4.2 MET
+  K8      c5            set=4 reads=4          set=4 reads=4  IDENTICAL — G-Q4.2 MET
+  K8      c6            set=4 reads=4          set=4 reads=4  IDENTICAL — G-Q4.2 MET
+
+  G-Q4.3 (no catalogue enumeration) is evidenced plan-independently in section 7: the
+  authorizer reports sqlite_schema/sqlite_master as reachable ONLY if the statement can read
+  it. G-Q4.4 (routing units counted in U) is satisfied by construction — route.unauth is
+  unioned into U in every cell above.
+
+============================================================================================================
+SECTION 9 — VALIDITY GATE 2: the negative control (EPA-0006 §4.6 S8)
+============================================================================================================
+A deliberately non-conforming candidate must be included in EVERY probe run. If the harness
+does not fail it, this run is VOID and its findings prove nothing.
+
+  M=    50  U=    52 answered=0/4 leaked=0  -> FAILS, as required
+  M=   500  U=   502 answered=0/4 leaked=0  -> FAILS, as required
+  M=  5000  U=  5002 answered=0/4 leaked=0  -> FAILS, as required
+  M= 20000  U= 20002 answered=0/4 leaked=0  -> FAILS, as required
+
+  The control failed in 4 of 4 cases -> the run is VALID (§4.6 S8).
+
+  Surface scan promised in section 2.5 — NOT E4, and not offered as E4.
+    2 engine-produced text surfaces scanned against 3 unauthorized
+    passage bodies -> 0 occurrence(s). Parameters are BOUND, never inlined, so no passage
+    text reaches the plan or the opcode operands. This says nothing about an engine log.
+
+============================================================================================================
+SECTION 10 — EVIDENCE PER CANDIDATE, AND VERDICTS
+============================================================================================================
+EPA-0006 §4.6 S6: CLEARED requires E1 + E2 + E3 + E4 ALL OBTAINED, U = 0 at every measured size,
+shown not to grow with N. §4.6 S9: NOT CLEARED is the required answer wherever evidence is absent.
+
+------------------------------------------------------------------------------------------------------------
+CANDIDATE K7
+------------------------------------------------------------------------------------------------------------
+  E1  traversal-bounding
+      plan evidence        : 2 distinct full plan(s), 2 distinct version traversal(s), across 48 configurations
+      plan-INDEPENDENT     : the authorizer reports 8 reachable structures, 0 of them scope-spanning
+      -> REACHABLE-STRUCTURE limb: HOLDS, and holds INDEPENDENTLY OF THE OPTIMIZER. No plan can open a
+         scope-spanning structure because the statement cannot reach one. This is the one
+         piece of E1 evidence here that survives gap 3 intact.
+      -> CONFINEMENT limb: a property of the CHOSEN PLAN, and the version traversal took 2 DIFFERENT FORMS. NOT plan-independent.
+
+  E2  counters
+      U    (row-access placement, engine-measured) : 0, 7, 12, 71, 112, 714, 1112, 2857, 4445
+      Nidx (entries visited,      engine-measured) : 10, 11, 15, 16, 74, 75, 115, 116, 717, 718, 1115, 1116, 2860, 2861, 4448, 4449
+      U1lb (unauthorized entries, DERIVED bound)   : 0, 3, 4, 62, 63, 103, 104, 705, 706, 1103, 1104, 2848, 2849, 4436, 4437
+      -> U1 = 0 IS NOT CLAIMED ANYWHERE. The largest derived lower bound is 4437, and it
+         rises with N. §4.6 S4 counts U1 as examining and §4.7 Q1's fail-closed default keeps
+         that reading, so E2 requires U = 0 WITH U1 INCLUDED.
+      -> A positive lower bound is conclusive under §4.6 S5: E2 IS NOT OBTAINED.
+      -> AND U ITSELF IS NOT A PROPERTY OF THIS DESIGN: at a fixed size and distribution it
+         takes different values in different configurations, with the design unchanged.
+
+  E3  opaque stages
+      N/A for this fixture: every structure is relational, with no FTS5 MATCH, no vector
+      index and no ANN graph. THE EXEMPTION IS NOT TRANSFERABLE — a real lexical or vector
+      stage reintroduces the opaque stage and G-Q6 applies unchanged.
+
+  E4  log inspection
+      NOT OBTAINABLE on this test subject — established by enumeration in section 2, not
+      inferred. Per §4.6 S6 an absent evidence class yields NOT CLEARED.
+
+  G-Q4 routing
+      MET across every configuration tested (section 8); no catalogue reachable at prepare time (section 7).
+
+  Answers: authorized content withheld in 0 of 48 cells; unauthorized content returned in 0.
+
+  >>> VERDICT: NOT CLEARED
+      Deciding evidence, in the order it decides:
+        1. E4 is UNOBTAINABLE (section 2) — sufficient on its own under §4.6 S6/S9.
+        2. E2 is NOT OBTAINED: the derived U1 lower bound reaches 4437 and rises with N
+           (sections 5 and 6). The row-access zero, where it occurs, is a zero of the
+           INSTRUMENT'S PLACEMENT and not of the design — section 3's bytecode shows why.
+        3. E1's confinement limb is NOT plan-independent: 2 distinct version traversals across ordinary, supported engine states.
+
+------------------------------------------------------------------------------------------------------------
+CANDIDATE K8
+------------------------------------------------------------------------------------------------------------
+  E1  traversal-bounding
+      plan evidence        : 2 distinct full plan(s), 2 distinct version traversal(s), across 48 configurations
+      plan-INDEPENDENT     : the authorizer reports 8 reachable structures, 0 of them scope-spanning
+      -> REACHABLE-STRUCTURE limb: HOLDS, and holds INDEPENDENTLY OF THE OPTIMIZER. No plan can open a
+         scope-spanning structure because the statement cannot reach one. This is the one
+         piece of E1 evidence here that survives gap 3 intact.
+      -> CONFINEMENT limb: a property of the CHOSEN PLAN, and the version traversal took 2 DIFFERENT FORMS. NOT plan-independent.
+
+  E2  counters
+      U    (row-access placement, engine-measured) : 0
+      Nidx (entries visited,      engine-measured) : 10, 15, 74, 115, 717, 1115, 2860, 4448
+      U1lb (unauthorized entries, DERIVED bound)   : 0, 3, 62, 103, 705, 1103, 2848, 4436
+      -> U1 = 0 IS NOT CLAIMED ANYWHERE. The largest derived lower bound is 4436, and it
+         rises with N. §4.6 S4 counts U1 as examining and §4.7 Q1's fail-closed default keeps
+         that reading, so E2 requires U = 0 WITH U1 INCLUDED.
+      -> A positive lower bound is conclusive under §4.6 S5: E2 IS NOT OBTAINED.
+
+  E3  opaque stages
+      N/A for this fixture: every structure is relational, with no FTS5 MATCH, no vector
+      index and no ANN graph. THE EXEMPTION IS NOT TRANSFERABLE — a real lexical or vector
+      stage reintroduces the opaque stage and G-Q6 applies unchanged.
+
+  E4  log inspection
+      NOT OBTAINABLE on this test subject — established by enumeration in section 2, not
+      inferred. Per §4.6 S6 an absent evidence class yields NOT CLEARED.
+
+  G-Q4 routing
+      MET across every configuration tested (section 8); no catalogue reachable at prepare time (section 7).
+
+  Answers: authorized content withheld in 0 of 48 cells; unauthorized content returned in 0.
+
+  >>> VERDICT: NOT CLEARED
+      Deciding evidence, in the order it decides:
+        1. E4 is UNOBTAINABLE (section 2) — sufficient on its own under §4.6 S6/S9.
+        2. E2 is NOT OBTAINED: the derived U1 lower bound reaches 4436 and rises with N
+           (sections 5 and 6). The row-access zero, where it occurs, is a zero of the
+           INSTRUMENT'S PLACEMENT and not of the design — section 3's bytecode shows why.
+        3. E1's confinement limb is NOT plan-independent: 2 distinct version traversals across ordinary, supported engine states.
+
+============================================================================================================
+SECTION 11 — FINDINGS. Each one is arithmetic on the tables above, not commentary.
+============================================================================================================
+F1. K7 AND K8 VISIT THE SAME NUMBER OF ENTRIES. `U` SEES ONE AND NOT THE OTHER.
+
+             M   K7 Nidx   K8 Nidx     K7 U     K8 U
+            50        10        10        7        0
+           500        74        74       71        0
+          5000       717       717      714        0
+         20000      2860      2860     2857        0
+
+    Nidx identical at every size: YES. The two designs traverse the same
+    number of index entries; they differ only in WHICH BOUND is the seek, and therefore in
+    whether the unauthorized entries are rejected FROM THE INDEX (invisible to a row-access
+    counter) or AFTER A ROW READ (visible to it).
+
+    TASK-0038 reported K7 U=715 and K8 U=0 at M=5000 and called that the sharpest result in
+    the table. IT WAS CORRECTLY MEASURED AND IT MEANT SOMETHING NARROWER THAN IT LOOKED:
+    K8 did not examine less. It examined the same amount somewhere the instrument could not
+    see. MSG-0118 said as much in its result 4 and could not measure it; this run measures it.
+
+F2. `ANALYZE` ALONE DRIVES K7's U FROM 2857 TO 0 — AND CHANGES NOTHING ELSE.
+
+    ANALYZE is an ordinary, supported maintenance operation. It writes statistics. It does
+    not touch the schema, the data, the indexes, the query text or the design. After it,
+    K7's planner switches the populated partition's bounded limb from the LOWER-bound index
+    to the UPPER-bound one — becoming, in the only respect that matters here, K8.
+
+    U:    2857 -> 0        (the row-access counter goes quiet)
+    Nidx: 2860 -> 2861     (the traversal visits ONE MORE entry, not fewer)
+
+    A candidate measured before a routine ANALYZE and one measured after would receive
+    OPPOSITE `U` readings for THE SAME DESIGN. On this engine `U` is not a property of the
+    design; it is a property of the statistics table.
+
+F3. E1 SPLITS INTO A LIMB THAT IS PLAN-INDEPENDENT AND A LIMB THAT IS NOT.
+
+    REACHABLE STRUCTURES — plan-independent, and OBTAINED. The authorizer enumerates every
+    structure the statement can read, at compile time, before any plan choice. For K7 and K8
+    it reports only routed partitions and no scope-spanning structure, and it reports the
+    same set under every configuration. It is a SUPERSET of what any plan opens, which is the
+    fail-closed direction: what it excludes, no plan can reach.
+
+    CONFINEMENT — NOT plan-independent. K7 produced 2 distinct version traversals and
+    K8 produced 2, across configurations that are all ordinary engine states. INDEXED BY
+    pinned the bounded limb and did NOT pin the rest: K8's open limb still became a full
+    partition scan after ANALYZE. Pinning one limb pins one limb.
+
+    So the honest position is: the "which structures" half of E1 can be evidenced without
+    trusting a single plan observation, and the "how much is traversed" half cannot — not on
+    this engine, and not by any instrument reachable from it.
+
+F4. THE ONE INSTRUMENT THAT WOULD SETTLE U1 IS A BUILD FLAG AWAY, AND THAT IS A SELECTION
+    CRITERION RATHER THAN A DEFECT. `sqlite3_stmt_scanstatus` reports per-loop visit counts
+    directly. It requires SQLITE_ENABLE_STMT_SCANSTATUS at compile time (ABSENT here) AND a
+    binding in node:sqlite (ABSENT here). EPA-0006 §4.6 S10 already holds that an engine which
+    cannot be observed fails the burden AMD-01 places on it. This run is a worked example of
+    that rule biting: not "the engine examined too much" but "the engine cannot be asked".
+    Recorded as evidence, NOT as a recommendation to select any engine or build option.
+
+============================================================================================================
+SECTION 12 — WHAT THIS RUN DOES NOT ESTABLISH
+============================================================================================================
+  * NOTHING IS CLEARED. Both candidates are NOT CLEARED. No gate was relaxed to reach that.
+  * U1 = 0 IS NOT ESTABLISHED FOR ANYTHING, and is not claimed. The index-cursor instrument is
+    a LOWER BOUND: it can prove examination, never absence of examination.
+  * E4 IS NOT OBTAINED. It is established UNOBTAINABLE ON THIS TEST SUBJECT. That is a fact
+    about node:sqlite and this build of SQLite, NOT about engines in general, and NOT a claim
+    that no engine can supply E4.
+  * NO PLANNER BEHAVIOUR IS GENERALIZED. Every plan, every U and every U1 lower bound here is
+    evidence about SQLite 3.51.3 via node:sqlite, in these configurations, on
+    these fixtures. MSG-0120 forbids carrying it to another engine without evidence.
+  * THE CONFIGURATION SET IS NOT EXHAUSTIVE. Plan stability observed across the configurations
+    tested is not plan stability in general: a future engine version, a different page size, a
+    different statistics state or a build with ENABLE_STAT4 could all choose differently.
+  * K3 AND K4 ARE UNCHANGED and remain NOT CLEARED under MSG-0119's strict Q11 reading. They
+    were not re-run and no evidence here bears on them.
+  * ALL PRIOR VERDICTS STAND. TASK-0033/0035/0037/0038 were not modified or re-run. The
+    TASK-0038 grid is not replaced: this run explains WHY K8 measured U = 0 there, and that
+    explanation leaves the recorded U = 0 correct AS A ROW-ACCESS COUNT and insufficient as
+    evidence of non-examination.
+  * NO ENGINE, RUNTIME, PROVIDER, MODEL OR INDEX TECHNOLOGY IS SELECTED. No implementation or
+    deployment is authorized, proposed or performed. No ADR is amended.
+
+============================================================================================================
+END OF PROBE OUTPUT
+============================================================================================================

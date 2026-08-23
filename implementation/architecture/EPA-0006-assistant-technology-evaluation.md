@@ -1279,6 +1279,184 @@ fail-closed default.
 
 ---
 
+### 4.12 K7/K8 remaining clearance evidence: E4, `U1` observability, plan-independence (TASK-0039, MSG-0120)
+
+**Added 2026-08-24 by TASK-0039. Additive and declared: nothing in §4.1–§4.11 is deleted or
+reworded, and no verdict changes.** This section records what happened when the three remaining
+clearance gaps on the **physically partitioned K7/K8 class** were attacked directly. **It amends no
+ADR, invents no threshold, relaxes no gate, and selects, adopts, recommends, installs and deploys no
+engine.** Authority: **MSG-0120**, with **MSG-0119** binding. Full evidence: **MSG-0123**; harness
+and captured output at `implementation/probes/TASK-0039/`.
+
+**Why K7/K8 and nothing else.** MSG-0119 ruled Q11 strictly, so **K3 and K4 remain NOT CLEARED** and
+were not re-run. K7 and K8 partition their version **and** chunk stores, satisfying E1's
+reachable-structure limb under **both** readings — which made them the only candidates whose E1
+position was not in question, and the only ones worth closing gaps on.
+
+**Both are NOT CLEARED. Nothing here clears anything.**
+
+#### Gap 1 — E4 is UNOBTAINABLE on this test subject, established by enumeration
+
+**MSG-0120 required E4 be obtained or explicitly established as unobtainable, and forbade inferring
+it.** It was established, by enumeration rather than by assertion:
+
+| Check | Result |
+|---|---|
+| `DatabaseSync` / `StatementSync` prototypes, enumerated at runtime | **no trace, profile or log member of any kind** |
+| `sqlite3_trace_v2`, `sqlite3_profile`, `SQLITE_CONFIG_LOG`, `sqlite3_stmt_scanstatus` | **none bound by `node:sqlite`** |
+| `PRAGMA compile_options` | **`SQLITE_DEBUG` ABSENT · `ENABLE_SQLLOG` ABSENT · `ENABLE_STMT_SCANSTATUS` ABSENT** |
+| `PRAGMA vdbe_trace` / `vdbe_listing` / `parser_trace` / `sql_trace` | accepted **and inert** |
+| `db.location()` on `:memory:` | **`null`** — no file, so no journal, WAL or engine-written artefact to read |
+
+**The trap that check caught is worth keeping.** SQLite **silently ignores an unrecognised pragma**,
+so *"`PRAGMA vdbe_trace=on` returned no error"* is evidence of nothing. The probe ran a pragma that
+certainly does not exist as a **control**, and every tracing pragma behaved identically to it. **A
+probe without that control could have reported E4 obtained from an instrument that was never
+running.**
+
+**Consequence, stated before any count in the record it belongs to:** under §4.6 S6 an absent
+evidence class yields **NOT CLEARED**, so **no candidate could have been cleared in that run
+whatever `U` showed.**
+
+#### Gap 2 — `U1` is partially instrumentable after all, and the prior zero was a ROW-ACCESS zero
+
+**MSG-0118 recorded that `U1` is not instrumentable through `node:sqlite`, and MSG-0120 forbade
+reporting `U1 = 0` on that basis. The stronger of the two turns out to be available:** `U1` **is**
+measurable in part, and what it measures is **failure**.
+
+**The engine's own bytecode shows where a row-access counter sits.** For the pinned bounded limb,
+`EXPLAIN` prints `SeekGT` → `IdxGT` → **`DeferredSeek`** → `Column` *on the index cursor* → `Gt` →
+**`Next`**. **An entry failing the residual is rejected from the index and the table row is never
+read**, so a counter on a non-indexed column **cannot fire for it**. §4.6 S5 predicted exactly this;
+here it is demonstrated at opcode level.
+
+**The instrument:** a function applied to `open_ended`, the **leading column of both candidate
+indexes**, is evaluated **from the index cursor** and therefore fires **once per entry visited in the
+seek range**. It was **calibrated against a cohort known by construction, on both candidate plans,
+and reproduced the constructed count exactly** (302 and 402) before being used on anything.
+
+**What it is, precisely, because the bound only works one way:**
+
+- **`Nidx`** — engine-measured entries visited. **All** entries; the instrument cannot classify them.
+- **`U1lb`** — a **derived, deliberately generous** lower bound on the unauthorized share.
+- It is a **LOWER BOUND**: it does not see interior b-tree pages, pager reads, or other loops.
+  **A positive value is conclusive of failure (§4.6 S5); no value of it may ever be read as
+  `U1 = 0`, and the probe never so reads it.**
+- The transfer licence was **checked, not assumed**: every measurement captured the plan with and
+  without the instrument and required the **seek bound to be identical**. **0 of 96 failed.**
+
+#### The measurement, and the two results that carry
+
+**K7 and K8 visit THE SAME NUMBER OF ENTRIES. `U` sees one and not the other.**
+
+| M | K7 `Nidx` | K8 `Nidx` | K7 `U` | K8 `U` |
+|---|---|---|---|---|
+| 50 | 10 | 10 | 7 | 0 |
+| 500 | 74 | 74 | 71 | 0 |
+| 5000 | 717 | 717 | 714 | 0 |
+| 20000 | 2860 | 2860 | 2857 | 0 |
+
+**MSG-0118 §5 result 5 called K7-vs-K8 the sharpest finding in that table, and it was correctly
+measured — it simply meant something narrower than it looked. K8 did not examine less.** It examined
+the same amount, in a place the instrument could not see, because its seek is on the **upper**
+effectivity bound and the unauthorized entries are rejected **from the index**. **MSG-0118's own
+result 4 said this could not be measured; it now is.**
+
+**`ANALYZE` alone drives K7's `U` from 2857 to 0, and changes nothing else.** `ANALYZE` is ordinary
+maintenance: it writes statistics and touches no schema, data, index, query text or design. After
+it, K7's planner switches the populated partition's bounded limb to the upper-bound index —
+**becoming K8 in the only respect that matters.** `U`: 2857 → **0**. `Nidx`: 2860 → **2861**, i.e.
+**one entry more, not fewer.**
+
+> **The same candidate, measured before and after a routine `ANALYZE`, receives opposite `U`
+> readings. On this engine `U` is not a property of the design; it is a property of the statistics
+> table.** That sharpens §4.11 result 5 from *"the planner decides"* to *"a maintenance command
+> decides"*.
+
+#### Gap 3 — E1 splits: one limb is plan-independent and obtained, the other is not
+
+**OBTAINED, and genuinely independent of the optimizer.** `sqlite3_set_authorizer`, bound as
+`DatabaseSync.setAuthorizer`, enumerates every `(table, column)` a statement **may** read, **at
+compilation**, before and regardless of any plan choice. For K7 and K8 it reports **eight structures,
+all routed partitions, and no scope-spanning structure**, identically under every configuration. It
+reports a **superset** of what any plan opens — the fail-closed direction, so **what it excludes, no
+plan can reach**. For the negative control it reports `k_chunk` and `k_version`, **failing E1
+plan-independently**.
+
+**The instrument was characterised rather than assumed.** Its callback count is **invariant with
+collection size** (101 at M=500 and at M=5000), so it is a **compilation event, not a per-entry
+counter**; it cannot measure `U` or `U1` and is not used to.
+
+**NOT OBTAINED: the confinement limb.** Across configurations that are all ordinary engine states —
+baseline, `automatic_index=off`, fresh connections, shifted query instant, after `ANALYZE`, after
+`ANALYZE` + `PRAGMA optimize` — at four collection sizes and two distributions:
+
+| Design | distinct version traversals | `U` range | derived `U1lb` range |
+|---|---|---|---|
+| **K7** | **2** | 0 … 4445 | 0 … 4437 |
+| **K8** | **2** | 0 | 0 … 4436 |
+
+**`INDEXED BY` pinned the bounded limb and did not pin the rest** — K8's *open* limb still became a
+full partition scan after `ANALYZE`. **Pinning one limb pins one limb.**
+
+#### Verdicts — both NOT CLEARED
+
+| Candidate | E1 | E2 | E3 | E4 | G-Q4 | **Verdict** |
+|---|---|---|---|---|---|---|
+| **K7** | reachable-structure limb **HOLDS plan-independently**; confinement limb **NOT plan-independent** | **NOT OBTAINED** — `U1lb` to 4437, rising with `N` | N/A, **not transferable** | **NOT OBTAINABLE** | MET in all 12 configurations | **NOT CLEARED** |
+| **K8** | as K7 | **NOT OBTAINED** — `U1lb` to 4436, rising with `N` | N/A, **not transferable** | **NOT OBTAINABLE** | MET in all 12 configurations | **NOT CLEARED** |
+
+**Both validity gates passed:** the adversarial precondition held at all four sizes under both
+distributions, and the negative control **failed in 4 of 4 cases** (§4.6 S8).
+
+#### What this section does NOT establish
+
+- **Nothing is CLEARED**, and no gate was relaxed to reach that. MSG-0119 is explicit that failure
+  does not authorize weakening the gates; **the question returns to §4.7 Q3.**
+- **`U1 = 0` is not established for anything and is not claimed.** The instrument proves
+  examination, never its absence.
+- **E4 is not obtained — it is established unobtainable ON THIS TEST SUBJECT.** That is a fact about
+  `node:sqlite` and this build, **not** a claim that no engine can supply E4.
+- **No planner behaviour is generalized.** Every plan, count and bound is evidence about **SQLite
+  3.51.3 via `node:sqlite`**, in these configurations, on these fixtures.
+- **The configuration set is not exhaustive.** Plan stability across what was tested is not plan
+  stability: a different engine version, page size, statistics state, or a build with
+  `ENABLE_STAT4`, could all choose differently.
+- **K3 and K4 are unchanged** and remain **NOT CLEARED** under MSG-0119's strict Q11 reading.
+- **All prior verdicts stand.** TASK-0033/0035/0037/0038 were **not modified or re-run**; TASK-0038's
+  seven-scenario grid is not replaced. **Its recorded `U = 0` for K8 remains correct as a row-access
+  count** and is insufficient as evidence of non-examination — which is what §4.6 S5 always said.
+- **No numeric staleness threshold**; no benchmark, latency, capacity, recall or throughput figure.
+- **No engine, runtime, provider, model or index technology is selected**, and no implementation task
+  is authorized or marked READY.
+
+#### Q12 — must a probe take the index-cursor placement wherever the engine exposes one? Surfaced, NOT decided
+
+**Numbering:** §4.7 holds **Q1–Q3**, still open. **Q4–Q6** are ruled and encoded in §4.9. **Q7** is
+ruled with its numeric limb open. **Q8–Q10** are ruled (MSG-0116a/b). **Q11** is ruled by MSG-0119.
+**Q12 is the next free number**, allocated here and verified unused.
+
+**The question.** §4.6 S7 requires a probe to *"record where each instrument sits"*, *"report the
+maximum count across all placements"*, and *"never present a single count as 'the' number"*. **It
+does not say which placements must be attempted.** This run found a reachable placement that four
+prior probes did not take, and taking it changed a reported `U = 0` into a rising `U1` lower bound
+on the same design.
+
+**Should §4.6 S7 be strengthened to require the index-cursor placement — or any index-only-evaluable
+placement — wherever the engine permits one, and should a `U` taken only at row access be
+insufficient for E2 by rule rather than by a probe's diligence?**
+
+**Why it is referred rather than applied.** That would be a change to the **criterion**, and
+encoding a ruling into §4.6 is what TASK-0034 and TASK-0036 were separately authorized to do.
+**TASK-0039 is an evidence task and MSG-0120 stops it at evidence and clearance status.**
+
+**Why it blocks nothing.** The fail-closed default already covers the case: §4.6 S5 makes a
+**non-zero count conclusive** and a **zero count inconclusive**, so a probe that omits the placement
+cannot clear anything it should not have — it can only fail to detect a failure. **Q12 asks whether
+that should depend on a probe noticing, and the answer changes no verdict recorded anywhere.**
+
+---
+
 ## 5. Candidate technology classes against Approach C (MSG-0098 item 1)
 
 **Approach C is settled and is treated here as a constraint, not an option** (EPA-0005 §5; MSG-0092): a
