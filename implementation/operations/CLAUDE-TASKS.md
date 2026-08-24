@@ -53,6 +53,7 @@ Only the architecture lead may authorize new work, mark a task READY, or change 
 | TASK-0041 | **Q3 architecture response — technology-agnostic retrieval topology against the existing gates** | **COMPLETE** — 2026-08-24; **8/8 acceptance criteria MET** | MSG-0130 AUTHORIZED, MSG-0129 (Q3 ruled), EPA-0006 §4.6–§4.8, all prior evidence | 2026-08-24 — **EPA-0006 §4.13** added (**392 insertions / 0 deletions**, one file) plus a **declared pointer note** under §4.7 Q3; MSG-0129 **quoted, not paraphrased**; `git diff --name-only docs/` **empty**; **nothing executed, no probe written or re-run, no test count claimed**; **MSG-0132** | none — **no task is READY.** MSG-0130's acceptance ends at the documented architecture response; **engine selection stays blocked and must be separately authorized.** **Nothing CLEARED and nothing could have been** — the task is entirely structural and **G-Q6 rejects construction-only evidence**, so its output is a topology **plus the evidence still owed on it**. **Five invariants derived** — **N1** containment, **N2** closure of the reachable set, **N3** refinement by enumerated transition, **N4** plan-independence, **N5** non-withholding — from §4.8 finding 1, the only measured mechanism by which `U` falls. **The load-bearing claim: N1 + N2 make N4 free** — if nothing unauthorized is within reach, **no plan can examine it**, which is why §4.12's `ANALYZE` result (`U` 2857 → 0 on a maintenance command) argues for redesign rather than for a better-behaved engine; **three caveats recorded with it**, chief among them that **N1 is a containment claim and does NOT discharge E2** (§4.11 result 4: two designs at `U = 0` holding 714 and 2143 unauthorized entries). **§4.8's catalogue extended, not replaced**: **I7** boundary-refined effectivity — effectivity **is** piecewise constant in time, so it refines on the interval to the next boundary, which is **data, not a tuning parameter**; and **I8** entitlement-class materialisation. **Both NEVER MEASURED.** **Four topologies W1–W4 mapped cell by cell** to E1–E4 and G-Q4/G-Q5/G-Q6/G-Q7/G-Q7.8, each property marked **S** / **X** / **S→X** — and **they differ from one another in exactly ONE cell**, which is itself the answer: topology decides **G-Q4.1 outright**, creates the **precondition** for E1/E3/G-Q5.1/G-Q7, and decides **E2, E4, G-Q5.2, G-Q6, G-Q7.8 and N5 not at all**. **Minimum evidence stated as EV1–EV12** — evidence, not a shortlist, **adding no gate and relaxing none**. **One bounded recommendation, R1**, a criterion and not a selection; **the W1–W4 choice preserved as OPEN** because the distinguishing costs are **all unmeasured**. **Five gaps recorded — GAP-A…GAP-E**, of which **GAP-B is the one to read first: E4 is UNOBTAINABLE on the only reachable test subject, so a future probe there would clear nothing whatever the topology.** **All prior verdicts reproduced unchanged** (MSG-0132 §6); **K7/K8 still NOT CLEARED**. **One question referred — Q13** (which temporal frames must a topology answer), fail-closed default, blocks nothing. **One discovery recorded and deliberately NOT corrected — DISC-0011**: §4.11's summary says *"Six designs NOT CLEARED"* where its own table shows **seven**; no verdict is wrong and nothing downstream depends on the tally | Claude Code |
 | TASK-0042 | **Architecture-bound retrieval evidence — routing, placements, transitions, I5/I7/I8, E4 re-check** | **COMPLETE** 2026-08-24 | MSG-0137 AUTHORIZED, MSG-0138 (queue write), MSG-0134/0135/0136 (Q1/Q2/Q7 ruled), MSG-0132 (§4.13 topology), EPA-0006 §4.6/§4.9/§4.13 | **8/8 acceptance criteria with evidence.** Probe run **VALID** — adversarial precondition HELD at 3 sizes x 2 distributions; retrieval control failed **3/3**; **routing** control failed G-Q4.2 as required; **freshness** control failed **6/6**; calibration EXACT on both plans; plan-transfer **0/54** non-transferable. **18 placement-grid cells + 36 freshness cells.** **ALL SIX CANDIDATES NOT CLEARED.** `U` max across placements: K7 **714**, K8 **709** (its row-access zero superseded by S7-R2), I5 **714**, I8 **714**, KR **714** (G-Q4.3 FAILED), I7 **0 on a VACUOUS bound** that **withheld 142 of 146 authorized chunks** at its interval boundary. **E4 re-checked: still NOT OBTAINABLE**, position unchanged. **DISC-0012** raised. Record **EPA-0006 §4.14**, evidence **MSG-0140**, probe `implementation/probes/TASK-0042/` | **Execute**: measure the **routing phase** and reachable physical structures with routing-phase examination counted in `U`; exercise **every applicable S7 placement** and report the **maximum** `U`; test **zero stale-answer tolerance** across update / approve / revoke / supersede **plus the abstention case**, distinguishing transition-triggered invalidation from periodic re-materialisation; measure **I5/I7/I8** only where genuinely observable, else **NEVER MEASURED / NOT CLEARED** with the exact limitation; **re-check E4 observability**. **Reuse committed harnesses; do not re-run prior cases for repetition.** **May clear nothing — clearance only if every applicable E1–E4 and G-Q4/G-Q5/G-Q6 requirement is satisfied by execution evidence.** **No selection, no implementation, no ADR change, no Docker or host install** — an environment boundary is **recorded**, not routed around | Claude Code |
 | TASK-0043 | **Bounded E4 observability evidence on a second test subject** | **COMPLETE** — 2026-08-24; **8/8 acceptance criteria MET** | MSG-0141 AUTHORIZED; **MSG-0145** (operator grant to invoke `py`); MSG-0140 §6; EPA-0006 §4.13 GAP-B, §4.6 S6/S9 | 2026-08-24 — **probe run under MSG-0145**: subject **Python 3.14.5 / SQLite 3.50.4**; **3 observability surfaces present** (`set_trace_callback`, `set_progress_handler`, `set_authorizer`), **4 checked and absent** (`stmt_scanstatus`, `set_profile`, `config_log`, `trace_v2`); **`DEBUG`/`ENABLE_SQLLOG`/`ENABLE_STMT_SCANSTATUS` ABSENT — the same three as the first subject, so the difference is the BINDING, not the build**; **5 of 5 tracing pragmas inert against the nonexistent-pragma control**; every instrument run **disarmed then armed** (0→1, 0→807, 0→3). **MSG-0146** | none — **no task is READY**; MSG-0141 returns control to the Architecture Lead. **E4 is OBTAINABLE on this subject — and the inspection is ADVERSE: unauthorized passage text bound as a PARAMETER appears verbatim in the engine's own trace** (`WHERE body = 'ZZ-UNAUTHORIZED-PASSAGE-TEXT-ZZ body 7'`), **the reverse of TASK-0042 §6's surface scan, which found 0 occurrences "parameters being bound rather than inlined" and rightly declined to offer it as E4**. **C4 kept separate and negative: the trace records the INSTRUCTION, not the examination** — 200 rows examined, 100 returned, **1 trace entry**. **`set_progress_handler` is a counter carrying no content; `set_authorizer` is prepare-time and names objects, never content.** **The WAL holds the unauthorized marker 135 times and is NOT offered as E4** — a durability artefact, referred in MSG-0146 §8 R2. **Nothing CLEARED — seven probes have now cleared nothing; all six TASK-0042 candidates remain NOT CLEARED; GAP-B concerns the FIRST subject and is not withdrawn.** **BLK-0011 RESOLVED** by the grant, **not by a workaround; the runner's permission set was NOT broadened** | Claude Code |
+| TASK-0044 | **Define the durability-artefact security criterion — before any measurement** | **READY** | MSG-0148b AUTHORIZED; MSG-0147 (R2 ruled); MSG-0146 §5/§8 R2; EPA-0006 §4.6 S6/S9, §9.3, ADR-0020 §6.2 | — not started | **Execute**: draft the precise criterion for **unauthorized policy content in engine-managed durability/persistence artefacts**, with **scope and exclusions**, **evidence semantics in §4.6 S9's existing vocabulary**, and an explicit **fail-closed interpretation** (uninspectable ⇒ **NOT CLEARED**). **Declare, do not assume, two structural choices: its label — E1–E4 may not be changed or extended — and its section.** **It must be distinguishable from E4 in its own text**: E4 is **execution observability**, this is **content at rest**. **NO measurement of any kind** — TASK-0043's WAL figures may appear only as an **illustrative shape, labelled as such**. **No engine selection or comparison, no gate change, no Shape-1 weakening, no ADR modified, no numeric threshold.** **The exposure evidence task is separate and must be separately authorized** | Claude Code |
 | TASK-0002 | Make test entry points shell-independent | **ABORTED** | — | 2026-08-19 | none — premise disproven by measurement | — |
 
 > **One arithmetic correction, carried from DISC-0011 — 2026-08-24.** **TASK-0038's row above says
@@ -709,7 +710,9 @@ READY means *authorized to attempt*, never *authorized to force*. A READY task w
 | MSG-0145 | Authorization | **AUTHORIZED** | Operator | Claude Code | **Operator grant: invoke `py` SOLELY for TASK-0043's bounded E4 probe.** Recorded **verbatim and before anything ran**, as `CLAUDE.md` requires of a conversational instruction. **No product-engine selection, adoption, deployment, implementation, gate/ADR change or scope expansion authorized** — the same prohibitions MSG-0141 already carries, so the grant widens the task by **exactly one mechanism**. **Nothing installed**: Python 3.14.5 and SQLite 3.50.4 were already present (MSG-0142 §3). **`runner-settings.json` deliberately NOT modified** — a standing rule would be broader than a one-task grant (MSG-0083 precedent) — so **this session executes and BLK-0011's unattended condition survives for future tasks**. TASK-0043 left **BLOCKED while the run proceeded**, so a concurrent supervisor cycle could not start a second session against it | 2026-08-24 |
 | MSG-0146 | Record + referrals | **OPEN** | Claude Code | Architecture lead | **TASK-0043 execution record — E4 is OBTAINABLE on the second subject, and the inspection is ADVERSE.** **8/8 criteria MET.** Subject **Python 3.14.5 / SQLite 3.50.4** (first subject quoted, not re-run). **Unauthorized passage text bound as a PARAMETER appears verbatim in the engine's own trace** — **the reverse of TASK-0042 §6's surface scan**, which found 0 occurrences because *"parameters being bound rather than inlined"* and **rightly declined to offer it as E4**: the protection it appeared to observe **does not hold at the surface E4 asks about**. **C4 recorded separately and negative — the trace records the INSTRUCTION, not the examination** (200 examined, 100 returned, **1 entry**). `set_progress_handler`: **807 armed invocations carrying no content — a counter, not a log**. `set_authorizer`: **prepare-time, names objects, 0 events on re-execution**. **5 of 5 tracing pragmas inert vs the control**; **every instrument run disarmed then armed**; **run VALID**. **WAL holds the marker 135 times — a durability artefact, NOT offered as E4** (referred). **Nothing CLEARED; seven probes have cleared nothing; GAP-B untouched.** Two referrals, neither blocking: **whether this becomes EPA-0006 §4.15**, and **whether text at rest in engine-managed files deserves architectural treatment** | 2026-08-24 |
 | MSG-0147 | Decision | DECIDED | Architecture lead | Claude Code | **R2 RULED YES — unauthorized policy content in an engine-managed durability artefact (WAL, journal, shared-memory file) is an architectural security concern and must be investigated as a separate security requirement.** **It is NOT reclassified as E4**: E4 stays the execution-observability criterion, and the durability concern is **a separate boundary about persistence** — the separation MSG-0146 preserved by refusing to offer the WAL result as E4. **Unauthorized content must not be accepted as harmless merely because it sits in a durability artefact rather than a log.** **Evidenced separately; clears or fails no engine by itself; no gate changed; nothing selected.** Future evidence must establish **whether a candidate's durability artefacts can contain unauthorized policy content and whether the architecture prevents it**. **The next bounded task, IF authorized, should define a reproducible exposure test rather than broaden engine evaluation** | 2026-08-25 |
-| MSG-0148 | Record | **OPEN** | Claude Code | Architecture lead | **R2 reconciled; a new evidence obligation exists and NO task is authorized to meet it.** MSG-0147 §6 is conditional — *"if authorized"* — so **the queue stays empty and the supervisor's NOOP is correct**; nothing was marked READY. Records the gap the ruling creates: **no criterion in EPA-0006 asks the durability question** — E1–E4 do not reach persistence artefacts and §9.3 concerns logs. **One choice offered, not requested**: **(a) encode the criterion first**, on the TASK-0034/0036/0040 mechanism, since evidence gathered before a bar exists gets measured against the probe's own idea of it; or **(b) define the exposure test first**, since **E4's history is the cautionary case — the criterion existed and the first subject could not instrument it at all**. **Doing both in one task is recommended against**: the same session would write the bar and the measurement together. **R1 remains open** | 2026-08-25 |
+| MSG-0148a | Record | **OPEN** | Claude Code | Architecture lead | **R2 reconciled; a new evidence obligation exists and NO task is authorized to meet it.** MSG-0147 §6 is conditional — *"if authorized"* — so **the queue stays empty and the supervisor's NOOP is correct**; nothing was marked READY. Records the gap the ruling creates: **no criterion in EPA-0006 asks the durability question** — E1–E4 do not reach persistence artefacts and §9.3 concerns logs. **One choice offered, not requested**: **(a) encode the criterion first**, on the TASK-0034/0036/0040 mechanism, since evidence gathered before a bar exists gets measured against the probe's own idea of it; or **(b) define the exposure test first**, since **E4's history is the cautionary case — the criterion existed and the first subject could not instrument it at all**. **Doing both in one task is recommended against**: the same session would write the bar and the measurement together. **R1 remains open** | 2026-08-25 |
+| MSG-0148b | Decision | AUTHORIZED | Architecture lead | Claude Code | **R2 CRITERION-FIRST authorized — TASK-0044.** Define the **WAL/durability-artefact security criterion BEFORE** any exposure evidence task: *"The criterion must establish the security bar independently of the measurement. The later evidence task must measure against the already-authoritative criterion."* **May**: draft the precise criterion for unauthorized policy content in **engine-managed durability/persistence artefacts**; define its **scope, exclusions, evidence semantics and fail-closed interpretation**; record it through the established architecture/COMMS mechanism. **May NOT**: run the WAL exposure experiment; select, compare, adopt, deploy or implement an engine; change **E1–E4** or any existing gate; weaken Shape-1; or **combine criterion creation and measurement in one task**. **Success:** a bounded, independently reviewable criterion record on `main` stating **what exposure is prohibited and what evidence would satisfy or fail it**. **No measurement under this authorization.** **Number shared with MSG-0148a — eighth collision, no file renamed (MSG-0058 F4)** | 2026-08-25 |
+| MSG-0149 | Record | **OPEN** | Claude Code | Architecture lead | **TASK-0044 reconciled as the single READY task, and the eighth message-number collision recorded.** The Lead took **option (a), criterion-first**, and **forbade the combination outright** — *"combine criterion creation and measurement in the same task"* is a prohibition, not a preference, which is stronger than the recommendation it answers. Records what the criterion must not become: **E4 by another name**. E4 is about **execution observability**; this is about **content at rest in engine-managed files**, and MSG-0147 kept them separate deliberately. Also records the standing evidence from TASK-0043 the criterion must be able to describe — **a WAL carrying the unauthorized marker 135 times while the main database and `-shm` carried none** — **as an example the criterion must be able to classify, NOT as evidence under it** | 2026-08-25 |
 | MSG-0117 | Record | **OPEN** | Claude Code | Architecture lead | **TASK-0038 reconciled as the single READY task, and a seventh number collision recorded.** **Two lead-authored files claim MSG-0116** — the MSG-0020 shape, and MSG-0020's pair **contradicted**, so agreement was verified clause by clause before queueing rather than assumed. **They agree on all three rulings and the next action**; no stop fired. **They are not interchangeable** — 0116a carries the kernel-read-count and citation-version points, 0116b the separate-instrumentation requirement and the no-clearance-follows warning — so **the task section carries the union and links both**. Neither renamed, per MSG-0058 F4; **neither was registered in either index** until now | 2026-08-23 |
 | MSG-0115 | Record + referrals | **OPEN** | Claude Code | Architecture lead | **TASK-0037 execution record — the freshness mechanism is measured, and nothing is cleared.** **8/8 acceptance criteria MET**; **a real probe ran** — **8 designs × 11 scenarios × 3 collection sizes**, two instrument placements each, on **SQLite 3.51.3 via `node:sqlite`** (class **R** test subject, the only engine reachable — `docker` is not on this runner's PATH), `:memory:` only, no install, no network, no corpus, **no wall-clock read and no timing figure produced**. The **mandatory negative control failed** — NC returned a superseded version in **12 cases** — so the run is valid; **the adversarial precondition also caught a real fixture defect** and correctly declared the first draft VOID. **Two terminology reconciliations were taken from the accepted ADRs rather than invented**: MSG-0113's *"revoked"* is ADR-0018 §2's **WITHDRAWN** (no `REVOKED` state exists), and *"the current approved version"* is read as ADR-0018's **PUBLISHED and effective** version, since `APPROVED (not yet published)` is **not answerable** — both strict, both fail-closed. **The discriminator MSG-0113 §3 demands was built and it fired**: S2 and S3 are the **same recorded transition** queried before and after the periodic timer, and the two timer-only designs **returned the superseded version before the timer and the correct one after** — *"made correct by waiting, not by the transition."* **Five results carry beyond the engine.** **Version identity is necessary and nowhere near sufficient** — the two designs differing **only** in whether the structure carries it have **identical grids**; carrying it without consulting the kernel changes nothing, and a design carrying none **cannot name the version it answered from**, defeating ADR-0018 §1's citation rule independently. **"Answered nothing" is not "abstained"** — one design returned an **empty ANSWER** where abstention was required, and on the kernel-unreachable case **answered correctly by luck**; ADR-0017 §5 classifies abstentions A1–A7 and an empty answer is none of them. **The faked re-check is a no-op, now demonstrated rather than predicted** — against the same change, the kernel re-check `kept 0/4` and abstained while the self re-check `kept 4/4` and **returned four chunks of a reclassified version**, with the same structures, the same plan and the **same `U`**; **G-Q5.2c is satisfied for the first time** (a re-check observed to **REJECT**). **`U` cannot distinguish a leaking design from a conservative one** — those two designs both report **`U` = 4 at every size**, which **extends §4.6 S5**: the asymmetry rule warns a *zero* count can be a placement artefact; here a *non-zero* count identical between two designs conceals **opposite** security outcomes. **And "`U` = 0 is a property of an instant" is not only about time** — in the decisive scenario **no time passes at all**, an authorization attribute changes in the kernel, and **no timer would have caught it**, corroborating §4.8 finding 1 in a second fixture. **A hook is only as complete as the set of changes it is wired to**, so MSG-0113 §2(2) and §2(5) are **not alternatives**. **Nothing is CLEARED** — 7 NOT CLEARED, 1 DISQUALIFIED; **the design meeting BOTH G-Q5 conditions and every G-Q7 requirement (11/11) is still NOT CLEARED** on **E2** (`U` = 4 > 0), **E4** (not obtained) and **G-Q4** (not measured) — §4.9's *"necessary, never sufficient"* demonstrated in practice. **All nine MSG-0104 and all eight TASK-0035 verdicts reproduced unchanged; neither prior probe modified or re-run**; **`git diff --name-only docs/` empty**; **EPA-0006 §4.10 added, 122 insertions / 0 deletions**; **no numeric threshold introduced** — the bound exhibited is a **fixture constant** whose magnitude **G-Q5.1a** expressly does not judge. **Three questions referred, none blocking**: **Q8** whether the mandatory §3 point-2 re-check is itself *examination* (its kernel reads are **bounded by `k` and invariant with `N`**), **Q9** sharpening §4.7 Q3 with the new evidence, **Q10** the MSG-0113/ADR-0018 terminology mismatch | 2026-08-23 |
 | MSG-0099 | Record | **CLOSED** 2026-08-23 — discharged by execution (MSG-0100); the distinction it asked for is recorded in WP-0009 §6.2, the architecture README and MSG-0100 §5, and its warning held — no unmeasured figure appears in the delivered record | Claude Code | Architecture lead | **TASK-0032 reconciled as the single READY task.** Records that this is **not a re-run of TASK-0026**: that task evaluated stack **shape** (Approaches A/B/C) and produced EPA-0005; this evaluates **technology classes** against the now-settled Approach C and against ADR-0020 **as amended by AMD-01**, neither of which existed then. **Both are labelled "A-STACK" in WP-0009 §6.2**, where A-STACK already reads EXECUTED — the label reuse is flagged so the record is not read as one task run twice, and the task is told to distinguish the rows rather than overwrite. Also flags the likeliest failure mode: a technology comparison invites throughput, latency, memory and recall numbers, **none of which has been measured here** | 2026-08-23 |
@@ -4429,3 +4432,130 @@ before every push.
 **Check what MSG-0140 §6 already enumerated before re-enumerating it.** The `node:sqlite` surface is
 settled and re-running it produces no new evidence. **The new ground is a different subject**, and the
 task's budget belongs there.
+
+---
+
+## TASK-0044 — define the durability-artefact security criterion, before any measurement
+
+**Priority:** 1 | **Status:** **READY** | **Owner:** Claude Code
+**Depends on:** MSG-0148b AUTHORIZED; MSG-0147 (R2 ruled); MSG-0146 §5 and §8 R2 (the observation that raised it); EPA-0006 §4.6 S6, §9.3, ADR-0020 §6.2
+**Next eligible task:** none — **the exposure evidence task is separate and must be separately authorized**; MSG-0148b forbids combining them
+**Type:** criterion definition — **no measurement, nothing selected, no gate changed**
+
+**Specification:** [`MSG-0148b`](../comms/MSG-0148-r2-criterion-first-authorization.md), with
+[`MSG-0147`](../comms/MSG-0147-r2-wal-architectural-security-decision.md) binding, **plus this section.**
+
+### Why criterion first, in the Lead's words
+
+> **"The criterion must establish the security bar independently of the measurement. The later evidence
+> task must measure against the already-authoritative criterion."**
+
+**MSG-0148a offered this as one of two options and recommended against combining them. MSG-0148b turns
+that into a prohibition** — *"combine criterion creation and measurement in the same task"* sits in the
+**may not** list. **A bar written by the session that also takes the measurement is a bar shaped by what
+the measurement could reach**, and §4.6 S5's *counters prove failure, never success* exists because that
+shaping is invisible afterwards.
+
+### What the criterion must NOT become
+
+**E4 by another name.** MSG-0147 is explicit that the WAL finding **is not reclassified as E4** and that
+**E4 remains limited to the established execution-observability criterion**. **This criterion is about
+content AT REST in engine-managed files; E4 is about what an engine's execution surface emits.** Two
+different boundaries, deliberately kept apart — **and MSG-0146 kept them apart at some cost**, recording
+the WAL result and refusing to offer it as E4 evidence when doing so would have looked like a stronger
+result.
+
+### The four things it must define (MSG-0148b)
+
+1. **The precise security criterion** for unauthorized policy content in **engine-managed
+   durability/persistence artefacts**.
+2. **Scope and exclusions** — which artefacts are in scope (write-ahead logs, rollback journals,
+   shared-memory files, temporary spill files, backups produced by the engine) and **what is deliberately
+   out** (application logs, OS page cache, storage-layer encryption at rest, anything the engine does not
+   itself write).
+3. **Evidence semantics** — what observation would **satisfy** it and what would **fail** it, in the
+   vocabulary §4.6 S9 already uses, so a later probe cannot invent its own.
+4. **The fail-closed interpretation** — what verdict applies when the artefact **cannot be inspected at
+   all**. §4.6 S9's answer for unobtainable evidence is **NOT CLEARED**, never an inferred pass, and this
+   criterion should say so in its own terms rather than leave it to inference.
+
+### The evidence that already exists, and its exact status
+
+**TASK-0043 observed, on a synthetic fixture:** `-wal` **28872 bytes carrying the unauthorized marker 135
+times**; **main database 4096 bytes, marker absent**; **`-shm` 32768 bytes, marker absent**;
+**`-journal` absent**.
+
+> **That is an example the criterion must be able to CLASSIFY — it is NOT evidence under the criterion**,
+> because the criterion does not exist yet and **MSG-0148b forbids this task from measuring anything.**
+> **Do not re-run it, extend it, or treat it as a result.** Its value here is as a **shape**: a criterion
+> that cannot say plainly whether *"the marker appears 135 times in a WAL and nowhere else"* is a
+> violation is not yet a usable criterion.
+
+### Where it goes
+
+**Through the established architecture/COMMS mechanism** — the additive, declared mechanism TASK-0034,
+TASK-0036 and TASK-0040 used for earlier criteria — **plus a numbered COMMS record**.
+
+**Two structural choices this task must make and DECLARE rather than assume:**
+
+- **Its label.** **E1–E4 may not be changed or extended** (MSG-0148b), so the criterion needs an
+  identifier of its own that cannot be mistaken for a Shape-1 gate. **State the choice and why.**
+- **Its section.** Whether it belongs in **EPA-0006 §4.6** beside the other criteria or in a new section
+  of its own. **Either is defensible; picking silently is not.**
+
+### Boundaries (MSG-0148b)
+
+- **Do NOT run the WAL exposure experiment**, or any measurement. **No probe, no fixture, no harness.**
+- **No engine selection, comparison, adoption, deployment or implementation.**
+- **No change to E1–E4 or any existing clearance gate**; **no weakening of strict Shape-1.**
+- **Do not combine criterion creation and measurement.**
+- **No numeric threshold, no benchmark, no invented figure.**
+- **No accepted ADR modified** — `git diff --name-only docs/` must be **empty**.
+
+### Acceptance criteria
+
+1. **A bounded criterion record exists on `main`** and is **independently reviewable** — readable by
+   someone who has not followed this thread.
+2. **It states plainly what durability-artefact exposure is PROHIBITED.**
+3. **It states what evidence would SATISFY it and what would FAIL it**, in §4.6 S9's existing vocabulary.
+4. **Scope and exclusions are explicit**, including artefacts deliberately out of scope.
+5. **The fail-closed interpretation is stated** — unobtainable inspection yields **NOT CLEARED**.
+6. **The criterion is distinguishable from E4 in its own text**, and says which boundary it is.
+7. **No measurement was performed**, and the record says so; **TASK-0043's WAL figures appear only as an
+   illustrative shape, labelled as such** if they appear at all.
+8. **No gate changed, nothing selected**, `git diff --name-only docs/` **empty**; queue, COMMS and status
+   reconciled.
+
+### Verification
+
+Documentary — **no test count, and none may be claimed**; nothing is executed. Before reporting
+completion, verify and quote:
+
+```text
+git diff --name-only docs/    -> empty
+git status --porcelain        -> empty after commit
+insertions / deletions        -> exact figures per file changed
+```
+
+**Verify the delivered content from `main` after pushing.**
+
+### Documentation
+
+Record the result in `implementation/comms/` as a numbered message, update
+`implementation/status/current.md` and this queue. Write the checkpoint.
+
+### Stop conditions
+
+Stop if defining the criterion would require **measuring anything**, **changing an existing gate**,
+**modifying an accepted ADR**, **selecting or comparing an engine**, or **inventing a numeric threshold**.
+**If the criterion cannot be stated without a measurement to anchor it, that is a finding** — record it
+and stop, because MSG-0148b's whole premise is that the bar comes first.
+
+**Also stop if `origin/main` moves mid-run.** Record the starting HEAD in checkpoint 1 and re-check
+before every push.
+
+### Recovery procedure
+
+**Check whether a durability-artefact criterion already exists before writing one.** §4.6 carries S1–S11
+and §4.9 carries G-Q4…G-Q7; **a second statement of one rule is the drift this record has warned about
+since TASK-0030**, and §4.12's Q12 note is the pattern to follow — **point rather than restate.**
