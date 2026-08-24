@@ -698,6 +698,16 @@ zero, the correct output is **NOT CLEARED for all of them** — a defensible ver
 
 #### Q3 — If no engine class can reach zero, what is the architectural response?
 
+> **Q3 HAS SINCE BEEN RULED, and this question is otherwise unchanged.** Note added 2026-08-24 by
+> **TASK-0041** under **MSG-0130**; **additive — nothing below is deleted or reworded, and the heading
+> is left as TASK-0034 wrote it** so the referral reads as it did when made. **MSG-0129 takes the third
+> of the three branches named below — *reconsider the retrieval topology*** — and the response is
+> worked out in **§4.13**, which is where it must be read from. **It is deliberately not restated
+> here**; two statements of one answer invite drift, which is the convention §4.12's Q12 note
+> established. **Q1 and Q2 above are NOT ruled by MSG-0129 and remain open.** **No verdict changes:
+> the project stays NOT CLEARED for retrieval-engine selection**, and MSG-0129 says so in terms —
+> *"Failure of all tested candidates … is not authority to weaken AMD-01 or strict Shape-1."*
+
 **This may well be the outcome, and it should be visible before a probe runs rather than discovered
 after.** TASK-0033 cleared nothing; §4.3's one structural conformance claim is withdrawn above; and
 **class K faces the same measurement question as class R**, having never been measured at all.
@@ -1552,6 +1562,388 @@ encoding a ruling into §4.6 is what TASK-0034 and TASK-0036 were separately aut
 **non-zero count conclusive** and a **zero count inconclusive**, so a probe that omits the placement
 cannot clear anything it should not have — it can only fail to detect a failure. **Q12 asks whether
 that should depend on a probe noticing, and the answer changes no verdict recorded anywhere.**
+
+---
+
+### 4.13 The Q3 architecture response: a technology-agnostic retrieval topology, and the evidence still owed on it (TASK-0041, MSG-0130)
+
+**Added 2026-08-24 by TASK-0041. Additive and declared: nothing in §4.1–§4.12 is deleted or
+reworded, and no verdict changes.** Authority: **MSG-0130**, with **MSG-0129** (Q3, **DECIDED**)
+binding. Full record: **MSG-0132**.
+
+**This section clears nothing, and it is the first section in this record that could not have cleared
+anything even in principle.** It is **entirely structural**, and §4.9 **G-Q6 rejects
+construction-only evidence in terms**. MSG-0130 repeats the prohibition: *"Do not claim that a
+structural design clears a gate where execution evidence is required."* **Its honest output is a
+topology plus the evidence still owed on it — never a cleared candidate**, which is why the evidence
+list below is the section's real deliverable and the pattern catalogue is its scaffolding.
+
+**No engine, runtime, provider, model or index technology is selected, adopted, recommended,
+installed or deployed. No ADR is amended. No gate is weakened, and no numeric threshold, benchmark,
+latency, capacity, recall or throughput figure appears anywhere below.** **No prior probe was re-run
+and no prior verdict is relabelled.**
+
+#### The ruling, quoted rather than paraphrased
+
+> Q3 asks what the architectural response is if no engine class can satisfy the existing strict
+> Shape-1 clearance gates.
+>
+> The response is **not to relax the bar and not to select the least-bad engine**. If the remaining
+> candidate classes cannot satisfy strict Shape-1, the project remains **NOT CLEARED** for
+> retrieval-engine selection and returns to architecture work to define a retrieval topology that can
+> satisfy the existing gates.
+>
+> The existing security criterion remains authoritative: `U = 0`, E1–E4, G-Q4/G-Q5/G-Q6 and the other
+> recorded gates remain mandatory. Failure of all tested candidates is evidence that the
+> architecture/technology space explored so far is insufficient; it is not authority to weaken AMD-01
+> or strict Shape-1.
+>
+> — **MSG-0129**, Q3 ruling
+
+Two further limbs of the same ruling bind this section and are quoted with it: *"The next architecture
+work is to define and evaluate a technology-agnostic retrieval topology capable of satisfying the
+existing strict gates, including physical candidate-set confinement where necessary, before any
+engine-selection decision"*, and *"the architecture work must preserve the distinction between a
+logical projection and its physical organization and must not assume that a particular engine's
+planner behaviour generalizes to the class."*
+
+**Which of §4.7's three branches this is.** §4.7 Q3 named the shape of the choice as: accept physical
+organisation as an architectural requirement (**Q2**); or settle what `U` counts (**Q1**); or
+**reconsider the retrieval topology**. **MSG-0129 takes the third and rules neither of the others.**
+**Q1 and Q2 therefore remain OPEN**, and this section decides neither. It is worth recording that the
+answer below runs *with* the direction §4.7 Q2's evidence already pointed — *"`U = 0` appears to
+require that the traversal open only structures whose every entry is already authorized"* — **without
+settling Q2**, because Q2 asks whether that is a *requirement of the criterion* and this section asks
+only what a topology would have to look like.
+
+**And the boundary MSG-0101 §1(1) sets is unchanged and is not reinterpreted here:** *"one projection
+index"* means one **logical** projection. **Nothing below requires one physical index or one physical
+store**, and nothing below permits more than one logical projection.
+
+#### What five probes established that any topology must survive — and no verdict moves
+
+**All prior verdicts are reproduced unchanged and nothing is relabelled.** §4.9 states the class
+position and it still stands verbatim: *"SQLite and every class-R configuration remain NOT CLEARED;
+classes S, V and K remain NOT CLEARED with no execution evidence; class D and class H remain
+DISQUALIFIED."* **K7 and K8 remain NOT CLEARED** (§4.12, MSG-0123); **K3 and K4 remain NOT CLEARED**
+under MSG-0119's strict Q11 reading; **K5, K6 and every negative control remain DISQUALIFIED**; the
+eight §4.8 design verdicts and the eight §4.10 design verdicts stand. **Five probes have cleared
+nothing, and this section clears nothing.** The full reproduction is in **MSG-0132**.
+
+**The measured results a topology proposal has to survive**, each carried from where it was measured
+rather than restated as a new claim:
+
+| # | Result | Where |
+|---|---|---|
+| **F1** | **`U` equals the number of unauthorized rows the routed structures still contain.** Isolation reduces `U` exactly insofar as it removes unauthorized rows from the structures opened, **and by nothing else** — two independent measurements agreeing at every design and every collection size | §4.8 finding 1 |
+| **F2** | **A global lexical or vector index undoes perfect partitioning.** A partitioned base paired with one scope-spanning secondary structure puts traversal back over a structure spanning every authorization scope — **disqualifying under E1 regardless of any counter** | §4.8 I6; §4.6 S6/E1 |
+| **F3** | **Partial isolation can be worse than none.** Scope-only partitioning examined **the most** of any design measured, by moving work from an index restriction into a structural scan without carrying the rest of the predicate | §4.8 finding 2, design P1 |
+| **F4** | **The four discrete conjuncts refine perfectly; effectivity is the entire residual.** In the sharpest measurement **not one** wrong-scope, wrong-audience, restricted-class or superseded unit was examined at any size — the residual was composed **exclusively** of the three effectivity failure modes | §4.11 result 2 |
+| **F5** | **Instant-refined effectivity decays into leakage, not conservatism.** Where examine-then-reject examines unauthorized rows and discards them, a stale materialised structure **returns** them — 5 of 5, at every collection size | §4.8 finding 3, design P4S |
+| **F6** | **Divergence happens at ZERO elapsed time.** An authorization fact changing in the kernel puts unauthorized rows in the routed structures immediately. **No timer can observe this**, corroborated in three independent fixtures | §4.10 finding 5; §4.11; §4.8 finding 1 |
+| **F7** | **A hook is only as complete as the set of changes it is wired to.** Delivered as a recorded transition the change was caught; delivered as an attribute reassignment outside that set, **only the designs re-checking against the kernel survived** | §4.10 |
+| **F8** | **Removing the copy does not help.** The designs holding **no copy at all** eliminate divergence, answer every scenario, and carry the **largest `U` in the record, growing linearly with `N`** | §4.11 result 1 |
+| **F9** | **`U = 0` is purchasable by withholding authorized content.** One design reached zero at every size while returning an **empty ANSWER** where an answer existed — a **wrong-exclusive** availability defect, **invisible to `U` by construction** | §4.11 result 3, design K4 |
+| **F10** | **A design can report `U = 0` while the structures it opens still hold unauthorized entries.** Two designs reporting zero carried `Ustruct` of **714** and **2143** | §4.11 result 4 |
+| **F11** | **On the one measured class, the planner decided the outcome** — one index-hint token, same schema, data, indexes, answers and grid, `U` **715 → 0** | §4.11 result 5 |
+| **F12** | **And a routine maintenance command decided it.** Statistics maintenance alone drove the same design's `U` from **2857 to 0** while entries visited went **2860 → 2861 — one more, not fewer** | §4.12 |
+| **F13** | **A row-access zero is not an index-cursor zero.** An entry failing the residual is rejected **from the index** and the row is never read, so a row-access counter **cannot fire for it** | §4.6 S7-R3; §4.12 gap 2 |
+| **F14** | **E1 splits, and one limb was obtained plan-independently.** A compilation-time enumeration of every structure a statement **may** read returned a **superset** of what any plan opens, invariant with collection size, identical in every configuration, and **failed the negative control** — while the **confinement** limb was **not** plan-independent | §4.12 gap 3 |
+| **F15** | **E4 was established UNOBTAINABLE on the only reachable test subject, by enumeration with a control.** Under §4.6 S6 **no candidate could have been cleared in that run whatever any count showed** | §4.12 gap 1 |
+| **F16** | **Per-principal materialisation (I5) discharges four conjuncts and has never been measured.** | §4.8 |
+
+**F11 and F12 together are the argument for this section's existence.** If a maintenance command can
+flip a design's `U` between 2857 and 0 without touching schema, data, index, query text or design,
+then **whatever satisfies the gates cannot be a property of an engine's optimizer.** MSG-0129's
+instruction not to *"assume that a particular engine's planner behaviour generalizes to the class"*
+is the conservative reading of that; the stronger reading, and the one this section takes, is that
+**a property held only by the optimizer is not held by the architecture at all.**
+
+#### The reduction — what the evidence forces the answer to be
+
+**F1 is the whole reduction.** `U` falls only as unauthorized entries leave the structures the
+traversal opens. Every other lever measured in five probes — widening an index, pushing a conjunct
+into a `WHERE` clause, joining the authoritative facts inline, pinning a plan, removing the copy —
+**moved `U` without changing what the opened structures contained, and none reached a defensible
+zero.**
+
+**So the topology requirement is a statement about containment and reach.** It is stated as five
+invariants, numbered so a proposal can be failed against them.
+
+| | Invariant | Why, from the evidence |
+|---|---|---|
+| **N1** | **Containment.** Every structure the traversal may open contains, **at answer time**, no entry unauthorized for the routed subject — **for every conjunct, effectivity included** | **F1** — the only measured mechanism by which `U` falls. **F4** says four of the five conjuncts already do this; **effectivity is the entire remaining problem** |
+| **N2** | **Closure of the reachable set.** The set of structures the query **may** open is enumerable **before execution**, contains no scope-spanning structure, and **includes every secondary structure** — lexical index, vector index, ANN graph or centroid set, term dictionary, document-id map, corpus-wide scoring statistics, structure catalogue | **F2** and **G-Q6.3**. **F14** shows this limb is obtainable **plan-independently** on at least one engine class, which is what makes N2 a checkable requirement rather than an aspiration |
+| **N3** | **Refinement by enumerated transition.** The partition invariant is restored by **the recorded event that would break it**, never by a timer; and **the set of breaking events is enumerated and closed** | **F5, F6, F7.** MSG-0113 already made this move for lifecycle transitions and the Lead ruled it; **F6 shows the same is required for changes that consume no time at all** |
+| **N4** | **Plan-independence.** Whether unauthorized content is examined is **not** a function of the optimizer's choice, of a statistics-maintenance command, of the data distribution, or of an engine version | **F11, F12.** A security property a maintenance command can toggle is not a property of the architecture |
+| **N5** | **Non-withholding.** The routed structures contain **every** entry the subject **is** authorized to see. A topology reaching N1 by dropping authorized content has traded a confidentiality defect for an availability one | **F9.** `U = 0` is purchasable, and the purchase is invisible to `U` |
+
+**The load-bearing claim of this section, stated so it can be attacked:**
+
+> **N1 and N2 together make N4 free.** If every structure within reach contains only entries the
+> routed subject is authorized to see, then **no plan over that reachable set can examine an
+> unauthorized unit** — whatever the optimizer chooses, whatever the statistics say, and whatever a
+> maintenance command rewrites. **The planner's freedom stops mattering exactly when there is nothing
+> unauthorized left for it to reach.**
+>
+> **This is the precise sense in which the Q3 answer is topological rather than engine-behavioural.**
+> §4.12's maintenance-command result is not an argument for finding a better-behaved planner; it is
+> an argument for a topology in which planner behaviour **cannot decide the question.**
+
+**Three caveats on that claim — each is where it could fail, and none is hypothetical:**
+
+1. **It holds only if N2's reachable set is genuinely complete.** A single omitted secondary
+   structure — a shared dictionary, a corpus-wide statistics table, a catalogue read during routing —
+   reintroduces exactly the traversal F2 disqualifies. **This is why N2 must be established by
+   enumeration at compilation or authorization time (F14) and never by reading the query text.**
+2. **It does not discharge E2 and must not be read as doing so.** `U` counts what the engine
+   **examined**; N1 is a claim about what the structures **contain**. **F10 is the demonstration** —
+   two designs reporting `U = 0` while holding 714 and 2143 unauthorized entries. **N1's own
+   measurement already exists and is placement-independent: `Ustruct`, defined in §4.11.** So the
+   topology's central claim is falsifiable by an instrument this record has already built and used,
+   which is the most that can be said for a structural claim.
+3. **It says nothing about U5 or about routing-phase units.** Buffers, caches, temporary structures
+   and log lines (§4.6 S4 **U5**) and every unit read while **selecting** structures (**G-Q4.4**)
+   remain in scope and are not addressed by containment.
+
+**N1 is an instantaneous property, and that is the fragile part.** §4.8 finding 3 put it exactly:
+*"`U = 0` for a materialised structure is a property of an instant, not of a design."* **N3 exists to
+convert an instantaneous property into a maintained one**, and **F6 is the proof that a clock cannot
+do it.**
+
+#### Two additions to §4.8's catalogue — extended, not replaced
+
+**§4.8's I0–I6 are measured and are kept.** A fresh catalogue would discard five probes of evidence,
+and MSG-0130's second required work item forbids relabelling any of it. **Two patterns are added
+because the evidence identifies gaps the existing six do not cover.** Both are **structural
+proposals and neither has been measured**; under **G-Q6 neither can contribute to a clearance.**
+
+| | Pattern | Conjunct discharged | Status |
+|---|---|---|---|
+| **I7** | **Boundary-refined effectivity** — the structure holds what is effective across the **half-open interval to the next effectivity boundary**, and is re-refined **at** that boundary rather than on a timer | 3, **without a decay term** | **Structural proposal. NEVER MEASURED** |
+| **I8** | **Entitlement-class materialisation** — one structure per **equivalence class of subject entitlement sets**, rather than per token (I3) or per principal (I5) | 1, 2a, 2b, 4 — the I5 set, at a coarser key | **Structural proposal. NEVER MEASURED** |
+
+**I7 answers the residual F4 names, and its argument is written out because it contradicts a reading
+of §4.8 that would otherwise stand.** §4.8's refinement rule requires that *"every row in a partition
+agree on that conjunct's truth value for every subject routed to it"*, and §4.8 concluded that
+**effectivity-at-answer-time does not refine at all without fixing a time**, refining only *as of an
+instant* and **decaying from that instant onward**. **That conclusion is precise, and it was read one
+step too pessimistically.**
+
+**Effectivity is piecewise constant in time.** The set of versions effective at `T` changes only when
+`T` crosses some version's `effective_from` or `effective_to` — and **those boundaries are data
+already held in the kernel, not a tuning parameter.** So on the half-open interval from an instant
+`t` to the **next boundary after `t`**, every row's effectivity truth value is constant **by
+construction**, and **§4.8's refinement rule is satisfied on that interval.** I4 fixes a point and
+decays; **I7 fixes an interval whose end is computable, and is invalidated by the event of reaching
+it.** That is the move MSG-0113 made for lifecycle — freshness is a **transition** property, not an
+elapsed-time one — **applied to a second class of transition.**
+
+**Three costs and traps of I7, recorded with no figure attached because none was measured:**
+
+- **The interval end is a corpus-wide minimum**, so it **shortens as the corpus grows**. The
+  re-refinement rate is a function of the corpus's boundary density, which is **UNKNOWN** — §11 #1,
+  corpus scale, is unmeasured at n=1.
+- **A version added to the projection between `t` and the next boundary changes the partition without
+  any boundary being crossed.** **Ingestion is therefore itself an invalidating event** under N3, and
+  it is the one a boundary-driven design omits most naturally.
+- **I7 is an I4 descendant, so G-Q5 applies to it in full, unrelaxed.** Its interval end is a **bound
+  that exists and has a value** in G-Q5.1a's sense, but **G-Q5.1c's abstention-on-breach and
+  G-Q5.2's kernel re-check are unchanged and are execution evidence.**
+
+**I8 sits between I3 and I5.** I3 replicates per audience token and fans a subject's query in across
+tokens; I5 gives one structure set per principal and **has never been measured**. Keying on the
+**equivalence class of entitlement sets** collapses subjects who see exactly the same corpus into one
+structure set — fewer structures than I5, no cross-token fan-in of I3 — at the cost of a **class
+count that is combinatorial in the worst case** and a **further invalidating event**: a subject's
+entitlement change moves them between classes. **No class count, replication factor or fan-out figure
+is claimed; none was measured.**
+
+#### Four topology patterns, defined technology-agnostically
+
+**No product, engine, vendor or index technology is named as the bearer of any property below**, and
+none of these is a shortlist entry. Each is a **composition** over §4.8's catalogue as extended.
+
+| | Topology | Composition | The idea in one line |
+|---|---|---|---|
+| **W1** | **Fully refined partitioning with boundary-maintained effectivity** | I1 + I2 + I3 + **I7** + I6 | Refine every conjunct structurally, effectivity included, and build **every secondary structure per partition** |
+| **W2** | **Per-principal materialisation** | **I5** + **I7** + I6 | One reachable structure set per principal; routing is the identity of the requester |
+| **W3** | **Entitlement-class materialisation** | **I8** + **I7** + I6 | W2's shape at a coarser key — one structure set per distinct entitlement class |
+| **W4** | **Scoped execution confinement** | any of W1–W3, **plus** a retrieval component instance whose **reachable dataset is the routed partition** | Move the confinement boundary from the schema to the **execution context**: the component cannot open what is not in its dataset |
+
+**W4 is a different axis, not a fourth alternative, and it is included because F14 is what suggests
+it.** The one limb of E1 obtained **plan-independently** was an enumeration, at compilation, of every
+structure a statement **may** read. **W4 generalises that**: if the reachable set is bounded by the
+execution context rather than by the query, then **N2 is checkable at a coarser and more auditable
+granularity** — what the component can open **at all**, rather than what this statement chose to open.
+**It composes with W1, W2 or W3 and replaces none of them.**
+
+**What W4 is NOT.** It is **not** a claim that process, container or dataset isolation substitutes
+for any gate — **every gate below applies to it unchanged.** And it is **not** a licence to read
+*"physical"* as *"one store per tenant and therefore done"*: **MSG-0101 §1(1) still binds — one
+logical projection.**
+
+#### The mapping — each topology against E1–E4 and G-Q4/G-Q5/G-Q6
+
+**Legend, and it is the point of the table.** **S** = **structurally supplied**: the property follows
+from the topology's construction and does not depend on engine behaviour. **X** = **execution
+evidence required**: no structure can supply it, and §4.9 G-Q6 forbids arguing it from construction.
+**S→X** = the structure creates the **precondition** and the evidence is still owed.
+
+| Requirement | W1 | W2 | W3 | W4 | The property, and why it lands where it does |
+|---|---|---|---|---|---|
+| **E1 — reachable-structure limb** | **S→X** | **S→X** | **S→X** | **S→X** | The topology determines the reachable set; **that it is what the engine actually reaches is F14's compilation-time enumeration**, which is evidence and has been obtained once. **Structure proposes; enumeration disposes** |
+| **E1 — confinement limb** | **S→X** | **S→X** | **S→X** | **S→X** | **Made vacuous by N1 if N1 holds** — nothing unauthorized is reachable to confine. **That N1 holds at answer time is `Ustruct = 0`, a measurement** (§4.11), not a construction |
+| **E2 — `U = 0`, invariant with `N`** | **X** | **X** | **X** | **X** | **No topology can supply a count.** Under **§4.6 S7-R1/R2/R3** every **reachable index-cursor placement must be exercised**, the maximum reported, and the reachable-but-unexercised set **empty** |
+| **E3 — opaque stages** | **S→X** | **S→X** | **S→X** | **S→X** | **I6 confines the stage; G-Q6 rejects construction as the discharge** and admits it only as a **contributor** (G-Q6.4). Where a topology carries **no** opaque stage, that must be shown **by enumeration**, not asserted |
+| **E4 — engine logs** | **X** | **X** | **X** | **X** | **No topology property whatsoever.** This is an **engine-exposure** criterion (§4.6 S10), and **F15 is decisive**: on the only reachable test subject E4 is **UNOBTAINABLE**, so nothing could be cleared there under any topology |
+| **G-Q4.1 routing from entitlements alone** | **S** | **S** | **S** | **S** | **The strongest structural result in the table.** W2 and W3 route on the requester's own identity or entitlement class; W1 computes an exact key from the entitlement set. **None needs to consult the corpus in order to route** |
+| **G-Q4.2 differential test** | **X** | **X** | **X** | **X** | Whether the routed set and the routing-phase read count are **invariant to other subjects' partitions** is behavioural (§4.9), and it has already failed one design that returned identical answers |
+| **G-Q4.3 no catalogue enumeration** | **S→X** | **S→X** | **S→X** | **S** | Computing a name is structural; **that the engine resolves it by exact key rather than by scanning a catalogue is plan or trace evidence** — §4.9's *"behaviourally identical and only one satisfies the gate"*, since demonstrated. **W4 is the one case where the catalogue is itself bounded by the execution context**, and even there the resolution must be exhibited |
+| **G-Q4.4 routing units counted in `U`** | **X** | **X** | **X** | **X** | A counter at the routing step specifically, placement recorded, **at the S7 placement rules including S7-R1** |
+| **G-Q5.1 bounded re-materialisation** | **S→X** | **S→X** | **S→X** | **S→X** | **I7's interval end is a bound whose value is data**, which is G-Q5.1a. **G-Q5.1b (a clock the candidate does not control), G-Q5.1c (abstention on breach) and G-Q5.1d (the instant recorded with every zero) are all execution evidence** |
+| **G-Q5.2 kernel re-check, demonstrated to reject** | **X** | **X** | **X** | **X** | **Unchanged and undiminished by any topology. F7 is why** — the re-check is what caught the change no invalidation hook was wired for. **G-Q5.2b's no-op limb is the one most easily faked** |
+| **G-Q6 opaque-stage confinement** | **X** | **X** | **X** | **X** | **MSG-0110 §4 in terms.** Per-partition secondary structures are a **contributor**; the discharge is execution evidence of the actual traversal boundary |
+| **G-Q7.1–7.6 version-transition freshness** | **S→X** | **S→X** | **S→X** | **S→X** | **N3 is the structural half** — an enumerated, closed event set. **G-Q7.2's discriminator, G-Q7.4's abstention and G-Q7.5's re-check are execution evidence** |
+| **G-Q7.8a–e re-check is a control-plane lookup** | **X** | **X** | **X** | **X** | Requires **two separated counters**; without the separation a violating design reports clean |
+| **N5 non-withholding** | **X** | **X** | **X** | **X** | **The served set must be measured alongside `U`. F9**: a design that answers nothing reaches zero |
+
+**Read the table by its columns and the finding is uncomfortable and correct.** **The four topologies
+differ from one another in exactly one cell** — G-Q4.3, where W4's execution-scoped catalogue is the
+only structural rather than conditional entry. **Everywhere else they are identical.** That is not a
+defect in the analysis; **it is the answer to Q3.** Topology decides **G-Q4.1 outright** and creates
+the **precondition** for E1, E3, G-Q5.1 and G-Q7. **It decides E2, E4, G-Q5.2, G-Q6, G-Q7.8 and N5
+not at all.** A future session choosing between W1–W4 is therefore choosing on **cost and
+operability**, not on clearance — and **the cost figures do not exist.**
+
+#### The minimum evidence before any engine-selection task could be authorized
+
+**MSG-0130 asks for evidence, not a shortlist, and this is the list.** Each item states what
+discharges it. **All twelve are necessary, none is sufficient, and satisfying all twelve is what
+§4.6 S6 already means by CLEARED** — this list **adds no gate and relaxes none.**
+
+| | Evidence | Discharged by |
+|---|---|---|
+| **EV1** | **E1's reachable-set limb, plan-independently** | An enumeration taken from the engine's own compilation or authorization surface, **characterised rather than assumed** (shown invariant with `N`, so it is a compilation event and not a counter), returning **no scope-spanning structure**, and **demonstrated to FAIL a negative control.** F14 is the worked standard |
+| **EV2** | **N1 itself, measured: `Ustruct = 0`** | The placement-independent count of §4.11 — unauthorized entries **present in the structures the traversal opens** — **zero at every measured collection size and at every measured instant.** **This is the item that would have caught the two designs reporting `U = 0` over 714 and 2143 unauthorized entries** |
+| **EV3** | **E2 under the full S7 placement rules** | `U = 0` at **≥ 3 collection sizes**, shown **invariant with `N`**; **every reachable index-cursor placement exercised** (S7-R1); the **maximum** reported as `U` (S7-R2); the **reachable-but-unexercised set EMPTY** (S7-R3). A *"no such placement is reachable"* report is admissible **only by enumeration with a control** (S7.3) |
+| **EV4** | **E3 for every opaque stage** | G-Q6.1–G-Q6.4: execution evidence of the actual traversal boundary, evidence about the **mechanism** rather than one run, and explicit evidence that **no shared out-of-partition structure** is consulted. **Or:** a demonstration **by enumeration** that the topology carries no opaque stage |
+| **EV5** | **E4, or its unobtainability established** | Inspection of the engine's own logs showing no unauthorized passage text — **or** unobtainability established **by enumeration with a control** (F15's nonexistent-pragma control is the standard). **Note the asymmetry: unobtainable is NOT relief.** Under §4.6 S6/S10 it yields **NOT CLEARED**, so **an engine that cannot supply EV5 cannot be selected under any topology** |
+| **EV6** | **G-Q4.1–G-Q4.4 in full** | Including **the differential test** — same subject and query against collections differing **only** in other subjects' partitions, with an **identical routed set and identical routing-phase read count** — and routing-phase units counted into `U` at the S7 placements |
+| **EV7** | **G-Q5, both conditions** | A bound that exists, is enforced against a clock the candidate does not control, **breaches into abstention A7 rather than a degraded answer**, and **every `U = 0` carrying its materialisation instant**; plus a kernel re-check **demonstrated to REJECT**, not merely to run |
+| **EV8** | **G-Q7.1–G-Q7.6 and G-Q7.8a–e** | Including MSG-0113's **discriminator** — the transition queried **both before and after** the periodic mechanism would have fired — and **two separated counters** for the re-check, one of which must read **no content-bearing data from an unauthorized candidate** |
+| **EV9** | **N3's event set, exhibited and closed** | The enumerated set of invalidating events, **each demonstrated to restore the invariant.** It must include the classes the record shows are most easily missed: **zero-elapsed-time authorization-attribute reassignment** (F6, F7), **effectivity-boundary crossing** and **ingestion into the projection** (I7's own traps), and, for W3, **a subject changing entitlement class** |
+| **EV10** | **N5, measured** | The **served set** reported alongside `U` in every cell, with at least one scenario in which an answer exists. **A design returning an empty answer where an answer exists fails**, whatever its `U` |
+| **EV11** | **Plan- and maintenance-independence** | The same verdict in **every** configuration cell, across at minimum: baseline; **after statistics maintenance**; with and without any available plan pinning; fresh connections; a shifted query instant; and **≥ 2 data distributions**. **F12 is why this is not optional** — a single-configuration measurement is a measurement of one plan |
+| **EV12** | **Both validity gates, per run** | The **adversarial precondition** verified before **every** measurement (the unconstrained top-`k` contains **no** authorized chunk), and a **negative control that FAILS**. **§4.6 S8: if the harness does not fail the control, the run is void and its passes prove nothing** |
+
+**Two scoping rules on this list, both carried from the record rather than invented here.** **No
+result may be generalized from one build to an engine class** (§4.12; MSG-0130) — evidence obtained
+against a specific runtime, version and configuration is evidence about that, and must say so. And
+**EV1–EV12 are obtained against a test subject, which is not a selection**: naming a candidate names
+a **test subject** (§4.6 S11; MSG-0101 §3).
+
+#### The bounded recommendation, and what stays open
+
+**MSG-0130 permits a bounded architecture recommendation or the preservation of the choice as open.
+This section does the second for the topology choice and the first for one criterion**, on §12.2's
+precedent — *recommend criteria, not selections.*
+
+> **R1 — recommended for recording as settled, subject to the Lead's ruling.** **The architectural
+> response to Q3 is N1 + N2: stop requiring the engine not to examine unauthorized content, and
+> instead ensure there is no unauthorized content within its reach.** The **confinement limb of E1
+> becomes a property the topology makes vacuous** rather than one the engine must prove, and the
+> surviving question — whether containment actually holds at answer time — is answered by a
+> **placement-independent measurement that already exists** (`Ustruct`, §4.11) rather than by an
+> instrument whose placement can flatter it.
+>
+> **R1 selects nothing, clears nothing, and amends no ADR.** It is a **criterion**, and like every
+> item in §12.2 it is a consequence of already-accepted material — **AMD-01's strict Shape-1, §4.6
+> S6/E1, and §4.8 finding 1** — rather than a new decision.
+
+**The topology choice among W1–W4 stays OPEN, and the reason is a named missing measurement rather
+than indecision.** The mapping table shows the four are **indistinguishable on clearance** and differ
+on **structure count, replication factor, invalidation fan-out, re-refinement rate, and the cost of
+splitting scoring statistics across per-partition secondary structures.** **Every one of those is
+unmeasured**, and the corpus scale that would size them is **UNKNOWN at n=1** (§11 #1). **Choosing
+between them now would be choosing without evidence, which is the failure mode this section exists to
+avoid.**
+
+**§12.1's engine-selection row is unchanged: OPEN, and now additionally blocked.** MSG-0129: a future
+engine *"may be selected only after the existing clearance gates are positively satisfied with
+evidence."*
+
+#### The architecture gap, recorded because selection stays blocked
+
+**MSG-0130: *"If the evidence cannot establish a topology capable of satisfying the existing gates,
+record the architecture gap and keep selection blocked."*** The gap is recorded here. **It is the
+honest outcome and not a failure of the task** — §4.7 Q3 anticipated it, and an open choice preserved
+as open is a valid result.
+
+| | Gap | Consequence |
+|---|---|---|
+| **GAP-A** | **I5, I7 and I8 have never been measured.** §4.8 recorded I5 as *"not measured"* and nothing since has measured it; I7 and I8 are introduced above as structural proposals | **No topology in this section is shown capable of satisfying the gates.** All four rest on at least one unmeasured pattern |
+| **GAP-B** | **E4 is UNOBTAINABLE on the only reachable test subject** (F15) | **This blocks clearance independently of topology.** A future probe on the same subject **would clear nothing whatever the topology**, because an absent evidence class is NOT CLEARED by rule (§4.6 S6). **Reaching a clearance at all requires a test subject that exposes its own log, or is shown to write none** |
+| **GAP-C** | **Cost is entirely unmeasured** — structure count, replication factor, invalidation fan-out, re-refinement rate, split scoring statistics | The choice among W1–W4 cannot be made on evidence. **No figure is claimed and none was produced** |
+| **GAP-D** | **The addressable temporal frame is unsettled** — see **Q13** below | I7's interval is defined relative to a query instant; a question addressing a **different** temporal frame addresses a different interval |
+| **GAP-E** | **§4.7 Q1 and Q2 remain OPEN**, and **Q7's numeric limb** remains open | MSG-0129 ruled Q3 **without** ruling Q1 or Q2. The fail-closed default recorded for each continues to apply, so **none of them blocks the evidence work above** |
+
+**GAP-B is the one to read first.** It says the topology work this section performs is **necessary and
+nowhere near sufficient**, and that the next binding constraint is an **engine-observability**
+property that **no amount of architecture can supply.**
+
+#### Q13 — which temporal frames must a topology be able to answer? Surfaced, NOT decided
+
+**Numbering:** §4.7 holds **Q1–Q3**; **Q3 is now ruled** by MSG-0129 and answered above, with **Q1 and
+Q2 still open**. **Q4–Q6** are ruled and encoded in §4.9; **Q7** is ruled with its numeric limb open;
+**Q8–Q10** are ruled (MSG-0116a/b); **Q11** is ruled by MSG-0119; **Q12** is ruled by MSG-0124 and
+encoded in §4.6 S7.1–S7.4. **Q13 is the next free number**, allocated here and verified unused.
+
+**The question.** §3 constraint 3 defines effectivity as evaluated at *"`T`, the question's temporal
+frame, **defaulting to now**"* — which admits questions whose frame is **not** now. **I7 refines
+effectivity on the interval containing a given instant**, so a structure refined for the interval
+around *now* **cannot answer a question addressed to a different interval**, and a topology required
+to serve an arbitrary `T` needs a structure per addressable interval.
+
+**Is the addressable temporal frame restricted to *now* for release 1, or must the retrieval topology
+serve historical and future frames?** The two have materially different topologies and materially
+different costs.
+
+**Why it is referred rather than answered.** It is a **product and architecture** question — what an
+employee may ask — and settling it here would decide the scope of ADR-0018 §4's effectivity semantics
+by implication. **This record proposes no answer.**
+
+**Default until ruled, and it blocks nothing: the strictest available reading — a topology must serve
+only the frames the answer path actually admits, and any frame it cannot serve must ABSTAIN rather
+than answer from the wrong interval.** That is fail-closed in the same shape as G-Q7.4, it can only
+withhold an answer and never grant an unauthorized one, and **it requires no ruling to operate.**
+
+#### What this section does NOT establish
+
+- **Nothing is CLEARED, and nothing could have been.** This section is structural, and **G-Q6 rejects
+  construction-only evidence.** **Five probes have cleared nothing and this section clears nothing.**
+- **No topology is shown capable of satisfying the gates.** W1–W4 are **proposals mapped against the
+  gates**, and all four rest on at least one **never-measured** pattern (**GAP-A**).
+- **No engine, runtime, provider, model or index technology is selected, adopted, recommended,
+  installed or deployed**, and **no shortlist is created.** No product is named as the bearer of any
+  property above.
+- **No prior verdict changes and nothing is relabelled.** **K7 and K8 remain NOT CLEARED**; **K3 and
+  K4 remain NOT CLEARED**; the **DISQUALIFIED** set is unchanged; the nine MSG-0104 class and
+  candidate verdicts, the eight §4.8 design verdicts, the eight §4.10 design verdicts and **every**
+  §4.11 and §4.12 design verdict all stand. **No prior probe was modified or re-run.**
+- **No gate is weakened and no bar is moved.** `U = 0`, **E1–E4**, **G-Q4/G-Q5/G-Q6/G-Q7/G-Q7.8** and
+  **S7-R1/R2/R3** are reproduced as they stand. **No numeric threshold, tolerance or allowance is
+  introduced.**
+- **No ADR is amended, proposed, or affected**, and **MSG-0101 §1(1) is not reinterpreted** — *"one
+  projection index"* still means one **logical** projection.
+- **No numeric figure of any kind is produced** — no benchmark, latency, capacity, recall,
+  throughput, structure count, replication factor or fan-out. Where a cost is named it is named as
+  **unmeasured**.
+- **No planner behaviour is generalized from one build to an engine class**, and no measured result
+  above is re-derived — each is carried from the section that measured it.
+- **No implementation task is authorized or marked READY**, and **no engine-selection task becomes
+  executable.** MSG-0129: selection follows the gates being *"positively satisfied with evidence"*,
+  and MSG-0130's acceptance ends at this documented response.
 
 ---
 
