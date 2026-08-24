@@ -2,7 +2,7 @@
 
 **Active Work Package:** WP-0001 — PCI Kernel Foundation
 **Status:** **COMPLETE** — declared by the architecture lead 2026-08-19 (MSG-0020(b), resolved by MSG-0022 / MSG-0023, TASK-0009)
-**Last Updated:** 2026-08-24 UTC — **TASK-0043 READY: bounded E4 observability evidence on a SECOND test subject** (MSG-0141). **The E4 question has changed shape** — MSG-0140 §6 settled with a **second negative** that the current subject cannot supply it, so what remains is **whether any reachable subject can**. **The subject is an INSTRUMENT, not a candidate**: MSG-0141 says twice that this is **not engine selection, adoption, deployment or implementation**, and **a successful E4 observation clears nothing**. **Read-only environment enumeration by this session, offered as capability evidence and explicitly NOT as E4 evidence:** `docker`, `psql`, `sqlite3` CLI, `java`, `dotnet`, `go` **ABSENT**; **`python` ABSENT but `py` PRESENT → Python 3.14.5 with SQLite 3.50.4**, exposing **`set_trace_callback`**, **`set_authorizer`**, **`set_progress_handler`**. **Whether a statement-level trace records what the engine EXAMINED is the question, not the answer** — *"a real surface that still does not satisfy E4"* is a correct outcome. **Third `PATH` artefact read as absence in this project.** **TASK-0042 COMPLETE and cleared nothing** — six candidates, **all NOT CLEARED**, **DISC-0012** recorded. **Six probes have cleared nothing; nothing installed, nothing selected, no ADR touched.**
+**Last Updated:** 2026-08-24 UTC — **TASK-0043 READY: bounded E4 observability evidence on a SECOND test subject** (MSG-0141). **The E4 question has changed shape** — MSG-0140 §6 settled with a **second negative** that the current subject cannot supply it, so what remains is **whether any reachable subject can**. **The subject is an INSTRUMENT, not a candidate**: MSG-0141 says twice that this is **not engine selection, adoption, deployment or implementation**, and **a successful E4 observation clears nothing**. **Read-only environment enumeration by this session, offered as capability evidence and explicitly NOT as E4 evidence:** `docker`, `psql`, `sqlite3` CLI, `java`, `dotnet`, `go` **ABSENT**; **`python` ABSENT but `py` PRESENT → Python 3.14.5 with SQLite 3.50.4**, exposing **`set_trace_callback`**, **`set_authorizer`**, **`set_progress_handler`**. **Whether a statement-level trace records what the engine EXAMINED is the question, not the answer** — *"a real surface that still does not satisfy E4"* is a correct outcome. **Third `PATH` artefact read as absence in this project.** **TASK-0042 COMPLETE and cleared nothing** — six candidates, **all NOT CLEARED**, **DISC-0012** recorded. **Six probes have cleared nothing; nothing installed, nothing selected, no ADR touched.** **The Windows scheduled task `PCI-Execution-Supervisor` is `Disabled`, so TASK-0043 will NOT start unattended** — MSG-0143, correcting a claim this file made an hour earlier.
 
 > **The line this replaces, retained:** "**TASK-0042 COMPLETE (8/8); six candidates measured, ALL NOT CLEARED; no task is READY.** **The evidence the four rulings made possible has now been taken**, and it clears nothing — **E4 alone would have sufficed for that** (§4.13 GAP-B, re-checked and unchanged), **but it is not the only thing missing.** `U` grows to **714** at `M` = 5000 for K7, I5, I8 and the routing control; **K8's row-access `U` = 0 is superseded by 2 / 66 / 709 at the index cursor — the first time S7-R3 bites by RULE rather than by a probe's diligence.** **I5 and I8, both NEVER MEASURED until now, measure IDENTICALLY to K7 at every size**: a finer key that does not refine **effectivity** removes no unauthorized row, corroborating §4.8 finding 1 in a third fixture. **I7 reached `U` = 0 and failed anyway, by WITHHOLDING — 142 of 146 authorized chunks at its interval boundary**, plus a version **ingested inside the interval** that never appeared, on a bound **VACUOUS in 3 of 3 cells**; **`U` is blind to both.** **Five placements exercised**, one (**P-CIDX**) never taken before, and **dbstat TAKEN rather than argued away** — it measures stored layout, not traversal, so the reachable-but-unexercised set is **EMPTY for the right reason** (S7.3). **Q7 = A over 36 cells**: the discriminator **fired in 4** (*made correct by waiting*), and **T3 vs T5 isolates the faked re-check**, reproducing §4.10 result 3 independently. **Run VALID** — adversarial precondition HELD, and **three** negative controls failed as required. **DISC-0012 raised**: the prior G-Q4.2 differential ran against a catalogue holding **no foreign structure**, so **TASK-0039's MET is bounded, not withdrawn** — **no verdict moves.** **Record EPA-0006 §4.14 (287 insertions / 0 deletions); evidence MSG-0140. Nothing selected, no ADR touched, no gate relaxed, no threshold introduced. Engine selection stays blocked.**" True when written; **the Architecture Lead has since authorized the bounded E4 evidence task that GAP-B makes necessary.**
 
@@ -2242,7 +2242,13 @@ both tables index it, and both were updated in the same commit as the record.
 ## Next Action
 
 **TASK-0043 is READY and is the single READY task** — authorized by MSG-0141 and written into the queue
-by this session. **A supervisor cycle can take it without a manual trigger.**
+by this session. **It will NOT start unattended: the Windows scheduled task `PCI-Execution-Supervisor`
+is `Disabled`** (MSG-0143), so it waits for the operator to re-enable the schedule or trigger a cycle by
+hand.
+
+> **The sentence this replaces, retained, and it was wrong:** "**A supervisor cycle can take it without
+> a manual trigger.**" **The config says `enabled: true`; the schedule says `Disabled`. Both had to be
+> checked and only one was.**
 
 > **The paragraph this replaces, retained:** "**No task is READY, and the next action is the Architecture
 > Lead's.** **TASK-0042 is COMPLETE** — 8 of 8 acceptance criteria with evidence — and MSG-0137's *Next
@@ -2477,13 +2483,22 @@ test subject **cannot clear anything**, whether to measure I5/I7/I8 there anyway
 falsify or support N1/N2/N3) or to obtain a test subject that can supply E4 first. **MSG-0132 §12
 states these and takes none of them.**
 
-**Operationally, the supervisor is ENABLED** — `supervisor-config.json` carries `enabled: true`,
-`dryRun: false`. The heartbeat observed at the start of this session, **2026-08-24T18:07:18Z**, records
-`decision: NOOP`, `reason: no READY task`, `runnerActive: false`, and **no `runner.lock` exists** — the
-TASK-0042 runner (pid 26712) took its lock at 17:17:18Z, completed, and released it. **That NOOP was
-correct**: TASK-0043 was authorized in MSG-0141 but **had no queue row until this reconciliation**.
-**Once this is pushed, the next cycle can take TASK-0043.** **No blocker is open. Two discoveries are
-recorded: DISC-0011 and DISC-0012**, and **neither moves a verdict.**
+**Operationally: the supervisor CONFIG is live, but the WINDOWS SCHEDULE IS DISABLED, so nothing
+fires.** `supervisor-config.json` carries `enabled: true`, `dryRun: false` — and the scheduled task
+**`PCI-Execution-Supervisor` is `Disabled`**: `LastRunTime` **18:07:07Z**, `LastTaskResult` **0**,
+**`NumberOfMissedRuns: 2`**, with the scheduler service itself **Running**. The supervisor log **stops
+after the 18:07:18Z NOOP**, and the heartbeat has not moved since. **TASK-0043 is correctly READY and
+will not start until the schedule is re-enabled or a cycle is triggered by hand** — **an operator
+action, not taken here.** **No blocker is open. Two discoveries are recorded: DISC-0011 and DISC-0012**,
+and **neither moves a verdict.** Full record: **MSG-0143**.
+
+> **The paragraph this replaces, retained, and it was wrong:** it said *"the supervisor is ENABLED"* and
+> *"once this is pushed, the next cycle can take TASK-0043"*, citing the **18:07:18Z** NOOP heartbeat and
+> `enabled: true`. **The config was read; the scheduled task was not.** **Two independent switches, and
+> only one was checked** — the same shape as the three `PATH`-artefact readings already recorded.
+> **The symptom was visible in this session's first command**: a heartbeat that had not moved in two
+> cycle intervals. It also observed, correctly, that **a Lead authorization does not become work until a
+> session writes the queue row** — that part stands.
 
 > **The paragraph this replaces, retained:** it cited the **17:07:20Z** heartbeat at `head: 2841f23`
 > with *"no READY task"*, and explained that the NOOP was accurate because **the queue held no TASK-0042
