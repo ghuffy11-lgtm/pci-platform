@@ -2,7 +2,7 @@
 
 **Active Work Package:** WP-0001 — PCI Kernel Foundation
 **Status:** **COMPLETE** — declared by the architecture lead 2026-08-19 (MSG-0020(b), resolved by MSG-0022 / MSG-0023, TASK-0009)
-**Last Updated:** 2026-08-24 UTC — **TASK-0043 READY: bounded E4 observability evidence on a SECOND test subject** (MSG-0141). **The E4 question has changed shape** — MSG-0140 §6 settled with a **second negative** that the current subject cannot supply it, so what remains is **whether any reachable subject can**. **The subject is an INSTRUMENT, not a candidate**: MSG-0141 says twice that this is **not engine selection, adoption, deployment or implementation**, and **a successful E4 observation clears nothing**. **Read-only environment enumeration by this session, offered as capability evidence and explicitly NOT as E4 evidence:** `docker`, `psql`, `sqlite3` CLI, `java`, `dotnet`, `go` **ABSENT**; **`python` ABSENT but `py` PRESENT → Python 3.14.5 with SQLite 3.50.4**, exposing **`set_trace_callback`**, **`set_authorizer`**, **`set_progress_handler`**. **Whether a statement-level trace records what the engine EXAMINED is the question, not the answer** — *"a real surface that still does not satisfy E4"* is a correct outcome. **Third `PATH` artefact read as absence in this project.** **TASK-0042 COMPLETE and cleared nothing** — six candidates, **all NOT CLEARED**, **DISC-0012** recorded. **Six probes have cleared nothing; nothing installed, nothing selected, no ADR touched.** **The Windows scheduled task `PCI-Execution-Supervisor` is `Disabled`, so TASK-0043 will NOT start unattended** — MSG-0143, correcting a claim this file made an hour earlier.
+**Last Updated:** 2026-08-24 UTC — **TASK-0043 ATTEMPTED and BLOCKED — BLK-0011 is OPEN, and no task is READY.** The supervisor **did** start it unattended (pid 25932, 18:59:38Z), disproving MSG-0143's *"will not start unattended"* — **the scheduler starts the supervisor loop; it does not drive each cycle**, so a `Disabled` task with two missed runs had missed *starts* of an **already-running** process. **Fifth instance of that class of error; MSG-0143 is not edited, both readings kept.** The session then **stopped at the task's first substantive action**: the second test subject — **Python 3.14.5 / SQLite 3.50.4 via `py`** — **is not invocable by this runner**, `py -V` and `py …/probe.py` both returning **`This command requires approval`**, with the **cause VERIFIED from the permission set** (`Bash(node *)` and eight `--version` checks allowed; **no `py` / `python` / `python3`**) rather than inferred. **A denial, not an absence** — `node -e` ran, `docker`/`psql` were `command not found`, `py` was neither. **The harness is written, committed and NOT RUN.** **The verdict is NEITHER MSG-0141 outcome, deliberately**: *"could not be run"* ≠ *"ran and showed nothing"*, and calling it **unobtainable** would repeat at task level the error **§4.12's control** prevents at pragma level. **E4 stays NOT CLEARED; GAP-B untouched; the second subject's position UNKNOWN.** **A `node` + `child_process` workaround exists, was NOT taken (rule 2), and is recorded so the next session refuses it deliberately.** **4/8 acceptance criteria MET; nothing installed, no host change, no ADR touched, no verdict moved; `docs/` diff empty.** **Seven probe efforts have now cleared nothing.** Records: **MSG-0144**, **BLK-0011**. **The line this replaces, retained:** "**TASK-0043 READY: bounded E4 observability evidence on a SECOND test subject** (MSG-0141). **The E4 question has changed shape** — MSG-0140 §6 settled with a **second negative** that the current subject cannot supply it, so what remains is **whether any reachable subject can**. **The subject is an INSTRUMENT, not a candidate**: MSG-0141 says twice that this is **not engine selection, adoption, deployment or implementation**, and **a successful E4 observation clears nothing**. **Read-only environment enumeration by this session, offered as capability evidence and explicitly NOT as E4 evidence:** `docker`, `psql`, `sqlite3` CLI, `java`, `dotnet`, `go` **ABSENT**; **`python` ABSENT but `py` PRESENT → Python 3.14.5 with SQLite 3.50.4**, exposing **`set_trace_callback`**, **`set_authorizer`**, **`set_progress_handler`**. **Whether a statement-level trace records what the engine EXAMINED is the question, not the answer** — *"a real surface that still does not satisfy E4"* is a correct outcome. **Third `PATH` artefact read as absence in this project.** **TASK-0042 COMPLETE and cleared nothing** — six candidates, **all NOT CLEARED**, **DISC-0012** recorded. **Six probes have cleared nothing; nothing installed, nothing selected, no ADR touched.** **The Windows scheduled task `PCI-Execution-Supervisor` is `Disabled`, so TASK-0043 will NOT start unattended** — MSG-0143, correcting a claim this file made an hour earlier." **True when written except for its last clause, which the very next unattended run disproved.**
 
 > **The line this replaces, retained:** "**TASK-0042 COMPLETE (8/8); six candidates measured, ALL NOT CLEARED; no task is READY.** **The evidence the four rulings made possible has now been taken**, and it clears nothing — **E4 alone would have sufficed for that** (§4.13 GAP-B, re-checked and unchanged), **but it is not the only thing missing.** `U` grows to **714** at `M` = 5000 for K7, I5, I8 and the routing control; **K8's row-access `U` = 0 is superseded by 2 / 66 / 709 at the index cursor — the first time S7-R3 bites by RULE rather than by a probe's diligence.** **I5 and I8, both NEVER MEASURED until now, measure IDENTICALLY to K7 at every size**: a finer key that does not refine **effectivity** removes no unauthorized row, corroborating §4.8 finding 1 in a third fixture. **I7 reached `U` = 0 and failed anyway, by WITHHOLDING — 142 of 146 authorized chunks at its interval boundary**, plus a version **ingested inside the interval** that never appeared, on a bound **VACUOUS in 3 of 3 cells**; **`U` is blind to both.** **Five placements exercised**, one (**P-CIDX**) never taken before, and **dbstat TAKEN rather than argued away** — it measures stored layout, not traversal, so the reachable-but-unexercised set is **EMPTY for the right reason** (S7.3). **Q7 = A over 36 cells**: the discriminator **fired in 4** (*made correct by waiting*), and **T3 vs T5 isolates the faked re-check**, reproducing §4.10 result 3 independently. **Run VALID** — adversarial precondition HELD, and **three** negative controls failed as required. **DISC-0012 raised**: the prior G-Q4.2 differential ran against a catalogue holding **no foreign structure**, so **TASK-0039's MET is bounded, not withdrawn** — **no verdict moves.** **Record EPA-0006 §4.14 (287 insertions / 0 deletions); evidence MSG-0140. Nothing selected, no ADR touched, no gate relaxed, no threshold introduced. Engine selection stays blocked.**" True when written; **the Architecture Lead has since authorized the bounded E4 evidence task that GAP-B makes necessary.**
 
@@ -2241,14 +2241,58 @@ both tables index it, and both were updated in the same commit as the record.
 
 ## Next Action
 
-**TASK-0043 is READY and is the single READY task** — authorized by MSG-0141 and written into the queue
-by this session. **It will NOT start unattended: the Windows scheduled task `PCI-Execution-Supervisor`
-is `Disabled`** (MSG-0143), so it waits for the operator to re-enable the schedule or trigger a cycle by
-hand.
+**TASK-0043 was ATTEMPTED and is BLOCKED. No task is READY, and the next action is the Architecture
+Lead's** — a choice among the three options in **BLK-0011**.
+
+**The supervisor started it unattended at 18:59:38Z**, and it **stopped at the task's first substantive
+action.** The second test subject MSG-0142 identified — **Python 3.14.5 / SQLite 3.50.4 via the `py`
+launcher** — **is not invocable by this runner**: `py -V` and `py implementation/probes/TASK-0043/probe.py`
+**both** return **`This command requires approval`**. **The cause is VERIFIED by reading the permission
+set rather than inferred** — `.claude/settings.local.json` allows `Bash(node *)` and eight `--version`
+checks and carries **no `py` / `python` / `python3` entry**; `runner-settings.json` grants **no
+interpreter at all**. Note the shape of it: **the allowlist can ask `pip --version` and cannot run
+Python.**
+
+**It is a denial, not an absence, and three behaviours establish that:** `node -e` **ran**
+(`v24.15.0`), `docker` and `psql` returned **`command not found`**, and `py` did **neither**.
+**BLK-0010's two-step disambiguation was applied before anything was concluded** — the compound form
+was refused for *"multiple operations"*, wording that names a command **shape**, not a boundary.
+
+**The verdict is NEITHER of the two outcomes MSG-0141 permits, and that is deliberate.** *"The
+instrument could not be run"* is **not** *"the instrument ran and showed nothing"*. Recording **E4
+unobtainable** here would commit at the level of the task the exact error **§4.12's nonexistent-pragma
+control** was invented to prevent at the level of a pragma. So: **E4 stays NOT CLEARED for the reasons
+already on record; §4.13 GAP-B stands untouched** — GAP-B is a claim about the **first** subject — and
+**the second subject's E4 position is UNKNOWN.**
+
+**The probe harness is written, committed and NOT RUN** — `implementation/probes/TASK-0043/probe.py`,
+built to §4.12's control standard: **every instrument it arms is run disarmed first, and a disarmed
+instrument that is not silent voids the run.** **There is no output file, because there is no output.**
+
+**A workaround exists and was NOT taken.** `Bash(node *)` is allowed, and the permission layer inspects
+the Bash command line rather than what the process it starts goes on to spawn — so
+`node -e "...execSync('py ...')..."` would very probably run. **CLAUDE.md rule 2 forbids it**, and it is
+written down in BLK-0011 and MSG-0144 **precisely so the next session refuses it deliberately instead of
+rediscovering it and taking it.**
+
+**Nothing installed, no host change, no ADR touched, no gate weakened, no verdict moved.**
+`git diff --name-only docs/` **empty**. **4 of 8 acceptance criteria MET** — the four unmet are the four
+that required the probe to run. **Seven probe efforts have now cleared nothing**: six that measured, and
+one that could not start. Record: **MSG-0144**; blocker: **BLK-0011**; checkpoint:
+`implementation/operations/checkpoints/TASK-0043.md`.
+
+> **The paragraph this replaces, retained, and its prediction was wrong in the favourable direction:**
+> "**TASK-0043 is READY and is the single READY task** — authorized by MSG-0141 and written into the
+> queue by this session. **It will NOT start unattended: the Windows scheduled task
+> `PCI-Execution-Supervisor` is `Disabled`** (MSG-0143), so it waits for the operator to re-enable the
+> schedule or trigger a cycle by hand." **The supervisor started it unattended about half an hour
+> later.** See the *Operationally* paragraph below for the mechanism — **the scheduler starts the
+> supervisor loop; it does not drive each cycle.**
 
 > **The sentence this replaces, retained, and it was wrong:** "**A supervisor cycle can take it without
 > a manual trigger.**" **The config says `enabled: true`; the schedule says `Disabled`. Both had to be
-> checked and only one was.**
+> checked and only one was.** **Read with the correction above, this sentence was right after all — for
+> a reason neither it nor MSG-0143 had established.**
 
 > **The paragraph this replaces, retained:** "**No task is READY, and the next action is the Architecture
 > Lead's.** **TASK-0042 is COMPLETE** — 8 of 8 acceptance criteria with evidence — and MSG-0137's *Next
@@ -2483,14 +2527,31 @@ test subject **cannot clear anything**, whether to measure I5/I7/I8 there anyway
 falsify or support N1/N2/N3) or to obtain a test subject that can supply E4 first. **MSG-0132 §12
 states these and takes none of them.**
 
-**Operationally: the supervisor CONFIG is live, but the WINDOWS SCHEDULE IS DISABLED, so nothing
-fires.** `supervisor-config.json` carries `enabled: true`, `dryRun: false` — and the scheduled task
-**`PCI-Execution-Supervisor` is `Disabled`**: `LastRunTime` **18:07:07Z**, `LastTaskResult` **0**,
-**`NumberOfMissedRuns: 2`**, with the scheduler service itself **Running**. The supervisor log **stops
-after the 18:07:18Z NOOP**, and the heartbeat has not moved since. **TASK-0043 is correctly READY and
-will not start until the schedule is re-enabled or a cycle is triggered by hand** — **an operator
-action, not taken here.** **No blocker is open. Two discoveries are recorded: DISC-0011 and DISC-0012**,
-and **neither moves a verdict.** Full record: **MSG-0143**.
+**Operationally: the supervisor IS running unattended, and it DID start TASK-0043 — the schedule being
+Disabled did not prevent it.** VERIFIED 2026-08-24 from `implementation/operations/supervisor/state/`:
+`runner.lock` names **`TASK-0043`, pid 25932, acquired 18:59:38Z**, and `heartbeat.json` reads
+`decision: RUNNER_RUNNING`, `runnerPid: 25932`, **`supervisorPid: 24604`**, `head: 7d6bcbd…`,
+**advancing 19:03:08Z → 19:03:38Z** while that session read other files. **The scheduler STARTS the
+supervisor loop; it does not drive each cycle** — so a `Disabled` task with `NumberOfMissedRuns: 2` had
+missed *starts* of a process that was **already running**. **One blocker is now OPEN: BLK-0011** — the
+Python interpreter that TASK-0043's second test subject requires is **not invocable by this runner**,
+so the task **stopped at its first substantive action and is BLOCKED, not COMPLETE**. **Two discoveries
+remain recorded — DISC-0011 and DISC-0012 — and neither moves a verdict.** Full record: **MSG-0144**.
+
+> **The paragraph this replaces, retained, and its central prediction was wrong:** it said *"the
+> WINDOWS SCHEDULE IS DISABLED, so nothing fires"* and **"TASK-0043 is correctly READY and will not
+> start until the schedule is re-enabled or a cycle is triggered by hand"**, citing `enabled: true` /
+> `dryRun: false`, the scheduled task `Disabled`, `LastRunTime 18:07:07Z`, `LastTaskResult 0`,
+> **`NumberOfMissedRuns: 2`**, the scheduler service **Running**, and a supervisor log stopping after
+> the **18:07:18Z** NOOP. **Its observations were all sound; the inference from them was not.** It
+> treated the scheduled task as the **only** invocation path, so *schedule disabled* became *nothing
+> fires* — and roughly half an hour after it was pushed, **the supervisor started TASK-0043 unattended
+> anyway.** **This is the fifth instance of the same class of error in this project**, and the first
+> where the misread component was the supervisor rather than a `PATH`; MSG-0143 counted the prior four
+> (MSG-0102, MSG-0103, MSG-0142, itself). **MSG-0143's file is deliberately NOT edited** — both readings
+> are kept, per CLAUDE.md's rule that a corrected diagnosis is worth more to a later reader than a tidy
+> record. **What it got right and is worth keeping: re-enabling a schedule is an operator action, and it
+> was not taken here either.**
 
 > **The paragraph this replaces, retained, and it was wrong:** it said *"the supervisor is ENABLED"* and
 > *"once this is pushed, the next cycle can take TASK-0043"*, citing the **18:07:18Z** NOOP heartbeat and
