@@ -2,7 +2,9 @@
 
 **Active Work Package:** WP-0001 — PCI Kernel Foundation
 **Status:** **COMPLETE** — declared by the architecture lead 2026-08-19 (MSG-0020(b), resolved by MSG-0022 / MSG-0023, TASK-0009)
-**Last Updated:** 2026-08-24 UTC — **Q1, Q2, Q7 and Q13 RULED; TASK-0042 READY.** **Q1 = A strict** (unauthorized index entries, keys and metadata **are** examination; **U1 stays in scope**), **Q2 = B** (**physical isolation required where necessary** — query-time predicates alone are insufficient where the engine examines unauthorized candidates first), **Q7 = A** (**zero stale-answer tolerance**, abstain rather than answer stale, **no threshold introduced**), **Q13** (**Release 1 is the current/"now" frame only**; a non-now request **abstains**). **Every numbered question Q1–Q13 is now ruled** — the first time that has been true — and **not one of them relaxed anything**: each was ruled in the fail-closed direction the record already defaulted to, so **every verdict stands and nothing became CLEARED by a decision**. **TASK-0042 is the single READY task** (MSG-0137): routing-phase and physical-structure measurement with **routing counted in `U`**, **every applicable S7 placement exercised and the maximum reported**, **zero-stale-answer transitions including abstention**, **I5/I7/I8 measured or recorded NEVER MEASURED with the exact limitation**, and an **E4 re-check**. **The queue write MSG-0138 asked for had not happened** — the queue held **zero mentions of TASK-0042** — so the supervisor's `no READY task` was **correct, not a stall**; it is written now. **ADR-0018 clarified in place under MSG-0133; K7/K8 still NOT CLEARED; GAP-A/B/C stand; nothing selected.**
+**Last Updated:** 2026-08-24 UTC — **TASK-0042 COMPLETE (8/8); six candidates measured, ALL NOT CLEARED; no task is READY.** **The evidence the four rulings made possible has now been taken**, and it clears nothing — **E4 alone would have sufficed for that** (§4.13 GAP-B, re-checked and unchanged), **but it is not the only thing missing.** `U` grows to **714** at `M` = 5000 for K7, I5, I8 and the routing control; **K8's row-access `U` = 0 is superseded by 2 / 66 / 709 at the index cursor — the first time S7-R3 bites by RULE rather than by a probe's diligence.** **I5 and I8, both NEVER MEASURED until now, measure IDENTICALLY to K7 at every size**: a finer key that does not refine **effectivity** removes no unauthorized row, corroborating §4.8 finding 1 in a third fixture. **I7 reached `U` = 0 and failed anyway, by WITHHOLDING — 142 of 146 authorized chunks at its interval boundary**, plus a version **ingested inside the interval** that never appeared, on a bound **VACUOUS in 3 of 3 cells**; **`U` is blind to both.** **Five placements exercised**, one (**P-CIDX**) never taken before, and **dbstat TAKEN rather than argued away** — it measures stored layout, not traversal, so the reachable-but-unexercised set is **EMPTY for the right reason** (S7.3). **Q7 = A over 36 cells**: the discriminator **fired in 4** (*made correct by waiting*), and **T3 vs T5 isolates the faked re-check**, reproducing §4.10 result 3 independently. **Run VALID** — adversarial precondition HELD, and **three** negative controls failed as required. **DISC-0012 raised**: the prior G-Q4.2 differential ran against a catalogue holding **no foreign structure**, so **TASK-0039's MET is bounded, not withdrawn** — **no verdict moves.** **Record EPA-0006 §4.14 (287 insertions / 0 deletions); evidence MSG-0140. Nothing selected, no ADR touched, no gate relaxed, no threshold introduced. Engine selection stays blocked.**
+
+> **The line this replaces, retained:** "**Q1, Q2, Q7 and Q13 RULED; TASK-0042 READY.** **Q1 = A strict** (unauthorized index entries, keys and metadata **are** examination; **U1 stays in scope**), **Q2 = B** (**physical isolation required where necessary** — query-time predicates alone are insufficient where the engine examines unauthorized candidates first), **Q7 = A** (**zero stale-answer tolerance**, abstain rather than answer stale, **no threshold introduced**), **Q13** (**Release 1 is the current/"now" frame only**; a non-now request **abstains**). **Every numbered question Q1–Q13 is now ruled** — the first time that has been true — and **not one of them relaxed anything**: each was ruled in the fail-closed direction the record already defaulted to, so **every verdict stands and nothing became CLEARED by a decision**. **TASK-0042 is the single READY task** (MSG-0137): routing-phase and physical-structure measurement with **routing counted in `U`**, **every applicable S7 placement exercised and the maximum reported**, **zero-stale-answer transitions including abstention**, **I5/I7/I8 measured or recorded NEVER MEASURED with the exact limitation**, and an **E4 re-check**. **The queue write MSG-0138 asked for had not happened** — the queue held **zero mentions of TASK-0042** — so the supervisor's `no READY task` was **correct, not a stall**; it is written now. **ADR-0018 clarified in place under MSG-0133; K7/K8 still NOT CLEARED; GAP-A/B/C stand; nothing selected.**" **True when written; the task it announced has now run.** **Its two central claims both held**: nothing relaxed anything, and **nothing became CLEARED by a decision** — the evidence cleared nothing either. **Its one inaccuracy is corrected above**: the queue write it says "is written now" **was written into the working tree and not committed**, so the committed queue still held zero mentions of TASK-0042 at `2841f23`. **K7/K8 remain NOT CLEARED and GAP-A/B/C still stand**, both unchanged by this run.
 
 > **The line this replaces, retained:** "**TASK-0041 COMPLETE; the Q3 architecture response is written.** **EPA-0006 §4.13**, **392 insertions / 0 deletions**, plus a declared pointer note under §4.7 Q3 — **the answer lives in one place and Q3 points at it**. **Nothing is CLEARED and nothing could have been**: the task is entirely structural and **G-Q6 rejects construction-only evidence**, so its output is **a topology plus the evidence still owed on it**. **Five invariants — N1 containment, N2 closure of the reachable set, N3 refinement by enumerated transition, N4 plan-independence, N5 non-withholding** — with the load-bearing claim that **N1 + N2 make N4 free**: nothing unauthorized within reach means **no plan can examine it**, which is precisely why **§4.12's `ANALYZE` result — `U` 2857 → 0 on a maintenance command — argues for redesign and not for a better-behaved planner**. **Three caveats recorded with the claim**, chief among them that **N1 is containment and does NOT discharge E2**. **§4.8's catalogue extended, not replaced: I7** boundary-refined effectivity — **effectivity IS piecewise constant in time**, so it refines on the interval to the next boundary, and those boundaries are **data already in the kernel, not a tuning parameter** — and **I8** entitlement-class materialisation; **both NEVER MEASURED**. **Four topologies W1–W4 mapped cell by cell to every gate**, and **they differ in exactly ONE cell**, which is itself the answer to Q3. **EV1–EV12** state the **minimum evidence** any future engine-selection task would need — **evidence, not a shortlist**. **R1 is a criterion, not a selection; the W1–W4 choice stays OPEN on unmeasured cost.** **Five gaps recorded and selection stays blocked — GAP-B first: E4 is UNOBTAINABLE on the only reachable test subject, so a future probe there would clear nothing whatever the topology.** **Q13 referred** (which temporal frames must a topology answer), fail-closed, blocking nothing. **DISC-0011 recorded, not corrected.** **K7/K8 still NOT CLEARED; nothing selected, nothing executed, no ADR touched. No task is READY.**" True when written; **the Architecture Lead has since ruled the four remaining questions and authorized the evidence task they make possible.**
 
@@ -2237,9 +2239,68 @@ both tables index it, and both were updated in the same commit as the record.
 
 ## Next Action
 
-**TASK-0042 is READY and is the single READY task** — authorized by MSG-0137 under the now-resolved
-Q1/Q2/Q7 boundaries, and written into the queue by this session. **A supervisor cycle can take it
-without a manual trigger.**
+**No task is READY, and the next action is the Architecture Lead's.** **TASK-0042 is COMPLETE** — 8 of
+8 acceptance criteria with evidence — and MSG-0137's *Next eligible task* reads **none**. **Engine
+selection stays blocked and must be separately authorized** once the existing gates are **positively
+satisfied with evidence** (MSG-0129).
+
+**What the evidence task established, and why it clears nothing.** **Six candidates measured, all NOT
+CLEARED.** **E4 alone would have been enough** — §4.13 GAP-B said so before the task started — **but
+it is not the only thing missing**, and that is the result. Four candidates fail **E2** on their own
+evidence with `U` growing to **714** at `M` = 5000; one fails **G-Q4.3**; and the one that reaches
+`U` = 0 fails by **withholding**, where no counter can see it. **The run is VALID**: the adversarial
+precondition held at three sizes under both distributions, and **three** negative controls failed as
+required — retrieval **3/3**, routing G-Q4.2, freshness **6/6**. **18 placement-grid cells + 36
+freshness cells.** Record: **EPA-0006 §4.14** (**287 insertions / 0 deletions**); evidence:
+**MSG-0140**; harness and captured output: `implementation/probes/TASK-0042/`.
+
+**Four results a later reader should not have to dig for.**
+
+1. **A row-access zero was superseded by rule for the first time.** **K8 reports `U` = 0 at row
+   access** at every size — correct, and unchanged from TASK-0038 — **and 2 / 66 / 709 at the index
+   cursor.** S7-R2 requires the maximum, so **the reported figure is the higher one**. Q12's ruling
+   now bites **by rule** rather than by a probe happening to notice.
+2. **I5 and I8 measure IDENTICALLY to K7 at every size.** A finer partition key that does not refine
+   the **effectivity** conjunct removes no unauthorized row and therefore reduces `U` by nothing —
+   **§4.8 finding 1 corroborated in a third independent fixture.** Both were **NEVER MEASURED** until
+   now; both are now measured and **NOT CLEARED**.
+3. **I7 reached `U` = 0 and failed anyway, by WITHHOLDING.** At its interval boundary it **withheld
+   142 of the 146 authorized chunks** the kernel held, and a version **ingested inside the interval**
+   never appeared — the event §4.13 predicted *"a boundary-driven design omits most naturally"*.
+   **`U` is blind to both**, and its zero rests on a bound **VACUOUS in 3 of 3 cells**. §4.6 S5 warned
+   a zero can be an artefact of placement; **this is a correctly-placed zero on top of a design that
+   answers almost nothing it should.**
+4. **DISC-0012 — the prior G-Q4.2 differential ran against a catalogue holding no foreign structure.**
+   TASK-0038's and TASK-0039's store builder skips foreign partition keys, so the differential varied
+   rows in the **kernel**, which routing never opens. **TASK-0039's `G-Q4 MET` is bounded, NOT
+   withdrawn, and no verdict moves** — K7/K8 were NOT CLEARED on E2 and E4, never on G-Q4. **No re-run
+   is needed: TASK-0042 ran the stronger differential**, with **320** foreign catalogue objects
+   present, and it discriminates.
+
+**Also recorded, because it is the kind of thing that otherwise vanishes:** **a defect in this
+probe's own first version.** Its currency consult ran the **full authorization predicate**, rejecting
+a reclassified version before the re-check was reached — so the faked-re-check design **passed 6 of 6
+and was a control that could not fail**. The repair is architecturally right anyway: **currency is not
+authorization.** Both the defect and the repair are in the probe source and in §4.14.
+
+**Q7 = A, measured:** 36 cells. **15** answered the prior version, **12** answered a version the kernel
+had made unauthorized, **6** returned an **empty answer where an abstention was required** (G-Q7.4),
+**6** withheld an authorized current version. **The discriminator fired in 4 cells** — designs *made
+correct by waiting*, which under Q7 = A is **not mitigation**, there being no allowance to fall inside.
+**T3 and T4 pass every transition at both instants and are STILL NOT CLEARED**, exactly as §4.10
+demonstrated with A6.
+
+**Open, and blocking nothing:** **DISC-0011** (a §4.11 arithmetic tally, no verdict affected) and
+**DISC-0012** (above). **GAP-A, GAP-B and GAP-C stand**, and **GAP-B continues to block clearance
+independently of anything measured.**
+
+> **The lines this replaces, retained:** "**TASK-0042 is READY and is the single READY task** —
+> authorized by MSG-0137 under the now-resolved Q1/Q2/Q7 boundaries, and written into the queue by
+> this session. **A supervisor cycle can take it without a manual trigger.**" **True when written, and
+> the supervisor did take it** — lock acquired `2026-08-24T17:17:18Z`. **One correction the later
+> session had to make first:** the queue write was **still uncommitted in the working tree** at
+> `2841f23`, so the *committed* queue held **zero** occurrences of `TASK-0042`. It was reviewed,
+> committed and pushed as `a9ce7f7` **before any measurement began**.
 
 > **The lines this replaces, retained:** "**No task is READY, and the next action is the Architecture
 > Lead's.** **TASK-0041 is COMPLETE** and MSG-0130's acceptance ends at the documented architecture
@@ -2260,6 +2321,13 @@ plus the abstention case**, distinguishing transition-triggered from periodic be
 **I5/I7/I8 measured where genuinely observable, else NEVER MEASURED with the exact limitation**; and an
 **E4 observability re-check**. **It may clear nothing** — **GAP-B says E4 is unobtainable on the only
 reachable subject, which blocks clearance independently of anything measured.**
+
+> **DISCHARGED 2026-08-24, and the paragraph above is left as written so the prediction can be read
+> against the result.** All six items were produced; the acceptance table in the queue's TASK-0042
+> *Result* block gives the evidence for each. **The "it may clear nothing" clause held**, and for the
+> reason it named: **E4 was re-checked and is still NOT OBTAINABLE.** What the paragraph did not
+> anticipate is that **E4 would not be the only thing missing** — four candidates fail E2 on their own
+> evidence, and **the one that reaches `U` = 0 fails by withholding instead.**
 
 > **The lines this replaces, retained:** "**TASK-0041 is READY and is the single READY task** — the
 > Architecture Lead authorized it in MSG-0130, under the Q3 ruling in MSG-0129. **A supervisor cycle

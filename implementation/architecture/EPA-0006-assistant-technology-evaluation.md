@@ -782,6 +782,13 @@ difficulty §4.7 Q2 recorded in advance, now with a measurement attached.
 paired with **one global lexical or vector index** puts the traversal back over a structure spanning
 every authorization scope, which §4.6 S6/E1 makes disqualifying regardless of any counter.
 
+> **I5's status has since changed and the row above is left as TASK-0035 wrote it.** Note added
+> 2026-08-24 by **TASK-0042** under **MSG-0137**; **additive — nothing above is deleted or reworded**,
+> so the catalogue reads as the probe that measured I0–I6 left it. **I5 was MEASURED by TASK-0042 and
+> is NOT CLEARED**; the measurement, and the parts of I5 that remain NEVER MEASURED with their exact
+> limitations, are in **§4.14**, which is where they must be read from. **They are deliberately not
+> restated here** — two statements of one result invite drift. **No verdict in this section changes.**
+
 #### What was measured (class R test subject; MSG-0109 §5)
 
 `U` = unauthorized units examined, maximum across three instrument placements (§4.6 S7):
@@ -914,6 +921,16 @@ was the right one; or an engine that exposes no observability over its routing p
 > **structures** rather than **chunks** — is *"related but distinct"*. **The practical position is
 > unchanged either way: the strict reading applies, and it can only withhold clearance, never grant
 > it.** Referred in MSG-0139 §4.
+>
+> **The quantity this interaction turns on has since been MEASURED to be UNOBSERVABLE here.** Note
+> added 2026-08-24 by **TASK-0042** under **MSG-0137**; **additive, nothing above deleted or
+> reworded.** **§4.14 finding 3** records it: an **explicit** catalogue read is measurable and was
+> measured — the catalogue-scanning routing mechanism read **320** entries naming other subjects'
+> structures — while **implicit schema resolution is NEVER MEASURED**, because `node:sqlite` binds no
+> hook below statement compilation and `SQLITE_ENABLE_STMT_SCANSTATUS` is **ABSENT** from this build.
+> **This still decides nothing about the interaction**, and it is not offered as an argument for
+> either reading. It records that **the quantity the question asks about cannot be observed on the
+> only reachable test subject** — which is a fact a ruling will need whichever way it goes.
 
 #### G-Q5 — temporal materialisation requires BOTH conditions, and one of them is only testable structurally
 
@@ -1757,6 +1774,16 @@ proposals and neither has been measured**; under **G-Q6 neither can contribute t
 | **I7** | **Boundary-refined effectivity** — the structure holds what is effective across the **half-open interval to the next effectivity boundary**, and is re-refined **at** that boundary rather than on a timer | 3, **without a decay term** | **Structural proposal. NEVER MEASURED** |
 | **I8** | **Entitlement-class materialisation** — one structure per **equivalence class of subject entitlement sets**, rather than per token (I3) or per principal (I5) | 1, 2a, 2b, 4 — the I5 set, at a coarser key | **Structural proposal. NEVER MEASURED** |
 
+> **Both rows have since been measured, and both are left as TASK-0041 wrote them.** Note added
+> 2026-08-24 by **TASK-0042** under **MSG-0137**; **additive — nothing above is deleted or reworded.**
+> **I7 and I8 were BUILT AND RUN and both are NOT CLEARED** (**§4.14**), so *"NEVER MEASURED"* in the
+> Status column is **no longer true of `U`** — and **remains true** of the costs and mechanisms §4.14
+> lists with their exact limitations, **I7's re-refinement rate and its abstention-on-breach mechanism
+> among them**. **The measurement is in §4.14 and is deliberately not restated here.** **Two results
+> below are worth the reader's attention before proceeding**: **I8 measured identically to K7 at every
+> size**, and **I7 reached `U` = 0 and failed anyway — by WITHHOLDING**, at the boundary and on
+> ingestion inside the interval, exactly as the third bullet under this table predicted.
+
 **I7 answers the residual F4 names, and its argument is written out because it contradicts a reading
 of §4.8 that would otherwise stand.** §4.8's refinement rule requires that *"every row in a partition
 agree on that conjunct's truth value for every subject routed to it"*, and §4.8 concluded that
@@ -2001,6 +2028,266 @@ withhold an answer and never grant an unauthorized one, and **it requires no rul
 - **No implementation task is authorized or marked READY**, and **no engine-selection task becomes
   executable.** MSG-0129: selection follows the gates being *"positively satisfied with evidence"*,
   and MSG-0130's acceptance ends at this documented response.
+
+---
+
+### 4.14 Architecture-bound evidence: routing, placements, transitions, I5/I7/I8 (TASK-0042, MSG-0137)
+
+**Added 2026-08-24 by TASK-0042. Additive and declared: nothing in §4.1–§4.13 is deleted or
+reworded, and no verdict changes.** This section records what happened when the evidence the four
+rulings make possible was actually taken. **It amends no ADR, invents no threshold, relaxes no gate,
+and selects, adopts, recommends, installs and deploys no engine.** Authority: **MSG-0137**, with
+**MSG-0134 (Q1 = A, strict)**, **MSG-0135 (Q2 = B)**, **MSG-0136 (Q7 = A)** and **MSG-0133 (Q13)**
+binding. Full evidence: **MSG-0140**; harness and captured output at `implementation/probes/TASK-0042/`.
+
+**Six candidates measured. All six NOT CLEARED. Nothing here clears anything**, and **E4 alone would
+have been enough for that** — which §4.13 GAP-B said in advance and section 2 of the probe re-checked.
+
+**What was NOT re-run, because item 3 forbids repetition:** TASK-0033's sweep, TASK-0035's P0…NC
+grid, TASK-0037's 8×11 freshness grid, TASK-0038's 7-scenario grid, TASK-0039's 12-configuration grid
+and its `M=20000` column. **All of it stands as measured.** The **validity gates were re-run**,
+because §4.6 S8 requires them in every run and without them this run's numbers would prove nothing.
+
+#### Run validity, stated before any number
+
+| Gate | Result |
+|---|---|
+| Adversarial precondition (§4.6 S8) | **HELD** at `M` = 50 / 500 / 5000 under **both** distributions — unconstrained top-6 contained **0** authorized chunks in all six cases |
+| Retrieval negative control | **FAILED in 3 of 3** cases — `U` = 116 / 566 / 5066, answering 1 of 4 authorized chunks |
+| **Routing** negative control | **FAILED G-Q4.2 as required** — see below |
+| **Freshness** negative control | **FAILED in 6 of 6** cells |
+| Index-cursor calibration | **EXACT on both plans** — 302 and 402 reproduced from a constructed cohort |
+| Plan-transfer control | **0 of 54** instrumented measurements moved the planner's seek signature |
+| Measurements | **18 placement-grid cells + 36 freshness cells**, plus calibration, routing and E4 enumeration |
+
+#### Finding 1 — the G-Q4.2 differential had never been run against a catalogue that could fail it
+
+**This is the correction that matters most, and it is a correction to the evidence base rather than to
+a verdict.** TASK-0038 and TASK-0039 both ran the G-Q4.2 differential with other subjects added to the
+**kernel** — but their store builder skips any partition key that is not the subject's, saying so in
+its own comment: *"other subjects' partitions are not materialised here"*. **So the structure
+catalogue those runs routed against contained no other subject's structure at all.**
+
+**A differential that varies rows in a table nobody routes over does not test G-Q4.2.** TASK-0039's
+*"G-Q4 MET in all 12 configurations"* was measured, and is not withdrawn — but **it was measured
+against a catalogue with nothing in it to find.** This probe materialised other subjects' partitions
+**physically**, and counted the catalogue:
+
+| other subjects | catalogue objects | subject's own | **another subject's** | kernel/other |
+|---|---|---|---|---|
+| 0 | 32 | 20 | **0** | 12 |
+| 16 | 128 | 20 | **80** | 28 |
+| 64 | 416 | 20 | **320** | 76 |
+
+**The subject's own structure count does not move. The foreign count does.** That is what the
+differential needed and had not had.
+
+#### Finding 2 — two routing mechanisms, behaviourally identical, and only one satisfies the gate
+
+**§4.9 G-Q4's design note predicted this and the probe measured it.** `R-COMPUTED` derives structure
+names from the subject's entitlements and resolves them by exact key. `R-CATALOGUE` finds them by
+scanning the catalogue for names that look applicable. **They select the same four structures** — so
+**no functional test could tell them apart.**
+
+| mechanism | others | routed | catalogue rows read | **`U`(routing)** | kernel/other entries |
+|---|---|---|---|---|---|
+| R-COMPUTED | 0 | 4 | **0** | **0** | 0 |
+| R-COMPUTED | 64 | 4 | **0** | **0** | 0 |
+| R-CATALOGUE | 0 | 4 | 32 | **0** | 12 |
+| R-CATALOGUE | 64 | 4 | **416** | **320** | 76 |
+
+**G-Q4.2, applied:** R-COMPUTED — routed set identical, routing reads **4 vs 4** → **MET**.
+R-CATALOGUE — routed set **identical**, routing reads **32 vs 416** → **FAILED**.
+
+> **The gate names both limbs, and this is why.** **A test checking only the routed set would have
+> passed the catalogue-scanning mechanism.** It returns exactly the right structures; it simply reads
+> 320 catalogue entries naming other subjects' structures on the way. **Under Q1 = A those reads are
+> examination** (MSG-0134), and **G-Q4.4 puts them in `U`** — which is why the candidate carrying that
+> routing mechanism reports `U` = 320 at `M` = 50, where its retrieval-phase `U` is 7.
+
+**G-Q4.3 is evidenced from the plan, not from the mechanism's name:** `EXPLAIN QUERY PLAN` on the
+routing statement returns **`SCAN sqlite_schema`** — a scan over the structure catalogue, disqualifying
+on the same reasoning §4.6 S6/E1 applies to a data scan.
+
+#### Finding 3 — routing-phase observability is PARTIAL, and the unmeasurable half is the one Q1's open interaction asks about
+
+**An explicit catalogue read is measurable and was measured. Implicit schema resolution is NEVER
+MEASURED on this test subject**, and the limitation is exact:
+
+- the **authorizer** reports `SQLITE_READ` for statements reading `sqlite_schema` **as data**, and
+  reports **nothing** for implicit name resolution. On the computed-routing statement it reported
+  **8 distinct read targets and none of them a catalogue object**;
+- **`SQLITE_ENABLE_STMT_SCANSTATUS` is ABSENT** from this build (the one API that would report
+  per-loop visits), and `node:sqlite` binds no hook below statement compilation.
+
+> **`NONE` there means the statement does not read the catalogue as data. It does NOT mean the engine
+> performed no schema lookup**, and no reachable instrument on this subject can say. **Under §4.6 S9 an
+> unmeasurable stage is NOT CLEARED, never a pass by default.**
+>
+> **This is §4.9 G-Q4's unnumbered open interaction in its measurable form** — whether an exact-key
+> catalogue lookup of an already-computed structure name is itself examination. **The probe decides
+> nothing about it.** It records that **the quantity the question asks about is not observable here**,
+> which is a fact the ruling needs either way. Kernel-object catalogue reads are **counted separately
+> and deliberately not folded into `U`**, for the same reason.
+
+#### Finding 4 — the placement set is now enumerated, and the reachable-but-unexercised set is EMPTY
+
+**§4.6 S7.3 requires that set to be empty, and requires reachability to be established by taking the
+placement.** Five were taken:
+
+| | Placement | What calibration showed it counts |
+|---|---|---|
+| **P-ROW** | `probe_ver(pv.version_id)` | once per **version row accessed** — TASK-0038's placement |
+| **P-VIDX** | `probe_idx(pv.open_ended)` | once per **version index entry visited**; reproduced the constructed cohort **exactly** (302 planner-choice, 402 pinned) — TASK-0039's placement |
+| **P-CIDX** | `probe_cidx(pc.version_id)` | **NEW — no prior probe took it.** Fires **once per surviving pair**: on this join shape the chunk cursor is entered only for versions that already passed the version-side residual, so **it does not see what that residual rejected** |
+| **P-RANK** | `probe_rank(...)` | once per candidate entering the ordering — §4.6 S4 **U3** |
+| **P-ROUTE** | `probe_cat(name)` | once per catalogue entry read while **selecting structures** — G-Q4.4 |
+
+**And one the compile options said existed was taken rather than argued away.**
+**`SQLITE_ENABLE_DBSTAT_VTAB` is PRESENT** — the only relevant option that is. The `dbstat` virtual
+table **is reachable**, and **is not a `U1` instrument**: it reports the **stored layout** of a b-tree,
+identically whether a query ran or not, and cannot say how many entries a **traversal visited** —
+which is the quantity §4.6 S4 U1 is defined on. **So the unexercised set is empty for the right
+reason: the placement was taken and found to measure a different quantity.**
+
+#### The grid — maximum `U` across exercised placements (S7-R2), at three collection sizes
+
+`Nvidx` is engine-measured; **`U1lb` is arithmetic applied to it** and is a **deliberately generous
+lower bound**. **A zero in `U1lb` means "this bound proves nothing at this size" — it is NOT `U1 = 0`.**
+
+| Candidate | Pattern | `M`=50 | `M`=500 | `M`=5000 | Growth | Verdict |
+|---|---|---|---|---|---|---|
+| **K7** | I1+I2+I3, planner-chosen index | **7** | **71** | **714** | **GROWS** | **NOT CLEARED** |
+| **K8** | K7, bounded limb pinned | **2** | **66** | **709** | **GROWS** | **NOT CLEARED** |
+| **I5** | per-principal materialisation | **7** | **71** | **714** | **GROWS** | **NOT CLEARED** |
+| **I8** | entitlement-class materialisation | **7** | **71** | **714** | **GROWS** | **NOT CLEARED** |
+| **I7** | boundary-refined effectivity | **0** | **0** | **0** | — **and the bound is VACUOUS in 3 of 3 cells** | **NOT CLEARED** |
+| **KR** | K7 structures, catalogue-scanned routing | **320** | **320** | **714** | **GROWS** | **NOT CLEARED** |
+
+> **K8's `M`=50 row is the S7-R3 rule working.** Its **row-access `U` is 0** at every size, exactly as
+> TASK-0038 measured. **The figure reported here is 2 / 66 / 709**, because S7-R2 requires the maximum
+> across exercised placements and the index-cursor placement is higher. **This is the first grid in
+> this record where a row-access zero is superseded by rule rather than by a probe's diligence.**
+
+#### Finding 5 — I5 and I8 measure IDENTICALLY to K7, and that is the result
+
+**I5 (per principal) and I8 (per entitlement class) discharge conjuncts 1, 2a, 2b and 4 — but not 3.**
+Their measured `U` is **7 / 71 / 714 — the same as K7's at every size**, on one routed structure
+instead of four.
+
+**§4.8 finding 1 predicted exactly this and is corroborated in a third independent fixture:** *"`U`
+equals the number of unauthorized rows the routed structures still contain… isolation reduces `U`
+exactly insofar as it removes unauthorized rows from the structures opened, and by nothing else."*
+**A finer partition key that does not refine the effectivity conjunct removes no unauthorized row, so
+it reduces `U` by nothing.** **I5 and I8 are not improvements on K7 in the only dimension the gate
+measures**, and neither is cleared by being finer-grained.
+
+#### Finding 6 — I7 reaches `U` = 0 and fails anyway, in the direction a counter cannot see
+
+**I7 is the only pattern whose measured `U` is zero at every size**, because refining on the interval
+to the next boundary discharges effectivity **by construction** for that interval. **§4.13's argument
+holds as far as it goes.** It does not go far enough, and the probe measured both reasons:
+
+- **At the boundary.** The next effectivity boundary is **computed from kernel data** (`eff_from` /
+  `eff_to`) and lands **15000 fixture units** after the query instant. Crossing it without re-refining:
+  the structure returned **4 rows, leaked 0** — the kernel re-check caught the leak — **and WITHHELD
+  142 of the 146 authorized chunks the kernel held at that instant.**
+- **Inside the interval.** A version **ingested** between `t` and the boundary — **no boundary
+  crossed** — **did not appear in the answer.** §4.13 named this in advance: *"ingestion is therefore
+  itself an invalidating event under N3, and it is the one a boundary-driven design omits most
+  naturally."* **It is measured here, not predicted.**
+
+> **Both failures are WITHHOLDING, and `U` is blind to both.** §4.6 S5 warns that a zero count may be
+> an artefact of placement; §4.10 result 4 extended that to a non-zero count concealing opposite
+> outcomes. **This extends it again: a genuine, correctly-placed `U` = 0 can sit on top of a design
+> that answers almost nothing it should.** **§3.3 wrong-exclusive and the K4 trap both say that cannot
+> be traded for a clean `U`** — and the record now has a measurement of it rather than a warning.
+
+#### Finding 7 — the four Q7 transitions, with the discriminator, and the faked re-check isolated
+
+**Six transitions × six designs × two instants = 36 cells.** The instants are **before** and **after**
+a periodic timer fires — **G-Q7.2's discriminator**. *The period is a fixture constant, present only
+so a "before" and an "after" exist; no magnitude is judged, proposed or recommended, and Q7 = A
+introduces no threshold.*
+
+| Design | Mechanism | Passes at BOTH instants |
+|---|---|---|
+| **T1** | materialised, **periodic only** | **0 / 6** |
+| **T2** | + transition-triggered invalidation, hooked to **lifecycle state only** | **2 / 6** |
+| **T3** | + kernel consult for currency + §3 point-2 re-check **against the kernel** | **6 / 6** |
+| **T4** | **authoritative partitioned store** — the truth lives in the partition, no copy | **6 / 6** |
+| **T5** | as T3 but the re-check reads **the copy** | **5 / 6** |
+| **NCF** | negative control — falls back to the last good snapshot | **0 / 6** — the control failed as required |
+
+**Aggregate failure counts, taken from recorded flags rather than from the displayed verdict string**
+(a cell that is both stale and unauthorized displays only the first; **the categories overlap**):
+**15 of 36** answered the prior version at at least one instant; **12 of 36** answered a version
+unauthorized for the subject; **6 of 36** returned an **empty answer** where an abstention was
+required (G-Q7.4); **6 of 36** withheld an authorized current version.
+
+**The discriminator fired in 4 cells** — T1 and NCF on *update* and *approval* — each **failing before
+the timer and passing after it**. **Those designs were made correct by waiting, not by the transition**,
+which is precisely what MSG-0113 §3 says a fixed-time test cannot detect. **Under Q7 = A the later pass
+is not mitigation**, because there is no elapsed-time allowance for it to fall inside.
+
+**T3 versus T5 isolates G-Q5.2b's "limb most easily faked".** On the one transition that separates them
+— a version that stays **current** by lifecycle and becomes **unauthorized** by reclassification —
+**T3 abstained and T5 answered it.** Same hooks, same consult, same structures; **they differ only in
+what the re-check reads.** §4.10 result 3 demonstrated this once; it is now reproduced on an
+independent fixture.
+
+> **A defect in this probe's own first version is recorded rather than quietly repaired.** The currency
+> consult originally ran the **full authorization predicate**, so it rejected the reclassified version
+> before the re-check was reached and **T5 passed 6 of 6** — a control that could not fail. **The
+> repair is architecturally the right one anyway: currency is not authorization.** G-Q7.1/G-Q7.3 ask
+> whether the answer resolves against the **current** version; ADR-0020 §3 point 2 and G-Q5.2 ask
+> whether each hit is **re-authorized**. Separating them is what made the limb testable.
+
+#### Finding 8 — E4, re-checked, unchanged
+
+**The §4.12 enumeration was re-run in full on the runtime as it stands** — SQLite **3.51.3** via
+`node:sqlite`, Node **v24.15.0** — including the **nonexistent-pragma control**:
+
+| Check | Result |
+|---|---|
+| `DatabaseSync` / `StatementSync` prototypes, enumerated at runtime | **no trace, profile or log member** |
+| `PRAGMA compile_options` | **`DEBUG` ABSENT · `ENABLE_SQLLOG` ABSENT · `ENABLE_STMT_SCANSTATUS` ABSENT** |
+| Five tracing pragmas vs a pragma that does not exist | **identical behaviour — all inert** |
+| `db.location()` on `:memory:` | **`null`** — no file, so no engine-written artefact |
+
+**E4 remains NOT OBTAINABLE on this test subject. §4.13 GAP-B stands, and the second negative is the
+expected result rather than a failure.** Under §4.6 S6 that yields **NOT CLEARED independently of
+every count above**, and MSG-0137 forbids inferring otherwise.
+
+#### What this section does NOT establish
+
+- **Nothing is CLEARED.** **All six candidates are NOT CLEARED**, and **no gate was relaxed to reach
+  that**. **Six probes have now cleared nothing.**
+- **`U1 = 0` is not established for anything and is not claimed.** Every index-entry figure is a
+  **lower bound**; **I7's zeroes sit on a bound that is VACUOUS in 3 of 3 cells** — a zero taken while
+  the version cursor did visit entries proves nothing at that size.
+- **I5, I7 and I8 are now MEASURED for `U` at three collection sizes and NOT CLEARED. They are not
+  measured for everything**, and what remains is recorded with its exact limitation: structure and
+  class **counts at scale** (corpus unmeasured at n=1, §11 #1), **I7's re-refinement rate** (a
+  function of corpus boundary density, **UNKNOWN**), **I7's G-Q5.1c abstention-on-breach mechanism**
+  (no abstention controller was built), **I8's cost of a subject moving between classes**, **E3** for
+  any lexical or vector stage, and **E4** for all of them.
+- **The routing-phase measurement is PARTIAL.** Explicit catalogue reads are measured; **implicit
+  schema resolution is NEVER MEASURED**, and §4.9 G-Q4's unnumbered open interaction is **left
+  exactly as open as it was**.
+- **TASK-0039's G-Q4 result is not withdrawn.** It was correctly measured; finding 1 records that
+  **the catalogue it was measured against was empty of foreign structures**, which bounds what it
+  established. **No verdict moves on that basis.**
+- **No planner behaviour is generalized.** Every plan, count and bound is evidence about **SQLite
+  3.51.3 via `node:sqlite`**, in these configurations, on these fixtures.
+- **All prior verdicts stand.** TASK-0033/0035/0037/0038/0039 were **not modified or re-run**; **K7
+  and K8 remain NOT CLEARED**; **K3 and K4 remain NOT CLEARED**; **class D and class H remain
+  DISQUALIFIED**.
+- **No numeric staleness threshold is introduced**; the freshness period is a **fixture constant** and
+  its magnitude is not judged. **No benchmark, latency, capacity, recall, throughput, structure count,
+  replication factor or fan-out figure is produced.**
+- **No engine, runtime, provider, model or index technology is selected**, **no ADR is amended**, and
+  **no implementation task is authorized or marked READY.** **Engine selection stays blocked.**
 
 ---
 
