@@ -2,7 +2,9 @@
 
 **Active Work Package:** WP-0001 — PCI Kernel Foundation
 **Status:** **COMPLETE** — declared by the architecture lead 2026-08-19 (MSG-0020(b), resolved by MSG-0022 / MSG-0023, TASK-0009)
-**Last Updated:** 2026-08-24 UTC — **TASK-0040 COMPLETE; Q12 encoded and closed.** EPA-0006 §4.6 gains **S7.1–S7.4**, **98 insertions / 0 deletions**: **every reachable index-cursor placement must be exercised**, the **maximum across exercised placements** is the reported `U`, and **row-access-only `U = 0` is insufficient for E2** where such a placement exists unexercised — **disqualifying, not merely noted**. **"Reachable" means occupiable and actually exercised**; a "none reachable" claim is admissible **only by enumeration**; **unreachability is not relief**. **Nothing executed, no probe re-run, no ADR touched, no gate weakened, no threshold invented.** **K7/K8 remain NOT CLEARED; five probes have cleared nothing.** **No task is READY** — the next evidence action must be **separately authorized**.
+**Last Updated:** 2026-08-24 UTC — **MSG-0129 RULES Q3; TASK-0041 READY.** The answer is **architecture, not relaxation**: *"not to relax the bar and not to select the least-bad engine."* The project stays **NOT CLEARED for retrieval-engine selection** and **returns to architecture work** to define a topology that can satisfy the existing gates. **`U = 0`, E1–E4 and G-Q4/G-Q5/G-Q6 remain mandatory**; five probes clearing nothing is evidence the **explored space is insufficient**, not licence to weaken AMD-01. **Q3 takes §4.7's third branch — reconsider the topology — leaving Q1 and Q2 open, not ruled.** **TASK-0041 is the single READY task** (MSG-0130): technology-agnostic topology patterns, each mapped to the gates and split into **structural** versus **execution-evidence-required**, plus the **minimum evidence** any future engine-selection task would need. **It is a structural task and G-Q6 rejects construction-only evidence, so it can clear nothing by itself.** **K7/K8 still NOT CLEARED; nothing selected, no ADR touched.**
+
+> **The line this replaces, retained:** "**TASK-0040 COMPLETE; Q12 encoded and closed.** EPA-0006 §4.6 gains **S7.1–S7.4**, **98 insertions / 0 deletions**: **every reachable index-cursor placement must be exercised**, the **maximum across exercised placements** is the reported `U`, and **row-access-only `U = 0` is insufficient for E2** where such a placement exists unexercised — **disqualifying, not merely noted**. **"Reachable" means occupiable and actually exercised**; a "none reachable" claim is admissible **only by enumeration**; **unreachability is not relief**. **Nothing executed, no probe re-run, no ADR touched, no gate weakened, no threshold invented.** **K7/K8 remain NOT CLEARED; five probes have cleared nothing.** **No task is READY** — the next evidence action must be **separately authorized**." True when written; **the Lead has since ruled Q3 and authorized the architecture response it requires.**
 
 > **The line this replaces, retained:** "**TASK-0039 COMPLETE; K7 and K8 NOT CLEARED** on 96 measurements plus calibration, opcode capture and a negative control. **MSG-0124 rules Q12 strictly**: a **reachable index-cursor placement must be exercised**, and **row-access-only `U = 0` is insufficient for E2** without it. **TASK-0040 READY** — encode that in EPA-0006 §4.6 S7, **additive and declared**, verifying the result **from `main`**. **Five probes have cleared nothing**; no gate relaxed, nothing selected." True when written; **the task it announced has now run**, started by the supervisor cycle at **10:27:18Z** and completed the same afternoon. **Its two method instructions were the load-bearing ones and both held**: the update is **additive** — 98 insertions, **0 deletions** — and the result was **read back from `main`**, not from the working tree. **The one thing the task section warned about is the one thing that had to be checked first**: encoding a rule twice leaves two statements of it, so S7 was verified to carry **no** Q12 text before a line was written.
 
@@ -2230,7 +2232,19 @@ both tables index it, and both were updated in the same commit as the record.
 
 ## Next Action
 
-**No task is READY, and the next action is the Architecture Lead's: authorize one.**
+**TASK-0041 is READY and is the single READY task** — the Architecture Lead authorized it in MSG-0130,
+under the Q3 ruling in MSG-0129. **A supervisor cycle can take it without a manual trigger.**
+
+> **The line this replaces, retained:** "**No task is READY, and the next action is the Architecture
+> Lead's: authorize one.**" True from TASK-0031's completion until **2026-08-24**, when MSG-0129 ruled
+> Q3 and MSG-0130 authorized the architecture response it requires.
+
+**What TASK-0041 must produce:** technology-agnostic retrieval-topology patterns capable of satisfying
+the existing strict Shape-1 gates, **each mapped to E1–E4 and G-Q4/G-Q5/G-Q6** and split into
+**structurally necessary** versus **execution-evidence-required**, plus the **minimum evidence** any
+future engine-selection task would need. **It clears nothing by itself** — §4.9 G-Q6 rejects
+construction-only evidence, and MSG-0130 repeats the prohibition. **If no topology can satisfy the
+gates, the architecture gap is the finding and selection stays blocked.**
 
 **Current position — verified 2026-08-24 by an interactive COMMS session that did not write it.**
 **TASK-0040 is COMPLETE**; `HEAD` = `origin/main` = `c6f9cc9`, working tree clean. The deliverable was
@@ -2240,21 +2254,39 @@ is a **pointer** to S7 rather than a second statement of the rule — the double
 task's own recovery procedure named. **MSG-0123…MSG-0127 each hold exactly one queue-ledger row and one
 register row**; no duplicate survives.
 
-**No task is READY, and nothing downstream became executable.** No engine, index technology, embedding
-model, framework, runtime or provider is selected; **K7 and K8 remain NOT CLEARED** and **five probes
-have cleared nothing**; WP-0009 still reads `DEFINED — NOT AUTHORIZED FOR IMPLEMENTATION`; **T-0 and
-T-A…T-I remain unauthorized**. MSG-0125 requires the **next evidence action to be separately
-authorized**, and MSG-0119 stands: **failure to clear does not authorize weakening the gates** — the
-question returns to **EPA-0006 §4.7 Q3**.
+**One architecture task is now READY (TASK-0041); nothing downstream became executable.** No engine,
+index technology, embedding model, framework, runtime or provider is selected; **K7 and K8 remain NOT
+CLEARED** and **five probes have cleared nothing**; WP-0009 still reads `DEFINED — NOT AUTHORIZED FOR
+IMPLEMENTATION`; **T-0 and T-A…T-I remain unauthorized**. **MSG-0129 rules Q3 and MSG-0130 authorizes
+the architecture response**; engine selection stays blocked and must be **separately authorized** once
+the existing gates are **positively satisfied with evidence**.
 
-**Open and awaiting the Architecture Lead:** §4.7 **Q1–Q3**, and **Q7's numeric limb** (no staleness
-threshold exists anywhere in the accepted set). **Q4–Q6, Q8–Q10, Q11 and Q12 are ruled and encoded.**
-**MSG-0060's observation about colliding task specifications is still unanswered.**
+> **The paragraph this replaces, retained in full:** "**No task is READY, and nothing downstream became
+> executable.** No engine, index technology, embedding model, framework, runtime or provider is
+> selected; **K7 and K8 remain NOT CLEARED** and **five probes have cleared nothing**; WP-0009 still
+> reads `DEFINED — NOT AUTHORIZED FOR IMPLEMENTATION`; **T-0 and T-A…T-I remain unauthorized**.
+> MSG-0125 requires the **next evidence action to be separately authorized**, and MSG-0119 stands:
+> **failure to clear does not authorize weakening the gates** — the question returns to **EPA-0006 §4.7
+> Q3**." True at 2026-08-24 ~11:50Z. **Superseded the same afternoon**: MSG-0129 ruled Q3 and MSG-0130
+> authorized TASK-0041. Everything else in it still holds.
 
-**Operationally, the supervisor is ENABLED and idle** — `supervisor-config.json` carries
-`enabled: true`, `dryRun: false`, and the heartbeat written at **2026-08-24T11:47:18Z** records
-`decision: NOOP`, `reason: no READY task`, `head: c6f9cc9`, `runnerActive: false`. **No `runner.lock`
-exists. No blocker is open.** A cycle will take the next READY task without a manual trigger.
+**Open and awaiting the Architecture Lead:** §4.7 **Q1 and Q2** — **Q3 is now RULED by MSG-0129**, which
+took the topology branch and left the other two open rather than deciding them — and **Q7's numeric
+limb** (no staleness threshold exists anywhere in the accepted set). **Q4–Q6, Q8–Q10, Q11 and Q12 are
+ruled and encoded.** **MSG-0060's observation about colliding task specifications is still unanswered.**
+
+**Operationally, the supervisor is ENABLED** — `supervisor-config.json` carries `enabled: true`,
+`dryRun: false`. Its last observed heartbeat, **2026-08-24T15:17:18Z**, records `decision: NOOP`,
+`reason: no READY task`, `head: 090fb21`, `runnerActive: false`, and **no `runner.lock` exists**. **That
+NOOP was correct when written and is now spent**: MSG-0130 had landed but TASK-0041 was not yet READY in
+the committed queue. **Once this reconciliation is pushed, the next cycle can take TASK-0041 without a
+manual trigger.** **No blocker is open.**
+
+> **The paragraph this replaces, retained:** it cited the **11:47:18Z** heartbeat at `head: c6f9cc9` with
+> *"no READY task"*. **Both facts were true and both have moved** — the Lead's two messages advanced
+> `origin/main` to `090fb21`, and this reconciliation makes a task READY. **A heartbeat is evidence about
+> the moment it was written and nothing later**, which is why it is dated here rather than quoted as the
+> current state.
 
 > **Everything below this line is retained history, and one line of it is no longer true in the present
 > tense.** The *"### Operational"* paragraph's **"The scheduled task is `Disabled`"** described

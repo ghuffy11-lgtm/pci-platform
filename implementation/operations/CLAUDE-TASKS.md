@@ -50,6 +50,7 @@ Only the architecture lead may authorize new work, mark a task READY, or change 
 | TASK-0038 | **Kernel-constrained retrieval / non-divergent projection evidence** | **COMPLETE** — 2026-08-24; **8/8 acceptance criteria MET** | MSG-0116a+b DECIDED (Q8/Q9/Q10), MSG-0115 evidence, EPA-0006 gates | 2026-08-24 — **probe built and executed**: **9 designs × 7 scenarios × 3 collection sizes**, two instrument placements plus a **placement-independent** structural measure; adversarial precondition held at all three sizes and the **negative control failed in 15 of 21 cases**, so the run is valid; **`git diff --name-only docs/` empty**; **EPA-0006 §4.11** added (187 insertions / 0 deletions); **MSG-0118** | none — **no task is READY.** MSG-0116a §6 and MSG-0116b require stopping at evidence and clearance status. **Nothing CLEARED** — 6 NOT CLEARED, 3 DISQUALIFIED. **The referred question is answered and the answer is negative: removing the copy eliminates divergence and does nothing for Shape-1** — the two designs holding no copy at all answer 7/7, cannot go stale, and carry the **largest `U` in the table, growing linearly with `N`**. **The four discrete conjuncts refine perfectly** — K3's residual is composed **entirely** of the three effectivity modes, with **zero** wrong-scope, wrong-audience, restricted-class or superseded units at any size. **`U = 0` is purchasable by withholding authorized content** (K4: zero at every size, **3/7** grid, empty ANSWER where an answer exists). **And the sharpest result: K7 and K8 differ by one `INDEXED BY` token** — same schema, data, indexes, answers and grid — and **`U` goes 715 → 0**, so on this engine class **whether unauthorized content is examined is decided by the query planner**, which is not part of the architecture. **Two defects in the probe's own apparatus were found and fixed before any result was reported** — a blind E1 check that had reported HOLDS for a design scanning the whole collection, and a counter placement that made one design's `U = 0` an artefact. **A6's freshness-passed-but-NOT-CLEARED status preserved**; no prior probe modified or re-run. **One non-blocking question referred — Q11** (does an exact-key seek into a scope-spanning structure violate E1?) | Claude Code |
 | TASK-0039 | **K7/K8 remaining clearance evidence — E4, U1 observability, plan-independence** | **COMPLETE** — 2026-08-24; **8/8 acceptance criteria MET** | MSG-0120 AUTHORIZED, MSG-0119 (strict Q11), MSG-0118 evidence, EPA-0006 §4.6–§4.11 | 2026-08-24 — **probe built and executed**: **2 designs × 6 configurations × 4 collection sizes × 2 distributions**, three instrument variants per cell (**96 measurements**), plus an API enumeration, an opcode capture, an instrument calibration and a negative control; both validity gates passed — adversarial precondition held at all four sizes under both distributions and the **negative control failed 4 of 4**; `git diff --name-only docs/` **empty**; **EPA-0006 §4.12** added (178 insertions / 0 deletions); **MSG-0123** | none — **no task is READY.** MSG-0120 requires stopping at evidence and clearance status. **Nothing CLEARED — K7 and K8 both NOT CLEARED.** **All three gaps closed, two of them against the candidates.** **E4 is established UNOBTAINABLE by enumeration, not inferred** — no trace/profile/log API is bound by `node:sqlite`, the build lacks `SQLITE_DEBUG`, `ENABLE_SQLLOG` and `ENABLE_STMT_SCANSTATUS`, every tracing pragma is **demonstrated inert against a nonexistent-pragma control**, and `:memory:` leaves no file; under §4.6 S6 **nothing could have been cleared whatever any count showed**, stated before the results table. **`U1` turned out to be PARTIALLY INSTRUMENTABLE**, reversing MSG-0118's "not instrumentable": a function on `open_ended` — the leading column of **both** candidate indexes — is evaluated **from the index cursor** and fires per entry visited, **calibrated exactly (302 and 402) against a cohort known by construction on both plans** before use, with the transfer licence checked in every cell (**0 of 96 failures**). It is a **LOWER BOUND** and **`U1 = 0` is claimed nowhere. The sharpest result: K7 and K8 visit the SAME number of entries at every size** (10 / 74 / 717 / 2860) **while `U` reads 7 / 71 / 714 / 2857 versus 0 / 0 / 0 / 0** — so **MSG-0118's headline K7-vs-K8 finding was correctly measured and meant something narrower than it looked: K8 did not examine less, it examined the same amount where a row-access counter cannot see it**, its seek being on the upper effectivity bound so unauthorized entries are rejected **from the index**; MSG-0118 §5 result 4 said this could not be measured and it now is, at opcode level (`SeekGT → IdxGT → DeferredSeek → Column(index) → Gt → Next`). **And `ANALYZE` ALONE drives K7's `U` from 2857 to 0** while `Nidx` goes 2860 → **2861** — one entry **more**, not fewer — so **the same design measured before and after routine maintenance receives opposite `U` readings**; §4.11 result 5 said the planner decides, this says **a maintenance command decides**. **Plan-independence SPLITS**: the **reachable-structure limb of E1 is OBTAINED independently of the optimizer** via `DatabaseSync.setAuthorizer` (a surface no prior probe used), which enumerates at compilation a **superset** of what any plan opens — 8 structures, all routed partitions, **no scope-spanning structure**, identical in every configuration, and it **fails the negative control plan-independently**; it was **characterised, not assumed** (callback count invariant with `N`: 101 at M=500 and M=5000 ⇒ a compilation event, not a counter). The **confinement limb is NOT plan-independent** — 2 distinct version traversals each, and **`INDEXED BY` pinned the bounded limb and not the rest**: K8's *open* limb still became a full partition scan after `ANALYZE`. **G-Q4 MET in all 12 design × configuration pairs.** **Two defects in the probe's own apparatus were found and corrected before any result was reported** — an index-entry column mislabelled as unauthorized-only (fixed by splitting engine-measured `Nidx` from a deliberately generous derived `U1lb`, since the wrong direction was **overstatement**), and an assertion the probe's own output contradicted **in the same line** (replaced by an invariance-with-`N` measurement). **Strict Q11 preserved; K3/K4 not re-run and still NOT CLEARED**; all prior verdicts unchanged; no prior probe modified or re-run. **One non-blocking question referred — Q12**: must a probe take the index-cursor placement wherever the engine exposes one, and is a `U` taken only at row access sufficient for E2? | Claude Code |
 | TASK-0040 | **Encode Q12 in EPA-0006 §4.6 S7 — index-cursor placement must be exercised** | **COMPLETE** — 2026-08-24; **8/8 acceptance criteria MET** | MSG-0125 AUTHORIZED, MSG-0124 (Q12), MSG-0123 evidence, TASK-0034 precedent | 2026-08-24 — **S7.1–S7.4 added to EPA-0006 §4.6**: MSG-0124 quoted verbatim; **S7-R1** every reachable index-cursor placement must be **exercised** (executed and captured, never described); **S7-R2** the **maximum observed across exercised applicable placements** is the reported `U`, still a lower bound; **S7-R3** row-access-only `U = 0` is **insufficient for E2** where such a placement exists unexercised — **disqualifying**, so E2 is not satisfied and by S6 the candidate is NOT CLEARED. **"Reachable" defined as occupiable-and-exercised**; a "none reachable" report is admissible **only by enumeration**, on §4.12 gap 1's nonexistent-pragma control; **unreachability is not relief** (zero stays inconclusive, E1 still required, S10 may bite). **98 insertions, 0 deletions, one file** — additive and declared; `git diff --name-only docs/` **empty**; **verdicts preserved (K7/K8 NOT CLEARED), no probe written or re-run, nothing executed**. Record: **MSG-0127** | none — **criterion update only**, additive and declared; no ADR change, nothing selected, **verdicts preserved**. One judgement call declared in MSG-0127 §7: a six-line **declared pointer note** was also added under §4.12's Q12 heading so the record does not read the question as both ruled and open; heading and existing lines untouched | Claude Code |
+| TASK-0041 | **Q3 architecture response — technology-agnostic retrieval topology against the existing gates** | **READY** | MSG-0130 AUTHORIZED, MSG-0129 (Q3 ruled), EPA-0006 §4.6–§4.8, all prior evidence | — not started | **Execute**: define technology-agnostic retrieval-topology patterns capable of satisfying strict Shape-1, map each to **E1–E4** and **G-Q4/G-Q5/G-Q6** separating **structurally necessary** from **execution-evidence-required**, and state the **minimum evidence** a future engine-selection task would need. **Nothing selected, nothing implemented, no ADR modified, no gate weakened.** **If no topology can be established, record the architecture gap and keep selection blocked** — MSG-0129: *"Failure does not authorize relaxing the gates"* | Claude Code |
 | TASK-0002 | Make test entry points shell-independent | **ABORTED** | — | 2026-08-19 | none — premise disproven by measurement | — |
 
 **TASK-0019 is COMPLETE (2026-08-21).** It was authorized by MSG-0050, reconciled into this queue in `39eabdb`, and executed by a supervisor-started session on its scheduled 06:37:13Z cycle. It was maintenance/audit work only, not a new product work package.
@@ -674,6 +675,9 @@ READY means *authorized to attempt*, never *authorized to force*. A READY task w
 | MSG-0126 | Record | **OPEN** | Claude Code | Architecture lead | **TASK-0040 reconciled as the single READY task.** Records the inference Q12 closes and why it recurs: **a row-access counter can read zero while an index cursor walks entries the subject cannot see** — the same error shape as the `U1` limitation in TASK-0038/0039, and as earlier PATH and CLI mistakes in this session. S7 must therefore make the **omission itself disqualifying**, not merely noted. Also carries MSG-0125's verification instruction: **read the post-change EPA-0006 from `main`, not the working tree** — the step that distinguishes "written" from "published", after BLK-0006 saw a push rejected mid-run | 2026-08-24 |
 | MSG-0127 | Record | **OPEN** | Claude Code | Architecture lead | **TASK-0040 execution record — Q12 is encoded and the run stops.** **8/8 acceptance criteria MET.** **EPA-0006 §4.6 gains S7.1–S7.4**: MSG-0124 **quoted verbatim**; **S7-R1** every reachable index-cursor placement must be **exercised — executed and captured, never described** (§4.9 G-Q6's rule applied); **S7-R2** the **maximum observed across exercised applicable placements** is the reported `U`, still a **lower bound**; **S7-R3** row-access-only `U = 0` is **insufficient for E2** where such a placement exists unexercised, and the insufficiency is **disqualifying** — E2 not satisfied, so **NOT CLEARED** by S6. **"Reachable" defined as occupiable-and-exercised**, established by taking the placement rather than by documentation; a **"none reachable" report is admissible only by enumeration**, on §4.12 gap 1's nonexistent-pragma control — *"the instrument reported nothing" and "the instrument was never running" are the same observation*; **unreachability is not relief**: the zero stays inconclusive, **E1 is still required**, **S10 may bite**. A probe must now record the **reachable-but-unexercised set, which must be empty**. **98 insertions, 0 deletions**, one file, **additive and declared**; `git diff --name-only docs/` **empty**; **no gate weakened, no threshold, no ADR touched**; **nothing executed — no probe written or re-run**; **K7/K8 remain NOT CLEARED**, K3/K4 unchanged, **five probes have cleared nothing**. **One judgement call declared (§7)**: a six-line **pointer note** added under §4.12's Q12 heading so the record is not ruled-and-open at once; heading and existing lines untouched, and it **points at S7 rather than restating the rule**. **No referral, nothing blocking. No task READY** — the next evidence action must be **separately authorized** | 2026-08-24 |
 | MSG-0128 | Verification | **OPEN** | Claude Code | Architecture lead | **COMMS verification of TASK-0040, by a session that did not execute it.** Verified **from `origin/main`**: **§4.6 S7.1–S7.4 published**, **98 insertions / 0 deletions**, `3a19dfb` touches **nothing under `docs/`**, and **§4.12's Q12 note points to S7 rather than restating it** — the double-encoding hazard TASK-0040's recovery procedure named. **MSG-0123…MSG-0127: one ledger row and one register row each, no duplicate.** `HEAD` = `origin/main` = `c6f9cc9`, tree clean, **no blocker open**, supervisor **enabled and idle** (heartbeat `11:47:18Z`, `NOOP`). **No task READY** — the next evidence action is **separately authorized** (MSG-0125); **MSG-0119 stands: failure does not authorize weakening the gates**, and the question returns to **§4.7 Q3** | 2026-08-24 |
+| MSG-0129 | Decision | DECIDED | Architecture lead | Claude Code | **Q3 RULED — return to architecture, do not relax the bar.** *"The response is not to relax the bar and not to select the least-bad engine."* If the remaining candidate classes cannot satisfy strict Shape-1, the project stays **NOT CLEARED for retrieval-engine selection** and returns to architecture work to define a topology that can satisfy the existing gates. **`U = 0`, E1–E4, G-Q4/G-Q5/G-Q6 remain mandatory**; failure of all tested candidates is evidence the explored space is insufficient, **not authority to weaken AMD-01 or strict Shape-1**. **Nothing selected, no ADR modified, all NOT CLEARED and DISQUALIFIED verdicts unchanged, K7/K8 still NOT CLEARED.** The architecture work must **preserve the logical-projection / physical-organization distinction** and **must not assume one engine's planner behaviour generalizes to its class** | 2026-08-24 |
+| MSG-0130 | Decision | AUTHORIZED | Architecture lead | Claude Code | **TASK-0041 authorized** — bounded architecture task defining and evaluating the **technology-agnostic retrieval topology** Q3 requires. Six work items: re-read EPA-0006 §4.6–§4.8 and the actual MSG-0129 authority; **reconcile prior evidence without relabelling K7/K8 or any candidate**; define topology patterns; **map each to E1–E4 and G-Q4/G-Q5/G-Q6, separating structural properties from those needing execution evidence**; state the **minimum evidence** before any future engine-selection task; **produce a bounded recommendation or preserve the choice as open**. **No selection, no implementation, no ADR change, no gate weakened, no corpus, no invented figure.** **Do not claim structure clears a gate that requires execution evidence**; **do not generalize `node:sqlite` planner behaviour.** **If no topology can satisfy the gates, record the gap and keep selection blocked** | 2026-08-24 |
+| MSG-0131 | Record | **OPEN** | Claude Code | Architecture lead | **TASK-0041 reconciled as the single READY task.** Records which branch Q3 took — **§4.7's third option, "reconsider the retrieval topology"**, with **Q1 and Q2 left open** rather than ruled — and the constraint that makes this task different from the five before it: **it is entirely structural, and §4.9 G-Q6 rejects construction-only evidence, so it can clear nothing by itself.** Anchors the work in **§4.8's measured I0–I6 catalogue** rather than a fresh one, carrying forward the facts a proposal must survive: **I6's global secondary index undoes the rest**, **I5 was never measured**, **removing the copy raises `U`**, **`U = 0` is purchasable by withholding authorized content**, and on the one measured class **the planner and `ANALYZE` decided the outcome** — which is why the answer must be topological | 2026-08-24 |
 | MSG-0117 | Record | **OPEN** | Claude Code | Architecture lead | **TASK-0038 reconciled as the single READY task, and a seventh number collision recorded.** **Two lead-authored files claim MSG-0116** — the MSG-0020 shape, and MSG-0020's pair **contradicted**, so agreement was verified clause by clause before queueing rather than assumed. **They agree on all three rulings and the next action**; no stop fired. **They are not interchangeable** — 0116a carries the kernel-read-count and citation-version points, 0116b the separate-instrumentation requirement and the no-clearance-follows warning — so **the task section carries the union and links both**. Neither renamed, per MSG-0058 F4; **neither was registered in either index** until now | 2026-08-23 |
 | MSG-0115 | Record + referrals | **OPEN** | Claude Code | Architecture lead | **TASK-0037 execution record — the freshness mechanism is measured, and nothing is cleared.** **8/8 acceptance criteria MET**; **a real probe ran** — **8 designs × 11 scenarios × 3 collection sizes**, two instrument placements each, on **SQLite 3.51.3 via `node:sqlite`** (class **R** test subject, the only engine reachable — `docker` is not on this runner's PATH), `:memory:` only, no install, no network, no corpus, **no wall-clock read and no timing figure produced**. The **mandatory negative control failed** — NC returned a superseded version in **12 cases** — so the run is valid; **the adversarial precondition also caught a real fixture defect** and correctly declared the first draft VOID. **Two terminology reconciliations were taken from the accepted ADRs rather than invented**: MSG-0113's *"revoked"* is ADR-0018 §2's **WITHDRAWN** (no `REVOKED` state exists), and *"the current approved version"* is read as ADR-0018's **PUBLISHED and effective** version, since `APPROVED (not yet published)` is **not answerable** — both strict, both fail-closed. **The discriminator MSG-0113 §3 demands was built and it fired**: S2 and S3 are the **same recorded transition** queried before and after the periodic timer, and the two timer-only designs **returned the superseded version before the timer and the correct one after** — *"made correct by waiting, not by the transition."* **Five results carry beyond the engine.** **Version identity is necessary and nowhere near sufficient** — the two designs differing **only** in whether the structure carries it have **identical grids**; carrying it without consulting the kernel changes nothing, and a design carrying none **cannot name the version it answered from**, defeating ADR-0018 §1's citation rule independently. **"Answered nothing" is not "abstained"** — one design returned an **empty ANSWER** where abstention was required, and on the kernel-unreachable case **answered correctly by luck**; ADR-0017 §5 classifies abstentions A1–A7 and an empty answer is none of them. **The faked re-check is a no-op, now demonstrated rather than predicted** — against the same change, the kernel re-check `kept 0/4` and abstained while the self re-check `kept 4/4` and **returned four chunks of a reclassified version**, with the same structures, the same plan and the **same `U`**; **G-Q5.2c is satisfied for the first time** (a re-check observed to **REJECT**). **`U` cannot distinguish a leaking design from a conservative one** — those two designs both report **`U` = 4 at every size**, which **extends §4.6 S5**: the asymmetry rule warns a *zero* count can be a placement artefact; here a *non-zero* count identical between two designs conceals **opposite** security outcomes. **And "`U` = 0 is a property of an instant" is not only about time** — in the decisive scenario **no time passes at all**, an authorization attribute changes in the kernel, and **no timer would have caught it**, corroborating §4.8 finding 1 in a second fixture. **A hook is only as complete as the set of changes it is wired to**, so MSG-0113 §2(2) and §2(5) are **not alternatives**. **Nothing is CLEARED** — 7 NOT CLEARED, 1 DISQUALIFIED; **the design meeting BOTH G-Q5 conditions and every G-Q7 requirement (11/11) is still NOT CLEARED** on **E2** (`U` = 4 > 0), **E4** (not obtained) and **G-Q4** (not measured) — §4.9's *"necessary, never sufficient"* demonstrated in practice. **All nine MSG-0104 and all eight TASK-0035 verdicts reproduced unchanged; neither prior probe modified or re-run**; **`git diff --name-only docs/` empty**; **EPA-0006 §4.10 added, 122 insertions / 0 deletions**; **no numeric threshold introduced** — the bound exhibited is a **fixture constant** whose magnitude **G-Q5.1a** expressly does not judge. **Three questions referred, none blocking**: **Q8** whether the mandatory §3 point-2 re-check is itself *examination* (its kernel reads are **bounded by `k` and invariant with `N`**), **Q9** sharpening §4.7 Q3 with the new evidence, **Q10** the MSG-0113/ADR-0018 terminology mismatch | 2026-08-23 |
 | MSG-0099 | Record | **CLOSED** 2026-08-23 — discharged by execution (MSG-0100); the distinction it asked for is recorded in WP-0009 §6.2, the architecture README and MSG-0100 §5, and its warning held — no unmeasured figure appears in the delivered record | Claude Code | Architecture lead | **TASK-0032 reconciled as the single READY task.** Records that this is **not a re-run of TASK-0026**: that task evaluated stack **shape** (Approaches A/B/C) and produced EPA-0005; this evaluates **technology classes** against the now-settled Approach C and against ADR-0020 **as amended by AMD-01**, neither of which existed then. **Both are labelled "A-STACK" in WP-0009 §6.2**, where A-STACK already reads EXECUTED — the label reuse is flagged so the record is not read as one task run twice, and the task is told to distinguish the rows rather than overwrite. Also flags the likeliest failure mode: a technology comparison invites throughput, latency, memory and recall numbers, **none of which has been measured here** | 2026-08-23 |
@@ -3855,3 +3859,128 @@ precedent when MSG-0110 landed. If it is judged out of scope it reverts cleanly.
 
 **The run stops here**, as MSG-0125 requires. **The next evidence action must be separately
 authorized.**
+
+---
+
+## TASK-0041 — Q3 architecture response: a technology-agnostic retrieval topology that could satisfy the existing gates
+
+**Priority:** 1 | **Status:** **READY** | **Owner:** Claude Code
+**Depends on:** MSG-0130 AUTHORIZED; MSG-0129 (Q3 DECIDED); MSG-0128, MSG-0123, MSG-0118, MSG-0115, MSG-0109 (evidence); EPA-0006 §4.6–§4.8
+**Next eligible task:** none — MSG-0130's acceptance ends at the documented architecture response; **engine selection stays blocked and must be separately authorized**
+**Type:** architecture / analysis — **no probe required, nothing selected, no ADR change**
+
+**Specification:** [`MSG-0130-task-0041-q3-architecture-response-authorization.md`](../comms/MSG-0130-task-0041-q3-architecture-response-authorization.md),
+with [`MSG-0129`](../comms/MSG-0129-architecture-lead-q3-ruling.md) binding, **plus this section.**
+
+### What Q3 was, and what the Lead ruled
+
+**Q3 was raised by EPA-0006 §4.7 before any probe ran** — *"if no engine class can reach zero, what is
+the architectural response?"* — and the record deliberately proposed none. **Five probes later, nothing
+has cleared.** MSG-0129 answers:
+
+> **"The response is not to relax the bar and not to select the least-bad engine."**
+
+**The project stays NOT CLEARED for retrieval-engine selection and returns to architecture work.**
+`U = 0`, **E1–E4**, **G-Q4/G-Q5/G-Q6** and every other recorded gate **remain mandatory**. Failure of
+all tested candidates is evidence that **the space explored so far is insufficient** — it is **not**
+authority to weaken AMD-01 or strict Shape-1.
+
+> **This is the branch §4.7 Q3 named third** — *"reconsider the retrieval topology"* — chosen over
+> settling what `U` counts (Q1) or accepting physical organisation as a requirement (Q2), **neither of
+> which is thereby ruled**. Q1 and Q2 remain open.
+
+### The six required work items (MSG-0130)
+
+1. **Re-read EPA-0006 §4.6–§4.8 and the actual Q3 authority in MSG-0129** — not the summary of it in
+   this queue, and not any session's recollection.
+2. **Reconcile all prior evidence without relabelling K7/K8 or any other candidate.**
+3. **Define technology-agnostic retrieval-topology patterns** that could satisfy the existing strict
+   Shape-1 gates.
+4. **Map each pattern to E1–E4 and G-Q4/G-Q5/G-Q6**, separating **structurally necessary** properties
+   from those **requiring execution evidence**.
+5. **Identify the minimum evidence** needed before any future engine-selection task could be authorized.
+6. **Produce a bounded architecture recommendation — or preserve the choice as open** if the evidence is
+   insufficient.
+
+### Start from §4.8, do not restart the catalogue
+
+**§4.8 already holds a measured pattern catalogue — I0–I6 — with the conjunct each discharges**, and
+§4.9–§4.12 hold what happened when they met the gates. **A new catalogue that ignores it would discard
+five probes of evidence.** The specific facts a topology proposal must survive:
+
+- **I6 is the one most easily omitted, and omitting it undoes the rest** — a perfectly partitioned base
+  paired with **one global lexical or vector index** puts traversal back over a scope-spanning
+  structure, which **E1 makes disqualifying regardless of any counter**.
+- **I5 (per-principal materialisation) discharges four conjuncts and was never measured.**
+- **Removing the copy does not help.** §4.11: the designs holding **no copy at all** carry the
+  **largest `U`**, growing with `N`.
+- **`U = 0` is purchasable by withholding authorized content** (K4) — a topology that answers nothing
+  is not a topology that clears.
+- **On the one measured engine class, the planner decided the outcome** (K7 vs K8: one `INDEXED BY`
+  token, `U` 715 → 0) **and so did `ANALYZE`** — which is precisely why the answer must be
+  **topological rather than engine-behavioural**.
+- **A row-access zero is not an index-cursor zero** (§4.6 S7-R3, MSG-0124).
+
+### Boundaries (MSG-0130)
+
+- **No engine, runtime, provider, model or index technology selection.** No implementation, no
+  deployment.
+- **No accepted ADR modified.**
+- **No weakening of strict Shape-1, `U = 0`, E1–E4, or Q4–Q12.**
+- **No real or confidential corpus.**
+- **No invented benchmark, latency, capacity, recall or throughput figure.**
+- **Do not claim a structural design clears a gate where execution evidence is required** — §4.9 G-Q6
+  rejects construction-only evidence in terms, and this task is entirely structural, so **it can clear
+  nothing by itself**.
+- **Do not generalize `node:sqlite` planner behaviour to an engine class.**
+
+### Acceptance criteria
+
+1. **The Q3 architecture response is explicitly documented**, quoting MSG-0129 rather than paraphrasing.
+2. **Topology patterns are defined technology-agnostically** — no product, engine or vendor named as the
+   bearer of a property.
+3. **Each pattern is mapped to E1–E4 and G-Q4/G-Q5/G-Q6**, marking each property **structural** or
+   **execution-evidence-required**.
+4. **The minimum evidence for a future engine-selection authorization is stated**, and it is evidence,
+   not a shortlist.
+5. **All prior verdicts reproduced unchanged** — **K7/K8 NOT CLEARED**, the DISQUALIFIED set unchanged,
+   **nothing relabelled**; **no prior probe re-run**.
+6. **`git diff --name-only docs/` is empty**; no implementation task marked READY.
+7. **Where evidence is insufficient, the architecture gap is recorded and selection stays blocked** —
+   an open choice preserved as open is a valid outcome, not a failure.
+8. COMMS, queue and status reconciled; **stop at the documented response.**
+
+### Verification
+
+Documentary — **no test count, and none may be claimed**; nothing is executed. Before reporting
+completion, verify and quote:
+
+```text
+git diff --name-only docs/    -> empty
+git status --porcelain        -> empty after commit
+insertions / deletions        -> the exact figures for each file changed
+```
+
+**Verify the delivered content from `main` after pushing**, as MSG-0125 required of TASK-0040 — the step
+that separates *"I wrote it"* from *"it is published"*.
+
+### Documentation
+
+Record the result in `implementation/comms/` as a numbered message, update
+`implementation/status/current.md` and this queue. Write the checkpoint.
+
+### Stop conditions
+
+Stop if the response would require **weakening a gate**, **modifying an accepted ADR**, **selecting an
+engine or technology**, **inventing a numeric figure**, or **claiming clearance from structure alone**.
+**If no topology can be shown capable of satisfying the gates, that is the finding** — record it and
+keep selection blocked. MSG-0129: **"Failure does not authorize relaxing the gates."**
+
+**Also stop if `origin/main` moves mid-run** — the scheduler is enabled. Record the starting HEAD in
+checkpoint 1 and re-check before every push.
+
+### Recovery procedure
+
+Check whether an architecture response to Q3 already exists in EPA-0006 or elsewhere before writing one.
+**Two answers to one question is the drift this record has warned about repeatedly**; §4.12's Q12 note
+is the pattern to follow — **point at the section that holds the rule rather than restating it.**
