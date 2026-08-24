@@ -2232,6 +2232,36 @@ both tables index it, and both were updated in the same commit as the record.
 
 **No task is READY, and the next action is the Architecture Lead's: authorize one.**
 
+**Current position — verified 2026-08-24 by an interactive COMMS session that did not write it.**
+**TASK-0040 is COMPLETE**; `HEAD` = `origin/main` = `c6f9cc9`, working tree clean. The deliverable was
+read back **from `origin/main`**, not from the working tree: **EPA-0006 §4.6 gains S7.1–S7.4 at 98
+insertions / 0 deletions**, `docs/` untouched in the applying commit `3a19dfb`, and the §4.12 Q12 note
+is a **pointer** to S7 rather than a second statement of the rule — the double-encoding hazard that
+task's own recovery procedure named. **MSG-0123…MSG-0127 each hold exactly one queue-ledger row and one
+register row**; no duplicate survives.
+
+**No task is READY, and nothing downstream became executable.** No engine, index technology, embedding
+model, framework, runtime or provider is selected; **K7 and K8 remain NOT CLEARED** and **five probes
+have cleared nothing**; WP-0009 still reads `DEFINED — NOT AUTHORIZED FOR IMPLEMENTATION`; **T-0 and
+T-A…T-I remain unauthorized**. MSG-0125 requires the **next evidence action to be separately
+authorized**, and MSG-0119 stands: **failure to clear does not authorize weakening the gates** — the
+question returns to **EPA-0006 §4.7 Q3**.
+
+**Open and awaiting the Architecture Lead:** §4.7 **Q1–Q3**, and **Q7's numeric limb** (no staleness
+threshold exists anywhere in the accepted set). **Q4–Q6, Q8–Q10, Q11 and Q12 are ruled and encoded.**
+**MSG-0060's observation about colliding task specifications is still unanswered.**
+
+**Operationally, the supervisor is ENABLED and idle** — `supervisor-config.json` carries
+`enabled: true`, `dryRun: false`, and the heartbeat written at **2026-08-24T11:47:18Z** records
+`decision: NOOP`, `reason: no READY task`, `head: c6f9cc9`, `runnerActive: false`. **No `runner.lock`
+exists. No blocker is open.** A cycle will take the next READY task without a manual trigger.
+
+> **Everything below this line is retained history, and one line of it is no longer true in the present
+> tense.** The *"### Operational"* paragraph's **"The scheduled task is `Disabled`"** described
+> 2026-08-23, before the schedule was re-enabled; the live heartbeat above is the current state. The
+> account is kept rather than deleted because it is still the clearest short statement of what TASK-0031
+> did and why its boundary was unusual.
+
 **TASK-0031 is COMPLETE (2026-08-23, MSG-0097).** ADR-0020 AMD-01 is **APPLIED** — applying commit
 `a1be892`, tree clean, **7/7 acceptance criteria MET**, `docs/decisions/` changed in **one file** at
 **15 insertions / 0 deletions**. That was the only thing MSG-0095 authorized, so **the queue is now
