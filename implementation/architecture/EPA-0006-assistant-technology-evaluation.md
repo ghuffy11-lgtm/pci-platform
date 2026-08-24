@@ -2291,6 +2291,234 @@ every count above**, and MSG-0137 forbids inferring otherwise.
 
 ---
 
+### 4.16 The durability-artefact criterion — DA-1 (TASK-0044, MSG-0148b)
+
+**Added 2026-08-25 by TASK-0044.** Authority: **MSG-0148b**, which authorizes *"defining the
+WAL/durability-artifact security criterion **before** running a dedicated WAL exposure evidence task"*,
+with **MSG-0147** binding. **This section is documentary. Nothing was measured to produce it, nothing
+was executed, and it clears, selects, adopts, compares, deploys and implements nothing.**
+
+**Why it exists at all, in the Lead's words:**
+
+> **"The criterion must establish the security bar independently of the measurement. The later evidence
+> task must measure against the already-authoritative criterion."** — MSG-0148b
+
+**And why that ordering is a prohibition rather than a preference:** a bar written by the session that
+also takes the measurement is a bar shaped by what that measurement could reach, and afterwards the
+shaping is invisible — the record shows only a criterion and a result that agree. This is **§4.6 S5's
+asymmetry rule applied to the criterion itself** rather than to a counter.
+
+#### DA-0 — Two structural choices, declared rather than assumed
+
+**MSG-0148b requires both of these to be stated, because either could defensibly have gone the other
+way and a silent choice cannot be reviewed.**
+
+**Choice 1 — the label is `DA-1`, and deliberately not `E5`.** MSG-0148b forbids changing or extending
+E1–E4. An `E`-number would read as a fifth Shape-1 evidence class no matter what its text said, and
+**§4.6 S6's table is the clearance bar** — adding to it is precisely the change that is forbidden.
+`DA` (**d**urability **a**rtefact) was verified unused across `docs/` and
+`implementation/architecture/` before it was allocated, so it collides with no existing identifier in
+this record's namespaces (`E1–E4`, `S1–S11`, `U1–U5`, `G-Q4…G-Q7.8`, `I1–I8`, `N1–N5`, `W1–W4`,
+`EV1–EV12`, `F1–F16`, `GAP-A…GAP-E`).
+
+**Choice 2 — a new section `§4.16`, with `§4.15` deliberately left unallocated.** Beside the other
+criteria in §4.6 was the alternative, and it was rejected for a reason internal to §4.6: **that
+section's own preamble states it exists to decide "whether a candidate satisfies the Shape-1 gate"**,
+and DA-1 is **not** a Shape-1 question. Housing it there would invite exactly the conflation MSG-0147
+ruled against. **The number skips 4.15 on purpose:** **R1 is OPEN** — MSG-0146 §8 asks whether the
+TASK-0043 E4 record becomes **§4.15** — and taking that number here would consume, in passing, a slot
+the Lead's own open referral has provisionally claimed. **The gap is declared, not accidental.**
+
+#### DA-1 — The prohibition
+
+> **Resolving a retrieval request on behalf of a subject `s` must not cause content that `s` is not
+> authorized to receive to be written to, or left readable in, any engine-managed durability or
+> persistence artefact.**
+
+Three limbs, kept separate because a candidate can fail any one of them alone:
+
+| | Limb | What it prohibits |
+|---|---|---|
+| **DA-1.1** | **No request-induced persistence** | Content unauthorized for the requesting subject becoming **durable** as a consequence of that subject's request — written into a write-ahead log, journal, temporary or spill file, or an engine-produced snapshot, because the request was resolved |
+| **DA-1.2** | **No residual retention** | Such content **remaining readable** in an engine-managed artefact after the request has completed. Transient presence during the operation is still presence; the limb asks what survives the operation |
+| **DA-1.3** | **No widened reach** | A durability artefact placing corpus content where **more principals, or a longer lifetime, can reach it than the projection store itself allows** — a spill file outside the store's protection, an artefact surviving teardown, or one written outside the governed persistent-state boundary the bootstrap contract already fixes (`/data/docker`, contract v0.2, MSG-0006 — **pointed at, not restated**) |
+
+**"Unauthorized" carries §4.6 S4's meaning unchanged** — failing the §3 predicate **for the requesting
+subject at answer time**, including all five failure modes that fixture kept separate. **No new
+definition of authorization is introduced here, and none may be inferred from this section.**
+
+#### DA-2 — Scope: what is an engine-managed durability artefact
+
+**In scope — any file or shared region the engine itself writes as part of storing or recovering
+state:**
+
+| In scope | Note |
+|---|---|
+| **Write-ahead logs** | the artefact that raised R2 |
+| **Rollback / undo journals** | the pre-WAL equivalent; MSG-0146 §5 recorded `-journal` **absent** in that configuration, which is a fact about the configuration, not about the criterion |
+| **Shared-memory / index files** (`-shm` and equivalents) | in scope even where an observation finds them empty |
+| **Temporary and spill files** — sorter, merge, materialisation, external-sort overflow | the artefacts a query creates under memory pressure, which is when they are least likely to be looked for |
+| **Backups, snapshots and replication streams produced by the engine itself** | *"produced by the engine"* is the boundary; see DA-3 |
+
+**Out of scope, and each for a stated reason rather than by omission:**
+
+| Deliberately out | Why |
+|---|---|
+| **Application logs, telemetry, ordinary audit payloads** | already governed by **ADR-0020 §6.2** and **§9.3 finding 9**. **Pointing, not restating** — a second statement of that rule is the drift this record has warned about since TASK-0030 |
+| **The engine's own execution surface** — traces, profiles, slow-query and debug logs | **that is E4** (§4.6 S6). See **DA-7** |
+| **OS page cache and other volatile kernel buffers** | not engine-written and not durable |
+| **Filesystem-, volume- or storage-layer encryption at rest** | a **storage** control (`docs/security/security-architecture.md`), orthogonal to what the engine writes. It can make an artefact unreadable to an outside reader; **it does not make DA-1 satisfied**, because DA-1 concerns what the engine puts there |
+| **Operator-taken backups, filesystem snapshots, host images** | *"anything the engine does not itself write"* (MSG-0148b). They inherit whatever DA-1 permits; they do not define it |
+| **The projection's own at-rest storage of approved corpus content** | governed by **ADR-0020 §1** — the index **is** a projection of approved content, so its data files holding that content is the design, not a breach. **DA-1.3 still applies to it**, and **DA-4 is where this boundary is actually load-bearing** |
+
+#### DA-4 — The line that makes DA-1 usable: **provenance**, not presence
+
+**This is the part a criterion written after a measurement would most likely have got wrong, and it is
+the reason MSG-0148b ordered them this way.**
+
+A projection index durably holds the corpus it indexes. Under a **single shared projection** every
+subject is unauthorized for some of it, so *"unauthorized-for-`s` bytes exist somewhere in the engine's
+files"* is **true by construction for every candidate at every moment**. A criterion phrased as mere
+presence would therefore fail every engine trivially, tell nobody anything, and be indistinguishable
+from a criterion that had been tuned to fail.
+
+**DA-1 is therefore a claim about provenance and reach, not about presence:**
+
+| Provenance of the content in the artefact | DA-1 |
+|---|---|
+| Written at **ingest**, as part of maintaining the projection of approved content | **Not a DA-1.1 or DA-1.2 finding.** ADR-0020 §1 governs it. **DA-1.3 still applies** |
+| Written, or retained, **because a request was resolved** | **DA-1.1 / DA-1.2 apply directly** |
+| **Provenance not established** | **See DA-6 — the answer is NOT CLEARED, never "presumed ingest"** |
+
+**The topology interaction, recorded because §4.13 already carries it:** where **N1 containment** holds
+— the reachable structure for a subject contains only content that subject may receive — the two
+provenances converge, because there is no unauthorized content in that partition to write down in the
+first place. **Under a single shared projection they do not converge, and DA-4 is the whole question.**
+**This observation adds no gate and moves no verdict**; it says which topologies make DA-1 easy to
+satisfy and which make it the binding constraint.
+
+#### DA-5 — Evidence semantics, in §4.6 S9's existing vocabulary
+
+**No new verdict vocabulary is created. §4.6 S9's three terms are used unchanged**, so a later probe
+cannot invent its own:
+
+| Observation | Verdict |
+|---|---|
+| Content unauthorized for the requesting subject **found** in an in-scope artefact, **attributable to the request** | **NOT CLEARED**, conclusively. **A single occurrence is sufficient**; no structural argument, vendor claim or configuration note rehabilitates it |
+| An engine that **writes such content by design** into an in-scope artefact, or whose durability artefacts are **reachable by a wider principal set than the projection store** | **DISQUALIFIED**, on the same footing as §4.6 S9's Shape-2/Shape-3 disqualification — the property is structural rather than incidental |
+| A scan of the in-scope artefacts finding **no such content** | **Not sufficient on its own.** §4.6 S5's asymmetry rule transfers intact: **an absence proves only that nothing crossed the point, and the moment, at which the inspection was taken.** An artefact may have been checkpointed, truncated, rotated or reclaimed between the request and the scan |
+| **Absence, plus evidence that the engine could not have written it** — containment of the reachable structure (**§4.13 N1/N2**), or an enumerated account of every in-scope artefact the request could touch, each inspected across the request's whole lifetime including under spill | **DA-1 satisfied.** This is deliberately the shape of **§4.6 S6's E1-with-E2-corroborating** requirement rather than a counter-only test, and for the same reason |
+| Provenance (DA-4) **not separable** by the available instruments | **NOT CLEARED** — DA-6 |
+
+**Two consequences, stated so they cannot be read the other way:**
+
+1. **Satisfying DA-1 clears nothing.** It is not an evidence class in §4.6 S6's table, it does not
+   contribute to a **CLEARED** Shape-1 verdict, and it cannot substitute for E1, E2, E3 or E4.
+2. **DA-1 relaxes nothing.** It adds a requirement. **Strict Shape-1, E1–E4 and G-Q4…G-Q7.8 are
+   unchanged by this section**, and no verdict recorded anywhere in this document moves because of it.
+
+#### DA-6 — The fail-closed interpretation, stated in DA-1's own terms
+
+**Where an in-scope artefact cannot be inspected at all — the engine exposes no way to read it, the
+deployment does not retain it, the instrument cannot reach it, or the artefact is reclaimed before it
+can be read — the verdict is `NOT CLEARED`.**
+
+**Never an inferred pass.** This is §4.6 S9's rule (*"`NOT CLEARED` is the required answer wherever
+evidence is absent"*) and §4.6 S10's engine-exposure criterion applied to persistence: **an engine
+whose durability artefacts cannot be observed fails the burden of demonstrating DA-1**, exactly as an
+engine whose opaque stages cannot be observed fails E3. **Uninspectable is not clean**, and
+**"we looked and found nothing" is not "it was never written"** — DA-5 row 3.
+
+#### DA-7 — DA-1 is not E4, and here is the difference in its own terms
+
+**MSG-0147 is explicit that the WAL finding is *"not reclassified as E4"* and that E4 *"remains limited
+to the established execution-observability criterion"*. Restated here so DA-1 carries the distinction
+without a reader having to hold MSG-0147 in mind:**
+
+| | **E4** (§4.6 S6) | **DA-1** (this section) |
+|---|---|---|
+| Boundary | what the engine's **execution surface emits** | **content at rest** in files the engine writes |
+| Artefacts | traces, profiles, slow-query and debug logs | WAL, journals, shared-memory, temporary and spill files, engine-produced backups |
+| Lifetime asked about | **during** execution | **after** the request completes |
+| Governing rule | §9.3 / ADR-0020 §6.2 — the logging prohibition | this section, under MSG-0147 |
+| Role in clearance | **an evidence class; required for CLEARED** | **a separate requirement; contributes to no Shape-1 verdict** |
+
+**MSG-0146 paid to keep these apart, and that is why the distinction is trustworthy.** It held a
+striking result — unauthorized text sitting in a file on disk — and **declined to offer it as E4**,
+when doing so would have looked like the stronger finding. **A criterion that quietly absorbed that
+result into E4 would be undoing the one act that establishes the boundary is real.**
+
+**One adjacency worth pointing at rather than restating:** **§4.6 S4 U5** already counts content placed
+in *"a buffer, cache, temporary structure, or log line **while resolving the query**"* as a **unit
+examined** — a Shape-1 count. **DA-1 is not that rule.** U5 counts an examination as it happens;
+**DA-1 asks what is still readable on disk afterwards, and by whom.** The same byte can be both, and
+the two are recorded separately.
+
+#### The TASK-0043 observation — an illustrative SHAPE, explicitly NOT evidence under DA-1
+
+**MSG-0148b forbids this task from measuring anything, so the figures below are reproduced from
+MSG-0146 §5 and are re-run, extended and treated as a result nowhere.** They appear for exactly one
+purpose: **a criterion that cannot classify this shape is not yet usable.**
+
+| Artefact | Size | Unauthorized marker |
+|---|---|---|
+| main db | 4096 B | absent |
+| **`-wal`** | 28872 B | **present — 135 times** |
+| `-shm` | 32768 B | absent |
+| `-journal` | absent | — |
+
+**DA-1 classifies it as follows, plainly:**
+
+1. **The artefacts are in scope** — DA-2 puts WAL, `-shm` and journals in, and the empty findings are
+   in scope as much as the non-empty one.
+2. **The shape alone does not decide DA-1.1 or DA-1.2**, because **the record does not establish
+   provenance** (DA-4): it does not say whether those 135 occurrences arrived when the fixture was
+   ingested or because a request was resolved. **Naming that missing discriminator is what a criterion
+   is for**, and it is the first thing the separately-authorized evidence task must separate.
+3. **In the absence of that discriminator the verdict is not "presumed ingest" — it is `NOT CLEARED`**
+   (DA-6). **The criterion returns a determinate, fail-closed answer on the shape as recorded.**
+4. **The observation does establish the mechanism DA-1 exists for**: content the engine wrote **outlives
+   the operation in a file on disk**, and **a scan of the main database alone would have found nothing**
+   — the exact false negative DA-5 row 3 refuses to accept as satisfaction.
+
+**Nothing here is a DA-1 verdict about any candidate**, because no candidate has been measured against
+DA-1 and **this task was forbidden to measure one.**
+
+#### Q14 — does a DA-1 failure block selection? **Surfaced, deliberately NOT decided**
+
+**DA-1 yields its own verdict in §4.6 S9's vocabulary. What that verdict does to a candidate's
+eligibility is an architecture decision, and it is the Lead's.** MSG-0147 consequence 2 states the R2
+ruling *"does not by itself clear or fail any retrieval engine"*, and MSG-0148b forbids changing any
+existing clearance gate — so **this section makes DA-1 a separate, separately-recorded requirement and
+stops there.**
+
+**Fail-closed default until ruled:** a **DA-1 NOT CLEARED or DISQUALIFIED result is recorded alongside
+the Shape-1 verdict and changes no Shape-1 verdict**. **The default costs nothing in either direction**,
+because **engine selection is blocked on independent grounds already** — all six TASK-0042 candidates
+are NOT CLEARED and no candidate is eligible for selection on any reading of Q14.
+
+#### What this section does NOT establish
+
+- **Nothing is CLEARED, and nothing could have been.** No measurement was performed under this
+  authorization; **seven probes have still cleared nothing**, and **all six TASK-0042 candidates remain
+  NOT CLEARED**.
+- **No DA-1 verdict exists for any candidate.** DA-1 has been **defined and never applied**.
+- **The TASK-0043 WAL figures are not evidence under DA-1** and are not offered as any. They are an
+  illustration, labelled as one, and **nothing was re-run, extended or reinterpreted as a result.**
+- **E1–E4 are unchanged**; **no existing clearance gate is changed**; **strict Shape-1 is not weakened,
+  and DA-1 cannot be used to satisfy any part of it.**
+- **No engine, runtime, provider, model or index technology is named as the bearer of any property**,
+  compared, selected, adopted, deployed or implemented.
+- **No ADR is amended or proposed**; `git diff --name-only docs/` is **empty** for this change.
+- **No numeric threshold, benchmark, size, count, interval or figure is introduced.** The only figures
+  in this section are MSG-0146's, quoted as an illustration.
+- **No probe, fixture or harness was written or run, no test executed, and no test count is claimed** —
+  none could be.
+- **The exposure evidence task is separate and is NOT authorized by this section.** It must be
+  authorized on its own, and it measures **against this criterion as it now stands**.
+
+---
+
 ## 5. Candidate technology classes against Approach C (MSG-0098 item 1)
 
 **Approach C is settled and is treated here as a constraint, not an option** (EPA-0005 §5; MSG-0092): a

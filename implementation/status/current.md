@@ -2,7 +2,9 @@
 
 **Active Work Package:** WP-0001 — PCI Kernel Foundation
 **Status:** **COMPLETE** — declared by the architecture lead 2026-08-19 (MSG-0020(b), resolved by MSG-0022 / MSG-0023, TASK-0009)
-**Last Updated:** 2026-08-25 UTC — **TASK-0044 READY: define the durability-artefact security criterion, and measure nothing** (MSG-0148b). **The Lead took the criterion-first option and made it a prohibition** — *"combine criterion creation and measurement in the same task"* is in the **may not** list — because **the criterion must establish the bar independently of the measurement**. **A bar written by the session that also takes the measurement is a bar shaped by what that measurement could reach**, and afterwards the shaping is invisible. **The criterion must not become E4 by another name**: E4 is **execution observability**, this is **content at rest in engine-managed files**, and MSG-0147 kept them apart deliberately — as did MSG-0146, which declined to offer its striking WAL result as E4 when doing so would have looked stronger. **TASK-0043's figures — the marker 135 times in `-wal`, absent from the main database and `-shm` — are a SHAPE the criterion must be able to classify, explicitly NOT evidence under it.** **Two structural choices must be declared, not assumed: the criterion's label (E1–E4 may not be extended) and its section.** **Eighth message-number collision recorded — `MSG-0148a`/`MSG-0148b`, no file renamed; MSG-0060's question about the cause is still unanswered.** **R1 open. Seven probes have cleared nothing; all six TASK-0042 candidates remain NOT CLEARED; no blocker open; nothing selected.**
+**Last Updated:** 2026-08-25 UTC — **TASK-0044 COMPLETE (8/8): the durability-artefact criterion `DA-1` exists as EPA-0006 §4.16, and nothing was measured** (MSG-0150). **228 insertions / 0 deletions, one file, additive**; `git diff --name-only docs/` **empty**; **no test count claimed and none could be.** **Both structural choices DECLARED: the label is `DA-1`, not `E5`** — an `E`-number would read as a fifth Shape-1 evidence class, and **§4.6 S6's table is the bar MSG-0148b forbids extending** — **and the section is a new §4.16 with §4.15 deliberately left unallocated**, because **R1 is OPEN and proposes §4.15** for the TASK-0043 record. **§4.6 was rejected as the home on §4.6's own words**: it exists to decide *"whether a candidate satisfies the Shape-1 gate"*, and **DA-1 is not a Shape-1 question**. **The load-bearing part is DA-4 — provenance, not presence**: a projection durably holds the corpus it indexes, so *"unauthorized-for-`s` bytes exist in the engine's files"* is **true by construction for every candidate**, and a presence-phrased criterion would **fail every engine trivially**. **DA-1 asks what became durable BECAUSE a request was resolved.** **Evidence semantics use §4.6 S9's vocabulary unchanged; §4.6 S5's asymmetry rule transfers intact — a scan finding nothing satisfies nothing; uninspectable ⇒ NOT CLEARED, never an inferred pass.** **DA-1 is distinguished from E4 in its own text** — execution surface vs **content at rest**, during vs **after**. **TASK-0043's WAL figures appear ONLY as a labelled illustration, and DA-1's verdict on that shape is `NOT CLEARED` because provenance is not established.** **Nothing CLEARED — DA-1 is defined and never applied; no DA-1 verdict exists for any candidate.** **One question referred — Q14** (does a DA-1 failure block selection?), fail-closed, blocking nothing. **The exposure evidence task is separate and NOT authorized. No task is READY. R1 still open. E1–E4 unchanged, no gate changed, Shape-1 not weakened, no ADR touched, nothing selected.**
+
+> **The line this replaces, retained:** "**TASK-0044 READY: define the durability-artefact security criterion, and measure nothing** (MSG-0148b). **The Lead took the criterion-first option and made it a prohibition** — *"combine criterion creation and measurement in the same task"* is in the **may not** list — because **the criterion must establish the bar independently of the measurement**. **A bar written by the session that also takes the measurement is a bar shaped by what that measurement could reach**, and afterwards the shaping is invisible. **The criterion must not become E4 by another name**: E4 is **execution observability**, this is **content at rest in engine-managed files**, and MSG-0147 kept them apart deliberately — as did MSG-0146, which declined to offer its striking WAL result as E4 when doing so would have looked stronger. **TASK-0043's figures — the marker 135 times in `-wal`, absent from the main database and `-shm` — are a SHAPE the criterion must be able to classify, explicitly NOT evidence under it.** **Two structural choices must be declared, not assumed: the criterion's label (E1–E4 may not be extended) and its section.** **Eighth message-number collision recorded — `MSG-0148a`/`MSG-0148b`, no file renamed; MSG-0060's question about the cause is still unanswered.** **R1 open. Seven probes have cleared nothing; all six TASK-0042 candidates remain NOT CLEARED; no blocker open; nothing selected.**" True when written; **the task it announced has now run**, started by the supervisor cycle at **21:27:18Z** and completed the same night. **Both of its central constraints held**: **nothing was measured**, and **both structural choices were declared rather than assumed**. **The trap it named was avoided** — DA-1 states in its own text that it is **content at rest** and E4 is **execution observability**. **What it did not anticipate is where the difficulty actually sat**: not in stating the prohibition, but in **separating provenance from presence** — a criterion phrased as mere presence would have failed every candidate trivially, and looking strictest is not the same as being usable.
 
 > **The line this replaces, retained:** "**R2 RULED YES (MSG-0147): unauthorized policy content in an engine-managed durability artefact is an architectural security concern in its own right, to be evidenced separately.** **It is NOT reclassified as E4** — E4 stays the execution-observability criterion and this is **a separate persistence boundary**, which is the distinction MSG-0146 preserved by recording the WAL result and **refusing to offer it as E4**. **Content is not harmless merely for sitting in a WAL rather than a log.** **No gate moved, no verdict moved, nothing selected**, and **the ruling clears or fails no engine by itself**. **No task is READY and none is authorized** — MSG-0147 §6 is conditional (*"the next bounded evidence task, **if authorized**"*), so the supervisor's `NOOP` is correct. **The obligation now has nowhere to live: no EPA-0006 criterion asks the durability question** — E1–E4 do not reach persistence artefacts and §9.3 concerns logs — so **MSG-0148 offers the Lead a choice between encoding the criterion first and defining the exposure test first**, and recommends against doing both in one task. **R1 (whether TASK-0043 becomes §4.15) is still open.** **Seven probes have cleared nothing; all six TASK-0042 candidates remain NOT CLEARED; no blocker open.**" True when written; **the Lead answered the choice it offered within the hour, taking option (a).**
 
@@ -1433,6 +1435,14 @@ Every tier reported a non-zero test count.
 
 Index: `implementation/comms/README.md` carries the full message register with links and status.
 
+**MSG-0150 (2026-08-25) — TASK-0044 execution record, OPEN, one referral, not blocking.** The
+**durability-artefact criterion `DA-1`** is written as **EPA-0006 §4.16** and **nothing was measured**.
+**8/8 acceptance criteria MET.** Both structural choices are declared — **`DA-1`, not `E5`**, and **a
+new §4.16 with §4.15 left unallocated for open R1**. **One question referred — Q14:** does a **DA-1
+failure block selection**, or is it recorded alongside the Shape-1 verdict? **Fail-closed default;
+blocks nothing, since no candidate is eligible on any reading.** **The exposure evidence task is
+separate and NOT authorized.**
+
 **MSG-0053 and MSG-0054 (2026-08-21).** C6 is **NOT AUTHORIZED / NOT REQUIRED** — proving MSG-0049
 option (B) would add an unattended cycle no current requirement needs, so option (B) stays
 explicitly unproven rather than being proven for its own sake. C7 authorized **no new product work
@@ -2247,8 +2257,57 @@ both tables index it, and both were updated in the same commit as the record.
 
 ## Next Action
 
-**TASK-0044 is READY and is the single READY task** — authorized by MSG-0148b and written into the queue
-by this session. **It defines the durability-artefact security criterion and measures nothing.**
+**TASK-0044 is COMPLETE (8/8) and NO task is READY. The next action is the Architecture Lead's.**
+
+**The durability-artefact criterion exists: `DA-1`, EPA-0006 §4.16** (**228 insertions / 0 deletions**,
+one file, additive; record **MSG-0150**). **Nothing was measured, and that is the authorization working
+as intended** — MSG-0148b puts *"combine criterion creation and measurement in the same task"* in the
+**may not** list, so **the bar is now fixed before anything is measured against it.**
+
+**Both structural choices were declared, not assumed.** **The label is `DA-1`, deliberately not `E5`** —
+an `E`-number would read as a fifth Shape-1 evidence class whatever its text said, and **§4.6 S6's table
+is the clearance bar MSG-0148b forbids extending**. **The section is a new §4.16, and §4.15 was
+deliberately left unallocated**, because **R1 is OPEN and proposes §4.15** for the TASK-0043 record —
+taking it would have consumed, in passing, a slot the Lead's own referral has claimed. **§4.6 was the
+alternative and was rejected on §4.6's own words**: it exists to decide *"whether a candidate satisfies
+the Shape-1 gate"*, and **DA-1 is not a Shape-1 question.**
+
+**The load-bearing part of the criterion is DA-4 — provenance, not presence**, and it is the part a
+criterion written *after* the measurement would most likely have got wrong. **A projection index durably
+holds the corpus it indexes**, so under a single shared projection *"unauthorized-for-`s` bytes exist
+somewhere in the engine's files"* is **true by construction for every candidate at every moment** — a
+presence-phrased criterion would **fail every engine trivially and be indistinguishable from one tuned
+to fail**. **DA-1 therefore asks what became durable BECAUSE a request was resolved**, and where
+**§4.13's N1 containment** holds the two provenances converge.
+
+**Evidence semantics use §4.6 S9's three verdicts unchanged**, so a later probe cannot invent its own,
+and **§4.6 S5's asymmetry rule transfers intact — a scan finding nothing satisfies nothing.**
+**Fail-closed: an in-scope artefact that cannot be inspected at all yields NOT CLEARED, never an
+inferred pass** (§4.6 S10 applied to persistence).
+
+**TASK-0043's WAL figures appear only as a labelled illustration, and DA-1's verdict on that shape is
+`NOT CLEARED`** — **because the record does not establish provenance**, and naming that missing
+discriminator is exactly the criterion's work. **It is the first thing the separate evidence task must
+separate.**
+
+**What is NOT authorized:** the **durability-artefact exposure evidence task**. It is separate and must
+be **separately authorized** (MSG-0148b; the queue's *Next eligible task: none*). **Nothing CLEARED —
+DA-1 is defined and never applied, no DA-1 verdict exists for any candidate, all six TASK-0042
+candidates remain NOT CLEARED, and seven probes have cleared nothing.**
+
+**Two questions are open for the Lead, neither blocking:** **R1** — whether TASK-0043's record becomes
+**§4.15** (**still open; §4.15 is unallocated and waiting**) — and **Q14** — whether a **DA-1 failure
+blocks selection** or is recorded alongside the Shape-1 verdict. **Q14's fail-closed default costs
+nothing either way**, because no candidate is eligible for selection on any reading of it.
+
+> **The block this replaces, retained:** "**TASK-0044 is READY and is the single READY task** —
+> authorized by MSG-0148b and written into the queue by this session. **It defines the
+> durability-artefact security criterion and measures nothing.**" **True when written; the task has now
+> run, and both of its central constraints held** — **nothing was measured**, and **both structural
+> choices were declared rather than assumed**. **The one thing it did not anticipate is where the
+> difficulty actually sat**: not in stating the prohibition, but in **DA-4** — the criterion had to
+> distinguish *provenance* from *presence* or it would have been unusable in the direction that looks
+> strictest.
 
 > **The block this replaces, retained:** "**No task is READY, and none is authorized.** **R2 is ruled
 > (MSG-0147)** and **TASK-0043 is COMPLETE with BLK-0011 RESOLVED**, so the next action is the
