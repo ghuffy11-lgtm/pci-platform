@@ -1,13 +1,13 @@
 # ADR-0018 — Approved Document Authority and Lifecycle
 
-**Status:** **ACCEPTED** — promoted from `implementation/decisions/ADR-0018-approved-document-authority-and-lifecycle.md` (PROPOSED) by MSG-0071
+**Status:** **ACCEPTED** — promoted from `implementation/decisions/ADR-0018-approved-document-authority-and-lifecycle.md` (PROPOSED) by MSG-0071; **Q13 Release-1 temporal-scope clarification applied 2026-08-24 by MSG-0133**
 **Date:** 2026-08-21
 **Proposed by:** Claude Code — TASK-0024 (A-ADR), under MSG-0068a and MSG-0068b
-**Accepted by:** Architecture Lead — MSG-0071
+**Accepted by:** Architecture Lead — MSG-0071; **Q13 clarification — MSG-0133**
 **Work package:** WP-0009 — Employee Policy Assistant
 **Surface:** WP-0009 §7, surface 2 (`REQUIRED`)
 **Settles:** MSG-0056b **D3** (approval authority, audience and classification assignment),
-MSG-0056a **D11** (historical questions out of scope for release 1)
+MSG-0056a **D11** (historical questions out of scope for release 1), **MSG-0133 Q13** (Release 1 temporal scope)
 **Gates it makes enforceable:** G1 — implementation task T-A, the first implementation task
 
 ## Context
@@ -81,6 +81,13 @@ produce answers that are wrong while looking right:
 - A version whose `effective_to` has passed with **no successor published** is a **policy gap** — an
   abstention (A4), never a licence to fall back to the expired text.
 
+**Release 1 temporal scope is now explicitly bounded by MSG-0133 Q13:** the supported answer path uses
+the **current/“now” temporal frame only**. Historical and future temporal frames are **out of scope for
+Release 1**. If a request requires a temporal frame outside that supported “now” frame, the system
+**MUST ABSTAIN** rather than answer from an incorrect, stale, or otherwise inapplicable interval.
+Effective-date and supersession data remain captured so a later, separately authorized temporal capability
+can be added without losing the underlying history.
+
 ### 5. Supersession is a relationship, not a flag
 
 `supersedes` / `superseded_by` are typed relationships between version objects, traversable in both
@@ -101,6 +108,11 @@ Historical and temporal questions over superseded versions are **out of scope fo
 (MSG-0056a D11). **Effective-date and supersession data must nevertheless be captured from T-A
 onward**: adding the capability later must not require a migration, and omitting the data now
 guarantees one. Any future historical answer must be conspicuously labelled as historical.
+
+**MSG-0133 further settles the Release-1 temporal boundary:** Release 1 supports only the current/“now”
+temporal frame. Historical and future temporal frames are not required for Release 1. Requests requiring
+a non-now temporal frame must fail closed by abstaining. Historical and future temporal support may be
+considered later only as a separately authorized product/architecture capability.
 
 ### 8. Ingestion is downstream of approval, never a path around it
 
@@ -150,6 +162,9 @@ organization must fix into an invisible behaviour the assistant has already norm
 - Every lifecycle transition is audited under SPEC-0006.
 - Release 1 answers only from currently effective versions, and users asking historical questions
   receive an abstention rather than a superseded answer.
+- Release 1 supports only the current/“now” temporal frame; non-now temporal requests fail closed by
+  abstention. Historical and future temporal support requires separate product/architecture
+  authorization.
 
 ## Traceability
 
@@ -157,6 +172,7 @@ organization must fix into an invisible behaviour the assistant has already norm
 |---|---|
 | Privileged upload; upload does not confer authority; author ≠ sole approver; only published versions authoritative | MSG-0056b **D3** |
 | Historical questions out of scope for release 1; preserve the data | MSG-0056a **D11** |
+| Release-1 current/“now” temporal scope; non-now requests abstain | **MSG-0133 Q13 ruling** |
 | Organization authoritative over content; PCI over its record | **ADR-0013** (reused unchanged) |
 | Approval as a governed, auditable, authorized action; multi-party approval | **SPEC-0022** (reused unchanged) |
 | Ingestion never silently overwrites authoritative data | SPEC-0014 |
