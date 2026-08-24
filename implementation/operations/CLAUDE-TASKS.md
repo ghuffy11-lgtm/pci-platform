@@ -52,6 +52,7 @@ Only the architecture lead may authorize new work, mark a task READY, or change 
 | TASK-0040 | **Encode Q12 in EPA-0006 §4.6 S7 — index-cursor placement must be exercised** | **COMPLETE** — 2026-08-24; **8/8 acceptance criteria MET** | MSG-0125 AUTHORIZED, MSG-0124 (Q12), MSG-0123 evidence, TASK-0034 precedent | 2026-08-24 — **S7.1–S7.4 added to EPA-0006 §4.6**: MSG-0124 quoted verbatim; **S7-R1** every reachable index-cursor placement must be **exercised** (executed and captured, never described); **S7-R2** the **maximum observed across exercised applicable placements** is the reported `U`, still a lower bound; **S7-R3** row-access-only `U = 0` is **insufficient for E2** where such a placement exists unexercised — **disqualifying**, so E2 is not satisfied and by S6 the candidate is NOT CLEARED. **"Reachable" defined as occupiable-and-exercised**; a "none reachable" report is admissible **only by enumeration**, on §4.12 gap 1's nonexistent-pragma control; **unreachability is not relief** (zero stays inconclusive, E1 still required, S10 may bite). **98 insertions, 0 deletions, one file** — additive and declared; `git diff --name-only docs/` **empty**; **verdicts preserved (K7/K8 NOT CLEARED), no probe written or re-run, nothing executed**. Record: **MSG-0127** | none — **criterion update only**, additive and declared; no ADR change, nothing selected, **verdicts preserved**. One judgement call declared in MSG-0127 §7: a six-line **declared pointer note** was also added under §4.12's Q12 heading so the record does not read the question as both ruled and open; heading and existing lines untouched | Claude Code |
 | TASK-0041 | **Q3 architecture response — technology-agnostic retrieval topology against the existing gates** | **COMPLETE** — 2026-08-24; **8/8 acceptance criteria MET** | MSG-0130 AUTHORIZED, MSG-0129 (Q3 ruled), EPA-0006 §4.6–§4.8, all prior evidence | 2026-08-24 — **EPA-0006 §4.13** added (**392 insertions / 0 deletions**, one file) plus a **declared pointer note** under §4.7 Q3; MSG-0129 **quoted, not paraphrased**; `git diff --name-only docs/` **empty**; **nothing executed, no probe written or re-run, no test count claimed**; **MSG-0132** | none — **no task is READY.** MSG-0130's acceptance ends at the documented architecture response; **engine selection stays blocked and must be separately authorized.** **Nothing CLEARED and nothing could have been** — the task is entirely structural and **G-Q6 rejects construction-only evidence**, so its output is a topology **plus the evidence still owed on it**. **Five invariants derived** — **N1** containment, **N2** closure of the reachable set, **N3** refinement by enumerated transition, **N4** plan-independence, **N5** non-withholding — from §4.8 finding 1, the only measured mechanism by which `U` falls. **The load-bearing claim: N1 + N2 make N4 free** — if nothing unauthorized is within reach, **no plan can examine it**, which is why §4.12's `ANALYZE` result (`U` 2857 → 0 on a maintenance command) argues for redesign rather than for a better-behaved engine; **three caveats recorded with it**, chief among them that **N1 is a containment claim and does NOT discharge E2** (§4.11 result 4: two designs at `U = 0` holding 714 and 2143 unauthorized entries). **§4.8's catalogue extended, not replaced**: **I7** boundary-refined effectivity — effectivity **is** piecewise constant in time, so it refines on the interval to the next boundary, which is **data, not a tuning parameter**; and **I8** entitlement-class materialisation. **Both NEVER MEASURED.** **Four topologies W1–W4 mapped cell by cell** to E1–E4 and G-Q4/G-Q5/G-Q6/G-Q7/G-Q7.8, each property marked **S** / **X** / **S→X** — and **they differ from one another in exactly ONE cell**, which is itself the answer: topology decides **G-Q4.1 outright**, creates the **precondition** for E1/E3/G-Q5.1/G-Q7, and decides **E2, E4, G-Q5.2, G-Q6, G-Q7.8 and N5 not at all**. **Minimum evidence stated as EV1–EV12** — evidence, not a shortlist, **adding no gate and relaxing none**. **One bounded recommendation, R1**, a criterion and not a selection; **the W1–W4 choice preserved as OPEN** because the distinguishing costs are **all unmeasured**. **Five gaps recorded — GAP-A…GAP-E**, of which **GAP-B is the one to read first: E4 is UNOBTAINABLE on the only reachable test subject, so a future probe there would clear nothing whatever the topology.** **All prior verdicts reproduced unchanged** (MSG-0132 §6); **K7/K8 still NOT CLEARED**. **One question referred — Q13** (which temporal frames must a topology answer), fail-closed default, blocks nothing. **One discovery recorded and deliberately NOT corrected — DISC-0011**: §4.11's summary says *"Six designs NOT CLEARED"* where its own table shows **seven**; no verdict is wrong and nothing downstream depends on the tally | Claude Code |
 | TASK-0042 | **Architecture-bound retrieval evidence — routing, placements, transitions, I5/I7/I8, E4 re-check** | **COMPLETE** 2026-08-24 | MSG-0137 AUTHORIZED, MSG-0138 (queue write), MSG-0134/0135/0136 (Q1/Q2/Q7 ruled), MSG-0132 (§4.13 topology), EPA-0006 §4.6/§4.9/§4.13 | **8/8 acceptance criteria with evidence.** Probe run **VALID** — adversarial precondition HELD at 3 sizes x 2 distributions; retrieval control failed **3/3**; **routing** control failed G-Q4.2 as required; **freshness** control failed **6/6**; calibration EXACT on both plans; plan-transfer **0/54** non-transferable. **18 placement-grid cells + 36 freshness cells.** **ALL SIX CANDIDATES NOT CLEARED.** `U` max across placements: K7 **714**, K8 **709** (its row-access zero superseded by S7-R2), I5 **714**, I8 **714**, KR **714** (G-Q4.3 FAILED), I7 **0 on a VACUOUS bound** that **withheld 142 of 146 authorized chunks** at its interval boundary. **E4 re-checked: still NOT OBTAINABLE**, position unchanged. **DISC-0012** raised. Record **EPA-0006 §4.14**, evidence **MSG-0140**, probe `implementation/probes/TASK-0042/` | **Execute**: measure the **routing phase** and reachable physical structures with routing-phase examination counted in `U`; exercise **every applicable S7 placement** and report the **maximum** `U`; test **zero stale-answer tolerance** across update / approve / revoke / supersede **plus the abstention case**, distinguishing transition-triggered invalidation from periodic re-materialisation; measure **I5/I7/I8** only where genuinely observable, else **NEVER MEASURED / NOT CLEARED** with the exact limitation; **re-check E4 observability**. **Reuse committed harnesses; do not re-run prior cases for repetition.** **May clear nothing — clearance only if every applicable E1–E4 and G-Q4/G-Q5/G-Q6 requirement is satisfied by execution evidence.** **No selection, no implementation, no ADR change, no Docker or host install** — an environment boundary is **recorded**, not routed around | Claude Code |
+| TASK-0043 | **Bounded E4 observability evidence on a second test subject** | **READY** | MSG-0141 AUTHORIZED; MSG-0140 §6 (second negative on the current subject); EPA-0006 §4.13 GAP-B, §4.6 S6/S9 | — not started | **Execute**: identify a **reachable** test subject exposing what **E4** requires, run **only the minimum probe**, record **the exact surface, what it proves and its limits**, and include a **negative control that separates an absent log from an instrument that was never armed**. **The subject is an INSTRUMENT, not a candidate** — a successful E4 observation **clears nothing and selects nothing**. **If E4 is unobtainable here too, that is the finding** and E4 stays **NOT CLEARED**. **Nothing installed, no host change, no ADR touched, no gate weakened**; **do not infer E4 from surface scans, query results, planner output or absence of errors** | Claude Code |
 | TASK-0002 | Make test entry points shell-independent | **ABORTED** | — | 2026-08-19 | none — premise disproven by measurement | — |
 
 > **One arithmetic correction, carried from DISC-0011 — 2026-08-24.** **TASK-0038's row above says
@@ -701,6 +702,8 @@ READY means *authorized to attempt*, never *authorized to force*. A READY task w
 | MSG-0138 | Record | **OPEN** | Architecture lead | Claude Code | **TASK-0042 queue reconciliation instruction** — states plainly that the **queue write is pending a supervisor or session reconciliation**, that TASK-0042 must be marked **READY** and be **the single READY task** absent a higher-priority authorization, and that the queue must be **re-read from `main` and verified against MSG-0137 before execution begins**. **The queue write it names is performed by MSG-0139** | 2026-08-24 |
 | MSG-0139 | Record | **OPEN** | Claude Code | Architecture lead | **TASK-0042 reconciled as the single READY task, and four EPA-0006 headings brought into line with the rulings.** The queue write MSG-0138 named **had not happened** — `CLAUDE-TASKS.md` contained **zero mentions of TASK-0042**, so the supervisor's `no READY task` was **correct**, not a stall. Also records that **Q1, Q2, Q7 and Q13 were ruled but EPA-0006 still read them as open**, the decisions living only in side files: **declared pointer notes added at each heading**, **Q13's heading changed as MSG-0133 instructs**, **GAP-E marked discharged**, **48 insertions / 1 deletion, nothing else reworded**. **Sentences elsewhere still say Q1/Q2 are open and are deliberately left as written** — whether to update them in place is **referred to the Lead**. Carries **DISC-0011** forward and corrects the same arithmetic where this queue repeated it | 2026-08-24 |
 | MSG-0140 | Record + discovery | **OPEN** | Claude Code | Architecture lead | **TASK-0042 execution record — architecture-bound retrieval evidence, and nothing is cleared.** **8/8 acceptance criteria with evidence.** Run **VALID**: adversarial precondition HELD at 3 sizes x 2 distributions, retrieval control failed **3/3**, **routing** control failed G-Q4.2 as required, **freshness** control failed **6/6**, index-cursor calibration **EXACT on both plans** (302 / 402 reproduced from a constructed cohort), plan-transfer **0/54** non-transferable; **18 placement-grid cells + 36 freshness cells**. **SIX CANDIDATES, ALL NOT CLEARED.** **Five placements exercised** — including **P-CIDX, which no prior probe took**, and **dbstat, TAKEN rather than argued away** and found to measure stored layout rather than traversal, so the reachable-but-unexercised set is **EMPTY for the right reason**. **K8's row-access `U` = 0 is superseded by 2 / 66 / 709 at the index cursor — the first time S7-R3 bites by RULE rather than by a probe's diligence.** **I5 and I8 measure IDENTICALLY to K7 at every size**, corroborating §4.8 finding 1 in a third fixture: a finer key that does not refine **effectivity** removes no unauthorized row. **I7 reached `U` = 0 and failed anyway, by WITHHOLDING — 142 of 146 authorized chunks at its interval boundary**, plus an **ingested version missed inside the interval**, on a bound that is **VACUOUS in 3/3 cells**. **Q7 = A across six transitions x six designs x two instants**: the discriminator **fired in 4 cells** (*made correct by waiting*), and **T3 vs T5 isolates the faked re-check**, reproducing §4.10 result 3. **E4 re-checked with the nonexistent-pragma control: still NOT OBTAINABLE, position unchanged.** **DISC-0012** raised — the prior G-Q4.2 differential ran against a catalogue holding **no foreign structure**; **TASK-0039's MET is bounded, not withdrawn, and no verdict moves**. **Nothing selected, no ADR touched, no gate relaxed, no threshold introduced; `docs/` diff empty; EPA-0006 additive 287/0** | 2026-08-24 |
+| MSG-0141 | Decision | AUTHORIZED | Architecture lead | Claude Code | **Bounded E4 observability evidence task authorized** — obtain the missing **E4 execution observability/inspection evidence** on **another available test subject used solely as an evidence instrument**. **Explicitly not engine selection, adoption, deployment or implementation**, and **the subject must not be evaluated for product suitability** beyond the E4 evidence needed. **Minimum probe only**; **record the exact surface, what it proves and its limits**; **include negative controls that distinguish an absent log from an instrument that was never running**; **if E4 cannot be established, record the exact limitation and leave E4 NOT CLEARED**. **No installing or modifying host infrastructure, no deployment, no product selection, no gate or ADR change.** **Do not infer E4 from surface scans, query results, planner output or absence of errors**, and **do not broaden into performance, cost, capability or engine comparison**. **A successful E4 observation clears no candidate** | 2026-08-24 |
+| MSG-0142 | Record | **OPEN** | Claude Code | Architecture lead | **TASK-0043 reconciled as the single READY task.** Records what the E4 question now is: **not whether the current subject can supply it — MSG-0140 §6 settled that with a second negative — but whether any reachable subject can.** Carries read-only environment enumeration so the task does not spend its budget rediscovering it: **`docker`, `psql`, `sqlite3` CLI, `java`, `dotnet`, `go` all ABSENT**, **`python` ABSENT but `py` PRESENT → Python 3.14.5 with SQLite 3.50.4 exposing `set_trace_callback`, `set_authorizer`, `set_progress_handler`**. **That is capability evidence, explicitly not E4 evidence** — whether a statement-level trace records what the engine **examined** is the question, and *"a real surface that still does not satisfy E4"* is a correct outcome. Notes the **third `PATH`-artefact-read-as-absence** in this project | 2026-08-24 |
 | MSG-0117 | Record | **OPEN** | Claude Code | Architecture lead | **TASK-0038 reconciled as the single READY task, and a seventh number collision recorded.** **Two lead-authored files claim MSG-0116** — the MSG-0020 shape, and MSG-0020's pair **contradicted**, so agreement was verified clause by clause before queueing rather than assumed. **They agree on all three rulings and the next action**; no stop fired. **They are not interchangeable** — 0116a carries the kernel-read-count and citation-version points, 0116b the separate-instrumentation requirement and the no-clearance-follows warning — so **the task section carries the union and links both**. Neither renamed, per MSG-0058 F4; **neither was registered in either index** until now | 2026-08-23 |
 | MSG-0115 | Record + referrals | **OPEN** | Claude Code | Architecture lead | **TASK-0037 execution record — the freshness mechanism is measured, and nothing is cleared.** **8/8 acceptance criteria MET**; **a real probe ran** — **8 designs × 11 scenarios × 3 collection sizes**, two instrument placements each, on **SQLite 3.51.3 via `node:sqlite`** (class **R** test subject, the only engine reachable — `docker` is not on this runner's PATH), `:memory:` only, no install, no network, no corpus, **no wall-clock read and no timing figure produced**. The **mandatory negative control failed** — NC returned a superseded version in **12 cases** — so the run is valid; **the adversarial precondition also caught a real fixture defect** and correctly declared the first draft VOID. **Two terminology reconciliations were taken from the accepted ADRs rather than invented**: MSG-0113's *"revoked"* is ADR-0018 §2's **WITHDRAWN** (no `REVOKED` state exists), and *"the current approved version"* is read as ADR-0018's **PUBLISHED and effective** version, since `APPROVED (not yet published)` is **not answerable** — both strict, both fail-closed. **The discriminator MSG-0113 §3 demands was built and it fired**: S2 and S3 are the **same recorded transition** queried before and after the periodic timer, and the two timer-only designs **returned the superseded version before the timer and the correct one after** — *"made correct by waiting, not by the transition."* **Five results carry beyond the engine.** **Version identity is necessary and nowhere near sufficient** — the two designs differing **only** in whether the structure carries it have **identical grids**; carrying it without consulting the kernel changes nothing, and a design carrying none **cannot name the version it answered from**, defeating ADR-0018 §1's citation rule independently. **"Answered nothing" is not "abstained"** — one design returned an **empty ANSWER** where abstention was required, and on the kernel-unreachable case **answered correctly by luck**; ADR-0017 §5 classifies abstentions A1–A7 and an empty answer is none of them. **The faked re-check is a no-op, now demonstrated rather than predicted** — against the same change, the kernel re-check `kept 0/4` and abstained while the self re-check `kept 4/4` and **returned four chunks of a reclassified version**, with the same structures, the same plan and the **same `U`**; **G-Q5.2c is satisfied for the first time** (a re-check observed to **REJECT**). **`U` cannot distinguish a leaking design from a conservative one** — those two designs both report **`U` = 4 at every size**, which **extends §4.6 S5**: the asymmetry rule warns a *zero* count can be a placement artefact; here a *non-zero* count identical between two designs conceals **opposite** security outcomes. **And "`U` = 0 is a property of an instant" is not only about time** — in the decisive scenario **no time passes at all**, an authorization attribute changes in the kernel, and **no timer would have caught it**, corroborating §4.8 finding 1 in a second fixture. **A hook is only as complete as the set of changes it is wired to**, so MSG-0113 §2(2) and §2(5) are **not alternatives**. **Nothing is CLEARED** — 7 NOT CLEARED, 1 DISQUALIFIED; **the design meeting BOTH G-Q5 conditions and every G-Q7 requirement (11/11) is still NOT CLEARED** on **E2** (`U` = 4 > 0), **E4** (not obtained) and **G-Q4** (not measured) — §4.9's *"necessary, never sufficient"* demonstrated in practice. **All nine MSG-0104 and all eight TASK-0035 verdicts reproduced unchanged; neither prior probe modified or re-run**; **`git diff --name-only docs/` empty**; **EPA-0006 §4.10 added, 122 insertions / 0 deletions**; **no numeric threshold introduced** — the bound exhibited is a **fixture constant** whose magnitude **G-Q5.1a** expressly does not judge. **Three questions referred, none blocking**: **Q8** whether the mandatory §3 point-2 re-check is itself *examination* (its kernel reads are **bounded by `k` and invariant with `N`**), **Q9** sharpening §4.7 Q3 with the new evidence, **Q10** the MSG-0113/ADR-0018 terminology mismatch | 2026-08-23 |
 | MSG-0099 | Record | **CLOSED** 2026-08-23 — discharged by execution (MSG-0100); the distinction it asked for is recorded in WP-0009 §6.2, the architecture README and MSG-0100 §5, and its warning held — no unmeasured figure appears in the delivered record | Claude Code | Architecture lead | **TASK-0032 reconciled as the single READY task.** Records that this is **not a re-run of TASK-0026**: that task evaluated stack **shape** (Approaches A/B/C) and produced EPA-0005; this evaluates **technology classes** against the now-settled Approach C and against ADR-0020 **as amended by AMD-01**, neither of which existed then. **Both are labelled "A-STACK" in WP-0009 §6.2**, where A-STACK already reads EXECUTED — the label reuse is flagged so the record is not read as one task run twice, and the task is told to distinguish the rows rather than overwrite. Also flags the likeliest failure mode: a technology comparison invites throughput, latency, memory and recall numbers, **none of which has been measured here** | 2026-08-23 |
@@ -4254,3 +4257,125 @@ latency, capacity, recall, throughput, structure-count, replication-factor or fa
 **Next eligible task: none.** **Engine selection stays blocked and must be separately authorized.**
 **GAP-A, GAP-B and GAP-C stand**, and **GAP-B continues to block clearance independently of anything
 measured here.**
+
+---
+
+## TASK-0043 — bounded E4 observability evidence on a second test subject
+
+**Priority:** 1 | **Status:** **READY** | **Owner:** Claude Code
+**Depends on:** MSG-0141 AUTHORIZED; MSG-0140 §6 (the second negative on the current subject); EPA-0006 §4.13 GAP-B, §4.6 S6/S9
+**Next eligible task:** none — MSG-0141 returns control to the Architecture Lead on completion
+**Type:** evidence / instrument capability — **the subject is an INSTRUMENT, not a candidate**
+
+**Specification:** [`MSG-0141-e4-observability-evidence-task-authorization.md`](../comms/MSG-0141-e4-observability-evidence-task-authorization.md),
+**plus this section.**
+
+### What this task is for
+
+**E4 is the last structural gap that no amount of architecture can close.** §4.13 **GAP-B** says it in
+terms, and **MSG-0140 §6 confirmed it a second time** on the only subject reached so far: SQLite 3.51.3
+via `node:sqlite` exposes **no trace, profile or log member**, its build lacks `DEBUG`,
+`ENABLE_SQLLOG` and `ENABLE_STMT_SCANSTATUS`, **five tracing pragmas behave identically to a pragma
+that does not exist**, and `:memory:` leaves no file. **Nothing was inferred from that absence, and
+nothing may be.**
+
+**So the question is no longer whether this subject can supply E4 — it cannot — but whether ANY
+reachable subject can.** MSG-0141 authorizes exactly that, and no more.
+
+> **The subject is an evidence instrument, not a candidate.** MSG-0141: *"not engine selection,
+> adoption, deployment, or implementation authorization"*, and it *"must not be evaluated for product
+> suitability beyond the E4 evidence necessary for this task."* **A subject that supplies E4 clears
+> nothing and is not thereby preferred.**
+
+### The eight boundaries (MSG-0141)
+
+1. **Identify an available test subject/runtime that exposes what E4 requires.**
+2. **Exercise only the minimum probe** needed to establish whether engine-execution inspection or log
+   evidence is **genuinely observable**.
+3. **Record the exact observability surface, what it proves, and its limitations.**
+4. **Include negative controls sufficient to distinguish an absent log from an instrument that was
+   never running** — the §4.12 nonexistent-pragma control is the pattern, and without it *"the
+   instrument reported nothing"* and *"the instrument was never running"* are **the same observation**.
+5. **If E4 cannot be established, record the exact limitation and leave E4 NOT CLEARED.**
+6. **Do not install or modify host infrastructure**, deploy anything, select a product engine, or alter
+   any gate or ADR.
+7. **Do not infer E4 from surface scans, query results, planner output, or absence of errors.**
+   MSG-0140 §6 ran a surface scan and **explicitly did not offer it as E4** — follow that.
+8. **Do not broaden into performance, cost, capability, engine comparison or product selection.**
+
+### What is already known about the environment — capability evidence, NOT E4 evidence
+
+**Enumerated read-only by the COMMS session that reconciled this task, 2026-08-24. It is offered so the
+task does not spend its budget rediscovering it, and it settles nothing:**
+
+| Probe | Result |
+|---|---|
+| `docker`, `docker-compose` | **ABSENT** from the runner's `PATH` — re-confirmed, as in TASK-0039 |
+| `psql`, `mysql`, `sqlite3` CLI, `duckdb`, `java`, `dotnet`, `go`, `rustc` | **ABSENT** |
+| `python` / `python3` | **ABSENT** — but see the next row |
+| **`py`** (the Windows Python launcher) | **PRESENT** at `C:\Windows\py` → **Python 3.14.5** |
+| Python's `sqlite3` module | **SQLite 3.50.4**, exposing **`set_trace_callback`**, **`set_authorizer`**, **`set_progress_handler`** |
+
+> **`python` is absent while Python is present.** That is **the third time in this project a `PATH`
+> artefact has been mistaken for absence** — MSG-0102 read it as "no Docker, no Python", MSG-0103
+> corrected "no SQLite" that was really "no `sqlite3` CLI". **Check the launcher before recording an
+> absence.**
+
+**What this does and does not tell the task.** `set_trace_callback` binds SQLite's **statement-level**
+trace; `set_progress_handler` fires per **N virtual-machine instructions**. **Whether either is an
+authoritative record of what the engine EXAMINED — which is what E4 asks — is the question, not the
+answer.** A statement trace that reports the statement and not the rows visited would be **a real
+surface that still does not satisfy E4**, and saying so plainly would be a correct outcome.
+
+### Acceptance criteria
+
+1. **The subject and runtime are named with versions**, as MSG-0140 §6 named its own, so a later reader
+   can tell whether a different answer means a changed engine or a changed probe.
+2. **The observability surface is described exactly** — what it emits, at what granularity, and **what
+   it does not emit**.
+3. **A negative control distinguishes an absent log from an inactive instrument**, and its result is
+   quoted.
+4. **The verdict is one of the two MSG-0141 permits**: E4 **obtainable** with reproducible evidence, or
+   E4 **unobtainable** within the bounded scope with the precise limitation recorded.
+5. **No candidate is cleared and no engine is selected** — a successful E4 observation **clears
+   nothing**, and the record says so.
+6. **Nothing installed, no host configuration modified**; `git diff --name-only docs/` **empty**.
+7. **All existing verdicts unchanged**; **no prior probe re-run**; **six probes have cleared nothing**
+   and that record stands.
+8. COMMS, queue and status reconciled; **control returns to the Architecture Lead.**
+
+### Verification
+
+Execution — **a non-zero number of captured observations is required**, and **"the trace produced
+nothing" must be distinguished from "the trace was never armed"** by the control in criterion 3. Before
+reporting completion, verify and quote:
+
+```text
+git diff --name-only docs/    -> empty
+git status --porcelain        -> empty after commit
+the probe's own output        -> what the surface emitted, verbatim
+```
+
+**Verify the delivered content from `main` after pushing.**
+
+### Documentation
+
+Record the result in `implementation/comms/` as a numbered message, update
+`implementation/status/current.md` and this queue. Write the checkpoint. **Commit the harness and its
+captured output** under `implementation/probes/TASK-0043/`, as every prior probe did.
+
+### Stop conditions
+
+Stop if establishing E4 would require **installing anything**, **modifying host configuration**,
+**operator intervention**, or **selecting an engine**. **An environment boundary is recorded, not routed
+around** — BLK-0008 and BLK-0010 are the precedents. **If E4 is unobtainable here too, that is the
+finding**, and E4 stays **NOT CLEARED**.
+
+**Also stop if `origin/main` moves mid-run.** Record the starting HEAD in checkpoint 1 and re-check
+before every push.
+
+### Recovery procedure
+
+**Check what MSG-0140 §6 already enumerated before re-enumerating it.** The `node:sqlite` surface is
+settled and re-running it produces no new evidence. **The new ground is a different subject**, and the
+task's budget belongs there.

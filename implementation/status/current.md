@@ -2,7 +2,9 @@
 
 **Active Work Package:** WP-0001 — PCI Kernel Foundation
 **Status:** **COMPLETE** — declared by the architecture lead 2026-08-19 (MSG-0020(b), resolved by MSG-0022 / MSG-0023, TASK-0009)
-**Last Updated:** 2026-08-24 UTC — **TASK-0042 COMPLETE (8/8); six candidates measured, ALL NOT CLEARED; no task is READY.** **The evidence the four rulings made possible has now been taken**, and it clears nothing — **E4 alone would have sufficed for that** (§4.13 GAP-B, re-checked and unchanged), **but it is not the only thing missing.** `U` grows to **714** at `M` = 5000 for K7, I5, I8 and the routing control; **K8's row-access `U` = 0 is superseded by 2 / 66 / 709 at the index cursor — the first time S7-R3 bites by RULE rather than by a probe's diligence.** **I5 and I8, both NEVER MEASURED until now, measure IDENTICALLY to K7 at every size**: a finer key that does not refine **effectivity** removes no unauthorized row, corroborating §4.8 finding 1 in a third fixture. **I7 reached `U` = 0 and failed anyway, by WITHHOLDING — 142 of 146 authorized chunks at its interval boundary**, plus a version **ingested inside the interval** that never appeared, on a bound **VACUOUS in 3 of 3 cells**; **`U` is blind to both.** **Five placements exercised**, one (**P-CIDX**) never taken before, and **dbstat TAKEN rather than argued away** — it measures stored layout, not traversal, so the reachable-but-unexercised set is **EMPTY for the right reason** (S7.3). **Q7 = A over 36 cells**: the discriminator **fired in 4** (*made correct by waiting*), and **T3 vs T5 isolates the faked re-check**, reproducing §4.10 result 3 independently. **Run VALID** — adversarial precondition HELD, and **three** negative controls failed as required. **DISC-0012 raised**: the prior G-Q4.2 differential ran against a catalogue holding **no foreign structure**, so **TASK-0039's MET is bounded, not withdrawn** — **no verdict moves.** **Record EPA-0006 §4.14 (287 insertions / 0 deletions); evidence MSG-0140. Nothing selected, no ADR touched, no gate relaxed, no threshold introduced. Engine selection stays blocked.**
+**Last Updated:** 2026-08-24 UTC — **TASK-0043 READY: bounded E4 observability evidence on a SECOND test subject** (MSG-0141). **The E4 question has changed shape** — MSG-0140 §6 settled with a **second negative** that the current subject cannot supply it, so what remains is **whether any reachable subject can**. **The subject is an INSTRUMENT, not a candidate**: MSG-0141 says twice that this is **not engine selection, adoption, deployment or implementation**, and **a successful E4 observation clears nothing**. **Read-only environment enumeration by this session, offered as capability evidence and explicitly NOT as E4 evidence:** `docker`, `psql`, `sqlite3` CLI, `java`, `dotnet`, `go` **ABSENT**; **`python` ABSENT but `py` PRESENT → Python 3.14.5 with SQLite 3.50.4**, exposing **`set_trace_callback`**, **`set_authorizer`**, **`set_progress_handler`**. **Whether a statement-level trace records what the engine EXAMINED is the question, not the answer** — *"a real surface that still does not satisfy E4"* is a correct outcome. **Third `PATH` artefact read as absence in this project.** **TASK-0042 COMPLETE and cleared nothing** — six candidates, **all NOT CLEARED**, **DISC-0012** recorded. **Six probes have cleared nothing; nothing installed, nothing selected, no ADR touched.**
+
+> **The line this replaces, retained:** "**TASK-0042 COMPLETE (8/8); six candidates measured, ALL NOT CLEARED; no task is READY.** **The evidence the four rulings made possible has now been taken**, and it clears nothing — **E4 alone would have sufficed for that** (§4.13 GAP-B, re-checked and unchanged), **but it is not the only thing missing.** `U` grows to **714** at `M` = 5000 for K7, I5, I8 and the routing control; **K8's row-access `U` = 0 is superseded by 2 / 66 / 709 at the index cursor — the first time S7-R3 bites by RULE rather than by a probe's diligence.** **I5 and I8, both NEVER MEASURED until now, measure IDENTICALLY to K7 at every size**: a finer key that does not refine **effectivity** removes no unauthorized row, corroborating §4.8 finding 1 in a third fixture. **I7 reached `U` = 0 and failed anyway, by WITHHOLDING — 142 of 146 authorized chunks at its interval boundary**, plus a version **ingested inside the interval** that never appeared, on a bound **VACUOUS in 3 of 3 cells**; **`U` is blind to both.** **Five placements exercised**, one (**P-CIDX**) never taken before, and **dbstat TAKEN rather than argued away** — it measures stored layout, not traversal, so the reachable-but-unexercised set is **EMPTY for the right reason** (S7.3). **Q7 = A over 36 cells**: the discriminator **fired in 4** (*made correct by waiting*), and **T3 vs T5 isolates the faked re-check**, reproducing §4.10 result 3 independently. **Run VALID** — adversarial precondition HELD, and **three** negative controls failed as required. **DISC-0012 raised**: the prior G-Q4.2 differential ran against a catalogue holding **no foreign structure**, so **TASK-0039's MET is bounded, not withdrawn** — **no verdict moves.** **Record EPA-0006 §4.14 (287 insertions / 0 deletions); evidence MSG-0140. Nothing selected, no ADR touched, no gate relaxed, no threshold introduced. Engine selection stays blocked.**" True when written; **the Architecture Lead has since authorized the bounded E4 evidence task that GAP-B makes necessary.**
 
 > **The line this replaces, retained:** "**Q1, Q2, Q7 and Q13 RULED; TASK-0042 READY.** **Q1 = A strict** (unauthorized index entries, keys and metadata **are** examination; **U1 stays in scope**), **Q2 = B** (**physical isolation required where necessary** — query-time predicates alone are insufficient where the engine examines unauthorized candidates first), **Q7 = A** (**zero stale-answer tolerance**, abstain rather than answer stale, **no threshold introduced**), **Q13** (**Release 1 is the current/"now" frame only**; a non-now request **abstains**). **Every numbered question Q1–Q13 is now ruled** — the first time that has been true — and **not one of them relaxed anything**: each was ruled in the fail-closed direction the record already defaulted to, so **every verdict stands and nothing became CLEARED by a decision**. **TASK-0042 is the single READY task** (MSG-0137): routing-phase and physical-structure measurement with **routing counted in `U`**, **every applicable S7 placement exercised and the maximum reported**, **zero-stale-answer transitions including abstention**, **I5/I7/I8 measured or recorded NEVER MEASURED with the exact limitation**, and an **E4 re-check**. **The queue write MSG-0138 asked for had not happened** — the queue held **zero mentions of TASK-0042** — so the supervisor's `no READY task` was **correct, not a stall**; it is written now. **ADR-0018 clarified in place under MSG-0133; K7/K8 still NOT CLEARED; GAP-A/B/C stand; nothing selected.**" **True when written; the task it announced has now run.** **Its two central claims both held**: nothing relaxed anything, and **nothing became CLEARED by a decision** — the evidence cleared nothing either. **Its one inaccuracy is corrected above**: the queue write it says "is written now" **was written into the working tree and not committed**, so the committed queue still held zero mentions of TASK-0042 at `2841f23`. **K7/K8 remain NOT CLEARED and GAP-A/B/C still stand**, both unchanged by this run.
 
@@ -2239,10 +2241,24 @@ both tables index it, and both were updated in the same commit as the record.
 
 ## Next Action
 
-**No task is READY, and the next action is the Architecture Lead's.** **TASK-0042 is COMPLETE** — 8 of
-8 acceptance criteria with evidence — and MSG-0137's *Next eligible task* reads **none**. **Engine
-selection stays blocked and must be separately authorized** once the existing gates are **positively
-satisfied with evidence** (MSG-0129).
+**TASK-0043 is READY and is the single READY task** — authorized by MSG-0141 and written into the queue
+by this session. **A supervisor cycle can take it without a manual trigger.**
+
+> **The paragraph this replaces, retained:** "**No task is READY, and the next action is the Architecture
+> Lead's.** **TASK-0042 is COMPLETE** — 8 of 8 acceptance criteria with evidence — and MSG-0137's *Next
+> eligible task* reads **none**. **Engine selection stays blocked and must be separately authorized**
+> once the existing gates are **positively satisfied with evidence** (MSG-0129)." **True when written;
+> the Lead answered it the same evening with MSG-0141.** The last two sentences are unchanged — **this
+> authorization is evidence work, not a step toward selection.**
+
+**What TASK-0043 must produce:** a **named subject and runtime with versions**; **the exact
+observability surface** — what it emits, at what granularity, and **what it does not**; a **negative
+control separating an absent log from an instrument that was never armed**; and one of the two verdicts
+MSG-0141 permits — **E4 obtainable with reproducible evidence**, or **E4 unobtainable within the bounded
+scope with the precise limitation recorded**.
+
+**It clears nothing either way.** MSG-0141: *"A successful E4 observation does not clear any candidate
+or permit engine selection."* **The subject is an instrument, not a candidate.**
 
 **What the evidence task established, and why it clears nothing.** **Six candidates measured, all NOT
 CLEARED.** **E4 alone would have been enough** — §4.13 GAP-B said so before the task started — **but
@@ -2462,12 +2478,19 @@ falsify or support N1/N2/N3) or to obtain a test subject that can supply E4 firs
 states these and takes none of them.**
 
 **Operationally, the supervisor is ENABLED** — `supervisor-config.json` carries `enabled: true`,
-`dryRun: false`. The heartbeat observed at the start of this session, **2026-08-24T17:07:20Z**, records
-`decision: NOOP`, `reason: no READY task`, `head: 2841f23`, `runnerActive: false`, and **no
-`runner.lock` exists**. **That NOOP was an accurate reading of the queue, not a stall** — TASK-0042 had
-been authorized in MSG-0137 but **the queue held no TASK-0042 row**, so there was genuinely nothing
-READY to take. **Once this reconciliation is pushed, the next cycle can take TASK-0042.** **No blocker
-is open. One discovery is recorded: DISC-0011.**
+`dryRun: false`. The heartbeat observed at the start of this session, **2026-08-24T18:07:18Z**, records
+`decision: NOOP`, `reason: no READY task`, `runnerActive: false`, and **no `runner.lock` exists** — the
+TASK-0042 runner (pid 26712) took its lock at 17:17:18Z, completed, and released it. **That NOOP was
+correct**: TASK-0043 was authorized in MSG-0141 but **had no queue row until this reconciliation**.
+**Once this is pushed, the next cycle can take TASK-0043.** **No blocker is open. Two discoveries are
+recorded: DISC-0011 and DISC-0012**, and **neither moves a verdict.**
+
+> **The paragraph this replaces, retained:** it cited the **17:07:20Z** heartbeat at `head: 2841f23`
+> with *"no READY task"*, and explained that the NOOP was accurate because **the queue held no TASK-0042
+> row**. **That happened again, one task later** — MSG-0141 authorized TASK-0043 and the queue did not
+> carry it. **The pattern is now stable enough to name: a Lead authorization does not become work until
+> a session writes the row**, and the supervisor reporting `NOOP` in between is **the system behaving
+> correctly, not stalling.**
 
 > **The paragraph this replaces, retained:** it cited the **15:28:48Z** heartbeat with
 > `decision: RUNNER_RUNNING`, `reason: TASK-0041 running for 90s`, `runnerPid: 4316`, and predicted the
