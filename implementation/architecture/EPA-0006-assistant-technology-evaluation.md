@@ -2360,7 +2360,7 @@ state:**
 | **Temporary and spill files** — sorter, merge, materialisation, external-sort overflow | the artefacts a query creates under memory pressure, which is when they are least likely to be looked for |
 | **Backups, snapshots and replication streams produced by the engine itself** | *"produced by the engine"* is the boundary; see DA-3 |
 
-**Out of scope, and each for a stated reason rather than by omission:**
+#### DA-3 — Exclusions, each for a stated reason rather than by omission
 
 | Deliberately out | Why |
 |---|---|
@@ -2370,6 +2370,12 @@ state:**
 | **Filesystem-, volume- or storage-layer encryption at rest** | a **storage** control (`docs/security/security-architecture.md`), orthogonal to what the engine writes. It can make an artefact unreadable to an outside reader; **it does not make DA-1 satisfied**, because DA-1 concerns what the engine puts there |
 | **Operator-taken backups, filesystem snapshots, host images** | *"anything the engine does not itself write"* (MSG-0148b). They inherit whatever DA-1 permits; they do not define it |
 | **The projection's own at-rest storage of approved corpus content** | governed by **ADR-0020 §1** — the index **is** a projection of approved content, so its data files holding that content is the design, not a breach. **DA-1.3 still applies to it**, and **DA-4 is where this boundary is actually load-bearing** |
+
+> **Numbering correction, recorded 2026-08-25 rather than tidied away.** As first published in commit
+> `86493bb`, the exclusions table sat inside **DA-2** and the section ran **DA-2 → DA-4**, leaving a gap
+> where **DA-3** should be. The exclusions now carry their own **DA-3** heading. **No text of the
+> criterion changed, no rule moved, and DA-4…DA-7 keep the numbers they were published with** — the
+> correction adds a heading and nothing else.
 
 #### DA-4 — The line that makes DA-1 usable: **provenance**, not presence
 

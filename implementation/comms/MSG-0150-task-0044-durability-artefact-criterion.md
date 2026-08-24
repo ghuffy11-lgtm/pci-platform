@@ -79,7 +79,7 @@ introduced, and none may be inferred.
 **In scope:** write-ahead logs, rollback/undo journals, shared-memory and index files, temporary and
 spill files, and **backups, snapshots or replication streams the engine itself produces**.
 
-**Deliberately out, each with a stated reason:** application logs/telemetry/audit payloads (**§9.3 and
+**Deliberately out (DA-3), each with a stated reason:** application logs/telemetry/audit payloads (**§9.3 and
 ADR-0020 §6.2 already**), the engine's **execution surface** (**that is E4**), OS page cache,
 storage-layer encryption at rest, operator-taken backups and host images, and **the projection's own
 at-rest storage of approved corpus content** (**ADR-0020 §1** — with DA-1.3 still applying, and §4 below
@@ -173,7 +173,7 @@ any reading of Q14.**
 | 1 | **A bounded criterion record exists on `main`**, independently reviewable | **EPA-0006 §4.16**, verified from `main` after the push (§9). It states its own authority, its scope, its exclusions and its verdicts without requiring the reader to have followed this thread |
 | 2 | **States plainly what is PROHIBITED** | §4.16 DA-1, three limbs — DA-1.1 request-induced persistence, DA-1.2 residual retention, DA-1.3 widened reach |
 | 3 | **States what SATISFIES and what FAILS it, in §4.6 S9's vocabulary** | §4.16 DA-5 — five rows, using **CLEARED / NOT CLEARED / DISQUALIFIED** unchanged; **no new vocabulary created** |
-| 4 | **Scope and exclusions explicit**, including what is deliberately out | §4.16 DA-2 — five in-scope classes, six exclusions, **each with a stated reason rather than an omission** |
+| 4 | **Scope and exclusions explicit**, including what is deliberately out | §4.16 **DA-2** — five in-scope artefact classes — and §4.16 **DA-3** — six exclusions, **each with a stated reason rather than an omission** |
 | 5 | **Fail-closed interpretation stated** — uninspectable ⇒ NOT CLEARED | §4.16 DA-6, in DA-1's own terms, tied to §4.6 S9 and S10 |
 | 6 | **Distinguishable from E4 in its own text** | §4.16 DA-7 — a five-row contrast (boundary, artefacts, lifetime, governing rule, role in clearance), plus the U5 adjacency **pointed at, not restated** |
 | 7 | **No measurement performed, and the record says so; TASK-0043's figures appear only as a labelled illustration** | §0 and §6 here; §4.16's illustration block and its *"What this section does NOT establish"* list. **No probe, fixture or harness written or run; no test executed; no test count claimed** |
