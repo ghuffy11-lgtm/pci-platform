@@ -1,0 +1,215 @@
+TASK-0043 -- bounded E4 observability evidence, SECOND test subject
+MSG-0141 AUTHORIZED.  The subject is an INSTRUMENT, not a candidate.
+This probe selects nothing, installs nothing, and clears nothing.
+
+==============================================================================
+A. SUBJECT AND RUNTIME IDENTIFICATION (acceptance criterion 1)
+==============================================================================
+  python sys.version:                            3.14.5 (tags/v3.14.5:5607950, May 10 2026, 10:43:50) [MSC v.1944 64 bit (AMD64)]
+  python sys.executable:                         C:\Python314\python.exe
+  sqlite3 module file:                           C:\Python314\Lib\sqlite3\__init__.py
+  sqlite3.sqlite_version  (the ENGINE):          3.50.4
+  sqlite3.version  (the BINDING, deprecated):    (removed in this build)
+  platform:                                      win32
+
+  The FIRST subject, for contrast -- NOT re-run here (§4.14 finding 8):
+    SQLite 3.51.3 via node:sqlite, Node v24.15.0 -- E4 NOT OBTAINABLE.
+
+==============================================================================
+B. OBSERVABILITY SURFACE, ENUMERATED AT RUNTIME (criterion 2)
+==============================================================================
+
+  Connection -- total public names:              42
+  Connection -- observability-related:           set_authorizer, set_progress_handler, set_trace_callback
+
+  Cursor -- total public names:                  15
+  Cursor -- observability-related:               NONE
+
+  sqlite3 module -- total public names:          210
+  sqlite3 module -- observability-related:       SQLITE_CONSTRAINT_COMMITHOOK, enable_callback_tracebacks
+
+  Absent-by-enumeration, checked explicitly rather than assumed:
+    Connection.set_trace_callback:               PRESENT
+    Connection.set_progress_handler:             PRESENT
+    Connection.set_authorizer:                   PRESENT
+    Connection.stmt_scanstatus:                  ABSENT
+    Connection.set_profile:                      ABSENT
+    Connection.config_log:                       ABSENT
+    Connection.trace_v2:                         ABSENT
+
+==============================================================================
+C. BUILD COMPILE OPTIONS (criterion 2)
+==============================================================================
+  compile options reported:                      43
+      ATOMIC_INTRINSICS=0
+      COMPILER=msvc-1944
+      DEFAULT_AUTOVACUUM
+      DEFAULT_CACHE_SIZE=-2000
+      DEFAULT_FILE_FORMAT=4
+      DEFAULT_JOURNAL_SIZE_LIMIT=-1
+      DEFAULT_MMAP_SIZE=0
+      DEFAULT_PAGE_SIZE=4096
+      DEFAULT_PCACHE_INITSZ=20
+      DEFAULT_RECURSIVE_TRIGGERS
+      DEFAULT_SECTOR_SIZE=4096
+      DEFAULT_SYNCHRONOUS=2
+      DEFAULT_WAL_AUTOCHECKPOINT=1000
+      DEFAULT_WAL_SYNCHRONOUS=2
+      DEFAULT_WORKER_THREADS=0
+      DIRECT_OVERFLOW_READ
+      ENABLE_FTS3
+      ENABLE_FTS4
+      ENABLE_FTS5
+      ENABLE_MATH_FUNCTIONS
+      ENABLE_RTREE
+      MALLOC_SOFT_LIMIT=1024
+      MAX_ATTACHED=10
+      MAX_COLUMN=2000
+      MAX_COMPOUND_SELECT=500
+      MAX_DEFAULT_PAGE_SIZE=8192
+      MAX_EXPR_DEPTH=1000
+      MAX_FUNCTION_ARG=1000
+      MAX_LENGTH=1000000000
+      MAX_LIKE_PATTERN_LENGTH=50000
+      MAX_MMAP_SIZE=0x7fff0000
+      MAX_PAGE_COUNT=0xfffffffe
+      MAX_PAGE_SIZE=65536
+      MAX_SQL_LENGTH=1000000000
+      MAX_TRIGGER_DEPTH=1000
+      MAX_VARIABLE_NUMBER=32766
+      MAX_VDBE_OP=250000000
+      MAX_WORKER_THREADS=8
+      MUTEX_W32
+      OMIT_AUTOINIT
+      SYSTEM_MALLOC
+      TEMP_STORE=1
+      THREADSAFE=1
+
+    DEBUG:                                       ABSENT
+    ENABLE_SQLLOG:                               ABSENT
+    ENABLE_STMT_SCANSTATUS:                      ABSENT
+
+==============================================================================
+D. TRACING PRAGMAS vs THE NONEXISTENT-PRAGMA CONTROL (criterion 3)
+==============================================================================
+  §4.12: SQLite silently ignores an unrecognised pragma, so 'no error'
+  is evidence of nothing.  The control establishes what 'inert' LOOKS
+  like on this build; anything matching it is inert.
+
+  CONTROL  PRAGMA pci_task_0043_pragma_that_certainly_does_not_exist: (False, None, [])
+
+  PRAGMA vdbe_trace:                             (False, None, [])   -> IDENTICAL TO CONTROL => INERT
+  PRAGMA vdbe_listing:                           (False, None, [])   -> IDENTICAL TO CONTROL => INERT
+  PRAGMA vdbe_addoptrace:                        (False, None, [])   -> IDENTICAL TO CONTROL => INERT
+  PRAGMA parser_trace:                           (False, None, [])   -> IDENTICAL TO CONTROL => INERT
+  PRAGMA sql_trace:                              (False, None, [])   -> IDENTICAL TO CONTROL => INERT
+
+  tracing pragmas indistinguishable from the control: 5 of 5
+
+==============================================================================
+E. FIXTURE (synthetic -- S11)
+==============================================================================
+  rows:                                          200
+  authorized / unauthorized:                     100 / 100
+  query under trace:                             SELECT id FROM chunk WHERE scope = 'AUTHORIZED'
+
+==============================================================================
+F. INSTRUMENT 1 -- set_trace_callback (criteria 2, 3)
+==============================================================================
+  F1a DISARMED -- rows returned:                 100
+  F1a DISARMED -- trace entries captured:        0
+  F1b ARMED -- rows returned:                    100
+  F1b ARMED -- trace entries captured:           1
+
+  F1b VERBATIM, every entry emitted (criterion 3 requires the quote):
+      [0] "SELECT id FROM chunk WHERE scope = 'AUTHORIZED'"
+
+  F1 CONTROL -- 'absent log' distinguished from 'never armed': YES -- silent disarmed, non-silent armed
+
+  F2 trace entries from the parameterised query: 1
+      [0] "SELECT id FROM chunk WHERE body = 'ZZ-UNAUTHORIZED-PASSAGE-TEXT-ZZ body 7'"
+  F2 entries containing the UNAUTHORIZED marker: 1
+  F2 => passage text CAN reach the engine's trace surface: YES -- §9.3 / ADR-0020 §6.2 is engaged
+
+  F3 rows in the fixture:                        200
+  F3 rows the query must examine:                200
+  F3 rows the query returns:                     100
+  F3 trace entries emitted:                      1
+  F3 => granularity:                             PER STATEMENT -- records the instruction, NOT the examination
+
+==============================================================================
+G. INSTRUMENT 2 -- set_progress_handler (criteria 2, 3)
+==============================================================================
+  DISARMED -- handler invocations:               0
+  ARMED (every 1 VM instruction) -- invocations: 807
+
+  content carried per invocation:                NONE -- the callback takes no arguments
+  => can this surface answer E4's passage-text question: NO -- it is a counter, not a log
+
+==============================================================================
+H. INSTRUMENT 3 -- set_authorizer (criteria 2, 3)
+==============================================================================
+  DISARMED -- authorizer events:                 0
+  ARMED -- authorizer events:                    3
+
+  VERBATIM (action, arg1, arg2, db, trigger):
+      [0] (21, None, None, None, None)
+      [1] (20, 'chunk', 'id', 'main', None)
+      [2] (20, 'chunk', 'scope', 'main', None)
+
+  events on an identical second execution:       0
+  => granularity:                                PREPARE-TIME, per column reference -- NOT per row examined
+  => can this surface answer E4's passage-text question: NO -- it names objects, never content
+
+==============================================================================
+I. ENGINE-WRITTEN FILE ARTEFACTS (the ':memory:' limb, closed)
+==============================================================================
+  temporary database:                            C:\Users\ADMINI~1\AppData\Local\Temp\3\pci-task-0043-mebsrhp4\probe.db
+  journal_mode:                                  wal
+
+  artefact (main db)   :                         4096 bytes; UNAUTHORIZED marker absent
+  artefact -wal        :                         28872 bytes; UNAUTHORIZED marker PRESENT 135 time(s)
+  artefact -journal    :                         ABSENT
+  artefact -shm        :                         32768 bytes; UNAUTHORIZED marker absent
+
+  STATED PRECISELY: these are DURABILITY artefacts, not logs.
+  They are recorded because §4.12 could not check them, and they
+  are NOT offered as E4 evidence -- E4 asks about the engine's
+  own LOGS (§4.6 S6, §9.3), and a WAL is not one.
+  temporary directory removed:                   True
+
+==============================================================================
+J. VERDICT (criteria 4, 5)
+==============================================================================
+  E4, as EPA-0006 §4.6 S6 defines it:
+    'Log inspection -- no unauthorized passage text in the engine's
+     own logs (§9.3; ADR-0020 §6.2)'
+
+  Three conditions, evaluated separately:
+  C1  an engine-emitted log surface exists and was TAKEN: True
+  C2  a control separates 'absent log' from 'never armed': True
+  C3  the surface can be inspected FOR passage text: True
+
+  And, kept separate because the two readings can disagree:
+  C4  the surface records what the engine EXAMINED: NO -- per-statement granularity
+
+  VERDICT: E4 is OBTAINABLE on this subject under §4.6 S6's
+  definition -- an engine-emitted surface exists, it was armed and
+  controlled, and it can be inspected for unauthorized passage text.
+
+  AND IT IS OBTAINABLE IN THE ADVERSE DIRECTION.  What the
+  inspection SHOWS is that passage text bound as a parameter DOES
+  appear in the engine's own trace -- which is §9.3's finding
+  demonstrated rather than argued.
+
+  WHAT THIS CLEARS: NOTHING.
+  MSG-0141: a successful E4 observation 'does not clear any candidate
+  or permit engine selection'.  No candidate in EPA-0006 is cleared,
+  preferred, selected or ranked by this file.  All six candidates
+  measured by TASK-0042 remain NOT CLEARED.  GAP-B is a statement
+  about the FIRST subject and this file does not withdraw it.
+
+  RUN VALIDITY: VALID -- every negative control behaved as required
+  (disarmed instruments silent, armed instruments not).
+
+END OF PROBE

@@ -1,7 +1,17 @@
 # BLK-0011 — The Python Interpreter Is Denied to the Unattended Runner; TASK-0043 Stopped at Its First Action
 
-**Status:** **OPEN** 2026-08-24 — requires an operator decision on this machine's runner permission
-set. **Nothing was executed, nothing was installed, and no E4 observation of any kind exists**
+**Status:** **RESOLVED** 2026-08-24 — **the operator granted authorization to invoke `py` solely for
+TASK-0043's bounded E4 probe (MSG-0145), and an interactive session ran the committed harness under it
+(MSG-0146). E4 is OBTAINABLE on the second subject, and the inspection is adverse: passage text bound
+as a PARAMETER appears verbatim in the engine's trace.** **Nothing was installed and the runner's own
+permission set was NOT broadened** — the grant was scoped to one task, so a standing `runner-settings`
+rule would have been wider than the authorization. **The condition this blocker describes therefore
+remains true for future UNATTENDED tasks**, and needs a fresh decision if one requires `py`.
+
+> **The line this replaces, retained:** "**OPEN** 2026-08-24 — requires an operator decision on this
+> machine's runner permission set. **Nothing was executed, nothing was installed, and no E4 observation
+> of any kind exists**." **True as written.** The stop was correct: the runner recorded the boundary
+> instead of routing around it, and **the harness it wrote was run unchanged** once the grant existed.
 **Raised:** 2026-08-24, by the supervisor-started TASK-0043 session (`runner.lock` pid **25932**,
 acquired **2026-08-24T18:59:38Z**, host `LENOVO-LA0X1754`)
 **Severity:** Hard boundary for an unattended runner. **Trivially clearable by an operator**, and
