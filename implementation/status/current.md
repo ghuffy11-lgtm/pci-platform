@@ -2,7 +2,9 @@
 
 **Active Work Package:** WP-0001 — PCI Kernel Foundation
 **Status:** **COMPLETE** — declared by the architecture lead 2026-08-19 (MSG-0020(b), resolved by MSG-0022 / MSG-0023, TASK-0009)
-**Last Updated:** 2026-08-24 UTC — **TASK-0039 COMPLETE; K7 and K8 NOT CLEARED** on 96 measurements plus calibration, opcode capture and a negative control. **MSG-0124 rules Q12 strictly**: a **reachable index-cursor placement must be exercised**, and **row-access-only `U = 0` is insufficient for E2** without it. **TASK-0040 READY** — encode that in EPA-0006 §4.6 S7, **additive and declared**, verifying the result **from `main`**. **Five probes have cleared nothing**; no gate relaxed, nothing selected.
+**Last Updated:** 2026-08-24 UTC — **TASK-0040 COMPLETE; Q12 encoded and closed.** EPA-0006 §4.6 gains **S7.1–S7.4**, **98 insertions / 0 deletions**: **every reachable index-cursor placement must be exercised**, the **maximum across exercised placements** is the reported `U`, and **row-access-only `U = 0` is insufficient for E2** where such a placement exists unexercised — **disqualifying, not merely noted**. **"Reachable" means occupiable and actually exercised**; a "none reachable" claim is admissible **only by enumeration**; **unreachability is not relief**. **Nothing executed, no probe re-run, no ADR touched, no gate weakened, no threshold invented.** **K7/K8 remain NOT CLEARED; five probes have cleared nothing.** **No task is READY** — the next evidence action must be **separately authorized**.
+
+> **The line this replaces, retained:** "**TASK-0039 COMPLETE; K7 and K8 NOT CLEARED** on 96 measurements plus calibration, opcode capture and a negative control. **MSG-0124 rules Q12 strictly**: a **reachable index-cursor placement must be exercised**, and **row-access-only `U = 0` is insufficient for E2** without it. **TASK-0040 READY** — encode that in EPA-0006 §4.6 S7, **additive and declared**, verifying the result **from `main`**. **Five probes have cleared nothing**; no gate relaxed, nothing selected." True when written; **the task it announced has now run**, started by the supervisor cycle at **10:27:18Z** and completed the same afternoon. **Its two method instructions were the load-bearing ones and both held**: the update is **additive** — 98 insertions, **0 deletions** — and the result was **read back from `main`**, not from the working tree. **The one thing the task section warned about is the one thing that had to be checked first**: encoding a rule twice leaves two statements of it, so S7 was verified to carry **no** Q12 text before a line was written.
 
 > **The line this replaces, retained:** "**TASK-0038 COMPLETE, nothing cleared**: the kernel-constrained path **eliminates divergence and does nothing for strict Shape-1** — the designs holding no copy at all carry the **largest** `U`. **MSG-0119 rules Q11 strictly**, leaving **K7/K8 the only candidates whose E1 position is not in question**. **TASK-0039 READY** — close their E4, `U1` observability and plan-independence gaps; **unobtainable evidence ⇒ NOT CLEARED**, never an inferred pass." True when written; **the task it announced has now run**, started by the supervisor cycle at **21:37:18Z** and completed across local midnight. **Its central instruction was the load-bearing one and it cut both ways.** *"Do not claim `U1 = 0` when the test subject cannot observe index-entry reads"* was written to prevent a false pass — and obeying it properly meant **first checking whether the subject really cannot observe them.** It can, in part: a placement four prior probes had not taken turned **the most promising `U = 0` in five probes into a rising lower bound on the same design.** **The instruction that was meant to stop an unsupported zero is what removed a supported-looking one.**
 
@@ -156,6 +158,7 @@ message on 2026-08-20 under MSG-0041 (MSG-0042) — the fifth.
 | TASK-0037 | Version-transition freshness and stale-version fail-closed evidence | **COMPLETE** (2026-08-23) — **8/8 acceptance criteria**; **a probe ran**: 8 designs × 11 scenarios × 3 collection sizes, two instrument placements each; negative control **failed as required** and the adversarial precondition **voided this probe's own first fixture**; **all eight MSG-0113 §3 evidence items demonstrated**; **nothing CLEARED** — 7 NOT CLEARED, 1 DISQUALIFIED; **the discriminator fired** on the timer-only designs; **the faked kernel re-check demonstrated to be a no-op**; **`U` = 4 for both the leaking and the conservative design**; **no numeric threshold introduced**; `git diff --name-only docs/` **empty**; EPA-0006 **§4.10** added, **122 insertions / 0 deletions**; all nine MSG-0104 and eight TASK-0035 verdicts **unchanged**; **MSG-0115** | MSG-0113 DECIDED, EPA-0006 §4.9, TASK-0033/0035 harnesses ✅ | Claude Code |
 | TASK-0038 | Kernel-constrained retrieval / non-divergent projection evidence | **COMPLETE** (2026-08-24) — **8/8 acceptance criteria**; **a probe ran**: 9 designs × 7 scenarios × 3 collection sizes, two instrument placements **plus a placement-independent structural measure**; adversarial precondition held and the negative control **failed in 15 of 21 cases**; **nothing CLEARED** — 6 NOT CLEARED, 3 DISQUALIFIED; **the referred question answered negatively — removing the copy eliminates divergence and does nothing for Shape-1**; **the four discrete conjuncts refine perfectly and effectivity is the entire residual**; **`U = 0` shown purchasable by withholding authorized content**; **two designs differing by one `INDEXED BY` token measure `U` = 715 and 0**, so the planner decides examination on this engine class; **G-Q4 measured for the first time** and failed by a design returning identical answers; **E4 NOT OBTAINED**; **two defects in the probe's own apparatus caught and fixed before any result was reported**; `git diff --name-only docs/` **empty**; EPA-0006 **§4.11** added, **187 insertions / 0 deletions**; all prior verdicts **unchanged**; **MSG-0118** | MSG-0116a+b DECIDED, MSG-0115, EPA-0006 §4.6–§4.10 ✅ | Claude Code |
 | TASK-0039 | K7/K8 remaining clearance evidence — E4, `U1` observability, plan-independence | **COMPLETE** (2026-08-24) — **8/8 acceptance criteria**; **a probe ran**: 2 designs × 6 configurations × 4 collection sizes × 2 distributions, three instrument variants per cell (**96 measurements**), plus an API enumeration, an opcode capture, an instrument calibration and a negative control; adversarial precondition held at all four sizes under both distributions and the negative control **failed 4 of 4**; **nothing CLEARED — K7 and K8 both NOT CLEARED**; **E4 established UNOBTAINABLE by enumeration, not inferred**, with every tracing pragma **demonstrated inert against a nonexistent-pragma control**; **`U1` proved partially instrumentable, reversing MSG-0118** — an index-cursor placement **calibrated exactly (302, 402) against a cohort known by construction on both plans**, showing **K7 and K8 visit the same entries at every size (10 / 74 / 717 / 2860) while `U` reads 2857 versus 0**, so **K8 never examined less**; **`ANALYZE` alone flips K7's `U` from 2857 to 0** while entries visited rise by one; **plan-independence splits** — E1's reachable-structure limb **obtained** independently of the optimizer via `setAuthorizer` (characterised, not assumed), its confinement limb **not**, and **`INDEXED BY` pins one limb only**; **G-Q4 MET 12/12**; **two defects in the probe's own apparatus caught before any result was reported**, one an assertion the output contradicted in the same line; `git diff --name-only docs/` **empty**; EPA-0006 **§4.12** added, **178 insertions / 0 deletions**; all prior verdicts **unchanged**, K3/K4 not re-run; **Q12 referred**; **MSG-0123** | MSG-0120 AUTHORIZED, MSG-0119 (strict Q11), MSG-0118, EPA-0006 §4.6–§4.11 ✅ | Claude Code |
+| TASK-0040 | Encode Q12 in EPA-0006 §4.6 S7 — reachable index-cursor placements must be exercised | **COMPLETE** (2026-08-24) — **8/8 acceptance criteria**; **EPA-0006 §4.6 S7.1–S7.4** added, **98 insertions / 0 deletions**, additive and declared; **MSG-0124 quoted verbatim**; **S7-R1** every reachable index-cursor placement must be **exercised — executed and captured, never described** (§4.9 G-Q6's rule applied); **S7-R2** the **maximum observed across exercised applicable placements** is the reported `U`, still a **lower bound**; **S7-R3** row-access-only `U = 0` is **insufficient for E2** where such a placement exists unexercised, stated as **disqualifying** — E2 not satisfied, **NOT CLEARED** by S6; **"reachable" defined as occupiable-and-exercised**, a **"none reachable" report admissible only by enumeration** on §4.12 gap 1's nonexistent-pragma control, and **unreachability is not relief** (zero stays inconclusive, **E1 still required**, **S10 may bite**); probes must record the **reachable-but-unexercised set, which must be empty**; documentary — **no test count and none claimed**, **nothing executed, no probe written or re-run**; `git diff --name-only docs/` **empty**; **no gate weakened, no numeric threshold**; **all prior verdicts unchanged — K7/K8 NOT CLEARED, K3/K4 not re-run**; **one judgement call declared** — a six-line pointer note under §4.12's Q12 heading, heading and existing lines untouched; **MSG-0127** | MSG-0125 AUTHORIZED, MSG-0124 (Q12), MSG-0123, TASK-0034 precedent ✅ | Claude Code |
 | TASK-0002 | Make test entry points shell-independent | **ABORTED** | — | — |
 
 > **Reconciled 2026-08-22 by TASK-0030 — additive and declared.** The three rows above were missing:
@@ -174,8 +177,71 @@ boundary**, not at an empty queue.
 > been executed and is COMPLETE (MSG-0055). MSG-0051 §C is fully discharged: C1–C5 by MSG-0052,
 > C6–C7 by MSG-0053.
 
-**Current position, 2026-08-24 after TASK-0039: no task is READY. Five probes have now cleared
-nothing, and this one changes what the Architecture Lead is deciding about.**
+**Current position, 2026-08-24 after TASK-0040: no task is READY. Q12 is ruled, encoded and closed;
+what a probe must *attempt* is now part of the criterion rather than part of a probe's diligence.**
+
+TASK-0040 executed MSG-0125, with MSG-0124 binding, and is **COMPLETE** — **8/8 acceptance criteria
+MET**, each mapped to evidence in **MSG-0127** §4. It was run by a supervisor-started session
+(`runner.lock` pid 20752, acquired 10:27:18Z) against starting `HEAD = ef8561e`, **unchanged at every
+push**. **No repository movement occurred during this run.**
+
+**Nothing was executed.** This was a documentary task: **no probe was written, run or re-run**, no
+engine was installed or started, no network was reached, no corpus was entered, and **no benchmark,
+latency, capacity, recall or throughput figure exists in it.** There is **no test count and none is
+claimed.**
+
+**EPA-0006 §4.6 S7 now carries the Q12 ruling as S7.1–S7.4**, added **additively — 98 insertions, 0
+deletions, one file.** The three requirements S7 already had are reproduced unchanged, and no sentence
+anywhere in the document was deleted or reworded.
+
+- **S7.1** quotes **MSG-0124 verbatim** with its stated consequences, and records that it is a
+  **criterion decision, not an engine selection and not implementation authority**.
+- **S7-R1** — **every reachable index-cursor placement the subject exposes must be exercised**, in
+  addition to the other applicable placements. **Exercised means executed and captured**; naming or
+  describing a placement is not exercising it, on §4.9 G-Q6's rule that construction never replaces
+  execution evidence.
+- **S7-R2** — the reported `U` is the **maximum observed across the exercised applicable placements**,
+  and remains a **lower bound**.
+- **S7-R3** — **row-access-only `U = 0` is insufficient for E2** where a reachable index-cursor
+  placement exists and was not exercised, and **the insufficiency is disqualifying**: E2 is not
+  satisfied, so by S6 the candidate is **NOT CLEARED**. **Nothing discharges R3 except exercising the
+  placement.**
+- **S7.3** defines **"reachable"** as *occupiable through the subject's own API and actually
+  exercised* — established by taking the placement, never from documentation. A **"none reachable"**
+  report is admissible **only by enumeration**, on §4.12 gap 1's nonexistent-pragma control, because
+  *"the instrument reported nothing"* and *"the instrument was never running"* are the same
+  observation. **Unreachability is not relief**: the zero stays inconclusive, **E1 is still required**,
+  and **S10 may bite**.
+- **A probe must now record the reachable-but-unexercised set, and it must be empty.**
+
+**This is why the rule became a gate rather than a caution.** A row-access counter can read **zero**
+while an index cursor walks entries the subject may not see — §4.12 showed the opcode sequence that
+makes it so. **The same error shape has appeared four times in this project**, each time an
+instrument's silence read as evidence that nothing happened. S7-R3 makes the **omission itself**
+disqualifying.
+
+**Nothing is CLEARED and nothing changed.** **K7 and K8 remain NOT CLEARED**; **K3 and K4 remain NOT
+CLEARED**; TASK-0038's recorded `U = 0` for K8 **remains correct as a row-access count** and is simply
+not evidence for E2 under R3. **No prior probe was modified or re-run.** `git diff --name-only docs/`
+is **empty** — **no accepted ADR was touched** — **no gate was weakened**, and **no numeric tolerance
+or threshold was introduced.**
+
+**One judgement call is declared rather than absorbed** (MSG-0127 §7). Alongside the authorized S7
+update, a **six-line declared pointer note** was added under §4.12's Q12 heading, which reads
+*"Surfaced, NOT decided"*. Leaving it would have left the record ruled in one place and open in
+another. **The heading and every existing line are untouched**, and the note **points at S7 instead of
+restating the rule** — two statements of one rule invite drift. **If the Architecture Lead judges it
+outside TASK-0040's scope, it is one blockquote and reverts cleanly.**
+
+**The run stops here, as MSG-0125 requires. The next evidence action must be separately authorized.**
+The standing next step is unchanged: MSG-0119 returns the question to **EPA-0006 §4.7 Q3**, and
+failure does not authorize weakening the gates.
+
+> **The paragraph this replaces, retained:** "**Current position, 2026-08-24 after TASK-0039: no task
+> is READY. Five probes have now cleared nothing, and this one changes what the Architecture Lead is
+> deciding about.**" True when written, and **still true** — TASK-0040 cleared nothing and ran nothing;
+> it encoded the criterion the TASK-0039 evidence produced, and **Q12, referred there as non-blocking,
+> is now ruled by MSG-0124 and closed in §4.6 S7.**
 
 TASK-0039 executed MSG-0120, with MSG-0119 binding, and is **COMPLETE** — **8/8 acceptance criteria
 MET**, each mapped to evidence in **MSG-0123** §8. It was run by a supervisor-started session

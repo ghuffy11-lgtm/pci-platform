@@ -499,6 +499,97 @@ Because counts are position-dependent (S5), a probe **must**:
 **An in-query counter does not measure rows scanned at all.** The **plan** is the evidence for scan
 extent — which is why E1 is required rather than optional.
 
+> **Added 2026-08-24 by TASK-0040 (MSG-0125), encoding the Architecture Lead's Q12 ruling
+> (MSG-0124). Additive and declared: the three numbered requirements above are reproduced unchanged —
+> no sentence of S7, or of any other section, is deleted or reworded — and no verdict recorded
+> anywhere in this record changes.** S7 as it stood said **how** placements are reported and **never
+> which placements must be attempted**; §4.12's Q12 referral names that gap in those words. **S7.1–S7.4
+> below close it.** They **weaken nothing**: E2, strict Shape-1, `U = 0`, E1–E4, G-Q4, and the Q8, Q10
+> and Q11 rulings are untouched, **no numeric tolerance or threshold is introduced**, and **no engine,
+> runtime, provider, model or index technology is selected.**
+
+##### S7.1 — The ruling, quoted rather than paraphrased
+
+> When the engine exposes a reachable index-cursor placement, the probe must exercise that placement
+> in addition to other applicable placements and report the maximum observed result. A row-access-only
+> `U = 0` is not sufficient to satisfy E2 when an index-cursor placement exists but has not been
+> exercised.
+>
+> — **MSG-0124**, Q12 decision
+
+**This is a criterion decision, not an engine selection and not an implementation authorization**
+(MSG-0124). Its stated consequences are part of the ruling and are quoted with it: *"The existing
+strict Shape-1 / E2 bar is not relaxed"*; *"A probe that omits a reachable index-cursor placement
+cannot clear a candidate on the basis of row-access-only `U = 0`"*; *"Existing MSG-0123 verdicts are
+unchanged: K7 and K8 remain NOT CLEARED."*
+
+**Why the rule is worth a gate rather than a caution.** A row-access counter can read **zero** while
+an index cursor is walking entries the subject may not see. §4.12 gap 2 demonstrated it at opcode
+level on this record's own test subject: an entry failing the residual is rejected **from the index**
+and the table row is **never read**, so a counter placed at row access *cannot fire for it*. **S5
+predicted this — a zero count proves only that nothing crossed the point where the instrument sits.**
+S7.1–S7.4 make the **omission itself** disqualifying rather than something a diligent probe happens to
+notice.
+
+##### S7.2 — The three requirements, stated so a probe can be failed against them
+
+| | Requirement | What discharges it | What fails it |
+|---|---|---|---|
+| **S7-R1** | **Every reachable index-cursor placement the test subject exposes must be exercised**, *in addition to* the other applicable placements — never instead of them | The probe **runs** each such placement and reports its count. Exercised means **executed and captured**, on the same fixtures and at the same collection sizes as the other placements | A placement that is reachable and was not exercised. **Naming a placement, describing it, or arguing what it would have shown is not exercising it** — §4.9 G-Q6's rule that execution evidence is never replaced by construction applies here in the same terms |
+| **S7-R2** | **The candidate's reported `U` is the MAXIMUM observed across the exercised applicable placements**, and remains a **lower bound** on units examined (unchanged from S7 item 2) | The probe records every placement's count, states which is the maximum, and reports **that** figure as `U` | Reporting a count from one placement as the candidate's `U` while a higher count was observed at another; or reporting a mean, a median, a preferred placement, or a count taken at a placement chosen after the numbers were seen |
+| **S7-R3** | **Row-access-only `U = 0` is INSUFFICIENT for E2 where a reachable index-cursor placement exists and was not exercised.** The insufficiency is **disqualifying**: **E2 is NOT satisfied**, and by S6 the candidate is **NOT CLEARED** | Nothing discharges R3 except **exercising the placement** and reporting the maximum under R2 | Any argument that the row-access zero "would have been" matched at the index cursor. **A row-access zero does not prove an index-cursor zero, and this specification does not permit that inference to be drawn or recorded** (MSG-0125) |
+
+**None of R1–R3 introduces a threshold, a tolerance, or a count.** They say *which placements must be
+attempted* and *which number is reported*. **The bar remains `U = 0` at every measured collection
+size, invariant with `N`, with E1 + E2 + E3 + E4 all obtained** (S6, S9).
+
+##### S7.3 — "Reachable", and the one way a probe may report that no such placement exists
+
+**Reachable** means: **a placement an instrument can actually occupy through the test subject's own
+API, runtime or configuration, as exercised.** Reachability is established **by taking the placement**,
+not by reading documentation about it.
+
+**A probe may report that no index-cursor placement is reachable — but only by enumeration, never by
+assertion.** The enumeration must name what was checked and what it returned: the API surface actually
+exposed, the build's compiled-in options, and any instrument that was tried and found inert. **§4.12
+gap 1 is the worked example of the required standard**, including its control: the subject silently
+ignores an unrecognised pragma, so a probe there ran **a pragma that certainly does not exist** and
+required every tracing pragma to behave differently from it before believing any of them. **Without
+such a control, "the instrument reported nothing" and "the instrument was never running" are the same
+observation.**
+
+**Unreachability is not relief, and it is not a pass.** Where no index-cursor placement is reachable:
+
+- the count obtained at whatever placements *were* reachable is still a **lower bound** (S5), and a
+  zero is still **inconclusive**;
+- **E1 is still required** and still carries the traversal-extent question that counters cannot answer;
+- **S10 may bite** — an engine that cannot be observed fails the burden AMD-01 places on it, *"regardless
+  of what its documentation asserts"*.
+
+**What a probe must record for E2, in every case:** the placements attempted; the count at each; which
+is the maximum and therefore the reported `U`; and **the set of reachable-but-unexercised placements —
+which must be empty.** A non-empty set is E2 **not satisfied**, however clean the row-access figure
+looks.
+
+##### S7.4 — What this does NOT change, stated item by item
+
+- **No verdict recorded in this document changes.** TASK-0033, TASK-0035, TASK-0037, TASK-0038 and
+  TASK-0039 stand exactly as measured; **none was re-run for this update**, and re-running one to make
+  the criterion fit is forbidden (MSG-0125).
+- **TASK-0038's recorded `U = 0` for K8 remains correct as a row-access count.** §4.12 already says so,
+  and this section does not relabel it. What R3 forbids is **reading such a figure as satisfying E2**
+  when a reachable index-cursor placement was not exercised — which is the reading §4.12 also declined
+  to take.
+- **K7 and K8 remain NOT CLEARED** (MSG-0123, §4.12); **K3 and K4 remain NOT CLEARED** under MSG-0119's
+  strict Q11 reading. **Five probes have cleared nothing, and nothing here clears anything.**
+- **No ADR is amended, proposed, or affected.** This is an evidence-instrument change, on the mechanism
+  TASK-0034 and TASK-0036 established.
+- **G-Q4.4 is not modified.** It already counts routing-phase units *"at the placement rules of S7"*; that
+  existing reference now reaches R1–R3 like every other, which is a consequence of the cross-reference
+  rather than a new requirement placed on the gate.
+- **No implementation task is authorized or marked READY**, and **no next evidence action is started** —
+  MSG-0125 requires the next one to be separately authorized.
+
 #### S8 — Mandatory negative control, and the adversarial precondition
 
 Both carried forward from TASK-0033, because both earned their place.
@@ -1431,6 +1522,13 @@ distributions, and the negative control **failed in 4 of 4 cases** (§4.6 S8).
   is authorized or marked READY.
 
 #### Q12 — must a probe take the index-cursor placement wherever the engine exposes one? Surfaced, NOT decided
+
+> **Q12 has since been RULED, and this section is otherwise unchanged.** Note added 2026-08-24 by
+> **TASK-0040** under **MSG-0125**; **additive — nothing below is deleted or reworded, and the heading
+> is left as TASK-0039 wrote it** so the referral reads as it did when made. **MSG-0124 answers the
+> question YES, strictly**, and the ruling is encoded as **§4.6 S7.1–S7.4**, which is where it must be
+> read from. **It is deliberately not restated here** — two statements of one rule invite drift. **No
+> verdict in this section changes: K7 and K8 remain NOT CLEARED**, and MSG-0124 says so in terms.
 
 **Numbering:** §4.7 holds **Q1–Q3**, still open. **Q4–Q6** are ruled and encoded in §4.9. **Q7** is
 ruled with its numeric limb open. **Q8–Q10** are ruled (MSG-0116a/b). **Q11** is ruled by MSG-0119.
