@@ -656,6 +656,13 @@ of them being answered** — each carries a stated fail-closed default.
 
 #### Q1 — Does "examine" reach index metadata, or only passage content?
 
+> **Q1 is RULED by MSG-0134 — A: the strict reading.** Note added 2026-08-24 by an interactive COMMS
+> session; **additive, nothing below deleted or reworded**, so the narrower reading stays visible as
+> the reading that was rejected. **Reading an unauthorized index entry, key or metadata is examination**
+> even when no passage content is touched; **U1–U5 as §4.6 S4 defines them remain authoritative**, and
+> **U1 stays in scope**. **A candidate cannot satisfy E2 by arguing unauthorized metadata was harmless.**
+> Ruling text in MSG-0134; **deliberately not restated here.**
+
 §4.6 S4 counts **U1** — reading an index entry or key — as examining. A narrower reading would count
 only units carrying **passage content** (U2–U5), on the ground that ADR-0020's stated hazard is content
 in the process.
@@ -670,6 +677,14 @@ touching no passage content under either.**
 **Default until ruled: the strict reading, U1–U5.** Fail-closed, and therefore safe to operate under.
 
 #### Q2 — Can strict Shape-1 be satisfied by query-time predicates alone, or does it constrain how the projection is *physically organised*?
+
+> **Q2 is RULED by MSG-0135 — B: physical isolation is required where necessary.** Note added
+> 2026-08-24 by an interactive COMMS session; **additive, nothing below deleted or reworded.**
+> Query-time predicates alone are **insufficient where the engine must examine unauthorized candidates
+> before applying them**; the governed projection must be **physically organized/partitioned as
+> necessary**. **The logical-projection / physical-organization distinction is preserved** — multiple
+> physical structures may constitute **one logical projection**. Ruling text in MSG-0135;
+> **deliberately not restated here.**
 
 **This is the question with the most architectural leverage, and it is MSG-0106 §4's question.**
 
@@ -889,6 +904,16 @@ was the right one; or an engine that exposes no observability over its routing p
 > §4.6 S4): the strict reading, and a routing read of a catalogue entry describing a structure the
 > subject is not entitled to **counts**. **That default can only withhold clearance, never grant it**,
 > so the gate is operable now.
+>
+> **Q1 has since been RULED A — the strict reading (MSG-0134).** Note added 2026-08-24 by an
+> interactive COMMS session; **additive, nothing above deleted or reworded.** **The fail-closed default
+> this paragraph names is therefore now the ruling**, and a routing read of a catalogue entry describing
+> a structure the subject is not entitled to **counts**, exactly as stated. **What is deliberately not
+> claimed here is that MSG-0134 settles the structure-identifier variant.** MSG-0134 rules on index
+> entries, keys and metadata; MSG-0109 §9 Q4 records that this question — identifiers describing
+> **structures** rather than **chunks** — is *"related but distinct"*. **The practical position is
+> unchanged either way: the strict reading applies, and it can only withhold clearance, never grant
+> it.** Referred in MSG-0139 §4.
 
 #### G-Q5 — temporal materialisation requires BOTH conditions, and one of them is only testable structurally
 
@@ -1053,6 +1078,15 @@ remain **NOT CLEARED**; classes **S**, **V** and **K** remain **NOT CLEARED** wi
 evidence; class **D** and class **H** remain **DISQUALIFIED**.
 
 #### Q7 — the numeric staleness bound. Surfaced for the Architecture Lead, deliberately NOT decided
+
+> **Q7 is RULED by MSG-0136 — zero stale-answer tolerance, and no numeric threshold.** Note added
+> 2026-08-24 by an interactive COMMS session; **additive, nothing below deleted or reworded.** Once a
+> policy is updated, approved, revoked or superseded, **the prior version must not answer**, and where
+> the current approved version cannot be established the system **abstains**. **The numeric limb this
+> heading refers to is answered by being refused**: the requirement is freshness, **not an elapsed-time
+> allowance**, so **no threshold is introduced**. **G-Q5's bounded re-materialisation interval remains
+> an evidence requirement, and does not become permission to answer stale content.** Ruling text in
+> MSG-0136; **deliberately not restated here.**
 
 **Numbering:** §4.7 holds **Q1–Q3**; MSG-0109 §9 raised **Q4–Q6**, now ruled by MSG-0110 and encoded
 above. **Q7 is the next free number**, allocated here and verified unused.
@@ -1892,7 +1926,30 @@ as open is a valid result.
 nowhere near sufficient**, and that the next binding constraint is an **engine-observability**
 property that **no amount of architecture can supply.**
 
-#### Q13 — which temporal frames must a topology be able to answer? Surfaced, NOT decided
+> **GAP-E is DISCHARGED, and the row above is left as TASK-0041 wrote it.** Note added 2026-08-24 by an
+> interactive COMMS session; **additive, nothing deleted**. **Q1 is ruled A** (MSG-0134), **Q2 is ruled
+> B** (MSG-0135) and **Q7 is ruled A** (MSG-0136) — see the notes at each heading and
+> [`EPA-0006-Q1-Q2-Q7-reconciliation.md`](EPA-0006-Q1-Q2-Q7-reconciliation.md). **GAP-A, GAP-B and
+> GAP-C are NOT discharged**, and **GAP-B still blocks clearance independently of topology.**
+>
+> **Sentences elsewhere in this record still say Q1 and Q2 are open** — §4.7's own bodies, §4.11, and
+> the numbering paragraph below among them. **They were true when written and are deliberately not
+> rewritten**; the heading notes carry the current state. Whether this record should be updated in
+> place more fully, on TASK-0040's declared mechanism, is **the Architecture Lead's call** and is
+> recorded in MSG-0139.
+
+#### Q13 — which temporal frames must a topology be able to answer? **RULED by MSG-0133** — Release 1 is the current/"now" frame only
+
+> **RULED by MSG-0133 — Release 1 is the current/"now" temporal frame only.** Note added 2026-08-24 by
+> an interactive COMMS session; **additive — nothing below is deleted or reworded**, so the referral
+> reads as TASK-0041 made it. **The heading is the one exception**, changed from *"Surfaced, NOT
+> decided"* because **MSG-0133 instructs that change in terms**. Historical and future frames are **out
+> of scope for Release 1**, a non-now request **must ABSTAIN**, and effective-date and supersession data
+> **stay captured** so a later, separately authorized capability loses no history. **The ruling text is
+> in MSG-0133 and the reconciliation in
+> [`EPA-0006-Q13-release-1-temporal-scope-reconciliation.md`](EPA-0006-Q13-release-1-temporal-scope-reconciliation.md);
+> it is deliberately not restated here.** **GAP-D is discharged as a scope decision. I7 remains a
+> structural pattern and remains NEVER MEASURED. No verdict, gate or selection authority changes.**
 
 **Numbering:** §4.7 holds **Q1–Q3**; **Q3 is now ruled** by MSG-0129 and answered above, with **Q1 and
 Q2 still open**. **Q4–Q6** are ruled and encoded in §4.9; **Q7** is ruled with its numeric limb open;

@@ -2,7 +2,9 @@
 
 **Active Work Package:** WP-0001 — PCI Kernel Foundation
 **Status:** **COMPLETE** — declared by the architecture lead 2026-08-19 (MSG-0020(b), resolved by MSG-0022 / MSG-0023, TASK-0009)
-**Last Updated:** 2026-08-24 UTC — **TASK-0041 COMPLETE; the Q3 architecture response is written.** **EPA-0006 §4.13**, **392 insertions / 0 deletions**, plus a declared pointer note under §4.7 Q3 — **the answer lives in one place and Q3 points at it**. **Nothing is CLEARED and nothing could have been**: the task is entirely structural and **G-Q6 rejects construction-only evidence**, so its output is **a topology plus the evidence still owed on it**. **Five invariants — N1 containment, N2 closure of the reachable set, N3 refinement by enumerated transition, N4 plan-independence, N5 non-withholding** — with the load-bearing claim that **N1 + N2 make N4 free**: nothing unauthorized within reach means **no plan can examine it**, which is precisely why **§4.12's `ANALYZE` result — `U` 2857 → 0 on a maintenance command — argues for redesign and not for a better-behaved planner**. **Three caveats recorded with the claim**, chief among them that **N1 is containment and does NOT discharge E2**. **§4.8's catalogue extended, not replaced: I7** boundary-refined effectivity — **effectivity IS piecewise constant in time**, so it refines on the interval to the next boundary, and those boundaries are **data already in the kernel, not a tuning parameter** — and **I8** entitlement-class materialisation; **both NEVER MEASURED**. **Four topologies W1–W4 mapped cell by cell to every gate**, and **they differ in exactly ONE cell**, which is itself the answer to Q3. **EV1–EV12** state the **minimum evidence** any future engine-selection task would need — **evidence, not a shortlist**. **R1 is a criterion, not a selection; the W1–W4 choice stays OPEN on unmeasured cost.** **Five gaps recorded and selection stays blocked — GAP-B first: E4 is UNOBTAINABLE on the only reachable test subject, so a future probe there would clear nothing whatever the topology.** **Q13 referred** (which temporal frames must a topology answer), fail-closed, blocking nothing. **DISC-0011 recorded, not corrected.** **K7/K8 still NOT CLEARED; nothing selected, nothing executed, no ADR touched. No task is READY.**
+**Last Updated:** 2026-08-24 UTC — **Q1, Q2, Q7 and Q13 RULED; TASK-0042 READY.** **Q1 = A strict** (unauthorized index entries, keys and metadata **are** examination; **U1 stays in scope**), **Q2 = B** (**physical isolation required where necessary** — query-time predicates alone are insufficient where the engine examines unauthorized candidates first), **Q7 = A** (**zero stale-answer tolerance**, abstain rather than answer stale, **no threshold introduced**), **Q13** (**Release 1 is the current/"now" frame only**; a non-now request **abstains**). **Every numbered question Q1–Q13 is now ruled** — the first time that has been true — and **not one of them relaxed anything**: each was ruled in the fail-closed direction the record already defaulted to, so **every verdict stands and nothing became CLEARED by a decision**. **TASK-0042 is the single READY task** (MSG-0137): routing-phase and physical-structure measurement with **routing counted in `U`**, **every applicable S7 placement exercised and the maximum reported**, **zero-stale-answer transitions including abstention**, **I5/I7/I8 measured or recorded NEVER MEASURED with the exact limitation**, and an **E4 re-check**. **The queue write MSG-0138 asked for had not happened** — the queue held **zero mentions of TASK-0042** — so the supervisor's `no READY task` was **correct, not a stall**; it is written now. **ADR-0018 clarified in place under MSG-0133; K7/K8 still NOT CLEARED; GAP-A/B/C stand; nothing selected.**
+
+> **The line this replaces, retained:** "**TASK-0041 COMPLETE; the Q3 architecture response is written.** **EPA-0006 §4.13**, **392 insertions / 0 deletions**, plus a declared pointer note under §4.7 Q3 — **the answer lives in one place and Q3 points at it**. **Nothing is CLEARED and nothing could have been**: the task is entirely structural and **G-Q6 rejects construction-only evidence**, so its output is **a topology plus the evidence still owed on it**. **Five invariants — N1 containment, N2 closure of the reachable set, N3 refinement by enumerated transition, N4 plan-independence, N5 non-withholding** — with the load-bearing claim that **N1 + N2 make N4 free**: nothing unauthorized within reach means **no plan can examine it**, which is precisely why **§4.12's `ANALYZE` result — `U` 2857 → 0 on a maintenance command — argues for redesign and not for a better-behaved planner**. **Three caveats recorded with the claim**, chief among them that **N1 is containment and does NOT discharge E2**. **§4.8's catalogue extended, not replaced: I7** boundary-refined effectivity — **effectivity IS piecewise constant in time**, so it refines on the interval to the next boundary, and those boundaries are **data already in the kernel, not a tuning parameter** — and **I8** entitlement-class materialisation; **both NEVER MEASURED**. **Four topologies W1–W4 mapped cell by cell to every gate**, and **they differ in exactly ONE cell**, which is itself the answer to Q3. **EV1–EV12** state the **minimum evidence** any future engine-selection task would need — **evidence, not a shortlist**. **R1 is a criterion, not a selection; the W1–W4 choice stays OPEN on unmeasured cost.** **Five gaps recorded and selection stays blocked — GAP-B first: E4 is UNOBTAINABLE on the only reachable test subject, so a future probe there would clear nothing whatever the topology.** **Q13 referred** (which temporal frames must a topology answer), fail-closed, blocking nothing. **DISC-0011 recorded, not corrected.** **K7/K8 still NOT CLEARED; nothing selected, nothing executed, no ADR touched. No task is READY.**" True when written; **the Architecture Lead has since ruled the four remaining questions and authorized the evidence task they make possible.**
 
 > **The line this replaces, retained:** "**MSG-0129 RULES Q3; TASK-0041 READY.** The answer is **architecture, not relaxation**: *"not to relax the bar and not to select the least-bad engine."* The project stays **NOT CLEARED for retrieval-engine selection** and **returns to architecture work** to define a topology that can satisfy the existing gates. **`U = 0`, E1–E4 and G-Q4/G-Q5/G-Q6 remain mandatory**; five probes clearing nothing is evidence the **explored space is insufficient**, not licence to weaken AMD-01. **Q3 takes §4.7's third branch — reconsider the topology — leaving Q1 and Q2 open, not ruled.** **TASK-0041 is the single READY task** (MSG-0130): technology-agnostic topology patterns, each mapped to the gates and split into **structural** versus **execution-evidence-required**, plus the **minimum evidence** any future engine-selection task would need. **It is a structural task and G-Q6 rejects construction-only evidence, so it can clear nothing by itself.** **K7/K8 still NOT CLEARED; nothing selected, no ADR touched.**" True when written; **the task it announced has now run**, started by the supervisor cycle at **15:27:18Z** and completed the same evening. **Its central prediction was the load-bearing one and it held in a sharper form than expected**: the task cleared nothing, as promised — but the reason is not merely that structure cannot clear. **Mapping four topologies against every gate produced four columns differing in exactly one cell**, which says that **topology decides far less of the clearance question than the framing suggested**, and that **the next binding constraint is engine observability rather than architecture** (GAP-B). **One instruction cut the other way**: *"start from §4.8, do not restart the catalogue"* was followed, and following it closely enough to re-read §4.8's refinement rule is what surfaced **I7** — **§4.8's conclusion that effectivity "does not refine at all without fixing a time" was precise and had been read one step too pessimistically.**
 
@@ -2235,10 +2237,29 @@ both tables index it, and both were updated in the same commit as the record.
 
 ## Next Action
 
-**No task is READY, and the next action is the Architecture Lead's.** **TASK-0041 is COMPLETE** and
-MSG-0130's acceptance ends at the documented architecture response. **Engine selection stays blocked
-and must be separately authorized** once the existing gates are **positively satisfied with
-evidence** (MSG-0129).
+**TASK-0042 is READY and is the single READY task** — authorized by MSG-0137 under the now-resolved
+Q1/Q2/Q7 boundaries, and written into the queue by this session. **A supervisor cycle can take it
+without a manual trigger.**
+
+> **The lines this replaces, retained:** "**No task is READY, and the next action is the Architecture
+> Lead's.** **TASK-0041 is COMPLETE** and MSG-0130's acceptance ends at the documented architecture
+> response. **Engine selection stays blocked and must be separately authorized** once the existing
+> gates are **positively satisfied with evidence** (MSG-0129)." **True when written.** The middle and
+> last sentences still hold exactly as written — **only the first has moved.**
+
+**The queue write MSG-0138 asked for had not happened.** `CLAUDE-TASKS.md` contained **zero occurrences
+of `TASK-0042`**, and the commit titled *"Reconcile TASK-0042 as next READY evidence task"* added **only
+the message file**. **So the supervisor's `no READY task` at 17:07:20Z was an accurate reading, not a
+stall** — the queue is the authority, and an authorization that has not reached it does not start work.
+**This is the ninth such gap, and closing it is a COMMS session's job.**
+
+**What TASK-0042 must produce:** routing-phase and reachable-structure measurement with **routing
+counted in `U`** (Q2, G-Q4); **every applicable S7 placement exercised and the maximum `U` reported**,
+strict U1–U5 preserved (Q1); **zero-stale-answer evidence across update / approve / revoke / supersede
+plus the abstention case**, distinguishing transition-triggered from periodic behaviour (Q7);
+**I5/I7/I8 measured where genuinely observable, else NEVER MEASURED with the exact limitation**; and an
+**E4 observability re-check**. **It may clear nothing** — **GAP-B says E4 is unobtainable on the only
+reachable subject, which blocks clearance independently of anything measured.**
 
 > **The lines this replaces, retained:** "**TASK-0041 is READY and is the single READY task** — the
 > Architecture Lead authorized it in MSG-0130, under the Q3 ruling in MSG-0129. **A supervisor cycle
@@ -2346,12 +2367,25 @@ would need its own authorization.
 > Q3**." True at 2026-08-24 ~11:50Z. **Superseded the same afternoon**: MSG-0129 ruled Q3 and MSG-0130
 > authorized TASK-0041. Everything else in it still holds.
 
-**Open and awaiting the Architecture Lead:** §4.7 **Q1 and Q2** — **Q3 is RULED by MSG-0129 and now
-ANSWERED in §4.13**, and the ruling took the topology branch without deciding the other two — **Q7's
-numeric limb** (no staleness threshold exists anywhere in the accepted set), and **Q13, newly raised**
-(which temporal frames must a retrieval topology be able to answer). **Q4–Q6, Q8–Q10, Q11 and Q12 are
-ruled and encoded.** **Every open question carries a fail-closed default and none of them blocks
-anything.** **MSG-0060's observation about colliding task specifications is still unanswered.**
+**Open and awaiting the Architecture Lead:** **nothing numbered.** **Every question Q1–Q13 is now
+ruled** — **Q1 = A** (MSG-0134), **Q2 = B** (MSG-0135), **Q7 = A** with its numeric limb answered by
+**refusing to set a threshold** (MSG-0136), **Q13** (MSG-0133), on top of Q3–Q6 and Q8–Q12 already
+ruled. **This is the first time no numbered question in EPA-0006 is open.** What remains is not a
+question but **evidence**: **GAP-A** (I5/I7/I8 never measured), **GAP-B** (E4 unobtainable on the only
+reachable subject) and **GAP-C** (cost entirely unmeasured). **One unnumbered interaction in §4.9 G-Q4
+is formally unsettled** — whether an exact-key catalogue lookup of a structure name is itself
+examination — but its fail-closed reading **is now backed by the Q1 ruling rather than by a default**,
+and it can only withhold clearance, never grant it. **MSG-0060's observation about colliding task
+specifications is still unanswered**, and **DISC-0011 is open**.
+
+> **The paragraph this replaces, retained:** "**Open and awaiting the Architecture Lead:** §4.7 **Q1 and
+> Q2** — **Q3 is RULED by MSG-0129 and now ANSWERED in §4.13**, and the ruling took the topology branch
+> without deciding the other two — and **Q7's numeric limb** (no staleness threshold exists anywhere in
+> the accepted set), and **Q13, newly raised** (which temporal frames must a retrieval topology be able
+> to answer). **Q4–Q6, Q8–Q10, Q11 and Q12 are ruled and encoded.** **Every open question carries a
+> fail-closed default and none of them blocks anything.**" **True when written at ~17:00Z; all four were
+> ruled the same evening.** The last sentence is why the sequence worked: **the defaults held the line
+> while the questions were open**, so nothing waited on them.
 
 **Offered for the Lead, requested by nothing:** whether **R1** is recorded as settled; **Q13**;
 **DISC-0011**; and **GAP-B's consequence for sequencing** — since a future evidence task on the same
@@ -2360,12 +2394,18 @@ falsify or support N1/N2/N3) or to obtain a test subject that can supply E4 firs
 states these and takes none of them.**
 
 **Operationally, the supervisor is ENABLED** — `supervisor-config.json` carries `enabled: true`,
-`dryRun: false`. The heartbeat observed during this run, **2026-08-24T15:28:48Z**, records
-`decision: RUNNER_RUNNING`, `reason: TASK-0041 running for 90s`, `readyTask: TASK-0041`,
-`head: 090fb21`, `runnerActive: true`, `runnerPid: 4316`. **That heartbeat is evidence about the
-moment it was written and nothing later** — TASK-0041 has since completed, so the next cycle should
-find **no READY task** and record `NOOP`, which is correct behaviour rather than a stall. **No blocker
+`dryRun: false`. The heartbeat observed at the start of this session, **2026-08-24T17:07:20Z**, records
+`decision: NOOP`, `reason: no READY task`, `head: 2841f23`, `runnerActive: false`, and **no
+`runner.lock` exists**. **That NOOP was an accurate reading of the queue, not a stall** — TASK-0042 had
+been authorized in MSG-0137 but **the queue held no TASK-0042 row**, so there was genuinely nothing
+READY to take. **Once this reconciliation is pushed, the next cycle can take TASK-0042.** **No blocker
 is open. One discovery is recorded: DISC-0011.**
+
+> **The paragraph this replaces, retained:** it cited the **15:28:48Z** heartbeat with
+> `decision: RUNNER_RUNNING`, `reason: TASK-0041 running for 90s`, `runnerPid: 4316`, and predicted the
+> next cycle would find **no READY task** and record `NOOP`. **The prediction held exactly** — the
+> 17:07:20Z heartbeat above is that NOOP. **What it could not predict is why the NOOP persisted:** not
+> because the work was done, but because **an authorized task had never reached the queue.**
 
 > **The paragraph this replaces, retained:** it cited the **15:17:18Z** heartbeat at `head: 090fb21`
 > with `decision: NOOP`, `reason: no READY task` and *"no `runner.lock` exists"*, and predicted that
