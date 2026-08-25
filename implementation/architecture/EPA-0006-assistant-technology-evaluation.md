@@ -2291,6 +2291,135 @@ every count above**, and MSG-0137 forbids inferring otherwise.
 
 ---
 
+### 4.15 E4 observability on a second test subject: obtainable, and adverse (TASK-0043, MSG-0141)
+
+**Recorded here by MSG-0153 (R1 = YES), from the execution record in MSG-0146.** **Additive: no line of
+any other section is changed, no verdict moves, and nothing in this section clears anything.**
+
+> **The subject below is an EVIDENCE INSTRUMENT, not a candidate.** MSG-0141: this is *"not engine
+> selection, adoption, deployment, or implementation authorization"*, the subject *"must not be
+> evaluated for product suitability"*, and a successful E4 observation *"does not clear any candidate or
+> permit engine selection."* **No candidate holds an E4 pass on the strength of this section.**
+
+#### Why a second subject was sought
+
+**§4.13 GAP-B records that E4 was UNOBTAINABLE on the only subject then reachable**, and §4.14 finding 8
+confirmed it a second time against the **nonexistent-pragma control** — without which *"the instrument
+reported nothing"* and *"the instrument was never running"* are the same observation.
+
+**GAP-B blocks clearance independently of any topology**, so the open question was not whether that
+subject could supply E4 — it cannot — but **whether any reachable subject could.**
+
+#### The two subjects
+
+| | First subject (§4.12, §4.14) | Second subject (this section) |
+|---|---|---|
+| Engine | **SQLite 3.51.3** via `node:sqlite` | **SQLite 3.50.4** via Python's `sqlite3` |
+| Runtime | Node **v24.15.0** | **Python 3.14.5**, `C:\Python314\python.exe` |
+| E4 | **NOT OBTAINABLE** | **OBTAINABLE** |
+
+**Both are recorded so a later reader can tell whether a different answer means a changed engine or a
+changed probe.**
+
+#### The surface, enumerated rather than assumed
+
+**Present** — 3 of 42 public `Connection` names: **`set_trace_callback`**, **`set_progress_handler`**,
+**`set_authorizer`**. **`Cursor` exposes none.**
+
+**Absent, each checked explicitly:** `stmt_scanstatus`, `set_profile`, `config_log`, `trace_v2`.
+
+**Build:** 43 compile options; **`DEBUG` ABSENT · `ENABLE_SQLLOG` ABSENT · `ENABLE_STMT_SCANSTATUS`
+ABSENT.**
+
+> **Those are the same three absences as the first subject, and the point is what it implies:** the two
+> subjects **differ in the binding, not in the build**. **E4's obtainability here is a property of what
+> the language binding exposes**, not of a differently-compiled engine — which is why this result may
+> **not** be generalized to "SQLite supplies E4", still less to any engine class (§4.6 S10, and
+> §4.12's standing prohibition on generalizing one subject's behaviour).
+
+**Tracing pragmas against the §4.12 control:** `vdbe_trace`, `vdbe_listing`, `vdbe_addoptrace`,
+`parser_trace`, `sql_trace` — **all five identical to the nonexistent-pragma control. 5 of 5 INERT.**
+
+#### The three instruments, each run disarmed before armed
+
+| Instrument | Disarmed | Armed | What it carries | Answers E4? |
+|---|---|---|---|---|
+| **`set_trace_callback`** | **0 entries** | **1 entry** | the **expanded statement text** | **YES — this is the surface** |
+| `set_progress_handler` | **0** | **807 invocations** (every 1 VM instruction) | **nothing — the callback takes no arguments** | **NO — a counter, not a log** |
+| `set_authorizer` | **0** | **3 events**, and **0 on an identical second execution** | action codes and **object names** (`chunk.id`, `chunk.scope`) — never content | **NO — prepare-time, per column reference** |
+
+**Every instrument was run disarmed first and the disarmed run was silent**, so *"absent log"* and
+*"never armed"* are distinguishable throughout. **The authorizer's zero on re-execution is the same
+compile-time signature §4.12 characterised on the first subject** — confirmed here, not assumed.
+
+#### The adverse finding, which is the substance of this section
+
+**Unauthorized passage text bound as a query PARAMETER appears verbatim in the engine's own trace:**
+
+```text
+query:  SELECT id FROM chunk WHERE body = ?      -- marker passed as a bound parameter
+trace:  [0] "SELECT id FROM chunk WHERE body = 'ZZ-UNAUTHORIZED-PASSAGE-TEXT-ZZ body 7'"
+        entries containing the unauthorized marker: 1
+```
+
+**The trace emits the EXPANDED statement, so binding a parameter does not keep the text out of it.**
+**§9.3 and ADR-0020 §6.2's concern is demonstrated rather than argued.**
+
+> **This is the reverse of §4.14's surface scan, and that scan was right not to be offered as E4.**
+> §4.14 scanned five engine-produced surfaces against three unauthorized passage bodies, found **0
+> occurrences**, attributed it to *"parameters being bound rather than inlined"*, and **declined to
+> present it as E4 evidence.** **The protection it appeared to observe does not hold at the surface E4
+> actually asks about.** A probe that had rounded that scan up would have recorded a false negative —
+> and the reason it did not is that §4.6 S6 names E4 as **log inspection specifically**, not as
+> "we looked in some engine output".
+
+#### What the surface does NOT do — recorded beside the verdict, not folded into it
+
+**It records the INSTRUCTION, not the EXAMINATION.** The traced query examines **200 rows**, returns
+**100**, and emits **1 trace entry**.
+
+**So this surface cannot measure `U`**, cannot substitute for an S7 placement, and says nothing about
+how many unauthorized units were touched. **E2 evidence it is not.**
+
+#### Verdict
+
+| | Condition | Result |
+|---|---|---|
+| **C1** | an engine-emitted log surface exists **and was taken** | **YES** |
+| **C2** | a control separates *"absent log"* from *"never armed"* | **YES** |
+| **C3** | the surface can be inspected **for passage text** | **YES** |
+| **C4** | the surface records **what the engine EXAMINED** | **NO — per-statement granularity** |
+
+**E4 is OBTAINABLE on this subject under §4.6 S6's definition, and the inspection is ADVERSE.** **Run
+validity: VALID** — every negative control behaved as required.
+
+#### What this section does NOT establish
+
+- **Nothing is CLEARED.** **All six §4.14 candidates remain NOT CLEARED**, and **seven probes have now
+  cleared nothing.**
+- **§4.13 GAP-B is not withdrawn.** It is a claim about the **first** subject, which is the subject every
+  Shape-1 measurement in §4.11, §4.12 and §4.14 was taken on. **Those measurements do not acquire E4
+  evidence because a different subject has a trace surface.**
+- **No engine, runtime, provider, model or index technology is selected, preferred or ranked**, and
+  **`node:sqlite` behaviour is not generalized to a class** — nor is Python's binding.
+- **No gate is changed.** E1–E4, strict Shape-1, `U = 0`, G-Q4…G-Q7.8 and S1–S11 are untouched.
+
+#### One observation whose classification belongs to §4.16, not here
+
+**On a file-backed database with `journal_mode = wal`, the unauthorized marker was found in the `-wal`
+file 135 times**, while the main database (4096 bytes) and `-shm` (32768 bytes) carried none and no
+`-journal` existed.
+
+**MSG-0146 recorded it and deliberately did NOT offer it as E4** — E4 asks about the engine's **logs**,
+and a write-ahead log is a **durability artefact**. **MSG-0147 ruled the same way**: the finding is *"not
+reclassified as E4"*.
+
+**Its classification is §4.16's question, not this section's.** **DA-4 decides it on provenance rather
+than presence**, and **DA-1 has never been measured against any candidate** — this observation is **the
+shape that motivated the criterion, not a result under it.**
+
+---
+
 ### 4.16 The durability-artefact criterion — DA-1 (TASK-0044, MSG-0148b)
 
 **Added 2026-08-25 by TASK-0044.** Authority: **MSG-0148b**, which authorizes *"defining the
