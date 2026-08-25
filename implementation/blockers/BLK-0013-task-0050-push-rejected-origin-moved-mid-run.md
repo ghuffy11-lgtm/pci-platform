@@ -118,9 +118,19 @@ what they are; only their availability is blocked.
   remote.
 - **No rebase, merge, pull or reset.** Not granted, and CLAUDE.md forbids further changes against a
   moving repository state until reconciliation confirms consistency.
-- **No retry loop.** The push was attempted, refused, and attempted once more at the close of the run so
-  the final record states a current result rather than a stale one. **A non-fast-forward does not
+- **No retry loop.** The push was attempted, refused, and attempted **once** more at the close of the
+  run so the final record states a current result rather than a stale one. **A non-fast-forward does not
   become a fast-forward by repetition.**
+
+  **The second attempt, VERIFIED at the close of the run, returned the identical rejection:**
+
+  ```text
+  $ git push origin main
+   ! [rejected]        main -> main (fetch first)
+  ```
+
+  **So the divergence is confirmed as the run's final state, not a transient race.** **Two attempts,
+  no third.**
 - **No `node` + `child_process` route to a denied git capability.** Same rule, same refusal, third time
   in this programme (BLK-0011, BLK-0012, here).
 
