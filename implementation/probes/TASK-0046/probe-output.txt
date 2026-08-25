@@ -1,0 +1,1509 @@
+TASK-0046 -- bounded Q16 evidence: does physical containment prevent the
+page-granularity durability exposure TASK-0045 measured?
+MSG-0157 AUTHORIZED.  EPA-0006 §4.16 and §4.13 are authoritative and are
+NOT adjusted here.  This probe selects nothing and clears nothing.
+
+==============================================================================
+A. SUBJECT AND RUNTIME
+==============================================================================
+  node version:                                        v24.15.0
+  platform / arch:                                     win32 / x64
+  binding:                                             node:sqlite (built in)
+  SQLite ENGINE version:                               3.51.3
+  default page_size:                                   {"page_size":4096}
+  secure_delete:                                       {"secure_delete":0}
+  auto_vacuum:                                         {"auto_vacuum":0}
+  OS temp directory:                                   C:\Users\ADMINI~1\AppData\Local\Temp
+
+  THE secure_delete AND auto_vacuum VALUES ARE LOAD-BEARING FOR L4 and
+  are read rather than assumed: together they decide what happens to a
+  page when a partition is dropped.  Whatever they say, they are
+  properties of THIS BUILD AND THIS DEPLOYMENT, and §4.15 is explicit
+  that the two available subjects differ in the BINDING, not the build.
+  NOTHING BELOW GENERALIZES TO AN ENGINE CLASS.
+
+  This is the FIRST test subject -- the one §4.13 GAP-B concerns.  The
+  second (Python 3.14.5 / SQLite 3.50.4) is NOT invoked: MSG-0145
+  granted `py` for TASK-0043's probe only and no fresh grant exists.
+
+==============================================================================
+B. THE QUESTION, THE INSTRUMENT, AND THE BOUNDARY
+==============================================================================
+  MSG-0157 Q16: "physical containment/isolation is relevant not only to
+  query-time U, but also to durability exposure."  This probe tests that
+  one boundary and nothing else.
+
+  THE INDEPENDENT VARIABLE is WHERE the unauthorized rows live.  Held
+  constant across every layout:
+    request-induced write shapes:                      two -- W-A access accounting, W-B cache writeback
+    rows touched per write:                            200 -- asserted equal across layouts, not assumed
+    rows the request was NOT entitled to touch:        0, in every layout and both shapes
+    unauthorized rows in the fixture:                  200
+    artefacts inspected:                               rollback journal, WAL, -shm, main store, temp/spill
+
+  WHY THESE REQUESTS.  §4.15 and MSG-0155 both turn on this: the
+  exposure needs NO post-filtering, NO bad plan and NO examination of
+  any unauthorized row.  Neither shape below reads, examines or writes
+  anything the subject was not entitled to.  A request that examined
+  unauthorized content would measure a different thing and get the
+  uninteresting answer.
+
+  WHAT THIS PROBE MAY NOT CONCLUDE, stated before any output exists:
+    - It cannot CLEAR anything.  DA-5 consequence 1: satisfying DA-1 clears
+      nothing, and DA-1 is not an §4.6 S6 evidence class.
+    - It cannot move a Shape-1 verdict.  All six TASK-0042 candidates stay
+      NOT CLEARED for the reasons they already were.
+    - It cannot select, adopt, compare-for-adoption, deploy or implement an
+      engine, or choose among W1-W4.
+    - It cannot change DA-1, N1-N5, E1-E4, S1-S11 or any G-Q gate.
+    - A layout that produces no finding is NOT thereby "safe": §4.6 S5 /
+      DA-5 row 3, an absence proves only what crossed the point of
+      inspection.
+
+==============================================================================
+MEASUREMENT L1 / DELETE / W-A
+==============================================================================
+  L1  SHARED PROJECTION -- one structure, both classes interleaved
+  The baseline. Authorized and unauthorized rows alternate, so they land
+  on the same pages.
+  WRITE SHAPE: ACCESS ACCOUNTING -- UPDATE over the rows the subject was entitled to
+
+  --- SUBJECT, MODE AND MAINTENANCE STATE (recorded per measurement) --------
+  subject / runtime:                                   SQLite 3.51.3 via node:sqlite, node v24.15.0
+  store file:                                          projection.db
+  journal_mode:                                        delete
+  page_size:                                           4096
+  secure_delete / auto_vacuum:                         {"secure_delete":0} / {"auto_vacuum":0}
+
+  --- BASELINE -- established before the request, and VERIFIED not assumed --
+  maintenance state:                                   none -- no checkpoint applies in this mode; no VACUUM, no ANALYZE
+  -journal at baseline:                                NEVER CREATED
+  baseline attributable (DA-4):                        YES -- no journal exists, so one seen later was created BY the transaction
+
+  --- THE STORE ITSELF, PAGE BY PAGE -- the precondition, measured ----------
+  store pages:                                         8   BOTH 7 | AUTH-only 0 | UNAUTH-only 0 | neither 1   (markers: UNAUTH x234, AUTH x235)
+      page     1:                                      neither       UNAUTH x  0   AUTH x  0
+      page     2:                                      BOTH          UNAUTH x 34   AUTH x 35
+      page     3:                                      BOTH          UNAUTH x 35   AUTH x 35
+      page     4:                                      BOTH          UNAUTH x 35   AUTH x 34
+      page     5:                                      BOTH          UNAUTH x 34   AUTH x 34
+      page     6:                                      BOTH          UNAUTH x 34   AUTH x 34
+      page     7:                                      BOTH          UNAUTH x 34   AUTH x 34
+      page     8:                                      BOTH          UNAUTH x 28   AUTH x 29
+
+      "BOTH" is page co-residency: one page holding rows of both
+      classes.  Measured on the store's own bytes, before any request
+      runs.  It is NOT itself a DA-1 finding -- the store holding the
+      projection it indexes is DA-3's last exclusion and DA-4 row 1.
+      It is the MECHANISM's precondition.
+
+  --- THE REQUEST -- touching ONLY rows the subject was entitled to ---------
+  SQL:                                                 UPDATE chunk SET served = served + 1 WHERE scope = 'AUTHORIZED'
+  rows the request will touch:                         200
+  unauthorized rows IN REACH of the request:           200   <-- the independent variable: this is what the topology changes
+
+  --- THE ROLLBACK JOURNAL -- read DURING the transaction, parsed page by page 
+  artefact:                                            PRESENT, 25136 bytes
+  header magic:                                        ZEROED -- written at commit, so absent mid-transaction
+  header nRec / dbSize / sector / page:                0 / 8 / 512 / 4096
+  journalled pages:                                    6   BOTH 6 | AUTH-only 0 | UNAUTH-only 0 | neither 0   (markers: UNAUTH x200, AUTH x200)
+      page     3:                                      BOTH          UNAUTH x 35   AUTH x 35
+      page     4:                                      BOTH          UNAUTH x 35   AUTH x 34
+      page     5:                                      BOTH          UNAUTH x 34   AUTH x 34
+      page     6:                                      BOTH          UNAUTH x 34   AUTH x 34
+      page     7:                                      BOTH          UNAUTH x 34   AUTH x 34
+      page     8:                                      BOTH          UNAUTH x 28   AUTH x 29
+    parser check (rollback journal):                   6 of 6 page images byte-identical to the independent copy
+  rows the request modified that it was NOT entitled to: 0   (measured after the write, not assumed)
+
+  --- THE OTHER IN-SCOPE ARTEFACTS -- enumerated, not assumed absent --------
+    -shm:                                              NEVER CREATED
+    -wal:                                              NEVER CREATED
+    -journal:                                          NEVER CREATED
+    temp/spill files seen during the request:          NONE
+
+  --- WHAT THE REQUEST MADE DURABLE, for this configuration -----------------
+  page images the request wrote into the artefact:     6
+  unauthorized markers in them:                        200
+  page images carrying BOTH classes:                   6
+  page images carrying UNAUTHORIZED ONLY:              0
+  finding under DA-1.1:                                YES -- DA-5 row 1: a single occurrence is sufficient => NOT CLEARED
+
+==============================================================================
+MEASUREMENT L1 / DELETE / W-B
+==============================================================================
+  L1  SHARED PROJECTION -- one structure, both classes interleaved
+  The baseline. Authorized and unauthorized rows alternate, so they land
+  on the same pages.
+  WRITE SHAPE: CACHE WRITEBACK -- INSERT of the subject's OWN authorized results
+
+  --- SUBJECT, MODE AND MAINTENANCE STATE (recorded per measurement) --------
+  subject / runtime:                                   SQLite 3.51.3 via node:sqlite, node v24.15.0
+  store file:                                          projection.db
+  journal_mode:                                        delete
+  page_size:                                           4096
+  secure_delete / auto_vacuum:                         {"secure_delete":0} / {"auto_vacuum":0}
+
+  --- BASELINE -- established before the request, and VERIFIED not assumed --
+  maintenance state:                                   none -- no checkpoint applies in this mode; no VACUUM, no ANALYZE
+  -journal at baseline:                                NEVER CREATED
+  baseline attributable (DA-4):                        YES -- no journal exists, so one seen later was created BY the transaction
+
+  --- THE STORE ITSELF, PAGE BY PAGE -- the precondition, measured ----------
+  store pages:                                         9   BOTH 7 | AUTH-only 0 | UNAUTH-only 0 | neither 2   (markers: UNAUTH x234, AUTH x235)
+      page     1:                                      neither       UNAUTH x  0   AUTH x  0
+      page     2:                                      BOTH          UNAUTH x 34   AUTH x 35
+      page     3:                                      BOTH          UNAUTH x 35   AUTH x 35
+      page     4:                                      BOTH          UNAUTH x 35   AUTH x 34
+      page     5:                                      BOTH          UNAUTH x 34   AUTH x 34
+      page     6:                                      BOTH          UNAUTH x 34   AUTH x 34
+      page     7:                                      BOTH          UNAUTH x 34   AUTH x 34
+      page     8:                                      BOTH          UNAUTH x 28   AUTH x 29
+      page     9:                                      neither       UNAUTH x  0   AUTH x  0
+
+      "BOTH" is page co-residency: one page holding rows of both
+      classes.  Measured on the store's own bytes, before any request
+      runs.  It is NOT itself a DA-1 finding -- the store holding the
+      projection it indexes is DA-3's last exclusion and DA-4 row 1.
+      It is the MECHANISM's precondition.
+
+  --- THE REQUEST -- touching ONLY rows the subject was entitled to ---------
+  SQL:                                                 INSERT INTO result_cache SELECT id, scope, body FROM chunk WHERE scope = 'AUTHORIZED'
+  rows the request will touch:                         200
+  unauthorized rows IN REACH of the request:           200   <-- the independent variable: this is what the topology changes
+
+  --- THE ROLLBACK JOURNAL -- read DURING the transaction, parsed page by page 
+  artefact:                                            PRESENT, 8720 bytes
+  header magic:                                        ZEROED -- written at commit, so absent mid-transaction
+  header nRec / dbSize / sector / page:                0 / 9 / 512 / 4096
+  journalled pages:                                    2   BOTH 0 | AUTH-only 0 | UNAUTH-only 0 | neither 2   (markers: UNAUTH x0, AUTH x0)
+      page     9:                                      neither       UNAUTH x  0   AUTH x  0
+      page     1:                                      neither       UNAUTH x  0   AUTH x  0
+    parser check (rollback journal):                   2 of 2 page images byte-identical to the independent copy
+  rows the request modified that it was NOT entitled to: 0   (measured after the write, not assumed)
+
+  --- THE OTHER IN-SCOPE ARTEFACTS -- enumerated, not assumed absent --------
+    -shm:                                              NEVER CREATED
+    -wal:                                              NEVER CREATED
+    -journal:                                          NEVER CREATED
+    temp/spill files seen during the request:          NONE
+
+  --- WHAT THE REQUEST MADE DURABLE, for this configuration -----------------
+  page images the request wrote into the artefact:     2
+  unauthorized markers in them:                        0
+  page images carrying BOTH classes:                   0
+  page images carrying UNAUTHORIZED ONLY:              0
+  finding under DA-1.1:                                no unauthorized marker observed
+      Absence, and DA-5 row 3 governs what it is worth on its own.
+
+==============================================================================
+MEASUREMENT L1 / WAL / W-A
+==============================================================================
+  L1  SHARED PROJECTION -- one structure, both classes interleaved
+  The baseline. Authorized and unauthorized rows alternate, so they land
+  on the same pages.
+  WRITE SHAPE: ACCESS ACCOUNTING -- UPDATE over the rows the subject was entitled to
+
+  --- SUBJECT, MODE AND MAINTENANCE STATE (recorded per measurement) --------
+  subject / runtime:                                   SQLite 3.51.3 via node:sqlite, node v24.15.0
+  store file:                                          projection.db
+  journal_mode:                                        wal
+  page_size:                                           4096
+  secure_delete / auto_vacuum:                         {"secure_delete":0} / {"auto_vacuum":0}
+
+  --- BASELINE -- established before the request, and VERIFIED not assumed --
+  maintenance applied:                                 PRAGMA wal_checkpoint(TRUNCATE) -> {"busy":0,"log":0,"checkpointed":0}
+  maintenance state:                                   checkpointed (TRUNCATE); no VACUUM, no ANALYZE
+  -wal at baseline:                                    PRESENT BUT EMPTY (0 bytes)
+  baseline attributable (DA-4):                        YES -- -wal measured at 0 bytes, so anything found later arrived after it
+
+  --- THE STORE ITSELF, PAGE BY PAGE -- the precondition, measured ----------
+  store pages:                                         8   BOTH 7 | AUTH-only 0 | UNAUTH-only 0 | neither 1   (markers: UNAUTH x234, AUTH x235)
+      page     1:                                      neither       UNAUTH x  0   AUTH x  0
+      page     2:                                      BOTH          UNAUTH x 34   AUTH x 35
+      page     3:                                      BOTH          UNAUTH x 35   AUTH x 35
+      page     4:                                      BOTH          UNAUTH x 35   AUTH x 34
+      page     5:                                      BOTH          UNAUTH x 34   AUTH x 34
+      page     6:                                      BOTH          UNAUTH x 34   AUTH x 34
+      page     7:                                      BOTH          UNAUTH x 34   AUTH x 34
+      page     8:                                      BOTH          UNAUTH x 28   AUTH x 29
+
+      "BOTH" is page co-residency: one page holding rows of both
+      classes.  Measured on the store's own bytes, before any request
+      runs.  It is NOT itself a DA-1 finding -- the store holding the
+      projection it indexes is DA-3's last exclusion and DA-4 row 1.
+      It is the MECHANISM's precondition.
+
+  --- THE REQUEST -- touching ONLY rows the subject was entitled to ---------
+  SQL:                                                 UPDATE chunk SET served = served + 1 WHERE scope = 'AUTHORIZED'
+  rows the request will touch:                         200
+  unauthorized rows IN REACH of the request:           200   <-- the independent variable: this is what the topology changes
+  rows the request modified that it was NOT entitled to: 0   (measured after the write, not assumed)
+
+  --- THE WAL -- read after the commit, parsed frame by frame ---------------
+  artefact:                                            PRESENT, 24752 bytes
+  WAL-framed pages:                                    6   BOTH 6 | AUTH-only 0 | UNAUTH-only 0 | neither 0   (markers: UNAUTH x200, AUTH x200)
+      page     3:                                      BOTH          UNAUTH x 35   AUTH x 35
+      page     4:                                      BOTH          UNAUTH x 35   AUTH x 34
+      page     5:                                      BOTH          UNAUTH x 34   AUTH x 34
+      page     6:                                      BOTH          UNAUTH x 34   AUTH x 34
+      page     7:                                      BOTH          UNAUTH x 34   AUTH x 34
+      page     8:                                      BOTH          UNAUTH x 28   AUTH x 29
+  maintenance applied AFTER the measurement:           wal_checkpoint(TRUNCATE) -> {"busy":0,"log":0,"checkpointed":0}  (for the parser check only)
+    parser check (WAL):                                6 of 6 page images byte-identical to the independent copy
+
+  --- THE OTHER IN-SCOPE ARTEFACTS -- enumerated, not assumed absent --------
+    -shm:                                              32768 bytes   UNAUTH x0   AUTH x0
+    -wal:                                              0 bytes   UNAUTH x0   AUTH x0
+    -journal:                                          NEVER CREATED
+    temp/spill files seen during the request:          NONE
+
+  --- WHAT THE REQUEST MADE DURABLE, for this configuration -----------------
+  page images the request wrote into the artefact:     6
+  unauthorized markers in them:                        200
+  page images carrying BOTH classes:                   6
+  page images carrying UNAUTHORIZED ONLY:              0
+  finding under DA-1.1:                                YES -- DA-5 row 1: a single occurrence is sufficient => NOT CLEARED
+
+==============================================================================
+MEASUREMENT L1 / WAL / W-B
+==============================================================================
+  L1  SHARED PROJECTION -- one structure, both classes interleaved
+  The baseline. Authorized and unauthorized rows alternate, so they land
+  on the same pages.
+  WRITE SHAPE: CACHE WRITEBACK -- INSERT of the subject's OWN authorized results
+
+  --- SUBJECT, MODE AND MAINTENANCE STATE (recorded per measurement) --------
+  subject / runtime:                                   SQLite 3.51.3 via node:sqlite, node v24.15.0
+  store file:                                          projection.db
+  journal_mode:                                        wal
+  page_size:                                           4096
+  secure_delete / auto_vacuum:                         {"secure_delete":0} / {"auto_vacuum":0}
+
+  --- BASELINE -- established before the request, and VERIFIED not assumed --
+  maintenance applied:                                 PRAGMA wal_checkpoint(TRUNCATE) -> {"busy":0,"log":0,"checkpointed":0}
+  maintenance state:                                   checkpointed (TRUNCATE); no VACUUM, no ANALYZE
+  -wal at baseline:                                    PRESENT BUT EMPTY (0 bytes)
+  baseline attributable (DA-4):                        YES -- -wal measured at 0 bytes, so anything found later arrived after it
+
+  --- THE STORE ITSELF, PAGE BY PAGE -- the precondition, measured ----------
+  store pages:                                         9   BOTH 7 | AUTH-only 0 | UNAUTH-only 0 | neither 2   (markers: UNAUTH x234, AUTH x235)
+      page     1:                                      neither       UNAUTH x  0   AUTH x  0
+      page     2:                                      BOTH          UNAUTH x 34   AUTH x 35
+      page     3:                                      BOTH          UNAUTH x 35   AUTH x 35
+      page     4:                                      BOTH          UNAUTH x 35   AUTH x 34
+      page     5:                                      BOTH          UNAUTH x 34   AUTH x 34
+      page     6:                                      BOTH          UNAUTH x 34   AUTH x 34
+      page     7:                                      BOTH          UNAUTH x 34   AUTH x 34
+      page     8:                                      BOTH          UNAUTH x 28   AUTH x 29
+      page     9:                                      neither       UNAUTH x  0   AUTH x  0
+
+      "BOTH" is page co-residency: one page holding rows of both
+      classes.  Measured on the store's own bytes, before any request
+      runs.  It is NOT itself a DA-1 finding -- the store holding the
+      projection it indexes is DA-3's last exclusion and DA-4 row 1.
+      It is the MECHANISM's precondition.
+
+  --- THE REQUEST -- touching ONLY rows the subject was entitled to ---------
+  SQL:                                                 INSERT INTO result_cache SELECT id, scope, body FROM chunk WHERE scope = 'AUTHORIZED'
+  rows the request will touch:                         200
+  unauthorized rows IN REACH of the request:           200   <-- the independent variable: this is what the topology changes
+  rows the request modified that it was NOT entitled to: 0   (measured after the write, not assumed)
+
+  --- THE WAL -- read after the commit, parsed frame by frame ---------------
+  artefact:                                            PRESENT, 20632 bytes
+  WAL-framed pages:                                    5   BOTH 0 | AUTH-only 4 | UNAUTH-only 0 | neither 1   (markers: UNAUTH x0, AUTH x271)
+      page     1:                                      neither       UNAUTH x  0   AUTH x  0
+      page     9:                                      AUTH-only     UNAUTH x  0   AUTH x 71
+      page    10:                                      AUTH-only     UNAUTH x  0   AUTH x 72
+      page    11:                                      AUTH-only     UNAUTH x  0   AUTH x 70
+      page    12:                                      AUTH-only     UNAUTH x  0   AUTH x 58
+  maintenance applied AFTER the measurement:           wal_checkpoint(TRUNCATE) -> {"busy":0,"log":0,"checkpointed":0}  (for the parser check only)
+    parser check (WAL):                                5 of 5 page images byte-identical to the independent copy
+
+  --- THE OTHER IN-SCOPE ARTEFACTS -- enumerated, not assumed absent --------
+    -shm:                                              32768 bytes   UNAUTH x0   AUTH x0
+    -wal:                                              0 bytes   UNAUTH x0   AUTH x0
+    -journal:                                          NEVER CREATED
+    temp/spill files seen during the request:          NONE
+
+  --- WHAT THE REQUEST MADE DURABLE, for this configuration -----------------
+  page images the request wrote into the artefact:     5
+  unauthorized markers in them:                        0
+  page images carrying BOTH classes:                   0
+  page images carrying UNAUTHORIZED ONLY:              0
+  finding under DA-1.1:                                no unauthorized marker observed
+      Absence, and DA-5 row 3 governs what it is worth on its own.
+
+==============================================================================
+MEASUREMENT L2 / DELETE / W-A
+==============================================================================
+  L2  ISOLATED STRUCTURES, ONE STORE -- separate b-trees in one file
+  Each table owns its pages, so the two classes cannot be page-co-resident
+  even though one file holds both.
+  WRITE SHAPE: ACCESS ACCOUNTING -- UPDATE over the rows the subject was entitled to
+
+  --- SUBJECT, MODE AND MAINTENANCE STATE (recorded per measurement) --------
+  subject / runtime:                                   SQLite 3.51.3 via node:sqlite, node v24.15.0
+  store file:                                          projection.db
+  journal_mode:                                        delete
+  page_size:                                           4096
+  secure_delete / auto_vacuum:                         {"secure_delete":0} / {"auto_vacuum":0}
+
+  --- BASELINE -- established before the request, and VERIFIED not assumed --
+  maintenance state:                                   none -- no checkpoint applies in this mode; no VACUUM, no ANALYZE
+  -journal at baseline:                                NEVER CREATED
+  baseline attributable (DA-4):                        YES -- no journal exists, so one seen later was created BY the transaction
+
+  --- THE STORE ITSELF, PAGE BY PAGE -- the precondition, measured ----------
+  store pages:                                         9   BOTH 0 | AUTH-only 4 | UNAUTH-only 4 | neither 1   (markers: UNAUTH x267, AUTH x268)
+      page     1:                                      neither       UNAUTH x  0   AUTH x  0
+      page     2:                                      AUTH-only     UNAUTH x  0   AUTH x 68
+      page     3:                                      UNAUTH-only   UNAUTH x 67   AUTH x  0
+      page     4:                                      UNAUTH-only   UNAUTH x 68   AUTH x  0
+      page     5:                                      UNAUTH-only   UNAUTH x 67   AUTH x  0
+      page     6:                                      UNAUTH-only   UNAUTH x 65   AUTH x  0
+      page     7:                                      AUTH-only     UNAUTH x  0   AUTH x 69
+      page     8:                                      AUTH-only     UNAUTH x  0   AUTH x 69
+      page     9:                                      AUTH-only     UNAUTH x  0   AUTH x 62
+
+      "BOTH" is page co-residency: one page holding rows of both
+      classes.  Measured on the store's own bytes, before any request
+      runs.  It is NOT itself a DA-1 finding -- the store holding the
+      projection it indexes is DA-3's last exclusion and DA-4 row 1.
+      It is the MECHANISM's precondition.
+
+  --- THE REQUEST -- touching ONLY rows the subject was entitled to ---------
+  SQL:                                                 UPDATE chunk_auth SET served = served + 1 WHERE scope = 'AUTHORIZED'
+  rows the request will touch:                         200
+  unauthorized rows IN REACH of the request:           0   <-- the independent variable: this is what the topology changes
+
+  --- THE ROLLBACK JOURNAL -- read DURING the transaction, parsed page by page 
+  artefact:                                            PRESENT, 12824 bytes
+  header magic:                                        ZEROED -- written at commit, so absent mid-transaction
+  header nRec / dbSize / sector / page:                0 / 9 / 512 / 4096
+  journalled pages:                                    3   BOTH 0 | AUTH-only 3 | UNAUTH-only 0 | neither 0   (markers: UNAUTH x0, AUTH x200)
+      page     7:                                      AUTH-only     UNAUTH x  0   AUTH x 69
+      page     8:                                      AUTH-only     UNAUTH x  0   AUTH x 69
+      page     9:                                      AUTH-only     UNAUTH x  0   AUTH x 62
+    parser check (rollback journal):                   3 of 3 page images byte-identical to the independent copy
+  rows the request modified that it was NOT entitled to: 0   (measured after the write, not assumed)
+
+  --- THE OTHER IN-SCOPE ARTEFACTS -- enumerated, not assumed absent --------
+    -shm:                                              NEVER CREATED
+    -wal:                                              NEVER CREATED
+    -journal:                                          NEVER CREATED
+    temp/spill files seen during the request:          NONE
+
+  --- WHAT THE REQUEST MADE DURABLE, for this configuration -----------------
+  page images the request wrote into the artefact:     3
+  unauthorized markers in them:                        0
+  page images carrying BOTH classes:                   0
+  page images carrying UNAUTHORIZED ONLY:              0
+  finding under DA-1.1:                                no unauthorized marker observed
+      Absence, and DA-5 row 3 governs what it is worth on its own.
+
+==============================================================================
+MEASUREMENT L2 / DELETE / W-B
+==============================================================================
+  L2  ISOLATED STRUCTURES, ONE STORE -- separate b-trees in one file
+  Each table owns its pages, so the two classes cannot be page-co-resident
+  even though one file holds both.
+  WRITE SHAPE: CACHE WRITEBACK -- INSERT of the subject's OWN authorized results
+
+  --- SUBJECT, MODE AND MAINTENANCE STATE (recorded per measurement) --------
+  subject / runtime:                                   SQLite 3.51.3 via node:sqlite, node v24.15.0
+  store file:                                          projection.db
+  journal_mode:                                        delete
+  page_size:                                           4096
+  secure_delete / auto_vacuum:                         {"secure_delete":0} / {"auto_vacuum":0}
+
+  --- BASELINE -- established before the request, and VERIFIED not assumed --
+  maintenance state:                                   none -- no checkpoint applies in this mode; no VACUUM, no ANALYZE
+  -journal at baseline:                                NEVER CREATED
+  baseline attributable (DA-4):                        YES -- no journal exists, so one seen later was created BY the transaction
+
+  --- THE STORE ITSELF, PAGE BY PAGE -- the precondition, measured ----------
+  store pages:                                         10   BOTH 0 | AUTH-only 4 | UNAUTH-only 4 | neither 2   (markers: UNAUTH x267, AUTH x268)
+      page     1:                                      neither       UNAUTH x  0   AUTH x  0
+      page     2:                                      AUTH-only     UNAUTH x  0   AUTH x 68
+      page     3:                                      UNAUTH-only   UNAUTH x 67   AUTH x  0
+      page     4:                                      UNAUTH-only   UNAUTH x 68   AUTH x  0
+      page     5:                                      UNAUTH-only   UNAUTH x 67   AUTH x  0
+      page     6:                                      UNAUTH-only   UNAUTH x 65   AUTH x  0
+      page     7:                                      AUTH-only     UNAUTH x  0   AUTH x 69
+      page     8:                                      AUTH-only     UNAUTH x  0   AUTH x 69
+      page     9:                                      AUTH-only     UNAUTH x  0   AUTH x 62
+      page    10:                                      neither       UNAUTH x  0   AUTH x  0
+
+      "BOTH" is page co-residency: one page holding rows of both
+      classes.  Measured on the store's own bytes, before any request
+      runs.  It is NOT itself a DA-1 finding -- the store holding the
+      projection it indexes is DA-3's last exclusion and DA-4 row 1.
+      It is the MECHANISM's precondition.
+
+  --- THE REQUEST -- touching ONLY rows the subject was entitled to ---------
+  SQL:                                                 INSERT INTO result_cache SELECT id, scope, body FROM chunk_auth WHERE scope = 'AUTHORIZED'
+  rows the request will touch:                         200
+  unauthorized rows IN REACH of the request:           0   <-- the independent variable: this is what the topology changes
+
+  --- THE ROLLBACK JOURNAL -- read DURING the transaction, parsed page by page 
+  artefact:                                            PRESENT, 8720 bytes
+  header magic:                                        ZEROED -- written at commit, so absent mid-transaction
+  header nRec / dbSize / sector / page:                0 / 10 / 512 / 4096
+  journalled pages:                                    2   BOTH 0 | AUTH-only 0 | UNAUTH-only 0 | neither 2   (markers: UNAUTH x0, AUTH x0)
+      page    10:                                      neither       UNAUTH x  0   AUTH x  0
+      page     1:                                      neither       UNAUTH x  0   AUTH x  0
+    parser check (rollback journal):                   2 of 2 page images byte-identical to the independent copy
+  rows the request modified that it was NOT entitled to: 0   (measured after the write, not assumed)
+
+  --- THE OTHER IN-SCOPE ARTEFACTS -- enumerated, not assumed absent --------
+    -shm:                                              NEVER CREATED
+    -wal:                                              NEVER CREATED
+    -journal:                                          NEVER CREATED
+    temp/spill files seen during the request:          NONE
+
+  --- WHAT THE REQUEST MADE DURABLE, for this configuration -----------------
+  page images the request wrote into the artefact:     2
+  unauthorized markers in them:                        0
+  page images carrying BOTH classes:                   0
+  page images carrying UNAUTHORIZED ONLY:              0
+  finding under DA-1.1:                                no unauthorized marker observed
+      Absence, and DA-5 row 3 governs what it is worth on its own.
+
+==============================================================================
+MEASUREMENT L2 / WAL / W-A
+==============================================================================
+  L2  ISOLATED STRUCTURES, ONE STORE -- separate b-trees in one file
+  Each table owns its pages, so the two classes cannot be page-co-resident
+  even though one file holds both.
+  WRITE SHAPE: ACCESS ACCOUNTING -- UPDATE over the rows the subject was entitled to
+
+  --- SUBJECT, MODE AND MAINTENANCE STATE (recorded per measurement) --------
+  subject / runtime:                                   SQLite 3.51.3 via node:sqlite, node v24.15.0
+  store file:                                          projection.db
+  journal_mode:                                        wal
+  page_size:                                           4096
+  secure_delete / auto_vacuum:                         {"secure_delete":0} / {"auto_vacuum":0}
+
+  --- BASELINE -- established before the request, and VERIFIED not assumed --
+  maintenance applied:                                 PRAGMA wal_checkpoint(TRUNCATE) -> {"busy":0,"log":0,"checkpointed":0}
+  maintenance state:                                   checkpointed (TRUNCATE); no VACUUM, no ANALYZE
+  -wal at baseline:                                    PRESENT BUT EMPTY (0 bytes)
+  baseline attributable (DA-4):                        YES -- -wal measured at 0 bytes, so anything found later arrived after it
+
+  --- THE STORE ITSELF, PAGE BY PAGE -- the precondition, measured ----------
+  store pages:                                         9   BOTH 0 | AUTH-only 4 | UNAUTH-only 4 | neither 1   (markers: UNAUTH x267, AUTH x268)
+      page     1:                                      neither       UNAUTH x  0   AUTH x  0
+      page     2:                                      AUTH-only     UNAUTH x  0   AUTH x 68
+      page     3:                                      UNAUTH-only   UNAUTH x 67   AUTH x  0
+      page     4:                                      UNAUTH-only   UNAUTH x 68   AUTH x  0
+      page     5:                                      UNAUTH-only   UNAUTH x 67   AUTH x  0
+      page     6:                                      UNAUTH-only   UNAUTH x 65   AUTH x  0
+      page     7:                                      AUTH-only     UNAUTH x  0   AUTH x 69
+      page     8:                                      AUTH-only     UNAUTH x  0   AUTH x 69
+      page     9:                                      AUTH-only     UNAUTH x  0   AUTH x 62
+
+      "BOTH" is page co-residency: one page holding rows of both
+      classes.  Measured on the store's own bytes, before any request
+      runs.  It is NOT itself a DA-1 finding -- the store holding the
+      projection it indexes is DA-3's last exclusion and DA-4 row 1.
+      It is the MECHANISM's precondition.
+
+  --- THE REQUEST -- touching ONLY rows the subject was entitled to ---------
+  SQL:                                                 UPDATE chunk_auth SET served = served + 1 WHERE scope = 'AUTHORIZED'
+  rows the request will touch:                         200
+  unauthorized rows IN REACH of the request:           0   <-- the independent variable: this is what the topology changes
+  rows the request modified that it was NOT entitled to: 0   (measured after the write, not assumed)
+
+  --- THE WAL -- read after the commit, parsed frame by frame ---------------
+  artefact:                                            PRESENT, 12392 bytes
+  WAL-framed pages:                                    3   BOTH 0 | AUTH-only 3 | UNAUTH-only 0 | neither 0   (markers: UNAUTH x0, AUTH x200)
+      page     7:                                      AUTH-only     UNAUTH x  0   AUTH x 69
+      page     8:                                      AUTH-only     UNAUTH x  0   AUTH x 69
+      page     9:                                      AUTH-only     UNAUTH x  0   AUTH x 62
+  maintenance applied AFTER the measurement:           wal_checkpoint(TRUNCATE) -> {"busy":0,"log":0,"checkpointed":0}  (for the parser check only)
+    parser check (WAL):                                3 of 3 page images byte-identical to the independent copy
+
+  --- THE OTHER IN-SCOPE ARTEFACTS -- enumerated, not assumed absent --------
+    -shm:                                              32768 bytes   UNAUTH x0   AUTH x0
+    -wal:                                              0 bytes   UNAUTH x0   AUTH x0
+    -journal:                                          NEVER CREATED
+    temp/spill files seen during the request:          NONE
+
+  --- WHAT THE REQUEST MADE DURABLE, for this configuration -----------------
+  page images the request wrote into the artefact:     3
+  unauthorized markers in them:                        0
+  page images carrying BOTH classes:                   0
+  page images carrying UNAUTHORIZED ONLY:              0
+  finding under DA-1.1:                                no unauthorized marker observed
+      Absence, and DA-5 row 3 governs what it is worth on its own.
+
+==============================================================================
+MEASUREMENT L2 / WAL / W-B
+==============================================================================
+  L2  ISOLATED STRUCTURES, ONE STORE -- separate b-trees in one file
+  Each table owns its pages, so the two classes cannot be page-co-resident
+  even though one file holds both.
+  WRITE SHAPE: CACHE WRITEBACK -- INSERT of the subject's OWN authorized results
+
+  --- SUBJECT, MODE AND MAINTENANCE STATE (recorded per measurement) --------
+  subject / runtime:                                   SQLite 3.51.3 via node:sqlite, node v24.15.0
+  store file:                                          projection.db
+  journal_mode:                                        wal
+  page_size:                                           4096
+  secure_delete / auto_vacuum:                         {"secure_delete":0} / {"auto_vacuum":0}
+
+  --- BASELINE -- established before the request, and VERIFIED not assumed --
+  maintenance applied:                                 PRAGMA wal_checkpoint(TRUNCATE) -> {"busy":0,"log":0,"checkpointed":0}
+  maintenance state:                                   checkpointed (TRUNCATE); no VACUUM, no ANALYZE
+  -wal at baseline:                                    PRESENT BUT EMPTY (0 bytes)
+  baseline attributable (DA-4):                        YES -- -wal measured at 0 bytes, so anything found later arrived after it
+
+  --- THE STORE ITSELF, PAGE BY PAGE -- the precondition, measured ----------
+  store pages:                                         10   BOTH 0 | AUTH-only 4 | UNAUTH-only 4 | neither 2   (markers: UNAUTH x267, AUTH x268)
+      page     1:                                      neither       UNAUTH x  0   AUTH x  0
+      page     2:                                      AUTH-only     UNAUTH x  0   AUTH x 68
+      page     3:                                      UNAUTH-only   UNAUTH x 67   AUTH x  0
+      page     4:                                      UNAUTH-only   UNAUTH x 68   AUTH x  0
+      page     5:                                      UNAUTH-only   UNAUTH x 67   AUTH x  0
+      page     6:                                      UNAUTH-only   UNAUTH x 65   AUTH x  0
+      page     7:                                      AUTH-only     UNAUTH x  0   AUTH x 69
+      page     8:                                      AUTH-only     UNAUTH x  0   AUTH x 69
+      page     9:                                      AUTH-only     UNAUTH x  0   AUTH x 62
+      page    10:                                      neither       UNAUTH x  0   AUTH x  0
+
+      "BOTH" is page co-residency: one page holding rows of both
+      classes.  Measured on the store's own bytes, before any request
+      runs.  It is NOT itself a DA-1 finding -- the store holding the
+      projection it indexes is DA-3's last exclusion and DA-4 row 1.
+      It is the MECHANISM's precondition.
+
+  --- THE REQUEST -- touching ONLY rows the subject was entitled to ---------
+  SQL:                                                 INSERT INTO result_cache SELECT id, scope, body FROM chunk_auth WHERE scope = 'AUTHORIZED'
+  rows the request will touch:                         200
+  unauthorized rows IN REACH of the request:           0   <-- the independent variable: this is what the topology changes
+  rows the request modified that it was NOT entitled to: 0   (measured after the write, not assumed)
+
+  --- THE WAL -- read after the commit, parsed frame by frame ---------------
+  artefact:                                            PRESENT, 20632 bytes
+  WAL-framed pages:                                    5   BOTH 0 | AUTH-only 4 | UNAUTH-only 0 | neither 1   (markers: UNAUTH x0, AUTH x268)
+      page     1:                                      neither       UNAUTH x  0   AUTH x  0
+      page    10:                                      AUTH-only     UNAUTH x  0   AUTH x 68
+      page    11:                                      AUTH-only     UNAUTH x  0   AUTH x 69
+      page    12:                                      AUTH-only     UNAUTH x  0   AUTH x 69
+      page    13:                                      AUTH-only     UNAUTH x  0   AUTH x 62
+  maintenance applied AFTER the measurement:           wal_checkpoint(TRUNCATE) -> {"busy":0,"log":0,"checkpointed":0}  (for the parser check only)
+    parser check (WAL):                                5 of 5 page images byte-identical to the independent copy
+
+  --- THE OTHER IN-SCOPE ARTEFACTS -- enumerated, not assumed absent --------
+    -shm:                                              32768 bytes   UNAUTH x0   AUTH x0
+    -wal:                                              0 bytes   UNAUTH x0   AUTH x0
+    -journal:                                          NEVER CREATED
+    temp/spill files seen during the request:          NONE
+
+  --- WHAT THE REQUEST MADE DURABLE, for this configuration -----------------
+  page images the request wrote into the artefact:     5
+  unauthorized markers in them:                        0
+  page images carrying BOTH classes:                   0
+  page images carrying UNAUTHORIZED ONLY:              0
+  finding under DA-1.1:                                no unauthorized marker observed
+      Absence, and DA-5 row 3 governs what it is worth on its own.
+
+==============================================================================
+MEASUREMENT L3 / DELETE / W-A
+==============================================================================
+  L3  ISOLATED STORES -- one store per partition, request reaches one
+  The routed shape of §4.13 W2/W3, bounded by execution context in W4. The
+  other partition is a different file the request never opens.
+  WRITE SHAPE: ACCESS ACCOUNTING -- UPDATE over the rows the subject was entitled to
+
+  --- SUBJECT, MODE AND MAINTENANCE STATE (recorded per measurement) --------
+  subject / runtime:                                   SQLite 3.51.3 via node:sqlite, node v24.15.0
+  store file:                                          authorized-partition.db
+  journal_mode:                                        delete
+  page_size:                                           4096
+  secure_delete / auto_vacuum:                         {"secure_delete":0} / {"auto_vacuum":0}
+  other partition store:                               other-partition.db
+
+  --- BASELINE -- established before the request, and VERIFIED not assumed --
+  maintenance state:                                   none -- no checkpoint applies in this mode; no VACUUM, no ANALYZE
+  -journal at baseline:                                NEVER CREATED
+  baseline attributable (DA-4):                        YES -- no journal exists, so one seen later was created BY the transaction
+
+  --- THE STORE ITSELF, PAGE BY PAGE -- the precondition, measured ----------
+  store pages:                                         5   BOTH 0 | AUTH-only 4 | UNAUTH-only 0 | neither 1   (markers: UNAUTH x0, AUTH x268)
+      page     1:                                      neither       UNAUTH x  0   AUTH x  0
+      page     2:                                      AUTH-only     UNAUTH x  0   AUTH x 68
+      page     3:                                      AUTH-only     UNAUTH x  0   AUTH x 69
+      page     4:                                      AUTH-only     UNAUTH x  0   AUTH x 69
+      page     5:                                      AUTH-only     UNAUTH x  0   AUTH x 62
+
+      "BOTH" is page co-residency: one page holding rows of both
+      classes.  Measured on the store's own bytes, before any request
+      runs.  It is NOT itself a DA-1 finding -- the store holding the
+      projection it indexes is DA-3's last exclusion and DA-4 row 1.
+      It is the MECHANISM's precondition.
+
+  --- THE REQUEST -- touching ONLY rows the subject was entitled to ---------
+  SQL:                                                 UPDATE chunk SET served = served + 1 WHERE scope = 'AUTHORIZED'
+  rows the request will touch:                         200
+  unauthorized rows IN REACH of the request:           0   <-- the independent variable: this is what the topology changes
+
+  --- THE ROLLBACK JOURNAL -- read DURING the transaction, parsed page by page 
+  artefact:                                            PRESENT, 12824 bytes
+  header magic:                                        ZEROED -- written at commit, so absent mid-transaction
+  header nRec / dbSize / sector / page:                0 / 5 / 512 / 4096
+  journalled pages:                                    3   BOTH 0 | AUTH-only 3 | UNAUTH-only 0 | neither 0   (markers: UNAUTH x0, AUTH x200)
+      page     3:                                      AUTH-only     UNAUTH x  0   AUTH x 69
+      page     4:                                      AUTH-only     UNAUTH x  0   AUTH x 69
+      page     5:                                      AUTH-only     UNAUTH x  0   AUTH x 62
+    parser check (rollback journal):                   3 of 3 page images byte-identical to the independent copy
+  rows the request modified that it was NOT entitled to: 0   (measured after the write, not assumed)
+
+  --- THE OTHER IN-SCOPE ARTEFACTS -- enumerated, not assumed absent --------
+    -shm:                                              NEVER CREATED
+    -wal:                                              NEVER CREATED
+    -journal:                                          NEVER CREATED
+    temp/spill files seen during the request:          NONE
+
+  --- WHAT THE REQUEST MADE DURABLE, for this configuration -----------------
+  page images the request wrote into the artefact:     3
+  unauthorized markers in them:                        0
+  page images carrying BOTH classes:                   0
+  page images carrying UNAUTHORIZED ONLY:              0
+  finding under DA-1.1:                                no unauthorized marker observed
+      Absence, and DA-5 row 3 governs what it is worth on its own.
+
+==============================================================================
+MEASUREMENT L3 / DELETE / W-B
+==============================================================================
+  L3  ISOLATED STORES -- one store per partition, request reaches one
+  The routed shape of §4.13 W2/W3, bounded by execution context in W4. The
+  other partition is a different file the request never opens.
+  WRITE SHAPE: CACHE WRITEBACK -- INSERT of the subject's OWN authorized results
+
+  --- SUBJECT, MODE AND MAINTENANCE STATE (recorded per measurement) --------
+  subject / runtime:                                   SQLite 3.51.3 via node:sqlite, node v24.15.0
+  store file:                                          authorized-partition.db
+  journal_mode:                                        delete
+  page_size:                                           4096
+  secure_delete / auto_vacuum:                         {"secure_delete":0} / {"auto_vacuum":0}
+  other partition store:                               other-partition.db
+
+  --- BASELINE -- established before the request, and VERIFIED not assumed --
+  maintenance state:                                   none -- no checkpoint applies in this mode; no VACUUM, no ANALYZE
+  -journal at baseline:                                NEVER CREATED
+  baseline attributable (DA-4):                        YES -- no journal exists, so one seen later was created BY the transaction
+
+  --- THE STORE ITSELF, PAGE BY PAGE -- the precondition, measured ----------
+  store pages:                                         6   BOTH 0 | AUTH-only 4 | UNAUTH-only 0 | neither 2   (markers: UNAUTH x0, AUTH x268)
+      page     1:                                      neither       UNAUTH x  0   AUTH x  0
+      page     2:                                      AUTH-only     UNAUTH x  0   AUTH x 68
+      page     3:                                      AUTH-only     UNAUTH x  0   AUTH x 69
+      page     4:                                      AUTH-only     UNAUTH x  0   AUTH x 69
+      page     5:                                      AUTH-only     UNAUTH x  0   AUTH x 62
+      page     6:                                      neither       UNAUTH x  0   AUTH x  0
+
+      "BOTH" is page co-residency: one page holding rows of both
+      classes.  Measured on the store's own bytes, before any request
+      runs.  It is NOT itself a DA-1 finding -- the store holding the
+      projection it indexes is DA-3's last exclusion and DA-4 row 1.
+      It is the MECHANISM's precondition.
+
+  --- THE REQUEST -- touching ONLY rows the subject was entitled to ---------
+  SQL:                                                 INSERT INTO result_cache SELECT id, scope, body FROM chunk WHERE scope = 'AUTHORIZED'
+  rows the request will touch:                         200
+  unauthorized rows IN REACH of the request:           0   <-- the independent variable: this is what the topology changes
+
+  --- THE ROLLBACK JOURNAL -- read DURING the transaction, parsed page by page 
+  artefact:                                            PRESENT, 8720 bytes
+  header magic:                                        ZEROED -- written at commit, so absent mid-transaction
+  header nRec / dbSize / sector / page:                0 / 6 / 512 / 4096
+  journalled pages:                                    2   BOTH 0 | AUTH-only 0 | UNAUTH-only 0 | neither 2   (markers: UNAUTH x0, AUTH x0)
+      page     6:                                      neither       UNAUTH x  0   AUTH x  0
+      page     1:                                      neither       UNAUTH x  0   AUTH x  0
+    parser check (rollback journal):                   2 of 2 page images byte-identical to the independent copy
+  rows the request modified that it was NOT entitled to: 0   (measured after the write, not assumed)
+
+  --- THE OTHER IN-SCOPE ARTEFACTS -- enumerated, not assumed absent --------
+    -shm:                                              NEVER CREATED
+    -wal:                                              NEVER CREATED
+    -journal:                                          NEVER CREATED
+    temp/spill files seen during the request:          NONE
+
+  --- WHAT THE REQUEST MADE DURABLE, for this configuration -----------------
+  page images the request wrote into the artefact:     2
+  unauthorized markers in them:                        0
+  page images carrying BOTH classes:                   0
+  page images carrying UNAUTHORIZED ONLY:              0
+  finding under DA-1.1:                                no unauthorized marker observed
+      Absence, and DA-5 row 3 governs what it is worth on its own.
+
+==============================================================================
+MEASUREMENT L3 / WAL / W-A
+==============================================================================
+  L3  ISOLATED STORES -- one store per partition, request reaches one
+  The routed shape of §4.13 W2/W3, bounded by execution context in W4. The
+  other partition is a different file the request never opens.
+  WRITE SHAPE: ACCESS ACCOUNTING -- UPDATE over the rows the subject was entitled to
+
+  --- SUBJECT, MODE AND MAINTENANCE STATE (recorded per measurement) --------
+  subject / runtime:                                   SQLite 3.51.3 via node:sqlite, node v24.15.0
+  store file:                                          authorized-partition.db
+  journal_mode:                                        wal
+  page_size:                                           4096
+  secure_delete / auto_vacuum:                         {"secure_delete":0} / {"auto_vacuum":0}
+  other partition store:                               other-partition.db
+
+  --- BASELINE -- established before the request, and VERIFIED not assumed --
+  maintenance applied:                                 PRAGMA wal_checkpoint(TRUNCATE) -> {"busy":0,"log":0,"checkpointed":0}
+  maintenance state:                                   checkpointed (TRUNCATE); no VACUUM, no ANALYZE
+  -wal at baseline:                                    PRESENT BUT EMPTY (0 bytes)
+  baseline attributable (DA-4):                        YES -- -wal measured at 0 bytes, so anything found later arrived after it
+
+  --- THE STORE ITSELF, PAGE BY PAGE -- the precondition, measured ----------
+  store pages:                                         5   BOTH 0 | AUTH-only 4 | UNAUTH-only 0 | neither 1   (markers: UNAUTH x0, AUTH x268)
+      page     1:                                      neither       UNAUTH x  0   AUTH x  0
+      page     2:                                      AUTH-only     UNAUTH x  0   AUTH x 68
+      page     3:                                      AUTH-only     UNAUTH x  0   AUTH x 69
+      page     4:                                      AUTH-only     UNAUTH x  0   AUTH x 69
+      page     5:                                      AUTH-only     UNAUTH x  0   AUTH x 62
+
+      "BOTH" is page co-residency: one page holding rows of both
+      classes.  Measured on the store's own bytes, before any request
+      runs.  It is NOT itself a DA-1 finding -- the store holding the
+      projection it indexes is DA-3's last exclusion and DA-4 row 1.
+      It is the MECHANISM's precondition.
+
+  --- THE REQUEST -- touching ONLY rows the subject was entitled to ---------
+  SQL:                                                 UPDATE chunk SET served = served + 1 WHERE scope = 'AUTHORIZED'
+  rows the request will touch:                         200
+  unauthorized rows IN REACH of the request:           0   <-- the independent variable: this is what the topology changes
+  rows the request modified that it was NOT entitled to: 0   (measured after the write, not assumed)
+
+  --- THE WAL -- read after the commit, parsed frame by frame ---------------
+  artefact:                                            PRESENT, 12392 bytes
+  WAL-framed pages:                                    3   BOTH 0 | AUTH-only 3 | UNAUTH-only 0 | neither 0   (markers: UNAUTH x0, AUTH x200)
+      page     3:                                      AUTH-only     UNAUTH x  0   AUTH x 69
+      page     4:                                      AUTH-only     UNAUTH x  0   AUTH x 69
+      page     5:                                      AUTH-only     UNAUTH x  0   AUTH x 62
+  maintenance applied AFTER the measurement:           wal_checkpoint(TRUNCATE) -> {"busy":0,"log":0,"checkpointed":0}  (for the parser check only)
+    parser check (WAL):                                3 of 3 page images byte-identical to the independent copy
+
+  --- THE OTHER IN-SCOPE ARTEFACTS -- enumerated, not assumed absent --------
+    -shm:                                              32768 bytes   UNAUTH x0   AUTH x0
+    -wal:                                              0 bytes   UNAUTH x0   AUTH x0
+    -journal:                                          NEVER CREATED
+    temp/spill files seen during the request:          NONE
+
+  --- WHAT THE REQUEST MADE DURABLE, for this configuration -----------------
+  page images the request wrote into the artefact:     3
+  unauthorized markers in them:                        0
+  page images carrying BOTH classes:                   0
+  page images carrying UNAUTHORIZED ONLY:              0
+  finding under DA-1.1:                                no unauthorized marker observed
+      Absence, and DA-5 row 3 governs what it is worth on its own.
+
+==============================================================================
+MEASUREMENT L3 / WAL / W-B
+==============================================================================
+  L3  ISOLATED STORES -- one store per partition, request reaches one
+  The routed shape of §4.13 W2/W3, bounded by execution context in W4. The
+  other partition is a different file the request never opens.
+  WRITE SHAPE: CACHE WRITEBACK -- INSERT of the subject's OWN authorized results
+
+  --- SUBJECT, MODE AND MAINTENANCE STATE (recorded per measurement) --------
+  subject / runtime:                                   SQLite 3.51.3 via node:sqlite, node v24.15.0
+  store file:                                          authorized-partition.db
+  journal_mode:                                        wal
+  page_size:                                           4096
+  secure_delete / auto_vacuum:                         {"secure_delete":0} / {"auto_vacuum":0}
+  other partition store:                               other-partition.db
+
+  --- BASELINE -- established before the request, and VERIFIED not assumed --
+  maintenance applied:                                 PRAGMA wal_checkpoint(TRUNCATE) -> {"busy":0,"log":0,"checkpointed":0}
+  maintenance state:                                   checkpointed (TRUNCATE); no VACUUM, no ANALYZE
+  -wal at baseline:                                    PRESENT BUT EMPTY (0 bytes)
+  baseline attributable (DA-4):                        YES -- -wal measured at 0 bytes, so anything found later arrived after it
+
+  --- THE STORE ITSELF, PAGE BY PAGE -- the precondition, measured ----------
+  store pages:                                         6   BOTH 0 | AUTH-only 4 | UNAUTH-only 0 | neither 2   (markers: UNAUTH x0, AUTH x268)
+      page     1:                                      neither       UNAUTH x  0   AUTH x  0
+      page     2:                                      AUTH-only     UNAUTH x  0   AUTH x 68
+      page     3:                                      AUTH-only     UNAUTH x  0   AUTH x 69
+      page     4:                                      AUTH-only     UNAUTH x  0   AUTH x 69
+      page     5:                                      AUTH-only     UNAUTH x  0   AUTH x 62
+      page     6:                                      neither       UNAUTH x  0   AUTH x  0
+
+      "BOTH" is page co-residency: one page holding rows of both
+      classes.  Measured on the store's own bytes, before any request
+      runs.  It is NOT itself a DA-1 finding -- the store holding the
+      projection it indexes is DA-3's last exclusion and DA-4 row 1.
+      It is the MECHANISM's precondition.
+
+  --- THE REQUEST -- touching ONLY rows the subject was entitled to ---------
+  SQL:                                                 INSERT INTO result_cache SELECT id, scope, body FROM chunk WHERE scope = 'AUTHORIZED'
+  rows the request will touch:                         200
+  unauthorized rows IN REACH of the request:           0   <-- the independent variable: this is what the topology changes
+  rows the request modified that it was NOT entitled to: 0   (measured after the write, not assumed)
+
+  --- THE WAL -- read after the commit, parsed frame by frame ---------------
+  artefact:                                            PRESENT, 20632 bytes
+  WAL-framed pages:                                    5   BOTH 0 | AUTH-only 4 | UNAUTH-only 0 | neither 1   (markers: UNAUTH x0, AUTH x268)
+      page     1:                                      neither       UNAUTH x  0   AUTH x  0
+      page     6:                                      AUTH-only     UNAUTH x  0   AUTH x 68
+      page     7:                                      AUTH-only     UNAUTH x  0   AUTH x 69
+      page     8:                                      AUTH-only     UNAUTH x  0   AUTH x 69
+      page     9:                                      AUTH-only     UNAUTH x  0   AUTH x 62
+  maintenance applied AFTER the measurement:           wal_checkpoint(TRUNCATE) -> {"busy":0,"log":0,"checkpointed":0}  (for the parser check only)
+    parser check (WAL):                                5 of 5 page images byte-identical to the independent copy
+
+  --- THE OTHER IN-SCOPE ARTEFACTS -- enumerated, not assumed absent --------
+    -shm:                                              32768 bytes   UNAUTH x0   AUTH x0
+    -wal:                                              0 bytes   UNAUTH x0   AUTH x0
+    -journal:                                          NEVER CREATED
+    temp/spill files seen during the request:          NONE
+
+  --- WHAT THE REQUEST MADE DURABLE, for this configuration -----------------
+  page images the request wrote into the artefact:     5
+  unauthorized markers in them:                        0
+  page images carrying BOTH classes:                   0
+  page images carrying UNAUTHORIZED ONLY:              0
+  finding under DA-1.1:                                no unauthorized marker observed
+      Absence, and DA-5 row 3 governs what it is worth on its own.
+
+==============================================================================
+MEASUREMENT L4 / DELETE / W-A
+==============================================================================
+  L4  ISOLATED STORES, AFTER RE-PARTITION -- this store held the other partition first
+  L3 exactly, except the authorized store PREVIOUSLY held the other
+  partition and was re-materialised. §4.13 N3 requires partitions to be
+  rebuilt on invalidating events, so this is a topology's normal operating
+  mode, not an exotic case.
+  WRITE SHAPE: ACCESS ACCOUNTING -- UPDATE over the rows the subject was entitled to
+
+  --- SUBJECT, MODE AND MAINTENANCE STATE (recorded per measurement) --------
+  subject / runtime:                                   SQLite 3.51.3 via node:sqlite, node v24.15.0
+  store file:                                          authorized-partition.db
+  journal_mode:                                        delete
+  page_size:                                           4096
+  secure_delete / auto_vacuum:                         {"secure_delete":0} / {"auto_vacuum":0}
+  maintenance after re-partition:                      NONE -- no VACUUM, no secure_delete
+
+  --- BASELINE -- established before the request, and VERIFIED not assumed --
+  maintenance state:                                   none -- no checkpoint applies in this mode; no VACUUM, no ANALYZE
+  -journal at baseline:                                NEVER CREATED
+  baseline attributable (DA-4):                        YES -- no journal exists, so one seen later was created BY the transaction
+
+  --- THE STORE ITSELF, PAGE BY PAGE -- the precondition, measured ----------
+  store pages:                                         16   BOTH 0 | AUTH-only 4 | UNAUTH-only 11 | neither 1   (markers: UNAUTH x165, AUTH x268)
+      page     1:                                      neither       UNAUTH x  0   AUTH x  0
+      page     2:                                      AUTH-only     UNAUTH x  0   AUTH x 68
+      page     3:                                      UNAUTH-only   UNAUTH x 15   AUTH x  0
+      page     4:                                      AUTH-only     UNAUTH x  0   AUTH x 69
+      page     5:                                      UNAUTH-only   UNAUTH x 15   AUTH x  0
+      page     6:                                      UNAUTH-only   UNAUTH x 15   AUTH x  0
+      page     7:                                      UNAUTH-only   UNAUTH x 15   AUTH x  0
+      page     8:                                      UNAUTH-only   UNAUTH x 15   AUTH x  0
+      page     9:                                      UNAUTH-only   UNAUTH x 15   AUTH x  0
+      page    10:                                      UNAUTH-only   UNAUTH x 15   AUTH x  0
+      page    11:                                      UNAUTH-only   UNAUTH x 15   AUTH x  0
+      page    12:                                      UNAUTH-only   UNAUTH x 15   AUTH x  0
+      … 4 further page(s) not printed individually; the tally above covers all of them.
+
+      "BOTH" is page co-residency: one page holding rows of both
+      classes.  Measured on the store's own bytes, before any request
+      runs.  It is NOT itself a DA-1 finding -- the store holding the
+      projection it indexes is DA-3's last exclusion and DA-4 row 1.
+      It is the MECHANISM's precondition.
+
+      NOTE THE UNAUTH-only PAGES IN AN ISOLATED STORE.  This store
+      holds no unauthorized ROW -- the re-partition dropped them.
+      Those pages are on the free list, and their bytes are still
+      there.  No query can reach them and no U counter can see them.
+      Provenance is the RE-PARTITION, not a request, so DA-4 row 1
+      applies and THIS IS NOT A DA-1.1 FINDING.  It is recorded
+      because of what the next section measures.
+
+  --- THE REQUEST -- touching ONLY rows the subject was entitled to ---------
+  SQL:                                                 UPDATE chunk SET served = served + 1 WHERE scope = 'AUTHORIZED'
+  rows the request will touch:                         200
+  unauthorized rows IN REACH of the request:           0   <-- the independent variable: this is what the topology changes
+
+  --- THE ROLLBACK JOURNAL -- read DURING the transaction, parsed page by page 
+  artefact:                                            PRESENT, 12824 bytes
+  header magic:                                        ZEROED -- written at commit, so absent mid-transaction
+  header nRec / dbSize / sector / page:                0 / 16 / 512 / 4096
+  journalled pages:                                    3   BOTH 0 | AUTH-only 3 | UNAUTH-only 0 | neither 0   (markers: UNAUTH x0, AUTH x200)
+      page     4:                                      AUTH-only     UNAUTH x  0   AUTH x 69
+      page    16:                                      AUTH-only     UNAUTH x  0   AUTH x 69
+      page    15:                                      AUTH-only     UNAUTH x  0   AUTH x 62
+    parser check (rollback journal):                   3 of 3 page images byte-identical to the independent copy
+  rows the request modified that it was NOT entitled to: 0   (measured after the write, not assumed)
+
+  --- THE OTHER IN-SCOPE ARTEFACTS -- enumerated, not assumed absent --------
+    -shm:                                              NEVER CREATED
+    -wal:                                              NEVER CREATED
+    -journal:                                          NEVER CREATED
+    temp/spill files seen during the request:          NONE
+
+  --- WHAT THE REQUEST MADE DURABLE, for this configuration -----------------
+  page images the request wrote into the artefact:     3
+  unauthorized markers in them:                        0
+  page images carrying BOTH classes:                   0
+  page images carrying UNAUTHORIZED ONLY:              0
+  finding under DA-1.1:                                no unauthorized marker observed
+      Absence, and DA-5 row 3 governs what it is worth on its own.
+
+==============================================================================
+MEASUREMENT L4 / DELETE / W-B
+==============================================================================
+  L4  ISOLATED STORES, AFTER RE-PARTITION -- this store held the other partition first
+  L3 exactly, except the authorized store PREVIOUSLY held the other
+  partition and was re-materialised. §4.13 N3 requires partitions to be
+  rebuilt on invalidating events, so this is a topology's normal operating
+  mode, not an exotic case.
+  WRITE SHAPE: CACHE WRITEBACK -- INSERT of the subject's OWN authorized results
+
+  --- SUBJECT, MODE AND MAINTENANCE STATE (recorded per measurement) --------
+  subject / runtime:                                   SQLite 3.51.3 via node:sqlite, node v24.15.0
+  store file:                                          authorized-partition.db
+  journal_mode:                                        delete
+  page_size:                                           4096
+  secure_delete / auto_vacuum:                         {"secure_delete":0} / {"auto_vacuum":0}
+  maintenance after re-partition:                      NONE -- no VACUUM, no secure_delete
+
+  --- BASELINE -- established before the request, and VERIFIED not assumed --
+  maintenance state:                                   none -- no checkpoint applies in this mode; no VACUUM, no ANALYZE
+  -journal at baseline:                                NEVER CREATED
+  baseline attributable (DA-4):                        YES -- no journal exists, so one seen later was created BY the transaction
+
+  --- THE STORE ITSELF, PAGE BY PAGE -- the precondition, measured ----------
+  store pages:                                         16   BOTH 0 | AUTH-only 4 | UNAUTH-only 10 | neither 2   (markers: UNAUTH x150, AUTH x268)
+      page     1:                                      neither       UNAUTH x  0   AUTH x  0
+      page     2:                                      AUTH-only     UNAUTH x  0   AUTH x 68
+      page     3:                                      UNAUTH-only   UNAUTH x 15   AUTH x  0
+      page     4:                                      AUTH-only     UNAUTH x  0   AUTH x 69
+      page     5:                                      neither       UNAUTH x  0   AUTH x  0
+      page     6:                                      UNAUTH-only   UNAUTH x 15   AUTH x  0
+      page     7:                                      UNAUTH-only   UNAUTH x 15   AUTH x  0
+      page     8:                                      UNAUTH-only   UNAUTH x 15   AUTH x  0
+      page     9:                                      UNAUTH-only   UNAUTH x 15   AUTH x  0
+      page    10:                                      UNAUTH-only   UNAUTH x 15   AUTH x  0
+      page    11:                                      UNAUTH-only   UNAUTH x 15   AUTH x  0
+      page    12:                                      UNAUTH-only   UNAUTH x 15   AUTH x  0
+      … 4 further page(s) not printed individually; the tally above covers all of them.
+
+      "BOTH" is page co-residency: one page holding rows of both
+      classes.  Measured on the store's own bytes, before any request
+      runs.  It is NOT itself a DA-1 finding -- the store holding the
+      projection it indexes is DA-3's last exclusion and DA-4 row 1.
+      It is the MECHANISM's precondition.
+
+      NOTE THE UNAUTH-only PAGES IN AN ISOLATED STORE.  This store
+      holds no unauthorized ROW -- the re-partition dropped them.
+      Those pages are on the free list, and their bytes are still
+      there.  No query can reach them and no U counter can see them.
+      Provenance is the RE-PARTITION, not a request, so DA-4 row 1
+      applies and THIS IS NOT A DA-1.1 FINDING.  It is recorded
+      because of what the next section measures.
+
+  --- THE REQUEST -- touching ONLY rows the subject was entitled to ---------
+  SQL:                                                 INSERT INTO result_cache SELECT id, scope, body FROM chunk WHERE scope = 'AUTHORIZED'
+  rows the request will touch:                         200
+  unauthorized rows IN REACH of the request:           0   <-- the independent variable: this is what the topology changes
+
+  --- THE ROLLBACK JOURNAL -- read DURING the transaction, parsed page by page 
+  artefact:                                            PRESENT, 12824 bytes
+  header magic:                                        ZEROED -- written at commit, so absent mid-transaction
+  header nRec / dbSize / sector / page:                0 / 16 / 512 / 4096
+  journalled pages:                                    3   BOTH 0 | AUTH-only 0 | UNAUTH-only 1 | neither 2   (markers: UNAUTH x15, AUTH x0)
+      page     5:                                      neither       UNAUTH x  0   AUTH x  0
+      page     1:                                      neither       UNAUTH x  0   AUTH x  0
+      page     3:                                      UNAUTH-only   UNAUTH x 15   AUTH x  0
+    parser check (rollback journal):                   3 of 3 page images byte-identical to the independent copy
+  rows the request modified that it was NOT entitled to: 0   (measured after the write, not assumed)
+
+  --- THE OTHER IN-SCOPE ARTEFACTS -- enumerated, not assumed absent --------
+    -shm:                                              NEVER CREATED
+    -wal:                                              NEVER CREATED
+    -journal:                                          NEVER CREATED
+    temp/spill files seen during the request:          NONE
+
+  --- WHAT THE REQUEST MADE DURABLE, for this configuration -----------------
+  page images the request wrote into the artefact:     3
+  unauthorized markers in them:                        15
+  page images carrying BOTH classes:                   0
+  page images carrying UNAUTHORIZED ONLY:              1
+  finding under DA-1.1:                                YES -- DA-5 row 1: a single occurrence is sufficient => NOT CLEARED
+
+==============================================================================
+MEASUREMENT L4 / WAL / W-A
+==============================================================================
+  L4  ISOLATED STORES, AFTER RE-PARTITION -- this store held the other partition first
+  L3 exactly, except the authorized store PREVIOUSLY held the other
+  partition and was re-materialised. §4.13 N3 requires partitions to be
+  rebuilt on invalidating events, so this is a topology's normal operating
+  mode, not an exotic case.
+  WRITE SHAPE: ACCESS ACCOUNTING -- UPDATE over the rows the subject was entitled to
+
+  --- SUBJECT, MODE AND MAINTENANCE STATE (recorded per measurement) --------
+  subject / runtime:                                   SQLite 3.51.3 via node:sqlite, node v24.15.0
+  store file:                                          authorized-partition.db
+  journal_mode:                                        wal
+  page_size:                                           4096
+  secure_delete / auto_vacuum:                         {"secure_delete":0} / {"auto_vacuum":0}
+  maintenance after re-partition:                      NONE -- no VACUUM, no secure_delete
+
+  --- BASELINE -- established before the request, and VERIFIED not assumed --
+  maintenance applied:                                 PRAGMA wal_checkpoint(TRUNCATE) -> {"busy":0,"log":0,"checkpointed":0}
+  maintenance state:                                   checkpointed (TRUNCATE); no VACUUM, no ANALYZE
+  -wal at baseline:                                    PRESENT BUT EMPTY (0 bytes)
+  baseline attributable (DA-4):                        YES -- -wal measured at 0 bytes, so anything found later arrived after it
+
+  --- THE STORE ITSELF, PAGE BY PAGE -- the precondition, measured ----------
+  store pages:                                         16   BOTH 0 | AUTH-only 4 | UNAUTH-only 11 | neither 1   (markers: UNAUTH x165, AUTH x268)
+      page     1:                                      neither       UNAUTH x  0   AUTH x  0
+      page     2:                                      AUTH-only     UNAUTH x  0   AUTH x 68
+      page     3:                                      UNAUTH-only   UNAUTH x 15   AUTH x  0
+      page     4:                                      AUTH-only     UNAUTH x  0   AUTH x 69
+      page     5:                                      UNAUTH-only   UNAUTH x 15   AUTH x  0
+      page     6:                                      UNAUTH-only   UNAUTH x 15   AUTH x  0
+      page     7:                                      UNAUTH-only   UNAUTH x 15   AUTH x  0
+      page     8:                                      UNAUTH-only   UNAUTH x 15   AUTH x  0
+      page     9:                                      UNAUTH-only   UNAUTH x 15   AUTH x  0
+      page    10:                                      UNAUTH-only   UNAUTH x 15   AUTH x  0
+      page    11:                                      UNAUTH-only   UNAUTH x 15   AUTH x  0
+      page    12:                                      UNAUTH-only   UNAUTH x 15   AUTH x  0
+      … 4 further page(s) not printed individually; the tally above covers all of them.
+
+      "BOTH" is page co-residency: one page holding rows of both
+      classes.  Measured on the store's own bytes, before any request
+      runs.  It is NOT itself a DA-1 finding -- the store holding the
+      projection it indexes is DA-3's last exclusion and DA-4 row 1.
+      It is the MECHANISM's precondition.
+
+      NOTE THE UNAUTH-only PAGES IN AN ISOLATED STORE.  This store
+      holds no unauthorized ROW -- the re-partition dropped them.
+      Those pages are on the free list, and their bytes are still
+      there.  No query can reach them and no U counter can see them.
+      Provenance is the RE-PARTITION, not a request, so DA-4 row 1
+      applies and THIS IS NOT A DA-1.1 FINDING.  It is recorded
+      because of what the next section measures.
+
+  --- THE REQUEST -- touching ONLY rows the subject was entitled to ---------
+  SQL:                                                 UPDATE chunk SET served = served + 1 WHERE scope = 'AUTHORIZED'
+  rows the request will touch:                         200
+  unauthorized rows IN REACH of the request:           0   <-- the independent variable: this is what the topology changes
+  rows the request modified that it was NOT entitled to: 0   (measured after the write, not assumed)
+
+  --- THE WAL -- read after the commit, parsed frame by frame ---------------
+  artefact:                                            PRESENT, 12392 bytes
+  WAL-framed pages:                                    3   BOTH 0 | AUTH-only 3 | UNAUTH-only 0 | neither 0   (markers: UNAUTH x0, AUTH x200)
+      page     4:                                      AUTH-only     UNAUTH x  0   AUTH x 69
+      page    15:                                      AUTH-only     UNAUTH x  0   AUTH x 62
+      page    16:                                      AUTH-only     UNAUTH x  0   AUTH x 69
+  maintenance applied AFTER the measurement:           wal_checkpoint(TRUNCATE) -> {"busy":0,"log":0,"checkpointed":0}  (for the parser check only)
+    parser check (WAL):                                3 of 3 page images byte-identical to the independent copy
+
+  --- THE OTHER IN-SCOPE ARTEFACTS -- enumerated, not assumed absent --------
+    -shm:                                              32768 bytes   UNAUTH x0   AUTH x0
+    -wal:                                              0 bytes   UNAUTH x0   AUTH x0
+    -journal:                                          NEVER CREATED
+    temp/spill files seen during the request:          NONE
+
+  --- WHAT THE REQUEST MADE DURABLE, for this configuration -----------------
+  page images the request wrote into the artefact:     3
+  unauthorized markers in them:                        0
+  page images carrying BOTH classes:                   0
+  page images carrying UNAUTHORIZED ONLY:              0
+  finding under DA-1.1:                                no unauthorized marker observed
+      Absence, and DA-5 row 3 governs what it is worth on its own.
+
+==============================================================================
+MEASUREMENT L4 / WAL / W-B
+==============================================================================
+  L4  ISOLATED STORES, AFTER RE-PARTITION -- this store held the other partition first
+  L3 exactly, except the authorized store PREVIOUSLY held the other
+  partition and was re-materialised. §4.13 N3 requires partitions to be
+  rebuilt on invalidating events, so this is a topology's normal operating
+  mode, not an exotic case.
+  WRITE SHAPE: CACHE WRITEBACK -- INSERT of the subject's OWN authorized results
+
+  --- SUBJECT, MODE AND MAINTENANCE STATE (recorded per measurement) --------
+  subject / runtime:                                   SQLite 3.51.3 via node:sqlite, node v24.15.0
+  store file:                                          authorized-partition.db
+  journal_mode:                                        wal
+  page_size:                                           4096
+  secure_delete / auto_vacuum:                         {"secure_delete":0} / {"auto_vacuum":0}
+  maintenance after re-partition:                      NONE -- no VACUUM, no secure_delete
+
+  --- BASELINE -- established before the request, and VERIFIED not assumed --
+  maintenance applied:                                 PRAGMA wal_checkpoint(TRUNCATE) -> {"busy":0,"log":0,"checkpointed":0}
+  maintenance state:                                   checkpointed (TRUNCATE); no VACUUM, no ANALYZE
+  -wal at baseline:                                    PRESENT BUT EMPTY (0 bytes)
+  baseline attributable (DA-4):                        YES -- -wal measured at 0 bytes, so anything found later arrived after it
+
+  --- THE STORE ITSELF, PAGE BY PAGE -- the precondition, measured ----------
+  store pages:                                         16   BOTH 0 | AUTH-only 4 | UNAUTH-only 10 | neither 2   (markers: UNAUTH x150, AUTH x268)
+      page     1:                                      neither       UNAUTH x  0   AUTH x  0
+      page     2:                                      AUTH-only     UNAUTH x  0   AUTH x 68
+      page     3:                                      UNAUTH-only   UNAUTH x 15   AUTH x  0
+      page     4:                                      AUTH-only     UNAUTH x  0   AUTH x 69
+      page     5:                                      neither       UNAUTH x  0   AUTH x  0
+      page     6:                                      UNAUTH-only   UNAUTH x 15   AUTH x  0
+      page     7:                                      UNAUTH-only   UNAUTH x 15   AUTH x  0
+      page     8:                                      UNAUTH-only   UNAUTH x 15   AUTH x  0
+      page     9:                                      UNAUTH-only   UNAUTH x 15   AUTH x  0
+      page    10:                                      UNAUTH-only   UNAUTH x 15   AUTH x  0
+      page    11:                                      UNAUTH-only   UNAUTH x 15   AUTH x  0
+      page    12:                                      UNAUTH-only   UNAUTH x 15   AUTH x  0
+      … 4 further page(s) not printed individually; the tally above covers all of them.
+
+      "BOTH" is page co-residency: one page holding rows of both
+      classes.  Measured on the store's own bytes, before any request
+      runs.  It is NOT itself a DA-1 finding -- the store holding the
+      projection it indexes is DA-3's last exclusion and DA-4 row 1.
+      It is the MECHANISM's precondition.
+
+      NOTE THE UNAUTH-only PAGES IN AN ISOLATED STORE.  This store
+      holds no unauthorized ROW -- the re-partition dropped them.
+      Those pages are on the free list, and their bytes are still
+      there.  No query can reach them and no U counter can see them.
+      Provenance is the RE-PARTITION, not a request, so DA-4 row 1
+      applies and THIS IS NOT A DA-1.1 FINDING.  It is recorded
+      because of what the next section measures.
+
+  --- THE REQUEST -- touching ONLY rows the subject was entitled to ---------
+  SQL:                                                 INSERT INTO result_cache SELECT id, scope, body FROM chunk WHERE scope = 'AUTHORIZED'
+  rows the request will touch:                         200
+  unauthorized rows IN REACH of the request:           0   <-- the independent variable: this is what the topology changes
+  rows the request modified that it was NOT entitled to: 0   (measured after the write, not assumed)
+
+  --- THE WAL -- read after the commit, parsed frame by frame ---------------
+  artefact:                                            PRESENT, 24752 bytes
+  WAL-framed pages:                                    6   BOTH 0 | AUTH-only 4 | UNAUTH-only 1 | neither 1   (markers: UNAUTH x15, AUTH x268)
+      page     1:                                      neither       UNAUTH x  0   AUTH x  0
+      page     3:                                      UNAUTH-only   UNAUTH x 15   AUTH x  0
+      page     5:                                      AUTH-only     UNAUTH x  0   AUTH x 68
+      page     6:                                      AUTH-only     UNAUTH x  0   AUTH x 69
+      page    11:                                      AUTH-only     UNAUTH x  0   AUTH x 62
+      page    14:                                      AUTH-only     UNAUTH x  0   AUTH x 69
+  maintenance applied AFTER the measurement:           wal_checkpoint(TRUNCATE) -> {"busy":0,"log":0,"checkpointed":0}  (for the parser check only)
+    parser check (WAL):                                6 of 6 page images byte-identical to the independent copy
+
+  --- THE OTHER IN-SCOPE ARTEFACTS -- enumerated, not assumed absent --------
+    -shm:                                              32768 bytes   UNAUTH x0   AUTH x0
+    -wal:                                              0 bytes   UNAUTH x0   AUTH x0
+    -journal:                                          NEVER CREATED
+    temp/spill files seen during the request:          NONE
+
+  --- WHAT THE REQUEST MADE DURABLE, for this configuration -----------------
+  page images the request wrote into the artefact:     6
+  unauthorized markers in them:                        15
+  page images carrying BOTH classes:                   0
+  page images carrying UNAUTHORIZED ONLY:              1
+  finding under DA-1.1:                                YES -- DA-5 row 1: a single occurrence is sufficient => NOT CLEARED
+
+==============================================================================
+I. COMPARABILITY -- the write shape held constant, checked not assumed
+==============================================================================
+  rows touched, every configuration of W-A:            200
+  rows touched, every configuration of W-B:            200
+  rows modified that the subject was NOT entitled to:  0   (measured per configuration)
+
+  THE INDEPENDENT VARIABLE, per layout -- unauthorized rows IN REACH of
+  the request.  This is the one thing that is SUPPOSED to differ:
+    L1:                                                200 unauthorized row(s) reachable by the request
+    L2:                                                0 unauthorized row(s) reachable by the request
+    L3:                                                0 unauthorized row(s) reachable by the request
+    L4:                                                0 unauthorized row(s) reachable by the request
+
+  Every configuration of a given shape touched the same number of rows,
+  and in EVERY configuration the request modified NOTHING the subject
+  was not entitled to -- checked after each write rather than argued
+  from the WHERE clause.  The layouts differ in what is IN REACH, and
+  in nothing else the request can see.
+
+==============================================================================
+NC-1  NEGATIVE CONTROL -- isolated layout, and it MUST produce a finding
+==============================================================================
+  The adverse shape is not contrived: a retrieval layer that caches its
+  working set writes back what it examined.  Give it a working set that
+  crossed the partition boundary -- the thing isolation is supposed to
+  prevent -- and the write lands in the AUTHORIZED store.  If the
+  instrument cannot see that, it cannot see anything, and every null
+  result in the isolated arm is uninterpretable.
+
+  --- NC-1 / DELETE -- unauthorized content written INTO the isolated store -
+  layout:                                              L3 ISOLATED STORES -- the same fixture the subject arm uses
+  journal_mode:                                        delete
+  -journal at baseline:                                NEVER CREATED
+  baseline attributable:                               YES
+  -journal during the write:                           PRESENT, 4616 bytes
+  journalled pages:                                    1   BOTH 0 | AUTH-only 0 | UNAUTH-only 1 | neither 0   (markers: UNAUTH x60, AUTH x0)
+      page     6:                                      UNAUTH-only   UNAUTH x 60   AUTH x  0
+  NC-1 / DELETE produced a DA-1 finding:               YES
+
+  --- NC-1 / WAL -- unauthorized content written INTO the isolated store ----
+  layout:                                              L3 ISOLATED STORES -- the same fixture the subject arm uses
+  journal_mode:                                        wal
+  -wal at baseline:                                    PRESENT BUT EMPTY (0 bytes)
+  baseline attributable:                               YES
+  -wal after the write:                                PRESENT, 4152 bytes
+  WAL-framed pages:                                    1   BOTH 0 | AUTH-only 0 | UNAUTH-only 1 | neither 0   (markers: UNAUTH x61, AUTH x0)
+      page     6:                                      UNAUTH-only   UNAUTH x 61   AUTH x  0
+  NC-1 / WAL produced a DA-1 finding:                  YES
+
+  MSG-0156, APPLIED IN ADVANCE rather than corrected afterwards: this is
+  a CONTROL.  It is built to produce a finding.  Its numbers are NOT a
+  finding about any layout, do NOT appear in section J or K, and are
+  counted nowhere as evidence about the subject.
+
+==============================================================================
+J. RESULTS -- per physical organization, per artefact, DA-5 vocabulary
+==============================================================================
+  Read "store BOTH" first: it is the co-residency precondition.  Read
+  "durable UNAUTH" second: it is what the request made durable.  The
+  relationship between those columns is the answer to Q16.
+
+  configuration            store BOTH  durable pages  durable UNAUTH   verdict
+  ----------------------------------------------------------------------------
+  L1 / DELETE / W-A                 7              6             200   FINDING -> NOT CLEARED (DA-5 row 1)
+  L1 / DELETE / W-B                 7              2               0   no marker observed (DA-5 row 3 governs)
+  L1 / WAL / W-A                    7              6             200   FINDING -> NOT CLEARED (DA-5 row 1)
+  L1 / WAL / W-B                    7              5               0   no marker observed (DA-5 row 3 governs)
+  L2 / DELETE / W-A                 0              3               0   no marker observed (DA-5 row 3 governs)
+  L2 / DELETE / W-B                 0              2               0   no marker observed (DA-5 row 3 governs)
+  L2 / WAL / W-A                    0              3               0   no marker observed (DA-5 row 3 governs)
+  L2 / WAL / W-B                    0              5               0   no marker observed (DA-5 row 3 governs)
+  L3 / DELETE / W-A                 0              3               0   no marker observed (DA-5 row 3 governs)
+  L3 / DELETE / W-B                 0              2               0   no marker observed (DA-5 row 3 governs)
+  L3 / WAL / W-A                    0              3               0   no marker observed (DA-5 row 3 governs)
+  L3 / WAL / W-B                    0              5               0   no marker observed (DA-5 row 3 governs)
+  L4 / DELETE / W-A                 0              3               0   no marker observed (DA-5 row 3 governs)
+  L4 / DELETE / W-B                 0              3              15   FINDING -> NOT CLEARED (DA-5 row 1)
+  L4 / WAL / W-A                    0              3               0   no marker observed (DA-5 row 3 governs)
+  L4 / WAL / W-B                    0              6              15   FINDING -> NOT CLEARED (DA-5 row 1)
+
+  --- DA-1.1 -- request-induced persistence, per physical organization ------
+    L1 / DELETE / W-A:                                 FINDING -- 200 unauthorized marker(s) across 6 durable page image(s); 6 carried BOTH classes, 0 carried unauthorized content only
+    L1 / DELETE / W-B:                                 no unauthorized marker in any page image the request made durable
+    L1 / WAL / W-A:                                    FINDING -- 200 unauthorized marker(s) across 6 durable page image(s); 6 carried BOTH classes, 0 carried unauthorized content only
+    L1 / WAL / W-B:                                    no unauthorized marker in any page image the request made durable
+    L1 VERDICT:                                        NOT CLEARED (DA-5 row 1) -- a single occurrence is sufficient, and no structural argument rehabilitates it
+    L2 / DELETE / W-A:                                 no unauthorized marker in any page image the request made durable
+    L2 / DELETE / W-B:                                 no unauthorized marker in any page image the request made durable
+    L2 / WAL / W-A:                                    no unauthorized marker in any page image the request made durable
+    L2 / WAL / W-B:                                    no unauthorized marker in any page image the request made durable
+    L2 VERDICT:                                        no DA-1.1 finding on either write shape; see the account below for what that is worth
+    L3 / DELETE / W-A:                                 no unauthorized marker in any page image the request made durable
+    L3 / DELETE / W-B:                                 no unauthorized marker in any page image the request made durable
+    L3 / WAL / W-A:                                    no unauthorized marker in any page image the request made durable
+    L3 / WAL / W-B:                                    no unauthorized marker in any page image the request made durable
+    L3 VERDICT:                                        no DA-1.1 finding on either write shape; see the account below for what that is worth
+    L4 / DELETE / W-A:                                 no unauthorized marker in any page image the request made durable
+    L4 / DELETE / W-B:                                 FINDING -- 15 unauthorized marker(s) across 3 durable page image(s); 0 carried BOTH classes, 1 carried unauthorized content only
+    L4 / WAL / W-A:                                    no unauthorized marker in any page image the request made durable
+    L4 / WAL / W-B:                                    FINDING -- 15 unauthorized marker(s) across 6 durable page image(s); 0 carried BOTH classes, 1 carried unauthorized content only
+    L4 VERDICT:                                        NOT CLEARED (DA-5 row 1) -- a single occurrence is sufficient, and no structural argument rehabilitates it
+
+  --- DA-5 ROW 4 -- what an absence here is, and is not ---------------------
+      DA-5 row 3: an absence "proves only that nothing crossed the
+      point, and the moment, at which the inspection was taken."
+      DA-5 row 4 is the ONLY route by which absence becomes
+      satisfaction: "absence, PLUS evidence that the engine could not
+      have written it -- containment of the reachable structure
+      (§4.13 N1/N2), or an enumerated account of every in-scope
+      artefact the request could touch."
+
+      What this probe supplies for the layouts that came back clean:
+        + the enumerated account -- every page the request made durable was
+          identified BY NUMBER and classified individually, and every
+          in-scope artefact was listed rather than assumed absent;
+        + an instrument check -- each parsed page image was compared byte
+          for byte against an independently read copy of the store, so the
+          account is not the parser marking its own work;
+        + a negative control on the SAME layout, which fired.
+
+      What it does NOT supply, and what therefore stays open:
+        - the whole DA-1 verdict.  DA-1.2 residual retention and DA-1.3
+          widened reach are NOT re-measured here -- TASK-0045 recorded both
+          NOT CLEARED and NOTHING in this run disturbs that.
+        - block-level erasure evidence.  Unlinking is observable; whether
+          the blocks are gone is not, on any instrument available here
+          (DA-6).
+        - anything about content a byte scan would miss -- compression,
+          re-encoding, partial-page writes.
+        - a second subject.  §4.15: binding, not build.  No class
+          generalization is available here and none may be read in.
+
+==============================================================================
+K. THE Q16 ANSWER -- for the tested configuration, and no wider
+==============================================================================
+  layout                                             W-A     W-B
+  --------------------------------------------------------------
+  L1  shared projection                              200       0
+  L2  isolated structures, one store                   0       0
+  L3  isolated stores                                  0       0
+  L4  isolated stores, after re-partition              0      15
+
+  (unauthorized markers the request made durable; W-A access
+  accounting, W-B cache writeback)
+
+  --- PART ONE -- the exposure the task asked about -------------------------
+      PHYSICAL CONTAINMENT PREVENTED IT.  Under W-A -- the write shape
+      that produced the TASK-0045 result -- the shared layout made
+      unauthorized content durable and NO isolated layout did.
+
+      And the mechanism is measured rather than inferred.  In L1 the
+      request made page images durable that carried BOTH classes; in
+      L2, L3 and L4 every page image it made durable carried one.
+      The page numbers and their classifications are printed above,
+      and each image was verified byte-identical to an independently
+      read copy of the store.  This is the co-residency mechanism
+      exhibited, not a marker count re-asserted.
+
+  --- PART TWO -- and the answer changes with the write shape ---------------
+      L4 IS L3 -- the same isolation, the same store layout, the same
+      entitlement, no unauthorized row anywhere in reach -- with one
+      difference: the store had previously held the OTHER partition
+      and was re-materialised.  Under W-B it made 15 unauthorized
+      marker(s) durable.
+
+      THE MECHANISM IS NOT CO-RESIDENCY OF ROWS.  It is co-residency
+      of BYTES.  A page released by the dropped partition keeps its
+      content on the free list; an appending request-induced write
+      consumes that page; and journalling the page writes its ORIGINAL
+      IMAGE -- the old partition's bytes -- into the artefact.
+
+      NOTE WHICH SHAPE DID IT, because it inverts TASK-0045.  There,
+      W-A was the shape that leaked and W-B "journalled nothing,
+      because a rollback journal holds original images of OVERWRITTEN
+      pages and appends overwrite none."  That reasoning was correct
+      about a store whose free list is empty.  In a re-materialised
+      store the append does overwrite something: a page the previous
+      partition left behind.  THE SAME WRITE SHAPE, THE OPPOSITE
+      RESULT, AND THE DIFFERENCE IS THE STORE'S HISTORY.
+
+      WHY THIS IS NOT A CORNER CASE.  §4.13 N3 requires the partition
+      invariant to be restored by "the recorded event that would break
+      it", and names ingestion, effectivity-boundary crossing and
+      entitlement-class change among those events.  A W1-W3 topology
+      RE-MATERIALISES PARTITIONS AS ITS NORMAL OPERATING MODE, so the
+      state L4 measures is not one a design would rarely be in.  It is
+      the state it spends most of its life in.
+
+      WHAT IT DOES AND DOES NOT SAY ABOUT N1.  §4.13 N1 requires every
+      structure the traversal may open to contain, at answer time, no
+      ENTRY unauthorized for the routed subject.  L4 SATISFIES N1 AS
+      WRITTEN -- there is no such entry, no query can reach those
+      bytes, and no U counter can see them.  N1 and DA-1 are asking
+      different questions of the same page.  This probe does NOT
+      propose amending N1: that is an architecture change it has no
+      authority to make.  It refers the question and stops.
+
+  --- THE BOUNDARY ON ALL OF THE ABOVE --------------------------------------
+      In the task file's own words, the result states whether physical
+      containment prevents the observed durability exposure FOR THE
+      TESTED CONFIGURATION, "without generalizing to an engine class."
+      One subject, one build, two write shapes, synthetic fixtures.
+
+      NOTHING IS CLEARED.  No candidate verdict moves, no gate changes,
+      no criterion is adjusted, and no topology is selected: W1-W4
+      differ on cost and operability (§4.13 GAP-C) and nothing here
+      narrows that choice.  DA-1 remains NOT CLEARED for this subject
+      on the two independent routes MSG-0155 recorded, neither of which
+      this run touched.
+
+==============================================================================
+L. COVERAGE, LIMITATIONS AND RUN VALIDITY
+==============================================================================
+
+  --- L1  Coverage -- every configuration accounted for, no silent omissions 
+    physical organizations:                            4 (L1 shared, L2 isolated structures, L3 isolated stores, L4 re-partitioned)
+    journal modes per organization:                    2 (DELETE / rollback journal, WAL)
+    request-induced write shapes:                      2 (W-A access accounting, W-B cache writeback)
+    measured configurations:                           16
+    negative controls:                                 2 -- one per instrument, both on the ISOLATED layout
+    rollback journals:                                 MEASURED, parsed page by page, parser verified
+    write-ahead logs:                                  MEASURED, parsed frame by frame, parser verified
+    shared-memory (-shm):                              MEASURED by marker count -- weaker instrument, no emptied baseline exists for it
+    temporary / spill files:                           WATCHED during every request; these write shapes produced none
+    engine-produced backups:                           NOT RE-MEASURED -- TASK-0045 measured this class and its result stands; re-running it would be the "prior evidence as new evidence" the task file forbids
+    replication streams:                               NOT APPLICABLE -- this subject is not a replicating engine
+
+  --- L2  Limitations, stated rather than left to be discovered -------------
+  1. ONE SUBJECT, ONE BUILD. §4.15: the two available subjects differ in
+     the BINDING, not the build. Nothing here is a claim about "SQLite",
+     still less about class R or about engines generally.
+  2. TWO WRITE SHAPES, NOT ALL OF THEM. W-A and W-B were chosen because
+     TASK-0045 measured both and got opposite answers. A third shape could
+     behave differently again, and this probe cannot exclude that.
+  3. THE L4 RESULT DEPENDS ON DEPLOYMENT SETTINGS that are REPORTED in
+     section A rather than assumed: secure_delete and auto_vacuum. A
+     deployment that zeroes freed pages, or that vacuums after
+     re-partition, would not reproduce it. This probe does not say which is
+     more common and has no evidence about that.
+  4. THE L4 FIXTURE GIVES THE MECHANISM A CHANCE TO APPEAR -- the
+     predecessor partition used wider rows than its successor, so the free
+     list is non-trivial when the request runs. That is a declared
+     construction. It establishes the mechanism is AVAILABLE, never that it
+     is universal.
+  5. BYTE SCANNING. The classifier counts a literal marker, so it would
+     miss content stored in a form the marker does not survive. An absence
+     is worth even less than DA-5 row 3 already makes it.
+  6. DA-1.2 AND DA-1.3 ARE NOT RE-MEASURED. TASK-0045 recorded both NOT
+     CLEARED and this run neither confirms nor disturbs them.
+  7. PAGE-TO-STRUCTURE ATTRIBUTION IS BY CONTENT, not by catalogue: a page
+     is classified by which markers its bytes contain. That is sufficient
+     for co-residency and is not a claim about b-tree ownership.
+
+  --- L3  RUN VALIDITY ------------------------------------------------------
+  §4.6 S8: a run whose negative control comes back clean has measured
+  nothing.  Success criterion 5 requires one that MUST fire.
+
+  NEGATIVE CONTROLS (these are NOT subject findings -- MSG-0156):
+      + NC-1 / DELETE fired on the ISOLATED layout: unauthorized marker x60
+        across 1 page image(s) the request made durable
+      + NC-1 / WAL fired on the ISOLATED layout: unauthorized marker x61
+        across 1 page image(s) the request made durable
+
+  INSTRUMENT CHECKS (a different thing from a control: they show the
+  parser reports what is actually in the file, not that it can see a
+  finding):
+      + L1 / DELETE / W-A: 6/6 rollback journal page images byte-identical
+        to an independently read copy
+      + L1 / DELETE / W-B: 2/2 rollback journal page images byte-identical
+        to an independently read copy
+      + L1 / WAL / W-A: 6/6 WAL page images byte-identical to an
+        independently read copy
+      + L1 / WAL / W-B: 5/5 WAL page images byte-identical to an
+        independently read copy
+      + … 12 further parser checks, all matching
+
+  RUN VALIDITY: VALID -- both negative controls produced a DA-1
+  finding on the layout where a null result needed defending; every
+  provenance baseline held and was verified rather than assumed; and
+  every parsed page image matched an independently read copy.
+
+  --- L4  What this probe did NOT do ----------------------------------------
+  - It selected, cleared, adopted, deployed and implemented NOTHING, and
+    chose no topology among W1-W4.
+  - It changed no criterion. DA-1…DA-7 and N1-N5 were read and applied as
+    written, including where inconvenient.
+  - It changed no gate. E1-E4, strict Shape-1, G-Q4…G-Q7.8 and S1-S11 are
+    untouched, and no U was measured.
+  - It moved no candidate verdict. All six TASK-0042 candidates remain NOT
+    CLEARED for the reasons they already were.
+  - It did not re-run TASK-0045 and report the output as new evidence. The
+    shared arm is a fresh fixture measured with a NEW instrument --
+    page-level parsing -- and its numbers are not TASK-0045's numbers.
+  - It installed nothing, modified no host configuration, touched no real
+    or confidential corpus, and wrote nothing inside the repository except
+    this harness and its captured output.
+  - It introduced no numeric threshold, benchmark, latency or capacity
+    figure. Every count above is an observation.
+
+END OF PROBE
