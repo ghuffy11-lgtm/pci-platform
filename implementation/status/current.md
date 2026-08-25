@@ -2,7 +2,9 @@
 
 **Active Work Package:** WP-0001 — PCI Kernel Foundation
 **Status:** **COMPLETE** — declared by the architecture lead 2026-08-19 (MSG-0020(b), resolved by MSG-0022 / MSG-0023, TASK-0009)
-**Last Updated:** 2026-08-25 UTC — **R1 RULED YES: TASK-0043's E4 result is now EPA-0006 §4.15, and TASK-0045 is READY** (MSG-0153, MSG-0154). **§4.15 — 129 insertions / 0 deletions, additive, verified from `origin/main`** — records **E4 OBTAINABLE on the second subject and ADVERSE**: passage text bound as a **parameter** appears verbatim in the engine's trace, **the reverse of §4.14's surface scan, which was right not to be offered as E4**. **C4 stays negative beside the verdict** — the trace records **the instruction, not the examination** (200 examined, 100 returned, **1 entry**), so **it cannot measure `U` and is not E2 evidence**. **The constraint that limits reuse: the two subjects differ in the BINDING, not the build** — `DEBUG`, `ENABLE_SQLLOG` and `ENABLE_STMT_SCANSTATUS` are absent on both — **so "SQLite supplies E4" is NOT established**, and **§4.13 GAP-B is not withdrawn**, because every Shape-1 measurement in §4.11/§4.12/§4.14 was taken on the **first** subject. **TASK-0045 is the single READY task**: measure **DA-1.1/DA-1.2/DA-1.3** against **§4.16 as written**, with **DA-4's provenance-not-presence rule as the hard part** — a probe that greps an artefact for a marker **measures nothing**, since unauthorized bytes exist by construction under a shared projection — **provenance not separable ⇒ NOT CLEARED**, **absence alone insufficient**, and a **negative control that must actually fire**. **The criterion is authoritative and this task does not adjust it.** **Satisfying DA-1 clears nothing. Seven probes have cleared nothing; nothing selected, no gate changed, no ADR touched.**
+**Last Updated:** 2026-08-25 UTC — **TASK-0045 COMPLETE (8/8): DA-1 is MEASURED, and nothing is cleared** (MSG-0155). **A real probe ran** — **8 configurations across 5 in-scope DA-2 artefact classes**, file-backed, on the **FIRST** subject (**SQLite 3.51.3 via `node:sqlite`**); **both mandatory negative controls FIRED, so the run is VALID**; `git diff --name-only docs/` **empty**. **DA-1 NOT CLEARED for that subject**, by **two independent routes — DA-5 row 1** on a single occurrence and **DA-6** on a limb no instrument here reaches. **The apparatus is the load-bearing part: DA-4 makes a grep meaningless** under a shared projection, so attribution rests on a **measured-empty baseline** (`wal_checkpoint(TRUNCATE)`, artefact **read back at 0 bytes**) — and **`-shm`, which a checkpoint does not empty, is reported with a weaker instrument and said to be weaker.** **The sharpest finding was not the one the probe was built to look for: a request that updated ONLY rows the subject was ENTITLED to still left the unauthorized marker in the rollback journal 236 times** — **journalling is page-granular, and a page holding an authorized row holds its unauthorized neighbours** — so it depends on **no post-filtering, no bad plan and no examination of anything unauthorized**; **a better query does not answer it, and §4.13 N1 containment does. The first measurement here arguing for containment on grounds independent of `U`.** **DA-4 demonstrated on the run's own output**: the same artefact at **ingest (26, NOT a finding)** versus **request resolution (236, a FINDING)** — **opposite verdicts on the same observation shape.** **An expectation failed and is recorded as measured**: the **append**-shaped write journalled **nothing**, because appends overwrite no pages — **`INSERT` versus `UPDATE` decided it.** **DA-1.1 NOT CLEARED** on rollback journals and **spill files** (**5 228 784 bytes**, marker **10 000 times**, created **by** the request); **DA-1.2 NOT CLEARED (DA-6)** on spill files — **the directory entry is observably gone, the blocks are not**; **DA-1.3 FINDING** on spill files (**outside the store, engine-chosen path**) and **engine-produced backups** (**measured, not asserted**). **Two defects in the probe's own apparatus found and fixed before any result was reported — both the presence-versus-provenance error DA-4 exists to prevent, committed by the probe written to test for it; fixing the first produced the page-granularity result.** **Nothing CLEARED — eight probes have now cleared nothing**; all six TASK-0042 candidates unchanged, **no verdict moved, no gate changed, no criterion adjusted, no ADR touched, nothing installed, the second subject NOT invoked.** **Q15** (does this become an EPA-0006 section? **deliberately not taken** — §4.15 is the precedent for *referring* it) and **Q16** (does page granularity bear on the W1–W4 topology question?) referred; **neither blocks. No task is READY.**
+
+> **The line this replaces, retained:** "**R1 RULED YES: TASK-0043's E4 result is now EPA-0006 §4.15, and TASK-0045 is READY** (MSG-0153, MSG-0154). **§4.15 — 129 insertions / 0 deletions, additive, verified from `origin/main`** — records **E4 OBTAINABLE on the second subject and ADVERSE**: passage text bound as a **parameter** appears verbatim in the engine's trace, **the reverse of §4.14's surface scan, which was right not to be offered as E4**. **C4 stays negative beside the verdict** — the trace records **the instruction, not the examination** (200 examined, 100 returned, **1 entry**), so **it cannot measure `U` and is not E2 evidence**. **The constraint that limits reuse: the two subjects differ in the BINDING, not the build** — `DEBUG`, `ENABLE_SQLLOG` and `ENABLE_STMT_SCANSTATUS` are absent on both — **so "SQLite supplies E4" is NOT established**, and **§4.13 GAP-B is not withdrawn**, because every Shape-1 measurement in §4.11/§4.12/§4.14 was taken on the **first** subject. **TASK-0045 is the single READY task**: measure **DA-1.1/DA-1.2/DA-1.3** against **§4.16 as written**, with **DA-4's provenance-not-presence rule as the hard part** — a probe that greps an artefact for a marker **measures nothing**, since unauthorized bytes exist by construction under a shared projection — **provenance not separable ⇒ NOT CLEARED**, **absence alone insufficient**, and a **negative control that must actually fire**. **The criterion is authoritative and this task does not adjust it.** **Satisfying DA-1 clears nothing. Seven probes have cleared nothing; nothing selected, no gate changed, no ADR touched.**" **True when written; TASK-0045 then executed and the count is now eight. The criterion was applied as written — including where it was inconvenient, which is the DA-6 verdict on spill-file DA-1.2.**
 
 > **The line this replaces, retained:** "**TASK-0044 COMPLETE (8/8): the durability-artefact criterion `DA-1` exists as EPA-0006 §4.16, and nothing was measured** (MSG-0150). **234 insertions / 0 deletions as published, one file, additive** — 228 in the criterion commit plus the 7/1 DA-3 heading fix that reading `main` back found (MSG-0151 §3); `git diff --name-only docs/` **empty**; **no test count claimed and none could be.** **Both structural choices DECLARED: the label is `DA-1`, not `E5`** — an `E`-number would read as a fifth Shape-1 evidence class, and **§4.6 S6's table is the bar MSG-0148b forbids extending** — **and the section is a new §4.16 with §4.15 deliberately left unallocated**, because **R1 is OPEN and proposes §4.15** for the TASK-0043 record. **§4.6 was rejected as the home on §4.6's own words**: it exists to decide *"whether a candidate satisfies the Shape-1 gate"*, and **DA-1 is not a Shape-1 question**. **The load-bearing part is DA-4 — provenance, not presence**: a projection durably holds the corpus it indexes, so *"unauthorized-for-`s` bytes exist in the engine's files"* is **true by construction for every candidate**, and a presence-phrased criterion would **fail every engine trivially**. **DA-1 asks what became durable BECAUSE a request was resolved.** **Evidence semantics use §4.6 S9's vocabulary unchanged; §4.6 S5's asymmetry rule transfers intact — a scan finding nothing satisfies nothing; uninspectable ⇒ NOT CLEARED, never an inferred pass.** **DA-1 is distinguished from E4 in its own text** — execution surface vs **content at rest**, during vs **after**. **TASK-0043's WAL figures appear ONLY as a labelled illustration, and DA-1's verdict on that shape is `NOT CLEARED` because provenance is not established.** **Nothing CLEARED — DA-1 is defined and never applied; no DA-1 verdict exists for any candidate.** **One question referred — Q14** (does a DA-1 failure block selection?), fail-closed, blocking nothing. **The exposure evidence task is separate and NOT authorized. No task is READY. R1 still open. E1–E4 unchanged, no gate changed, Shape-1 not weakened, no ADR touched, nothing selected.**" True when written; **the Lead then ruled R1 YES and directed the DA-1 evidence task.**
 
@@ -2259,19 +2261,63 @@ both tables index it, and both were updated in the same commit as the record.
 
 ## Next Action
 
-**TASK-0045 is READY and is the single READY task** — the bounded **DA-1 evidence** work, authorized by
-MSG-0153 and written into the queue by this session. **TASK-0044 remains COMPLETE (8/8)**, and **§4.15
-now records TASK-0043's E4 result**, verified from `origin/main`.
+**TASK-0045 is COMPLETE (8/8) and NO task is READY. The next action is the Architecture Lead's** —
+MSG-0153 returns control at the evidence, and **two questions are referred, neither blocking** (Q15,
+Q16 in MSG-0155 §10).
 
-> **The block this replaces, retained:** "**TASK-0044 is COMPLETE (8/8) and NO task is READY. The next
-> action is the Architecture Lead's.**" **True from TASK-0044's completion until MSG-0153**, which ruled
-> R1 YES and directed the measurement MSG-0148b had deliberately deferred.
+> **The block this replaces, retained:** "**TASK-0045 is READY and is the single READY task** — the
+> bounded **DA-1 evidence** work, authorized by MSG-0153 and written into the queue by this session.
+> **TASK-0044 remains COMPLETE (8/8)**, and **§4.15 now records TASK-0043's E4 result**, verified from
+> `origin/main`." **True until TASK-0045 executed.**
 
-**What TASK-0045 must produce:** a result for **each** of **DA-1.1 (request-induced persistence)**,
-**DA-1.2 (residual retention)** and **DA-1.3 (widened reach)**, across **DA-2's in-scope artefacts** —
-WAL, rollback journals, shared-memory files, **temporary and spill files**, engine-produced backups —
-with **DA-3's exclusions respected**, **DA-5's vocabulary unchanged**, and a **negative control that
-actually produces a DA-1 finding**.
+**What TASK-0045 produced** (record: **MSG-0155**; harness and captured output:
+`implementation/probes/TASK-0045/`): **a real probe ran** — **8 configurations across 5 in-scope DA-2
+artefact classes**, file-backed, on the **FIRST** test subject (**SQLite 3.51.3 via `node:sqlite`, node
+v24.15.0**) — and **both mandatory negative controls FIRED, so the run is VALID.** **DA-1 is NOT
+CLEARED for the subject measured**, by **two independent routes**: **DA-5 row 1** on a single
+occurrence, and **DA-6** on a limb no available instrument can reach.
+
+**The apparatus is what makes the numbers mean anything.** **DA-4 makes a grep meaningless** under a
+shared projection, so attribution rests on a **measured-empty baseline** — `wal_checkpoint(TRUNCATE)`,
+then the artefact **read back at 0 bytes** — and where that baseline was unavailable (**`-shm`, which a
+checkpoint does not empty**) the weaker instrument is **reported as weaker** rather than used quietly.
+
+**The sharpest finding was not the one the probe was built to look for.** **A request that updated ONLY
+rows the subject was ENTITLED to — ordinary access accounting — still left the unauthorized marker in
+the rollback journal 236 times.** **Journalling is page-granular, and a page holding an authorized row
+holds its unauthorized neighbours.** It depends on **no post-filtering, no bad plan, and no examination
+of any unauthorized row** — so unlike §4.11's planner result and §4.12's `ANALYZE` result, **a better
+query does not answer it, and §4.13's N1 containment is the kind of thing that does.** **This is the
+first measurement in the record arguing for containment on grounds independent of `U`.**
+
+**DA-4 is demonstrated on the run's own output rather than argued:** the **same artefact** at **ingest**
+(**26 occurrences — NOT a finding**, DA-4 row 1) and under **request resolution** (**236 — a FINDING**,
+DA-4 row 2). **Opposite verdicts on the same observation shape**, which a presence-phrased criterion
+could not have produced. **MSG-0148b's ordering earned its keep, visibly.**
+
+**One expectation failed and is recorded as measured:** the **append**-shaped cache write journalled
+**nothing**, because a rollback journal holds original images of **overwritten** pages and appends
+overwrite none. **So two request-induced writes differ entirely in what they make durable, and the
+difference is `INSERT` versus `UPDATE`** — not a security property anyone would think to specify.
+
+**Per limb, each with its own verdict:** **DA-1.1 NOT CLEARED** on rollback journals and on **spill
+files** (a **5 228 784-byte** sorter file holding the marker **10 000 times**, created **by** the
+request); **DA-1.2 NOT CLEARED (DA-6)** on spill files — **the directory entry is observably gone and
+the blocks are not observable**, which is **the criterion being inconvenient and taken as written**;
+**DA-1.3 FINDING** on spill files (**outside the store directory, at a path the engine chooses**) and on
+**engine-produced backups** (**measured, not asserted** — the engine wrote a complete second copy
+outside the store with no constraint of its own on the destination).
+
+**Two defects in the probe's own apparatus were found and fixed before any result was reported** —
+**both the presence-versus-provenance error DA-4 exists to prevent, committed by the probe written to
+test for it.** **Fixing the first produced the page-granularity finding above.**
+
+**Limitations stated rather than left to be discovered:** **one subject only** — **§4.15's caution
+applies unchanged, the two subjects differ in the BINDING not the build and neither generalizes to an
+engine class**; **the second subject was NOT invoked and no fresh `py` grant was sought**, MSG-0145
+covering TASK-0043's probe only; **DA-1.3's `/data/docker` limb is NOT MEASURED** (no PCI server
+deployment exists); **replication streams NOT APPLICABLE**; and **byte-scanning is blind to re-encoded
+content**, so every absence carries even less weight than DA-5 row 3 already gives it.
 
 **DA-4 is the part that decides whether the run means anything.** **DA-1 is about provenance, not
 presence**: under a shared projection *"bytes unauthorized for `s` exist somewhere in the engine's
