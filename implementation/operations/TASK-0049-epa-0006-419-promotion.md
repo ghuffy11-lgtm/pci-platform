@@ -1,11 +1,15 @@
 # TASK-0049 — promote TASK-0046's topology/durability evidence into EPA-0006 §4.19
 
-**Authority:** MSG-0161 (Q18 = YES), ruling consequence 1; MSG-0158 (the evidence and its boundary);
+**Authority:** **MSG-0161b** (Q18 = YES), ruling consequence 1; MSG-0158 (the evidence and its boundary);
 MSG-0162 §5 (section number fixed, task defined, sequencing).
 **Type:** Architecture documentation / evidence promotion. **Not a measurement task.**
-**Status:** **AUTHORIZED — NOT READY.** Sequenced **after TASK-0048**. It becomes READY only when the
-Architecture Lead reconciles it into `implementation/operations/CLAUDE-TASKS.md` as the single READY
-task. **Do not begin it before then.**
+**Status:** **READY** — reconciled into `implementation/operations/CLAUDE-TASKS.md` as the single READY
+task on 2026-08-26 (**MSG-0164**), its sequencing prerequisite (**TASK-0048 COMPLETE**, MSG-0163) now
+satisfied.
+
+> **This line read `AUTHORIZED — NOT READY` until 2026-08-26.** The change is the queue reconciliation
+> and nothing else: **the authority is unchanged (MSG-0161b, Q18 = YES), and the scope, required
+> outcomes and constraints below are unchanged.**
 
 ## Why this task exists separately
 
@@ -67,8 +71,9 @@ Promote what MSG-0158 records, in its own terms:
    precedent) rather than an edit to a table or a gate.
 6. **`git diff --name-only docs/` is empty**, and the change is verified from `origin/main` after
    pushing.
-7. **COMMS, status, queue row, and checkpoint recorded**, and the numbering follows **MSG-0163 or
-   later** (MSG-0162 §4: MSG-0161 is already doubly claimed).
+7. **COMMS, status, queue row, and checkpoint recorded**, and the numbering uses **MSG-0165 or
+   later** — MSG-0163 is the TASK-0048 record and **MSG-0164 is the Lead's verification/reconciliation
+   record**. The MSG-0161 collision is indexed as **MSG-0161a / MSG-0161b** in `comms/README.md`.
 
 ## Constraints
 
@@ -77,17 +82,18 @@ Promote what MSG-0158 records, in its own terms:
 - **No engine selection, adoption, deployment, implementation or clearance.** **Promotion clears
   nothing.**
 - **No change to N1–N6, DA-1…DA-7, E1–E4, G-Q4…G-Q7, S1–S11, strict Shape-1, or any clearance gate.**
-- **No candidate verdict changes.** Nine probes have cleared nothing.
+- **No candidate verdict changes.** **Ten** probes have cleared nothing (TASK-0048 is the tenth).
 - **No new measurement.** This task records evidence that already exists; if the promotion appears to
   require a number that MSG-0158 does not contain, **stop and refer it** rather than measuring.
-- **Do not restate TASK-0048's N6 findings as part of this section.** If TASK-0048 has reported by
-  the time this runs, §4.19 remains the TASK-0046 promotion; **N6 findings belong to their own
-  record.**
+- **Do not restate TASK-0048's N6 findings as part of this section.** **TASK-0048 HAS now reported**
+  (MSG-0163): §4.19 remains the **TASK-0046** promotion, and **N6 findings belong to MSG-0163 and to
+  their own record.** Note that MSG-0163 **did not reproduce** TASK-0046's L4/W-B arm — §4.19 records
+  what **MSG-0158** measured, and **must not** be reconciled against MSG-0163 or softened by it.
 - Stop at any environment or operator boundary rather than routing around it.
 - Stop if `origin/main` moves mid-run and reconcile before continuing.
 
 ## Execution boundary
 
-This task is **not executable** until it appears as the **single READY task** in the authoritative
-`implementation/operations/CLAUDE-TASKS.md` queue. **TASK-0048 is the current READY task and takes
-precedence.**
+This task **is now the single READY task** in the authoritative
+`implementation/operations/CLAUDE-TASKS.md` queue (**MSG-0164**). **TASK-0048 is COMPLETE** (MSG-0163)
+and no longer takes precedence.
