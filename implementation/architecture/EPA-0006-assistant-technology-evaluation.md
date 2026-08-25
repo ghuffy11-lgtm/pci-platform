@@ -1729,6 +1729,18 @@ invariants, numbered so a proposal can be failed against them.
 | **N4** | **Plan-independence.** Whether unauthorized content is examined is **not** a function of the optimizer's choice, of a statistics-maintenance command, of the data distribution, or of an engine version | **F11, F12.** A security property a maintenance command can toggle is not a property of the architecture |
 | **N5** | **Non-withholding.** The routed structures contain **every** entry the subject **is** authorized to see. A topology reaching N1 by dropping authorized content has traded a confidentiality defect for an availability one | **F9.** `U = 0` is purchasable, and the purchase is invisible to `U` |
 
+> **A sixth requirement, N6, exists and is NOT in this table.** Added 2026-08-25 by **TASK-0047** under
+> **MSG-0160 (Q19 = YES)**; **this table and every row in it are left exactly as written**. **N6 —
+> byte-level durability containment** — is defined in **§4.18**, and **is deliberately not restated
+> here**: two statements of one rule invite drift (§4.12's Q12 note is the precedent).
+>
+> **Why it is a separate requirement rather than a widening of N1.** **N1 is an entry-containment
+> requirement and is correct as written.** TASK-0046 measured a topology that **satisfies N1** — no
+> unauthorized **entry** in reach, `Ustruct` zero — and that **still made unauthorized bytes durable**
+> through a page the previous partition left on the free list (MSG-0158 §5). **N1 asks what the
+> reachable structures contain; N6 asks what resolving the request writes down.** **Neither implies the
+> other, and no verdict in this section changes.**
+
 **The load-bearing claim of this section, stated so it can be attacked:**
 
 > **N1 and N2 together make N4 free.** If every structure within reach contains only entries the
@@ -2676,6 +2688,136 @@ The run remained **VALID**, and DA-1 remained **NOT CLEARED** for the measured s
 The page-granularity finding bears directly on §4.13 physical containment: if the reachable structure contains only content the subject may receive, unauthorized neighbouring content is not co-resident on the page available to the authorized update.
 
 This section records TASK-0045 evidence only. It does not alter DA-1, E1–E4, strict Shape-1, or any existing clearance gate.
+
+### 4.18 Byte-level durability containment — N6 (TASK-0047, MSG-0160)
+
+**Authority:** **MSG-0160 (Q19 = YES)**, on the evidence in **MSG-0158** (TASK-0046) and **§4.17**.
+**Additive: no line of §4.13, §4.16 or §4.17 is changed, no invariant is amended, and no verdict moves.**
+
+> **This section defines a requirement. It measures nothing, selects nothing, and clears nothing.**
+> MSG-0160: the ruling *"does not select, adopt, deploy, implement, or clear an engine, and does not by
+> itself clear or disqualify any candidate."* **No candidate satisfies N6 on the strength of this
+> section, because nothing has been measured against it.**
+
+#### N6.0 — Two structural choices, declared rather than assumed
+
+**The label is `N6`.** The requirement is a **property of the topology**, which is what the N-series
+states, and **N1–N5 are already taken** (§4.13). **It is deliberately not a `DA` number**: the DA-series
+in §4.16 states what a **probe measures on an engine's artefacts**; **N6 states what a design must
+achieve.** They meet — a N6 violation is evidenced as a DA-1 finding — but they are not the same kind of
+statement, and merging them would make the criterion and the obligation impossible to fail separately.
+
+**The section is new — §4.18 — and §4.13's N-table is left exactly as TASK-0041 wrote it.** A pointer
+note is added under that table rather than a sixth row, on §4.12's Q12 precedent: **point rather than
+restate, so one rule has one statement.**
+
+**Rejected, and why:** amending **N1** to cover bytes. **N1 is correct as written and remains
+necessary** — MSG-0160 says so in terms — and widening it would destroy the distinction the TASK-0046
+evidence exists to record: **L4 satisfies N1 and still made unauthorized bytes durable.** **A rule that
+cannot be satisfied and violated separately from another rule is not a separate rule.**
+
+#### N6 — The requirement
+
+> **N6 — Byte-level durability containment.** Resolving a routed subject's request must not cause
+> **bytes** of content unauthorized for that subject to become durable, **including where those bytes
+> are already present in the store's physical history rather than in any structure the traversal may
+> open.**
+
+**Three limbs, kept separate because a topology can fail any one alone:**
+
+| | Limb | What it requires |
+|---|---|---|
+| **N6.1** | **No history-sourced durability** | A write performed while resolving the request must not make durable the **prior contents** of storage it reuses — a freed page, a reclaimed extent, a recycled block |
+| **N6.2** | **No original-image escape** | Where the engine records a **pre-image** of storage it is about to modify (rollback journal, undo record, shadow page), that image must not carry unauthorized bytes into an artefact |
+| **N6.3** | **History is bounded by the invariant, not only by the entries** | After a transition that restores the partition invariant (**§4.13 N3**), the store's **residue** must be brought within the invariant too, not only its live entries |
+
+#### N6 and N1 — the distinction, and why both are needed
+
+**N1 asks what the structures within reach CONTAIN. N6 asks what resolving the request WRITES DOWN.**
+
+**They are independent, and the evidence shows it in one measurement.** **L4 satisfies N1 as written** —
+no unauthorized **entry** is in reach, no query reaches those bytes, and **`Ustruct`, N1's own instrument
+(§4.11), counts entries and reports zero.** **Under an appending write, the same topology made the
+previous partition's marker durable 15 times** (MSG-0158 §5).
+
+| | **N1** | **N6** |
+|---|---|---|
+| Object | **entries** in reachable structures | **bytes** made durable by the request |
+| Instrument | `Ustruct` — entry counting (§4.11) | page-level parse and classification of the artefact (MSG-0158) |
+| Time | **at answer time** | **across the write the request causes** |
+| L4's result | **satisfied** | **violated** |
+
+**N1 is unchanged, unweakened, and still necessary.** **N6 does not subsume it**: a topology could keep
+its history clean and still route a subject to a structure holding unauthorized entries. **Neither
+implies the other.**
+
+#### N6 and DA-1 — obligation and criterion
+
+**DA-1 (§4.16) is the criterion a probe measures on an engine's durability artefacts. N6 is the property
+a topology must have.** **A N6 violation surfaces as a DA-1.1 or DA-1.2 finding**, which is exactly how
+this one surfaced.
+
+**What follows from that, stated so it cannot be read the other way:**
+
+1. **Satisfying N6 clears nothing.** DA-5 consequence 1 already says satisfying DA-1 clears nothing;
+   **N6 adds a requirement and creates no evidence class.** It is not in §4.6 S6's table and **cannot
+   substitute for E1, E2, E3 or E4.**
+2. **N6 relaxes nothing.** **Strict Shape-1, `U = 0`, E1–E4, G-Q4…G-Q7.8, S1–S11, DA-1…DA-7, Q1, Q2,
+   Q7, Q12 and Q13 are unchanged by this section**, and **no verdict recorded anywhere in this document
+   moves because of it.**
+3. **DA-1's fail-closed rule carries.** Where the residue or the pre-image **cannot be inspected**, the
+   answer is **`NOT CLEARED`** (DA-6) — **uninspectable is not clean**, and **"we looked and found
+   nothing" is not "it was never written"** (DA-5 row 3).
+
+#### N6's evidence boundary — what the demonstration does and does not support
+
+**Demonstrated (MSG-0158):** on **SQLite 3.51.3 via `node:sqlite`**, in **both journal modes**, an
+isolated store that **had previously held another partition** and was re-materialised made that
+partition's bytes durable under an **appending** write, from **a page the old partition left on the free
+list**, with **10 pages of the store still carrying `UNAUTH x15` each** and the journal's page images
+**3 of 3 byte-identical** to an independently read copy.
+
+**Not established, and not to be inferred:**
+
+- **That any topology satisfies N6.** **Nothing has been measured against N6**, which did not exist when
+  the evidence was taken.
+- **That this is a property of SQLite, of an engine class, or of storage engines generally.** **One
+  subject, one allocator.** §4.15's rule holds: the subjects differ in the **binding**, not the build,
+  and **§4.6 S10 forbids generalizing one subject's behaviour to a class.**
+- **That freed-page reuse is the only history mechanism.** N6.1's wording names reclaimed extents and
+  recycled blocks **because the mechanism is generic**, not because they were measured. **Filesystem-
+  level residue, block-device history and encryption-at-rest interactions are outside DA-3's scope and
+  outside this requirement's demonstrated basis.**
+- **That the residue is itself a violation.** It is not. **Its provenance is the re-partition, not a
+  request** — **DA-4 row 1** — and **the finding is what the request then did with it.**
+
+#### Why this is not a corner case, which is the architectural point
+
+**§4.13 N3 restores the partition invariant on an enumerated transition, and a W1–W3 topology
+re-materialises partitions as its normal operating mode.** **The state that produced this result is not
+one such a design would rarely occupy; it is the state it spends most of its life in.**
+
+**And the write shape inverts TASK-0045's finding.** There, the **updating** write leaked and the
+**appending** write journalled nothing, because *"a rollback journal holds original images of
+overwritten pages and appends overwrite none"* (MSG-0155). **That reasoning was correct — about a store
+whose free list is empty.** In a re-materialised store **the append does overwrite something**, and
+**the difference is the store's history, not the query.**
+
+> **This is why N6 is stated as an architecture requirement rather than left to the criterion.** **A
+> better query does not answer it**, a pinned plan does not answer it, and **no entry-counting
+> instrument can see it.**
+
+#### What this section does NOT do
+
+- **It selects, adopts, deploys, implements and clears nothing**, and **authorizes no implementation
+  task.**
+- **It changes no invariant.** **N1–N5 stand as written**; **§4.13's table is untouched.**
+- **It moves no verdict.** **Nine probes have cleared nothing**, and every candidate verdict recorded in
+  §4.11, §4.12, §4.14 and §4.17 stands unchanged.
+- **It measures nothing**, and **claims no candidate's N6 status** — **the evidence task that would, if
+  authorized, is a separate one.**
+
+---
 
 ## 5. Candidate technology classes against Approach C (MSG-0098 item 1)
 
