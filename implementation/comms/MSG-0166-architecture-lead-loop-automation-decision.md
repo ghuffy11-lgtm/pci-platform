@@ -154,3 +154,26 @@ separately.
 - **Open for the operator, unchanged by this message:** **Q21**, **Q17**, **Q14**, the **L4/W-B
   non-reproduction** (MSG-0164 §5), and **MSG-0060**.
 - **No blocker open.** DISC-0011 and DISC-0012 open; neither moves a verdict.
+
+---
+
+## 9. Operator ratification — 2026-08-26
+
+**The operator approved this decision explicitly after the loop was installed and its scope was
+restated to them.** The approval covers, and covers only:
+
+- the **Routine** (`trig_01PpjCrtoEUZnF3vPACBPfCW`, hourly at `:23`, fresh session per firing);
+- the **mechanical-only authority boundary** in `ARCHITECTURE-LEAD-LOOP.md` §5;
+- `ARCHITECTURE-LEAD-LOOP.md` as the loop's operating rules.
+
+**What the approval does NOT cover, recorded because a bare approval is exactly the thing that gets
+over-read later:** **it rules no open question.** **Q21, Q17, Q14 and the L4/W-B non-reproduction
+(MSG-0164 §5) remain OPEN and unruled.** The operator was asked to confirm this scope rather than
+letting a one-line approval be spread across four distinct architecture questions — two of which
+(**Q21**, *"at what strength"*; **Q17**, *"what the mechanism should be"*) **are not yes/no questions
+and cannot be answered by an approval at all.**
+
+**Status is unchanged by ratification: INSTALLED, NOT PROVEN.** Approval is not verification — the
+same distinction `CLAUDE.md` rule 10 draws for ratified ADRs: *"An accepted ADR states an obligation;
+it does not demonstrate that the obligation is met."* **The first firing (2026-08-25T22:23:00Z) is
+what proves the start path**, and §7 lists what it must establish.
