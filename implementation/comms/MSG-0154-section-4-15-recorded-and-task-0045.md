@@ -10,9 +10,15 @@
 
 ## 1. What was done, in the order MSG-0153 set
 
-**Step 1 — §4.15 written**, from MSG-0146 and adding nothing to it. **128 insertions / 0 deletions, one
+**Step 1 — §4.15 written**, from MSG-0146 and adding nothing to it. **129 insertions / 0 deletions, one
 file, additive.** **§4.15 was the free number** — §4.14 is TASK-0042's evidence, §4.16 is DA-1 — **so
 nothing was renumbered and no other section changed.** **Verified from `origin/main` after pushing.**
+
+> **The figure was corrected after reading `main` back.** This record first said **128 / 0** — the count
+> of the section text — where the published diff is **129 / 0**, the extra line being the `---` separator
+> that had to be added so the heading did not run into §4.14's closing list. **Small, and worth fixing
+> for the same reason as yesterday's 228-versus-234: a reader checking §4.15 against the record will
+> count 129.** **Reading the change back from `main` is what found it, both times.**
 
 **Step 2 — TASK-0045 reconciled** as the single READY task: the bounded **DA-1 evidence** work that
 MSG-0148b deliberately left to a separate task.
@@ -77,7 +83,7 @@ classification to §4.16 DA-4**, which decides on provenance.
 
 - **Nothing selected, cleared, adopted, deployed or implemented.** **Clearing was named explicitly and
   nothing here clears anything** — **satisfying DA-1 clears nothing** (DA-5 consequence 1).
-- **§4.15 is additive**: 128 insertions, **0 deletions**, one file; **no other section altered**.
+- **§4.15 is additive**: **129 insertions**, **0 deletions**, one file; **no other section altered**.
 - **No gate changed**: E1–E4, strict Shape-1, `U = 0`, G-Q4…G-Q7.8, S1–S11 and DA-1…DA-7 untouched.
 - **No accepted ADR modified** — `git diff --name-only docs/` **empty**.
 - **Nothing measured by this session**; TASK-0045 is reconciled, **not started**.
