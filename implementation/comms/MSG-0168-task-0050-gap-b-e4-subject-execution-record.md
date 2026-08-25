@@ -3,7 +3,9 @@
 **From:** Claude Code (unattended runner, started by the Execution Supervisor for TASK-0050)
 **To:** Architecture Lead
 **Date:** 2026-08-26
-**Status:** EXECUTION RECORD — evidence only
+**Status:** EXECUTION RECORD — evidence only. **NOT PUBLISHED: the push was rejected because
+`origin/main` moved mid-run — see §13 and BLK-0013. Required outcome 7 is UNMET and TASK-0050 is
+reported as executed but NOT COMPLETE.**
 **Task:** TASK-0050, from the Lead's committed definition
 [`TASK-0050-gap-b-e4-subject.md`](../operations/TASK-0050-gap-b-e4-subject.md)
 **Authority:** MSG-0167; EPA-0006 §4.13 GAP-B / EV5, §4.15, §4.12 gap 1 (F15), §4.6 S5/S6/S7/S8/S9/S10/S11;
@@ -413,7 +415,7 @@ and two subjects compared on different name lists are not compared. Recorded as 
 | **4** | C1–C4 stated explicitly for each, **including C4** | **MET** — §5.1–§5.4, four C-tables |
 | **5** | Whether a non-adverse subject can carry the Shape-1 apparatus | **MET** — §6. No non-adverse E4 subject exists in reach; the split between the two subjects is stated |
 | **6** | Report per subject in §4.6 S9's existing vocabulary, inventing no terms | **MET** — §6 |
-| **7** | Record COMMS, status, queue, checkpoint, harness/output, and verification from `main` | **MET on commit and push** — this file, DISC-0014, BLK-0012, checkpoint 1 and 2, the queue row, the status file, and `implementation/probes/TASK-0050/` at `f063f09`. **Verification from `main` is limited by the `git fetch` denial (§8)** |
+| **7** | Record COMMS, status, queue, checkpoint, harness/output, and verification from `main` | **NOT MET — see §13.** The records are **written and committed** (this file, DISC-0014, BLK-0012, BLK-0013, checkpoints 1–3, the queue row, the status file, and `implementation/probes/TASK-0050/` at `f063f09`), **but the push was REJECTED: `origin/main` moved mid-run and this runner cannot reconcile.** **Not rounded up** |
 | **—** | Make the referral rather than resolve it | **MADE** — §7 |
 
 ---
@@ -429,3 +431,42 @@ and two subjects compared on different name lists are not compared. Recorded as 
 4. **Note DISC-0014** when the next enumeration is specified.
 
 **No task is proposed as READY, and none may be.**
+
+---
+
+## 13. Addendum, written after the rest of this record — the push was REJECTED
+
+**Everything above was written, committed, and then could not be published.** Recorded here rather than
+silently amended above, because a reader is better served by seeing what changed and when.
+
+```text
+$ git push origin main
+ ! [rejected]        main -> main (fetch first)
+error: failed to push some refs to 'github-pci:ghuffy11-lgtm/pci-platform.git'
+```
+
+**`origin/main` moved after this session started.** That is TASK-0050's own stop condition — *"stop if
+`origin/main` moves mid-run"* — and CLAUDE.md's fail-closed recovery boundary. **The session stopped
+there.** No force-push, no rebase, no merge, no reset, no retry loop.
+
+**§8 predicted the shape of this and understated it.** It recorded that the `git fetch` denial made the
+stop condition enforceable *"only against the locally-cached ref and the heartbeat"*. **In the event the
+condition was detected by the push being refused** — the weakest possible form of the check, and the
+last possible moment. **A runner that cannot read the remote cannot notice movement until it tries to
+write.**
+
+**One thing this corrects rather than qualifies.** §8 left open whether the fetch denial could have been
+a transport fault. **It could not:** the push **reached** `github-pci` and returned a protocol-level
+rejection, so the network, SSH and credential all work. **The denial is the permission set alone** —
+which is what checkpoint 1 diagnosed by reading both files, now confirmed from the other direction.
+**This matters because BLK-0007 was a real transport fault, and sending the operator to fix SSH here
+would be sending them to fix something that is not broken.**
+
+**Consequence for this record's own status:** **required outcome 7 is UNMET**, TASK-0050 is reported as
+**executed but NOT COMPLETE**, and the queue row is marked **BLOCKED**. **Outcomes 1–6 and the referral
+are unaffected** — the measurements, the controls and §7's finding are what they are; **only their
+availability is blocked.**
+
+**Recorded as BLK-0013**, which names what an operator can do: **reconcile in an attended session
+(immediate)**, and **grant the unattended runner a read-only `git fetch` (standing)** — so that a future
+runner detects movement when it happens instead of after it has written a record it cannot publish.
