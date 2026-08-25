@@ -1,0 +1,495 @@
+TASK-0045 -- bounded DA-1 evidence: durability artefacts measured
+against EPA-0006 §4.16, which is authoritative and is NOT adjusted here.
+MSG-0153 AUTHORIZED.  This probe selects nothing and clears nothing.
+
+==============================================================================
+A. SUBJECT AND RUNTIME (acceptance criterion 6)
+==============================================================================
+  node version:                                      v24.15.0
+  platform / arch:                                   win32 / x64
+  binding:                                           node:sqlite (built in)
+  SQLite ENGINE version:                             3.51.3
+  OS temp directory:                                 C:\Users\ADMINI~1\AppData\Local\Temp
+  compile options reported:                          49
+    ENABLE_STMT_SCANSTATUS:                          ABSENT
+    DEBUG:                                           ABSENT
+    ENABLE_SQLLOG:                                   ABSENT
+    TEMP_STORE:                                      TEMP_STORE=1
+    THREADSAFE:                                      THREADSAFE=1
+    MAX_MMAP_SIZE:                                   MAX_MMAP_SIZE=0x7fff0000
+
+  THIS IS THE FIRST TEST SUBJECT -- the one §4.13 GAP-B concerns.
+  §4.15: the two available subjects differ in the BINDING, not the
+  build, and NEITHER GENERALIZES TO AN ENGINE CLASS.  Nothing below
+  may be read as "SQLite does X", still less as "class R does X".
+
+  The SECOND subject (Python 3.14.5 / SQLite 3.50.4) is NOT used:
+  MSG-0145 granted `py` for TASK-0043's probe ONLY, and the queue
+  section requires a fresh grant.  None exists, so it is not invoked.
+  Every measurement below is on the FIRST subject.  See section K.
+
+==============================================================================
+B. SCOPE, TAKEN FROM DA-2 AND DA-3 UNCHANGED (criterion 1)
+==============================================================================
+  IN SCOPE (DA-2) -- and where this probe measures each:
+    write-ahead logs:                                sections D, E, G (NC-2)
+    rollback / undo journals:                        section F
+    shared-memory / index files (-shm):              sections D, E
+    temporary and spill files:                       sections E, G (NC-1) -- the hard one
+    engine-produced backups / snapshots:             section H
+
+  OUT OF SCOPE (DA-3) -- not measured, and not narrowed either:
+      - application logs, telemetry, audit payloads (ADR-0020 §6.2, §9.3)
+      - the engine's execution surface -- traces/profiles/logs (that is E4; DA-7)
+      - OS page cache and other volatile kernel buffers
+      - filesystem / volume / storage-layer encryption at rest
+      - operator-taken backups, filesystem snapshots, host images
+      - the projection's own at-rest storage of APPROVED content (ADR-0020 §1)
+
+  The last exclusion is the one DA-4 makes load-bearing, and it is
+  why section C exists: without it, the main db always "fails".
+
+==============================================================================
+C. THE PROVENANCE BASELINE (DA-4) -- the apparatus, established first
+==============================================================================
+  DA-4: "unauthorized-for-s bytes exist somewhere in the engine's
+  files" is TRUE BY CONSTRUCTION under a shared projection.  So
+  presence is not evidence.  What follows is the discriminator.
+  journal_mode set:                                  wal
+  fixture rows (synthetic, S11):                     400  (200 authorized / 200 unauthorized)
+
+  --- C1  AFTER INGEST -- provenance here is INGEST, not a request ----------
+    (main db)     PRESENT, 4096 bytes:               UNAUTH x0  AUTH x0
+    -wal          PRESENT, 41232 bytes:              UNAUTH x235  AUTH x235
+    -shm          PRESENT, 32768 bytes:              UNAUTH x0  AUTH x0
+    -journal      NEVER CREATED:                     (no file to scan)
+      Under DA-4 row 1 this is NOT a DA-1.1/DA-1.2 finding: it is
+      the projection of approved content, governed by ADR-0020 §1.
+      A probe that stopped here would have measured nothing.
+
+  --- C2  MAINTENANCE OPERATION -- PRAGMA wal_checkpoint(TRUNCATE) ----------
+  checkpoint result:                                 {"busy":0,"log":0,"checkpointed":0}
+  maintenance state after this point:                checkpointed (TRUNCATE); no VACUUM, no ANALYZE
+
+  --- C3  BASELINE -- the artefact MEASURED empty, not assumed empty --------
+    (main db)     PRESENT, 32768 bytes:              UNAUTH x235  AUTH x235
+    -wal          PRESENT BUT EMPTY (0 bytes):       UNAUTH x0  AUTH x0
+    -shm          PRESENT, 32768 bytes:              UNAUTH x0  AUTH x0
+    -journal      NEVER CREATED:                     (no file to scan)
+
+  BASELINE ESTABLISHED for the -wal artefact:        YES -- 0 bytes, verified by reading it
+      => Any UNAUTH occurrence found in -wal AFTER this point
+         arrived after the baseline.  That is DA-4 row 2:
+         "written, or retained, BECAUSE a request was resolved."
+         Attribution is available for this artefact class.
+
+  NOTE ON THE -shm ARTEFACT, recorded rather than glossed: it is
+  NOT emptied by the checkpoint (see C3 above).  Attribution for
+  -shm therefore rests on its measured marker COUNT changing, not
+  on an empty baseline -- a weaker instrument, and said to be one.
+
+==============================================================================
+D/E. MEASUREMENT M1 -- a Shape-1-RESPECTING request, WAL mode
+==============================================================================
+  The entitlement predicate is applied BY the engine, before the sorter.
+  subject / runtime:                                 SQLite 3.51.3 via node:sqlite, node v24.15.0
+  journal_mode:                                      wal
+  temp_store:                                        {"temp_store":1}   (1 = FILE)
+  cache_size:                                        {"cache_size":-8}   (negative = KiB)
+  fixture rows (synthetic, S11):                     20000  (10000 authorized / 10000 unauthorized)
+  maintenance state at baseline:                     checkpointed (TRUNCATE) at baseline; no VACUUM, no ANALYZE
+
+  --- BASELINE -- after ingest + maintenance, before the request ------------
+    (main db)     PRESENT, 5484544 bytes:            UNAUTH x10000  AUTH x10000
+    -wal          PRESENT BUT EMPTY (0 bytes):       UNAUTH x0  AUTH x0
+    -shm          PRESENT, 32768 bytes:              UNAUTH x0  AUTH x0
+    -journal      NEVER CREATED:                     (no file to scan)
+  baseline attributable (DA-4):                      YES
+
+  --- THE REQUEST -- resolved for subject s, temp directory watched DURING --
+  SQL:                                               SELECT id, scope FROM chunk WHERE scope = ? ORDER BY body
+    plan:                                            SCAN chunk
+    plan:                                            USE TEMP B-TREE FOR ORDER BY
+    SPILL FILE (during) etilqs_cPRWdlgCPR5RLMc:      PRESENT, 2594395 bytes  |  UNAUTH x0  AUTH x10000
+  rows the ENGINE returned:                          10000
+  rows the request was entitled to:                  10000
+
+  --- AFTER THE REQUEST -- same artefacts, same instrument ------------------
+    (main db)     PRESENT, 5484544 bytes:            UNAUTH x10000  AUTH x10000
+    -wal          PRESENT BUT EMPTY (0 bytes):       UNAUTH x0  AUTH x0
+    -shm          PRESENT, 32768 bytes:              UNAUTH x0  AUTH x0
+    -journal      NEVER CREATED:                     (no file to scan)
+  temp-directory residue after the request:          NONE -- every spill file removed
+
+  --- AFTER CONNECTION CLOSE -- DA-1.2 asks what survives -------------------
+    (main db)     PRESENT, 5484544 bytes:            UNAUTH x10000  AUTH x10000
+    -wal          NEVER CREATED:                     (no file to scan)
+    -shm          NEVER CREATED:                     (no file to scan)
+    -journal      NEVER CREATED:                     (no file to scan)
+
+  READ THIS MEASUREMENT WITH DA-5 ROW 3 IN HAND.  A spill file was
+  still created, and it still carried corpus content out of the store
+  directory -- the difference from NC-1 is WHOSE content, not whether
+  an artefact was written.  DA-1.1 is not engaged; DA-1.3 is.
+
+==============================================================================
+F. ROLLBACK / UNDO JOURNAL (DA-2 row 2) -- and DA-4 shown, not argued
+==============================================================================
+  MSG-0146 §5 recorded "-journal ABSENT", which §4.16 DA-2 notes is
+  "a fact about the configuration, not about the criterion" -- that
+  run was in WAL mode, where no rollback journal is used.  This
+  section puts the subject in the configuration that DOES use one.
+  journal_mode:                                      delete
+  maintenance state:                                 none -- no checkpoint applies in this mode
+
+  --- F1  AFTER INGEST, no transaction open -- the per-transaction baseline -
+    (main db)     PRESENT, 32768 bytes:              UNAUTH x235  AUTH x235
+    -wal          NEVER CREATED:                     (no file to scan)
+    -shm          NEVER CREATED:                     (no file to scan)
+    -journal      NEVER CREATED:                     (no file to scan)
+  baseline: does a -journal exist before any transaction: NEVER CREATED
+  => a -journal seen later was CREATED by the transaction: YES -- attribution available at artefact level
+
+  --- F2  A write whose provenance is INGEST -- maintaining the projection --
+      This transaction adds approved-corpus rows.  It is NOT a
+      request being resolved for any subject.
+    -journal      PRESENT, 4616 bytes:               UNAUTH x26  AUTH x26
+
+      DA-4 ROW 1: written at ingest, maintaining the projection of
+      approved content => NOT a DA-1.1 or DA-1.2 finding, however
+      many times the marker appears.  ADR-0020 §1 governs it.
+
+  --- F3  Request-resolution write #1 -- the caching shape (APPENDS) --------
+      A retrieval layer that caches its working set writes back what
+      it examined, into a NEW table.  Nothing is ingested here: every
+      byte written is a consequence of resolving the request.
+    -journal      PRESENT, 8720 bytes:               UNAUTH x0  AUTH x0
+
+      MEASURED, AND NOT WHAT THE PROBE'S AUTHOR EXPECTED.  The marker
+      count above is what it is; if it is 0, the reason is structural:
+      a rollback journal holds the ORIGINAL images of pages about to
+      be OVERWRITTEN, and rows appended into fresh pages overwrite
+      nothing.  An APPEND-shaped request-induced write therefore need
+      not journal any corpus content at all.
+      Under DA-5 row 3 this absence is NOT sufficient and NOT a pass.
+
+  --- F4  Request-resolution write #2 -- access accounting (OVERWRITES) -----
+      The other everyday retrieval-layer write: record that a chunk
+      was served.  It UPDATES rows in the shared projection itself,
+      and it updates ONLY rows the subject was ENTITLED to receive.
+    -journal      PRESENT, 33344 bytes:              UNAUTH x236  AUTH x235
+
+  --- F5  AFTER COMMIT ------------------------------------------------------
+    -journal      NEVER CREATED:                     (no file to scan)
+
+  THE SHARPEST RESULT IN THIS SECTION.  The request updated ONLY
+  rows the subject was entitled to -- and the rollback journal came
+  back holding the UNAUTHORIZED marker 236 times.  The engine
+  journals whole PAGES, and a page holding an authorized row also
+  holds its unauthorized neighbours.  So a write touching nothing
+  the subject was forbidden still made forbidden content durable.
+  DA-4 row 2: it happened BECAUSE the request was resolved.
+  DA-5 row 1: a single occurrence is sufficient => NOT CLEARED.
+
+  Note what this does NOT depend on: no post-filtering, no bad query
+  plan, and no examination of unauthorized rows by the request. This
+  is page granularity, not query shape -- so §4.13 N1 containment,
+  which works by keeping unauthorized content out of REACH, is the
+  kind of answer it responds to, and a better query is not.
+
+  AND THE DA-4 CONTRAST, which is why the section is built this way:
+    F2 ingest write -- marker in journal:            26 times
+    F2 verdict:                                      NOT a DA-1 finding -- DA-4 row 1, ingest provenance
+    F4 request write -- marker in journal:           236 times
+    F4 verdict:                                      DA-1.1 FINDING -- DA-4 row 2, request provenance
+  The two observations are the same SHAPE and get opposite answers.
+  A criterion phrased as PRESENCE would have flagged both, failed the
+  engine on the ingest one, and told nobody anything.  That is what
+  §4.16 DA-4 was written to prevent, demonstrated on this run's own
+  output rather than argued.
+
+  READ F5 CAREFULLY.  "NEVER CREATED" does NOT mean the artefact never
+  held the content -- F2 and F4 measured that it did.  It means the
+  artefact was reclaimed between the inspections.  §4.16 DA-5 row 3
+  names this exactly: "an absence proves only that nothing crossed the
+  point, and the moment, at which the inspection was taken.  An
+  artefact may have been checkpointed, truncated, rotated or reclaimed
+  between the request and the scan."  A probe that scanned only AFTER
+  the request would have reported a clean result here, and it would
+  have been a FALSE NEGATIVE.
+
+==============================================================================
+G. NEGATIVE CONTROLS -- each MUST produce a DA-1 finding (criterion 5)
+==============================================================================
+  §4.6 S8.  "A run whose negative control comes back clean has
+  measured nothing."  Two controls, because there are two
+  instruments and they can fail independently.
+
+  --- NC-1  SPILL-FILE INSTRUMENT -- post-filtered retrieval ----------------
+      The adverse shape is not contrived: rank across the SHARED
+      projection, apply entitlement to the RESULT.  That is exactly
+      the post-filtering strict Shape-1 exists to forbid, and it is
+      how a retrieval layer is written when authorization is bolted
+      on afterwards.  The engine must sort every row to answer it.
+
+==============================================================================
+NC-1 (negative control) -- post-filtered retrieval, WAL mode
+==============================================================================
+  Entitlement applied AFTER the engine ranks the whole shared projection.
+  subject / runtime:                                 SQLite 3.51.3 via node:sqlite, node v24.15.0
+  journal_mode:                                      wal
+  temp_store:                                        {"temp_store":1}   (1 = FILE)
+  cache_size:                                        {"cache_size":-8}   (negative = KiB)
+  fixture rows (synthetic, S11):                     20000  (10000 authorized / 10000 unauthorized)
+  maintenance state at baseline:                     checkpointed (TRUNCATE) at baseline; no VACUUM, no ANALYZE
+
+  --- BASELINE -- after ingest + maintenance, before the request ------------
+    (main db)     PRESENT, 5484544 bytes:            UNAUTH x10000  AUTH x10000
+    -wal          PRESENT BUT EMPTY (0 bytes):       UNAUTH x0  AUTH x0
+    -shm          PRESENT, 32768 bytes:              UNAUTH x0  AUTH x0
+    -journal      NEVER CREATED:                     (no file to scan)
+  baseline attributable (DA-4):                      YES
+
+  --- THE REQUEST -- resolved for subject s, temp directory watched DURING --
+  SQL:                                               SELECT id, scope FROM chunk ORDER BY body
+    plan:                                            SCAN chunk
+    plan:                                            USE TEMP B-TREE FOR ORDER BY
+    SPILL FILE (during) etilqs_25FnmRrtGBej9Oc:      PRESENT, 5228784 bytes  |  UNAUTH x10000  AUTH x10000
+  rows the ENGINE returned:                          20000
+  rows the request was entitled to:                  10000
+
+  --- AFTER THE REQUEST -- same artefacts, same instrument ------------------
+    (main db)     PRESENT, 5484544 bytes:            UNAUTH x10000  AUTH x10000
+    -wal          PRESENT BUT EMPTY (0 bytes):       UNAUTH x0  AUTH x0
+    -shm          PRESENT, 32768 bytes:              UNAUTH x0  AUTH x0
+    -journal      NEVER CREATED:                     (no file to scan)
+  temp-directory residue after the request:          NONE -- every spill file removed
+
+  --- AFTER CONNECTION CLOSE -- DA-1.2 asks what survives -------------------
+    (main db)     PRESENT, 5484544 bytes:            UNAUTH x10000  AUTH x10000
+    -wal          NEVER CREATED:                     (no file to scan)
+    -shm          NEVER CREATED:                     (no file to scan)
+    -journal      NEVER CREATED:                     (no file to scan)
+
+  NC-1 produced a DA-1 finding:                      YES
+      QUOTED: spill file "etilqs_25FnmRrtGBej9Oc", 5228784 bytes,
+      UNAUTHORIZED marker present 10000 times, AUTHORIZED 10000 times.
+      => the spill-file instrument CAN see unauthorized content.
+
+  --- NC-2  WAL INSTRUMENT -- request resolution that materialises what it examined 
+      A retrieval layer that caches its working set writes examined
+      content back into the store.  Under a shared projection the
+      working set includes unauthorized rows.  This MUST reach the
+      WAL, and the baseline makes it attributable to the request.
+  journal_mode:                                      wal
+  maintenance state at baseline:                     checkpointed (TRUNCATE)
+    -wal          PRESENT BUT EMPTY (0 bytes):       UNAUTH x0  AUTH x0
+  baseline empty and attributable:                   YES
+    -wal          PRESENT, 24752 bytes:              UNAUTH x90  AUTH x89
+
+  NC-2 produced a DA-1 finding:                      YES
+      QUOTED: -wal went 0 bytes -> 24752 bytes;
+      UNAUTHORIZED marker present 90 times where the
+      measured baseline held it 0 times.  Provenance: DA-4 row 2.
+      => the WAL instrument CAN see unauthorized content.
+
+==============================================================================
+H. ENGINE-PRODUCED BACKUP (DA-2 row 5)
+==============================================================================
+  DA-2 puts "backups, snapshots and replication streams produced by
+  the engine itself" in scope; DA-3 excludes OPERATOR-taken backups.
+  node:sqlite exports backup(), so what follows is the IN-scope kind.
+  journal_mode:                                      wal
+  maintenance state:                                 checkpointed (TRUNCATE) before the backup
+  projection store directory:                        C:\Users\ADMINI~1\AppData\Local\Temp\pci-task-0045-backup-TvFGTK
+  backup() pages copied:                             8
+    backup        PRESENT, 32768 bytes:              UNAUTH x235  AUTH x235
+
+  PROVENANCE, stated plainly: the backup reproduces the PROJECTION,
+  whose content is there by INGEST -- DA-4 row 1.  So its holding
+  unauthorized-for-s content is NOT a DA-1.1 or DA-1.2 finding, for
+  exactly the reason DA-4 gives.  Reporting it as one would be the
+  presence-not-provenance error the criterion was written to stop.
+  DA-1.3 is the limb that applies, and it is TESTED below.
+
+  --- H2  DA-1.3 reach -- tested by writing the backup OUTSIDE the store ----
+  destination directory:                             C:\Users\ADMINI~1\AppData\Local\Temp\pci-task-0045-backup-elsewhere-e0x0GA
+  backup() -> outside the store directory:           SUCCEEDED, 8 pages
+    backup (outside)PRESENT, 32768 bytes:            UNAUTH x235  AUTH x235
+      => MEASURED, not asserted: the engine wrote a complete second
+         copy of the projection into a directory that is NOT the
+         store directory, and applied no constraint of its own to
+         the destination.  Whatever protects the store does not
+         travel with the copy.
+
+==============================================================================
+I. DA-1.3 -- WIDENED REACH (measured, not argued)
+==============================================================================
+  DA-1.3 prohibits an artefact "placing corpus content where MORE
+  PRINCIPALS, or a LONGER LIFETIME, can reach it than the projection
+  store itself allows" -- naming "a spill file outside the store's
+  protection" as its own example.  So this is measured by LOCATION
+  and LIFETIME, not by marker counts.
+
+  --- I1  WHERE each artefact lives, relative to the store directory --------
+  projection store directory:                        C:\Users\ADMINI~1\AppData\Local\Temp\pci-task-0045-reach-UibJ7D
+    (main db):                                       INSIDE the store directory
+    -wal:                                            INSIDE the store directory
+    -shm:                                            INSIDE the store directory
+    -journal:                                        NEVER CREATED
+    spill / temporary files:                         OUTSIDE the store directory: C:\Users\ADMINI~1\AppData\Local\Temp
+
+      MEASURED, from section G NC-1: the spill file was created in
+      the OS temp directory, which is NOT the store directory and
+      is NOT governed by whatever protects the store.  Its path is
+      chosen by the engine, not by the deployment.
+
+  --- I2  LIFETIME -- what survives the connection closing ------------------
+    (main db) after close:                           SURVIVES (32768 bytes)
+    -wal after close:                                removed
+    -shm after close:                                removed
+    -journal after close:                            removed
+
+  --- I3  READABILITY BY A SECOND PRINCIPAL, tested rather than asserted ----
+      The probe re-opened each surviving artefact as an ordinary
+      file, with no database connection and no engine involvement.
+    (main db) read as a plain file:                  READABLE -- 32768 bytes, UNAUTH x235
+
+      This is what "more principals can read it" means concretely:
+      no engine, no authorization, no §3 predicate -- a file read.
+
+  --- I4  The deployment limb of DA-1.3, and its boundary -------------------
+      DA-1.3 also names artefacts "written outside the governed
+      persistent-state boundary the bootstrap contract already fixes
+      (/data/docker, contract v0.2, MSG-0006)".  THAT LIMB IS NOT
+      MEASURED HERE and is not claimed either way: this probe runs on
+      the Windows development machine, which has no /data boundary,
+      and no PCI server deployment exists to measure.  Recorded as a
+      stated limitation (criterion 1), not silently omitted.
+
+      What IS established structurally: the engine chooses the temp
+      path itself, so on ANY deployment the spill artefact lands
+      wherever the engine's temp resolution points -- which is a
+      deployment-time question, not one the projection store answers.
+
+==============================================================================
+J. VERDICTS -- DA-5 vocabulary, unchanged (criteria 1, 2, 3, 4)
+==============================================================================
+  DA-1.1 -- REQUEST-INDUCED PERSISTENCE, per artefact class
+  --------------------------------------------------------------------------
+    write-ahead log:                                 no finding on the Shape-1-respecting request (-wal measured empty at baseline AND after)
+      verdict:                                       not sufficient alone (DA-5 row 3)
+    rollback journal:                                FINDING -- created BY the request-resolution transaction (F1 measured none existed) and held the unauthorized marker 236 times, though the request updated ONLY authorized rows
+      verdict:                                       NOT CLEARED (DA-5 row 1)
+      same artefact, APPEND-shaped request write:    marker present 0 times (F3)
+      verdict:                                       no finding -- appends overwrite nothing, so nothing is journalled
+      same artefact at INGEST:                       marker present 26 times (F2) -- and this is NOT a finding
+      verdict:                                       DA-4 row 1 -- ingest provenance. The contrast with the rows above IS the criterion working
+    shared-memory (-shm):                            no unauthorized marker observed in any measurement
+      verdict:                                       not sufficient alone (DA-5 row 3)
+    temporary / spill files:                         FINDING -- 5228784-byte spill file held the unauthorized marker 10000 times, created BY the request
+      verdict:                                       NOT CLEARED (DA-5 row 1)
+    engine-produced backup:                          content present, but provenance is INGEST (DA-4 row 1) -- NOT a DA-1.1 finding
+      verdict:                                       no DA-1.1 finding; DA-1.3 applies
+
+  DA-1.2 -- RESIDUAL RETENTION, per artefact class
+  --------------------------------------------------------------------------
+    write-ahead log:                                 survives the connection closing where it is non-empty; measured empty here after a Shape-1-respecting request
+      verdict:                                       not sufficient alone (DA-5 row 3)
+    rollback journal:                                the artefact is RECLAIMED at commit -- NEVER CREATED
+      verdict:                                       ABSENCE ONLY -- explicitly NOT sufficient (DA-5 row 3); the content WAS there, measured in F4 (236 occurrences) before the commit reclaimed it
+    temporary / spill files:                         removed when the statement finished; residue after the request: NONE
+      verdict:                                       NOT CLEARED (DA-6) -- see the paragraph below
+
+      Why DA-6 and not "satisfied": the probe can observe that the
+      DIRECTORY ENTRY is gone.  It cannot observe whether the CONTENT
+      is gone -- unlinking a file does not overwrite its blocks, and
+      no instrument available here reads them.  DA-6: "the instrument
+      cannot reach it ... the verdict is NOT CLEARED", and DA-5 row 3
+      refuses "we looked and found nothing" as satisfaction.  This is
+      the criterion being inconvenient, and it is taken as written.
+
+  DA-1.3 -- WIDENED REACH
+  --------------------------------------------------------------------------
+    spill / temporary files:                         created OUTSIDE the store directory, in the OS temp directory, at a path the ENGINE chooses
+      verdict:                                       FINDING -- DA-1.3 names this case in its own text
+    -wal / -shm / -journal:                          created INSIDE the store directory, alongside the main database
+      verdict:                                       no location finding; but readable as plain files by any principal with directory access
+    engine-produced backup:                          MEASURED (H2): the engine wrote a complete second copy of the projection into a directory outside the store, unconstrained
+      verdict:                                       FINDING -- longer-lived copy, wider reach, no engine-side constraint on where it lands
+    deployment limb (/data/docker):                  NOT MEASURED -- no PCI server deployment exists
+      verdict:                                       NOT MEASURED -- stated limitation, no verdict claimed either way
+
+  ==========================================================================
+  DA-1 OVERALL, for the subject measured: NOT CLEARED.
+  ==========================================================================
+  Decided by DA-5 row 1 on a single occurrence -- "A single occurrence
+  is sufficient; no structural argument, vendor claim or configuration
+  note rehabilitates it" -- and independently by DA-6 on DA-1.2 for
+  spill files.  Two independent routes to the same verdict.
+
+  AND WHAT IT DOES NOT MEAN -- DA-5 consequence 1, DA-7 row 5:
+  DA-1 is NOT an §4.6 S6 evidence class.  This verdict CLEARS NOTHING,
+  FAILS no Shape-1 gate, and MOVES NO VERDICT recorded anywhere in
+  EPA-0006.  All six TASK-0042 candidates remain NOT CLEARED for the
+  reasons they already were.  Under Q14's fail-closed default this is
+  recorded ALONGSIDE the Shape-1 verdict and changes none of it.
+
+==============================================================================
+K. COVERAGE, LIMITATIONS AND RUN VALIDITY (criteria 1, 5)
+==============================================================================
+
+  --- K1  Every DA-2 artefact class accounted for -- no silent omissions ----
+    write-ahead logs:                                MEASURED (sections C, D/E, G NC-2)
+    rollback / undo journals:                        MEASURED (section F, during the transaction)
+    shared-memory files (-shm):                      MEASURED (sections C, D/E) -- with a weaker instrument, said so in C
+    temporary and spill files:                       MEASURED (sections E, G NC-1, I)
+    engine-produced backups:                         MEASURED (section H)
+    replication streams:                             NOT APPLICABLE -- this subject is not a replicating engine; no such artefact exists to inspect
+
+  --- K2  Limitations, stated rather than left to be discovered -------------
+  1. ONE SUBJECT ONLY. Every measurement is on the FIRST test subject. §4.15:
+     the two available subjects differ in the BINDING, not the build, and
+     neither generalizes to an engine class. Nothing here is a claim about
+     "SQLite", still less about class R.
+  2. The `py` grant (MSG-0145) covers TASK-0043's probe only, so the second
+     subject was NOT invoked and no fresh grant was sought. That is the queue
+     section's instruction followed, not an omission.
+  3. DA-1.3's /data/docker limb is NOT MEASURED -- no PCI server deployment
+     exists to measure and this runner is the Windows development machine.
+  4. Spill-file DA-1.2 is NOT CLEARED by DA-6 rather than measured: unlinking
+     is observable, block reclamation is not.
+  5. The -shm attribution rests on a marker count rather than an emptied
+     baseline, because a checkpoint does not empty it. Weaker, and reported
+     as weaker.
+  6. Marker scanning is a BYTE scan. It would miss content the engine stored
+     in a form the marker does not survive -- compression, encoding or
+     partial-page writes. An absence therefore carries even less weight than
+     DA-5 row 3 already gives it.
+
+  --- K3  RUN VALIDITY ------------------------------------------------------
+  §4.6 S8: a run whose negative control comes back clean has measured
+  nothing.  Both controls are required to have fired.
+
+      + NC-1 fired: spill file etilqs_25FnmRrtGBej9Oc (5228784 bytes) held the unauthorized marker 10000 times
+      + NC-2 fired: -wal went from 0 bytes to 24752 and held the unauthorized marker 90 times, attributable to the resolution
+
+  RUN VALIDITY: VALID -- both negative controls produced a DA-1
+  finding, and each was quoted where it fired.
+
+  --- K4  What this probe did NOT do ----------------------------------------
+  - It selected, cleared, adopted, deployed and implemented NOTHING.
+    Clearing is named explicitly in MSG-0153, and DA-5 consequence 1 makes
+    satisfying DA-1 clear nothing in any case.
+  - It modified no criterion. DA-1…DA-7 were read and applied as written,
+    including where inconvenient.
+  - It changed no gate. E1-E4, strict Shape-1, G-Q4…G-Q7.8 and S1-S11 are
+    untouched, and no U was measured.
+  - It re-ran no prior probe, and reinterpreted none. §4.15's WAL figures
+    are TASK-0043's and are not extended here.
+  - It installed nothing, modified no host configuration, and touched no
+    real or confidential corpus. Every fixture is synthetic (S11).
+  - It introduced no numeric threshold, benchmark, latency or capacity
+    figure. The byte counts above are observations, not bars.
+
+END OF PROBE
