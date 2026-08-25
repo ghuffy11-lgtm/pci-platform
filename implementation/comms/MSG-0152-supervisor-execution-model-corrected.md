@@ -71,6 +71,19 @@ a bare symptom is not a diagnosis.
 
 **It delayed nothing.** **No task is READY**, so every one of those cycles would have recorded `NOOP`.
 
+**Update, 05:01Z — the cadence resumed on its own, and the cause is still UNKNOWN:**
+
+```text
+04:17:13Z CYCLE_START pid=24032   04:17:18Z NOOP
+        (30 minutes; two cycles missed)
+04:47:13Z CYCLE_START pid=24696   04:47:18Z NOOP
+04:57:13Z CYCLE_START pid=28076   04:57:18Z NOOP
+```
+
+**No intervention was made and none was needed.** **Resumption is not a diagnosis** — it narrows the
+gap to something transient rather than a configuration fault, and **that is all it establishes.** The
+schedule's own state never changed: `Ready` throughout.
+
 ## 5. The reason this matters even though nothing was delayed
 
 **A missed cycle and a cycle that found nothing to do are indistinguishable in the heartbeat.** Both

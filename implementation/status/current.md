@@ -2671,7 +2671,9 @@ can start while the task is Disabled.** Both are true at once.
 False`, `Schedule` service **Running**, `LastTaskResult: 0`. **Two cycles were missed today** — last was
 **04:17:13Z**, `NextRunTime` **04:47:47Z**, `NumberOfMissedRuns: 2` — and **the cause is UNKNOWN and is
 not being guessed at**; a missed start leaves no log entry, because the process that would have written
-one never ran. **Nothing waited on them: no task is READY.** **No blocker is open. DISC-0011 and
+one never ran. **Nothing waited on them: no task is READY.** **The cadence resumed unaided at 04:47:13Z
+and 04:57:13Z, with the schedule `Ready` throughout** — which narrows the gap to something transient
+and **is not itself a diagnosis**. **No blocker is open. DISC-0011 and
 DISC-0012 remain recorded and neither moves a verdict.** Full record: **MSG-0152**.
 
 > **The paragraph this replaces, retained, and its inference was wrong:** it said *"the supervisor IS
