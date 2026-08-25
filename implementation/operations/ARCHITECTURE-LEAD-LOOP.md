@@ -86,6 +86,12 @@ and do not soften it. **MSG-0164 §1 is the worked example of the standard.**
 - **Refresh stale cross-references** (numbering, counts, resolved conditionals) inside operations files.
 - **Commit and push** the above.
 
+**Before pushing any READY row, verify it against the Supervisor's parser.** The dependency cell is
+regex-scanned for `TASK-\d{4}`, and **every ID found there must name a task whose board status is
+`COMPLETE`** — otherwise the queue is contradictory and the Supervisor fails closed with a silent
+no-op. **Never put a task-definition filename, or a citation that happens to contain a task ID, in
+that cell.** **DISC-0013** is the incident; the failure is indistinguishable from "no work to do".
+
 ### FORBIDDEN (always; no exception, no inference, no "obviously intended")
 
 - **Ruling any open question** — Q14, Q17, Q21, or any future one. **They accumulate as OPEN and wait
