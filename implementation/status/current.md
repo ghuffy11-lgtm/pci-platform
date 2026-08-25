@@ -2,7 +2,9 @@
 
 **Active Work Package:** WP-0001 — PCI Kernel Foundation
 **Status:** **COMPLETE** — declared by the architecture lead 2026-08-19 (MSG-0020(b), resolved by MSG-0022 / MSG-0023, TASK-0009)
-**Last Updated:** 2026-08-26 UTC — **TASK-0050 IS READY AND THE QUEUE NOW PARSES; a silent stall is fixed and recorded as DISC-0013.** The operator reported a Supervisor cycle that **started nothing** while TASK-0050 stood READY. **The Supervisor was right and the QUEUE was wrong**: it regex-scans the dependency cell for `TASK-NNNN`, and **the Lead had written a markdown link to the task's own definition file there**, so **TASK-0050 depended on ITSELF** — never `COMPLETE`, therefore a **contradictory queue**, therefore a **fail-closed no-op**. **Cause established by reading `supervisor.ps1` and replicating its parse**, before and after: `PROBLEMS: TASK-0050 is READY but dependency TASK-0050 is READY -> NOOP` became `PROBLEMS: none -> STARTS RUNNER`. **The Supervisor was NOT modified.** **The larger finding: TASK-0048 and TASK-0049 carry the SAME defect and executed anyway — so the OPERATOR started them with `COMMS`, and the manual trigger MASKED the defect for two consecutive tasks** (INFERRED — the Supervisor logs and `runner.lock` live on the Windows machine and are not readable from here; the cycle logs would settle it). **Their rows are left alone** — both COMPLETE, only READY tasks are validated, and rewriting a finished row to tidy a defect would damage the record. **New standing rule, added to ARCHITECTURE-LEAD-LOOP.md §5: never put a `TASK-NNNN` string in the dependency cell unless it IS a dependency, and verify against the parser before pushing a READY row.** **This is the FOURTH distinct failure of the queue-row mechanism and is evidence for Q17, which stays OPEN and unruled.** **No architecture, invariant, criterion, gate, verdict or evidence result is touched; MSG-0167 and TASK-0050's definition are unchanged; nothing selected, adopted, deployed, implemented or cleared.**
+**Last Updated:** 2026-08-26 UTC — **TASK-0050 COMPLETE (7/7): GAP-B IS MEASURED, NO REACHABLE SUBJECT DISCHARGES IT — AND THE GATE IS *NOT* SHOWN UNSATISFIABLE** (MSG-0168). **The answer to the task's question is NO**, which MSG-0167 named in advance as *"a complete and valid outcome"* and *"the most consequential result the programme could produce"*. **GAP-B is NOT discharged, NOT withdrawn, NOT weakened; E4 was not reinterpreted to let anything pass.** **Subject 1 re-established NOT OBTAINABLE on a WIDER enumeration than §4.12 or §4.14 used** — SQLite **3.51.3** / `node:sqlite` / Node **v24.15.0**; **21 C-API names checked**, **49 compile options**, **7 of 7** tracing pragmas **inert** against the F15 control, and **`sqlite_stmt` / `bytecode` / `tables_used` / `sqlite_dbpage` ABSENT FROM THE BUILD** — `sqlite_stmt` being **the one surface that would have supplied a non-adverse E4 log**. **Four surfaces exercised disarmed-before-armed with C1–C4 each:** `dbstat` (non-adverse, **C1 = NO**); **`setAuthorizer`** (non-adverse, **invariant with `N` — 3 events at 200 / 1000 / 5000 rows**, **0 on re-execution**, **C1 = C4 = NO**); `sourceSQL` / `expandedSQL` (**C1 = NO** — no accumulation, so nothing to inspect for a statement the caller did not keep); **`createTagStore`** (**accumulates but has NO READ PATH — C3 = NO**, so its zero is **ZERO EVIDENCE, fail closed**, not a clean result). **Four controls, all behaved — run VALID**, one **stronger than a silence test**: a **DENYING** authorizer must make a prepare **fail**, and it did. **THE REFERRAL IS THE SUBSTANCE, AND IT POINTS THE OPPOSITE WAY TO THE ONE ANTICIPATED.** The task said to refer *inseparability* if found; **the evidence shows separability**. **§4.15's adverse result is a BINDING CHOICE, not an engine necessity**: the same engine exposes **`sourceSQL` (0 hits on parameter-bound unauthorized text)** and **`expandedSQL` (1 hit, VERBATIM)** as **separate accessors**, so a trace built on the unexpanded form would not have failed §4.15's probe. **The gate is therefore NOT shown unsatisfiable and this record does not conclude that it is.** **But two qualifications carry equal weight:** separability is **DEFEATED BY INLINING** — with the text inlined both forms carry it, so non-adversity rests on an **application** invariant, not an engine property — and **nothing in reach exposes a LOG built on the non-adverse form.** **Referred to the Lead, unanswered: is E4 satisfiable by a surface built on the UNEXPANDED statement text, given its non-adversity holds only for parameter-bound content? Both answers move the clearance bar, so neither was taken.** **BLK-0012 OPEN — the first open blocker since 2026-08-24** — recording the reach the answer is bounded by: MSG-0145's `py` grant is **scoped to TASK-0043** (BLK-0011's condition, exactly as it predicted), the build lacks **`ENABLE_STMTVTAB`**, and no extension binary exists. **A `node` + `child_process` workaround exists and was NOT taken.** **DISC-0014** — the two subjects were **enumerated to different standards** and compared as though they were not; the widened enumeration **STRENGTHENS §4.12/§4.14 and moves no verdict**. **A `git fetch` denial bounds one limb of outcome 7** — *"verification from `main`"* is corroborated by the Supervisor heartbeat (`21:56:59Z`, `head 9d71790…`), **not live-checked**; stated as a limitation rather than rounded up. **Nothing written into EPA-0006** — promotion is a separate Lead decision on the MSG-0153 / TASK-0049 mechanism. **Reported and deliberately NOT fixed** on the MSG-0037 / MSG-0039 precedent: **MSG-0166 and MSG-0167 have no row in `comms/README.md`, and DISC-0013 has none in `discoveries/README.md`** — a **fifth** index-drift finding. **NO TASK IS READY, and that is a DECISION BOUNDARY, not a stall** — the queue was verified against a replication of the Supervisor's own parser (`PROBLEMS: none`, `READY tasks: (none)`). **Open and unruled: the MSG-0168 §7 referral, Q21, Q17, Q14, the L4/W-B non-reproduction (MSG-0164 §5), MSG-0060.** **Nothing selected, adopted, deployed, implemented or cleared; no gate, invariant, criterion or verdict changed; eleven probes have cleared nothing; all six TASK-0042 candidates remain NOT CLEARED.**
+
+> **The line this replaces, retained:** "2026-08-26 UTC — **TASK-0050 IS READY AND THE QUEUE NOW PARSES; a silent stall is fixed and recorded as DISC-0013.** The operator reported a Supervisor cycle that **started nothing** while TASK-0050 stood READY. **The Supervisor was right and the QUEUE was wrong**: it regex-scans the dependency cell for `TASK-NNNN`, and **the Lead had written a markdown link to the task's own definition file there**, so **TASK-0050 depended on ITSELF** — never `COMPLETE`, therefore a **contradictory queue**, therefore a **fail-closed no-op**. **Cause established by reading `supervisor.ps1` and replicating its parse**, before and after: `PROBLEMS: TASK-0050 is READY but dependency TASK-0050 is READY -> NOOP` became `PROBLEMS: none -> STARTS RUNNER`. **The Supervisor was NOT modified.** **The larger finding: TASK-0048 and TASK-0049 carry the SAME defect and executed anyway — so the OPERATOR started them with `COMMS`, and the manual trigger MASKED the defect for two consecutive tasks** (INFERRED — the Supervisor logs and `runner.lock` live on the Windows machine and are not readable from here; the cycle logs would settle it). **Their rows are left alone** — both COMPLETE, only READY tasks are validated, and rewriting a finished row to tidy a defect would damage the record. **New standing rule, added to ARCHITECTURE-LEAD-LOOP.md §5: never put a `TASK-NNNN` string in the dependency cell unless it IS a dependency, and verify against the parser before pushing a READY row.** **This is the FOURTH distinct failure of the queue-row mechanism and is evidence for Q17, which stays OPEN and unruled.** **No architecture, invariant, criterion, gate, verdict or evidence result is touched; MSG-0167 and TASK-0050's definition are unchanged; nothing selected, adopted, deployed, implemented or cleared.**" **True as written, and the fix it describes held: the Supervisor started this runner on its next cycle** (`runner.lock` pid 14068, `2026-08-25T21:51:58Z`).
 
 > **The line this replaces, retained:** "2026-08-26 UTC — **GAP-B IS AUTHORIZED AS TASK-0050, THE SINGLE READY TASK** (MSG-0167, operator authorization). **GAP-B blocks clearance INDEPENDENTLY OF TOPOLOGY** and §4.13 calls it **"the one to read first"**. **A Lead error is corrected in MSG-0167 §1**: the Lead said E4 was unobtainable on BOTH subjects — **wrong**. §4.15's heading is *"obtainable, and adverse"*: first subject (`node:sqlite`) **NOT OBTAINABLE**, second (Python `sqlite3`) **OBTAINABLE and ADVERSE**. The three build flags are absent on both, but **the binding is why the second HAS a surface** — *"the two subjects differ in the binding, not in the build"*. **The real position is WORSE than "no surface exists"**: (1) where every Shape-1 measurement was taken, **E4 cannot be taken at all**, so a probe there **"would clear nothing whatever the topology"**; (2) where it COULD be taken it **FAILED** — unauthorized text **bound as a PARAMETER** appeared **verbatim**, because **the trace emits the EXPANDED statement**; (3) that surface is **C4 = NO** — it records the **instruction**, not the **examination** (200 examined, 100 returned, **1 trace entry**), so it **cannot measure `U` and is not E2**. **EV5: an engine that cannot supply it "cannot be selected under any topology"** — so **GAP-B is the binding constraint on the entire programme**, and **ten probes have cleared nothing because on the evidence subject the next ten cannot either.** **TASK-0050 asks whether ANY reachable subject supplies E4 that is OBTAINABLE *and* NON-ADVERSE, and can also carry the Shape-1 apparatus.** **A finding that NONE does is a COMPLETE and VALID outcome** — and the most consequential result the programme could produce. **Most likely task in the programme to hit an environment BLOCKER** (BLK-0011 precedent): if it needs an install, a differently-compiled build, or a host change, **record a blocker and STOP**. **E4 may NOT be weakened to let a subject pass** (MSG-0119). **A test subject is an INSTRUMENT, not a candidate** (MSG-0141). **Open and unruled: Q21, Q17, Q14, the L4/W-B non-reproduction (MSG-0164 §5), MSG-0060.** **Nothing selected, adopted, deployed, implemented or cleared; ten probes have cleared nothing; all six TASK-0042 candidates remain NOT CLEARED.**"
 
@@ -2100,7 +2102,30 @@ required as a messenger.
 
 ## Open Blockers
 
-**None.** BLK-0001 through **BLK-0010** are all RESOLVED.
+**One: BLK-0012**, raised 2026-08-26 by the TASK-0050 runner. **BLK-0001 through BLK-0011 are all
+RESOLVED.**
+
+**BLK-0012 is not a failure to execute a task.** TASK-0050 ran and answered its question; the blocker
+records **the reach that answer is bounded by**. Three things bounded it, each an operator decision and
+**none routed around**: MSG-0145's `py` grant is **scoped to TASK-0043** (so the only allowlisted
+invocation is the one probe TASK-0050 may not re-run as new evidence); the build lacks
+**`ENABLE_STMTVTAB`**, the flag that would supply `sqlite_stmt` — the one surface that could have been a
+**non-adverse E4 log**; and no loadable-extension binary exists. **§4.13 EV5 makes this severe in
+consequence while trivial to describe:** *"an engine that cannot supply EV5 cannot be selected under any
+topology."*
+
+**BLK-0011 predicted this exact stop and it arrived unchanged.** Its closing note reads: *"the grant was
+scoped to one task… the condition this blocker describes therefore remains true for future UNATTENDED
+tasks, and needs a fresh decision if one requires `py`."* **A `node` + `child_process` workaround exists
+and was NOT taken**, for the second time and on the same rule.
+
+**BLK-0012's own option A is to rule the MSG-0168 §7 referral first, and it costs nothing** — a *no*
+there would make a `py` grant and a rebuilt engine wasted effort.
+
+> **The line this replaces, retained:** "**None.** BLK-0001 through **BLK-0010** are all RESOLVED."
+> **True when written** — and already stale before this update, since BLK-0011 was raised and resolved
+> on 2026-08-24 without this line being touched. **Both corrections are recorded here rather than
+> silently overwritten.**
 
 **BLK-0010's resolution has now been proven by execution, not just by a headless probe.** On
 2026-08-22 the next supervisor-started session ran TASK-0027 end to end: **the corpus read succeeded on
@@ -2271,6 +2296,16 @@ both tables index it, and both were updated in the same commit as the record.
 | DISC-0008 | Compose kernel service cannot start as committed | **RESOLVED** 2026-08-19 by TASK-0005 |
 | DISC-0009 | Docker CLI writes client state to `/home/claude`, outside `/data` | **CLOSED — ACCEPTED, NOT A VIOLATION** 2026-08-19 by MSG-0020(b) / MSG-0022 / MSG-0023 |
 | DISC-0010 | The two work-package registers disagree about what WP-0001 is | **RECORDED** 2026-08-21 (TASK-0021, MSG-0055 §7.1) — no action taken, none proposed |
+| DISC-0014 | The two E4 test subjects were **enumerated to different standards** and compared as though they were not | **RECORDED — no verdict moves** 2026-08-26 (TASK-0050, MSG-0168 §9). `setAuthorizer` is present on subject 1 and **neither §4.12 nor §4.14 reported it**, on the **same** runtime — so **not a version change**. The widened enumeration **STRENGTHENS** those sections: the instrument is non-adverse, invariant with `N`, and **does not answer E4** — §4.15's own classification. **No section amended** |
+
+> **This table stops at DISC-0010 and the row above jumps to DISC-0014. That is deliberate, and the
+> gap is real: DISC-0011, DISC-0012 and DISC-0013 exist and have no row here.** The TASK-0050 session
+> added only the record it raised. **Backfilling another author's rows is what MSG-0037 and MSG-0039
+> made a separately-authorized act**, after TASK-0013 found a missing blocker row and **reported it
+> rather than fixing it**. **`implementation/discoveries/README.md` is the index of record** — and
+> **DISC-0013 is missing from that one too**, reported in `implementation/comms/README.md` on the same
+> precedent. **Fifth index-drift finding; the habit behind all five is creating a record in its own
+> file and not in the table that indexes it, in the same commit.**
 
 > **Corrected 2026-08-20 by TASK-0015.** This table had two defects. It was declared with **two**
 > columns while four rows supplied three cells, so the renderer silently dropped the status of
@@ -2296,9 +2331,41 @@ both tables index it, and both were updated in the same commit as the record.
 
 ## Next Action
 
-**TASK-0049 is COMPLETE (7/7) and NO task is READY. The next action is the Architecture Lead's.**
-**§4.17, §4.18 and §4.19 now stand together** — TASK-0045's DA-1 evidence, the N6 requirement, and the
-TASK-0046 topology evidence that motivated it.
+**TASK-0050 is COMPLETE (7/7) and NO task is READY. The next action is the Architecture Lead's**, and
+for once it is a question rather than an authorization.
+
+**The four actions, in the order MSG-0168 §12 recommends:**
+
+1. **Rule the MSG-0168 §7 referral.** *Is E4 satisfiable by a surface built on the **unexpanded**
+   statement text, given that its non-adversity holds only for **parameter-bound** content and is
+   **defeated by inlining**?* **Answering *yes* would make E4 satisfiable subject to an
+   application-level invariant E4 does not currently state — a change to the clearance bar.
+   Answering *no* would establish that E4 requires a surface no reachable binding provides. Both move
+   the bar, so the task moved neither.** **It is free to answer and it gates everything below.**
+2. **Decide whether MSG-0168 §4–§6 are promoted into EPA-0006** as a new section, on the MSG-0153 /
+   TASK-0049 mechanism. **Not done by the task — no authorization exists for it**, and TASK-0050's
+   required outcomes list COMMS, status, queue, checkpoint and harness, **not a section of the
+   evaluation record**.
+3. **Decide BLK-0012** — whether the programme wants an E4 subject reachable to an unattended runner.
+   **Its own option A is to rule the referral first**, because a *no* makes a `py` grant and a
+   `ENABLE_STMTVTAB` build wasted effort.
+4. **Note DISC-0014** when the next enumeration is specified.
+
+**Why the queue being empty is correct here.** It was verified against a replication of the
+Supervisor's own parser — `PROBLEMS: none`, `READY tasks: (none)` — so this is the **decision boundary
+Q17 keeps distinguishing from a stall**, not a fifth stall. **Only the Architecture Lead may authorize
+the next task.**
+
+**What TASK-0050 settled, and what it deliberately did not.** **Settled:** no reachable subject supplies
+E4 both obtainable and non-adverse; §4.15's adversity is a **binding choice, not an engine necessity**;
+and the two E4 subjects had been **enumerated to different standards** (DISC-0014). **Not settled, and
+not for the executor:** whether the gate can be met at all. **The record does NOT conclude E4 is
+unsatisfiable** — that conclusion was available and was refused, because it belongs to the Lead.
+
+> **The line this replaces, retained:** "**TASK-0049 is COMPLETE (7/7) and NO task is READY. The next
+> action is the Architecture Lead's.** **§4.17, §4.18 and §4.19 now stand together** — TASK-0045's DA-1
+> evidence, the N6 requirement, and the TASK-0046 topology evidence that motivated it." **True when
+> written**, and the Lead answered it with **MSG-0167**, authorizing GAP-B as TASK-0050.
 
 > **The line this replaces, retained:** "**TASK-0048 is COMPLETE (7/7) and NO task is READY. The next
 > action is the Architecture Lead's.**" **True when written**, and the Lead answered it with **MSG-0164**,
