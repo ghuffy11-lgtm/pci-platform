@@ -122,8 +122,25 @@ in output rather than in reasoning. **The criterion earned its keep.**
 | **write-ahead log** | Shape-1-respecting request: `-wal` measured **empty at baseline AND after** | **not sufficient alone** (DA-5 row 3) |
 | **rollback journal** | **236 occurrences**, created by the request-resolution transaction | **NOT CLEARED** (DA-5 row 1) |
 | **shared-memory `-shm`** | no unauthorized marker in any measurement | **not sufficient alone** (DA-5 row 3) |
-| **temporary / spill files** | **5 228 784-byte** spill file, marker **10 000 times**, created **by** the request | **NOT CLEARED** (DA-5 row 1) |
+| **temporary / spill files** | **Shape-1-respecting request:** a **2 594 395-byte** spill file was created, holding **UNAUTH ×0 / AUTH ×10 000** | **not sufficient alone** (DA-5 row 3) — **corrected, see below** |
 | **engine-produced backup** | content present, but provenance is **ingest** | **no DA-1.1 finding** — DA-4 row 1 |
+
+> **CORRECTION, 2026-08-25, by a COMMS session reading the probe output back against this table.**
+> **The spill-file row above originally read:** *"**5 228 784-byte** spill file, marker **10 000 times**,
+> created **by** the request | **NOT CLEARED** (DA-5 row 1)"*. **That measurement is NC-1 — the negative
+> control** (post-filtered retrieval, returning 20 000 rows where entitlement was 10 000), quoted as such
+> in §6. **The conforming request's spill file carried `UNAUTH x0`**, and the probe's own output says so
+> in terms: *"DA-1.1 is not engaged; DA-1.3 is."*
+>
+> **A negative control is designed to produce a finding** — that is what makes it evidence the instrument
+> works. **Presenting its result in the per-artefact verdict table states a finding about the subject that
+> the subject's own measurement contradicts.**
+>
+> **The DA-1 verdict does not change and neither does anything downstream.** **DA-1 remains NOT CLEARED**
+> on the two independent routes §1 named: the **rollback-journal DA-5 row 1 finding on a conforming
+> request** (236 occurrences — the page-granularity result, which is unaffected) and **DA-6 on the
+> spill-file residue limb**. **Only this one supporting cell was overstated**, and it is corrected here
+> rather than removed, with the original wording kept.
 
 ### DA-1.2 — residual retention
 
