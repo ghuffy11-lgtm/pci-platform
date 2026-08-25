@@ -2654,6 +2654,29 @@ are NOT CLEARED and no candidate is eligible for selection on any reading of Q14
 
 ---
 
+### 4.17 TASK-0045 DA-1 execution evidence — measured durability exposure
+
+**Authority:** MSG-0157 (Q15 = YES); MSG-0155; MSG-0156; TASK-0045.
+
+TASK-0045 produced a **VALID** DA-1 measurement run: 8 measured configurations across 5 in-scope artefact classes, with both mandatory negative controls firing.
+
+The principal finding was a request that examined no unauthorized row, returned no unauthorized row, and used no bad plan, but performed an authorized-row update:
+
+```text
+UPDATE chunk SET served = served + 1 WHERE scope = 'AUTHORIZED'
+    -journal PRESENT, 33344 bytes    UNAUTH x236    AUTH x235
+```
+
+The rollback journal therefore contained **236 unauthorized marker occurrences**. The engine journals whole pages, so a page containing an authorized row also contained unauthorized neighbouring rows. This is a **page-granularity durability exposure**, independent of post-filtering, optimizer choice, or unauthorized query examination.
+
+TASK-0045 also established the required provenance distinction: ingest-produced artefacts were not treated as request-induced findings; the conforming spill file contained **UNAUTH x0 / AUTH x10,000**; the append-shaped request-induced journal contained **UNAUTH x0**; and the available instrument could not establish destruction of unlinked spill-file content, producing the required fail-closed **NOT CLEARED** result.
+
+The run remained **VALID**, and DA-1 remained **NOT CLEARED** for the measured subject. No candidate moved, no clearance gate changed, and no engine was selected, adopted, deployed, implemented, or cleared.
+
+The page-granularity finding bears directly on §4.13 physical containment: if the reachable structure contains only content the subject may receive, unauthorized neighbouring content is not co-resident on the page available to the authorized update.
+
+This section records TASK-0045 evidence only. It does not alter DA-1, E1–E4, strict Shape-1, or any existing clearance gate.
+
 ## 5. Candidate technology classes against Approach C (MSG-0098 item 1)
 
 **Approach C is settled and is treated here as a constraint, not an option** (EPA-0005 §5; MSG-0092): a
