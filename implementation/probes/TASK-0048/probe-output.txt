@@ -1,0 +1,183 @@
+TASK-0048 -- bounded N6 measurement (EPA-0006 §4.18)
+Authority: MSG-0161b (Q20 = YES).  Selects nothing, clears nothing.
+One subject, one build.  No result here generalizes to an engine class.
+
+==============================================================================
+A. SUBJECT AND RUNTIME
+==============================================================================
+  sqlite_version                                       3.51.3
+  node                                                 v24.15.0
+  platform                                             win32
+  topologies under test                                L1, L2, L3, L4
+  journal modes                                        delete, wal
+  write shapes                                         W-A (access accounting (UPDATE of entitled rows)) | W-B (cache writeback (append INSERT ... SELECT))
+  rows per class                                       400
+
+  PRIOR TASK-0046 MEASUREMENTS ARE NOT RE-REPORTED (MSG-0161b).
+  Every number below was measured in this run.
+
+==============================================================================
+B. BASELINE -- what each topology holds BEFORE any request
+==============================================================================
+  DA-4: residue whose provenance is the TRANSITION is not a finding.
+  It is measured first so that what the request ADDS can be separated.
+
+  L1  live unauthorized rows                           400
+  L1  store pages carrying unauthorized bytes          23 of 25
+  L2  live unauthorized rows                           400
+  L2  store pages carrying unauthorized bytes          12 of 26
+  L3  live unauthorized rows                           0
+  L3  store pages carrying unauthorized bytes          0 of 14
+  L4  live unauthorized rows                           0
+  L4  store pages carrying unauthorized bytes          1 of 14
+
+==============================================================================
+C. PER-MEASUREMENT RESULTS (criteria 1, 3, 5)
+==============================================================================
+  topo mode    write  liveRows  baseResidPages  jImages/carry  walFrames/carry  identical
+  L1   delete  W-A    400       23              1/1/raw400     -                0/1
+  L1   delete  W-B    400       23              2/0/raw0       -                2/2
+  L1   wal     W-A    400       23              -              22/22            -
+  L1   wal     W-B    400       23              -              13/0             -
+  L2   delete  W-A    400       12              1/0/raw0       -                0/1
+  L2   delete  W-B    400       12              2/0/raw0       -                2/2
+  L2   wal     W-A    400       12              -              11/0             -
+  L2   wal     W-B    400       12              -              12/0             -
+  L3   delete  W-A    0         0               1/0/raw0       -                0/1
+  L3   delete  W-B    0         0               2/0/raw0       -                2/2
+  L3   wal     W-A    0         0               -              11/0             -
+  L3   wal     W-B    0         0               -              12/0             -
+  L4   delete  W-A    0         1               1/0/raw20      -                0/1
+  L4   delete  W-B    0         1               2/0/raw0       -                2/2
+  L4   wal     W-A    0         1               -              11/1             -
+  L4   wal     W-B    0         1               -              12/0             -
+
+==============================================================================
+D. N6 VERDICTS, PER LIMB (criteria 1, 5)
+==============================================================================
+
+  L1 / delete / W-A
+    N6.1 history-sourced durability                    FINDING (shared layout: rows in reach)
+    N6.2 original-image escape                         FINDING
+    N6.3 history within the invariant                  n/a (topology holds unauthorized rows by design)
+    basis                                              artefact carries unauthorized bytes; unauthorized rows are also in reach
+
+  L1 / delete / W-B
+    N6.1 history-sourced durability                    no finding (not sufficient alone, DA-5 row 3)
+    N6.2 original-image escape                         no finding (not sufficient alone, DA-5 row 3)
+    N6.3 history within the invariant                  n/a (topology holds unauthorized rows by design)
+    basis                                              artefacts inspected and carried no unauthorized bytes
+
+  L1 / wal / W-A
+    N6.1 history-sourced durability                    FINDING (shared layout: rows in reach)
+    N6.2 original-image escape                         FINDING
+    N6.3 history within the invariant                  n/a (topology holds unauthorized rows by design)
+    basis                                              artefact carries unauthorized bytes; unauthorized rows are also in reach
+
+  L1 / wal / W-B
+    N6.1 history-sourced durability                    no finding (not sufficient alone, DA-5 row 3)
+    N6.2 original-image escape                         no finding (not sufficient alone, DA-5 row 3)
+    N6.3 history within the invariant                  n/a (topology holds unauthorized rows by design)
+    basis                                              artefacts inspected and carried no unauthorized bytes
+
+  L2 / delete / W-A
+    N6.1 history-sourced durability                    no finding (not sufficient alone, DA-5 row 3)
+    N6.2 original-image escape                         no finding (not sufficient alone, DA-5 row 3)
+    N6.3 history within the invariant                  n/a (topology holds unauthorized rows by design)
+    basis                                              artefacts inspected and carried no unauthorized bytes
+
+  L2 / delete / W-B
+    N6.1 history-sourced durability                    no finding (not sufficient alone, DA-5 row 3)
+    N6.2 original-image escape                         no finding (not sufficient alone, DA-5 row 3)
+    N6.3 history within the invariant                  n/a (topology holds unauthorized rows by design)
+    basis                                              artefacts inspected and carried no unauthorized bytes
+
+  L2 / wal / W-A
+    N6.1 history-sourced durability                    no finding (not sufficient alone, DA-5 row 3)
+    N6.2 original-image escape                         no finding (not sufficient alone, DA-5 row 3)
+    N6.3 history within the invariant                  n/a (topology holds unauthorized rows by design)
+    basis                                              artefacts inspected and carried no unauthorized bytes
+
+  L2 / wal / W-B
+    N6.1 history-sourced durability                    no finding (not sufficient alone, DA-5 row 3)
+    N6.2 original-image escape                         no finding (not sufficient alone, DA-5 row 3)
+    N6.3 history within the invariant                  n/a (topology holds unauthorized rows by design)
+    basis                                              artefacts inspected and carried no unauthorized bytes
+
+  L3 / delete / W-A
+    N6.1 history-sourced durability                    no finding (not sufficient alone, DA-5 row 3)
+    N6.2 original-image escape                         no finding (not sufficient alone, DA-5 row 3)
+    N6.3 history within the invariant                  satisfied on this measurement (no residue found)
+    basis                                              artefacts inspected and carried no unauthorized bytes
+
+  L3 / delete / W-B
+    N6.1 history-sourced durability                    no finding (not sufficient alone, DA-5 row 3)
+    N6.2 original-image escape                         no finding (not sufficient alone, DA-5 row 3)
+    N6.3 history within the invariant                  satisfied on this measurement (no residue found)
+    basis                                              artefacts inspected and carried no unauthorized bytes
+
+  L3 / wal / W-A
+    N6.1 history-sourced durability                    no finding (not sufficient alone, DA-5 row 3)
+    N6.2 original-image escape                         no finding (not sufficient alone, DA-5 row 3)
+    N6.3 history within the invariant                  satisfied on this measurement (no residue found)
+    basis                                              artefacts inspected and carried no unauthorized bytes
+
+  L3 / wal / W-B
+    N6.1 history-sourced durability                    no finding (not sufficient alone, DA-5 row 3)
+    N6.2 original-image escape                         no finding (not sufficient alone, DA-5 row 3)
+    N6.3 history within the invariant                  satisfied on this measurement (no residue found)
+    basis                                              artefacts inspected and carried no unauthorized bytes
+
+  L4 / delete / W-A
+    N6.1 history-sourced durability                    FINDING (history-sourced)
+    N6.2 original-image escape                         FINDING
+    N6.3 history within the invariant                  VIOLATED -- 1 store pages carry unauthorized bytes with 0 unauthorized rows
+    basis                                              artefact carries unauthorized bytes and NO unauthorized row exists -- the bytes came from the store history
+
+  L4 / delete / W-B
+    N6.1 history-sourced durability                    no finding (not sufficient alone, DA-5 row 3)
+    N6.2 original-image escape                         no finding (not sufficient alone, DA-5 row 3)
+    N6.3 history within the invariant                  VIOLATED -- 1 store pages carry unauthorized bytes with 0 unauthorized rows
+    basis                                              artefacts inspected and carried no unauthorized bytes
+
+  L4 / wal / W-A
+    N6.1 history-sourced durability                    FINDING (history-sourced)
+    N6.2 original-image escape                         FINDING
+    N6.3 history within the invariant                  VIOLATED -- 1 store pages carry unauthorized bytes with 0 unauthorized rows
+    basis                                              artefact carries unauthorized bytes and NO unauthorized row exists -- the bytes came from the store history
+
+  L4 / wal / W-B
+    N6.1 history-sourced durability                    no finding (not sufficient alone, DA-5 row 3)
+    N6.2 original-image escape                         no finding (not sufficient alone, DA-5 row 3)
+    N6.3 history within the invariant                  VIOLATED -- 1 store pages carry unauthorized bytes with 0 unauthorized rows
+    basis                                              artefacts inspected and carried no unauthorized bytes
+
+==============================================================================
+E. NEGATIVE CONTROLS (criterion 2) -- kept separate from subject findings
+==============================================================================
+  NC-1 mechanism control: L1 shared layout arms        4
+  NC-1 arms that produced a durability finding         2
+  NC-2 instrument control: hits for a marker never written 0
+
+==============================================================================
+F. RUN VALIDITY
+==============================================================================
+  failures recorded                                    0
+  RUN VALIDITY                                         VALID
+
+==============================================================================
+G. WHAT THIS RUN DOES NOT ESTABLISH
+==============================================================================
+  - No engine is selected, adopted, deployed, implemented or cleared.
+  - No candidate verdict moves; N1-N5, DA-1..DA-7, E1-E4 and strict
+    Shape-1 are untouched.
+  - One subject and one build only.  §4.6 S10 forbids generalizing this
+    to SQLite as a product or to an engine class.
+  - Byte-scanning sees literal markers; re-encoded or compressed content
+    would be missed.  Absence is "not sufficient alone" (DA-5 row 3).
+  - Filesystem- and device-level residue is outside DA-3 scope and was
+    not measured.
+  
+  temp root removed                                 true
+
+END OF PROBE
