@@ -2655,16 +2655,32 @@ test subject **cannot clear anything**, whether to measure I5/I7/I8 there anyway
 falsify or support N1/N2/N3) or to obtain a test subject that can supply E4 first. **MSG-0132 §12
 states these and takes none of them.**
 
-**Operationally: the supervisor IS running unattended, and it DID start TASK-0043 — the schedule being
-Disabled did not prevent it.** VERIFIED 2026-08-24 from `implementation/operations/supervisor/state/`:
-`runner.lock` names **`TASK-0043`, pid 25932, acquired 18:59:38Z**, and `heartbeat.json` reads
-`decision: RUNNER_RUNNING`, `runnerPid: 25932`, **`supervisorPid: 24604`**, `head: 7d6bcbd…`,
-**advancing 19:03:08Z → 19:03:38Z** while that session read other files. **The scheduler STARTS the
-supervisor loop; it does not drive each cycle** — so a `Disabled` task with `NumberOfMissedRuns: 2` had
-missed *starts* of a process that was **already running**. **One blocker is now OPEN: BLK-0011** — the
-Python interpreter that TASK-0043's second test subject requires is **not invocable by this runner**,
-so the task **stopped at its first substantive action and is BLOCKED, not COMPLETE**. **Two discoveries
-remain recorded — DISC-0011 and DISC-0012 — and neither moves a verdict.** Full record: **MSG-0144**.
+**Operationally: Task Scheduler drives EVERY cycle, and a `Disabled` task does stop them.** VERIFIED
+2026-08-25 from the supervisor's own log: across the disabled window **nothing ran for 52 minutes** —
+`18:07:13Z CYCLE_START` → `18:07:18Z NOOP`, then **nothing until `18:59:33Z CYCLE_START`**, which is the
+cycle that started TASK-0043. **Every cycle carries a distinct pid** (22136, 24604, 21484, 22884, 14480,
+18928, 27416, 18140, 24032 …) — one process per cycle, not one loop.
+
+**The model, which reconciles every observation:** a cycle finding **no READY task** starts, reconciles,
+writes `NOOP` and **exits in about five seconds**; a cycle that **starts a runner stays alive monitoring
+it**, advancing the heartbeat **every ~30s** and logging `COMPLETED` off-cadence when the runner exits.
+**So while a runner is active the supervisor looks alive regardless of the schedule — and no NEW cycle
+can start while the task is Disabled.** Both are true at once.
+
+**Current state:** schedule **`Ready`**, `Interval: PT10M`, `StartWhenAvailable: True`, `WakeToRun:
+False`, `Schedule` service **Running**, `LastTaskResult: 0`. **Two cycles were missed today** — last was
+**04:17:13Z**, `NextRunTime` **04:47:47Z**, `NumberOfMissedRuns: 2` — and **the cause is UNKNOWN and is
+not being guessed at**; a missed start leaves no log entry, because the process that would have written
+one never ran. **Nothing waited on them: no task is READY.** **No blocker is open. DISC-0011 and
+DISC-0012 remain recorded and neither moves a verdict.** Full record: **MSG-0152**.
+
+> **The paragraph this replaces, retained, and its inference was wrong:** it said *"the supervisor IS
+> running unattended, and it DID start TASK-0043 — the schedule being Disabled did not prevent it"* and
+> **"The scheduler STARTS the supervisor loop; it does not drive each cycle"**, citing the `runner.lock`
+> for pid 25932 and a heartbeat **advancing 19:03:08Z → 19:03:38Z**. **The observation was real and the
+> conclusion does not follow.** That advancing heartbeat was **the 18:59:33Z cycle still monitoring the
+> runner it had started** — a cycle that began *after* the gap, not a process that had lived through it.
+> **MSG-0143's diagnosis therefore stands**, and the 52-minute hole in the log is the proof.
 
 > **The paragraph this replaces, retained, and its central prediction was wrong:** it said *"the
 > WINDOWS SCHEDULE IS DISABLED, so nothing fires"* and **"TASK-0043 is correctly READY and will not
@@ -2680,6 +2696,13 @@ remain recorded — DISC-0011 and DISC-0012 — and neither moves a verdict.** F
 > are kept, per CLAUDE.md's rule that a corrected diagnosis is worth more to a later reader than a tidy
 > record. **What it got right and is worth keeping: re-enabling a schedule is an operator action, and it
 > was not taken here either.**
+>
+> **That verdict is itself reversed, above and in MSG-0152.** The log shows **no cycle at all for 52
+> minutes** while the task was `Disabled`, and TASK-0043 was started by a cycle beginning **18:59:33Z** —
+> *after* the gap. **MSG-0143 was right that a disabled schedule stops cycles**; what it could not see
+> was that a cycle **already monitoring a runner** keeps heartbeating off-cadence, which is what looked
+> like a schedule-independent loop. **Both corrections are kept**, because the sequence — claim,
+> counter-claim, log — is worth more to a later reader than a tidy single answer.
 
 > **The paragraph this replaces, retained, and it was wrong:** it said *"the supervisor is ENABLED"* and
 > *"once this is pushed, the next cycle can take TASK-0043"*, citing the **18:07:18Z** NOOP heartbeat and
