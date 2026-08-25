@@ -2689,6 +2689,17 @@ The page-granularity finding bears directly on §4.13 physical containment: if t
 
 This section records TASK-0045 evidence only. It does not alter DA-1, E1–E4, strict Shape-1, or any existing clearance gate.
 
+> **A later measurement INVERTS this section's W-B result, and the two do not conflict.** Note added
+> 2026-08-26 by **TASK-0049**; **additive — nothing above is deleted or reworded.** §4.17 records that
+> the **appending** write journalled nothing, on the reasoning that *"a rollback journal holds original
+> images of overwritten pages and appends overwrite none."* **That reasoning is correct about a store
+> whose free list is empty.** **§4.19** measures a store that had been **re-materialised from another
+> partition**, where **the append does overwrite something** — a page the previous partition left on the
+> free list — and **the marker became durable 15 times with no unauthorized row anywhere in reach.**
+> **Same write shape, opposite result; the difference is the store's history, not the query.** **The
+> result stated above is not withdrawn and no verdict here changes** — it is bounded, and **§4.19 holds
+> the case it does not cover.**
+
 ### 4.18 Byte-level durability containment — N6 (TASK-0047, MSG-0160)
 
 **Authority:** **MSG-0160 (Q19 = YES)**, on the evidence in **MSG-0158** (TASK-0046) and **§4.17**.
@@ -2816,6 +2827,162 @@ whose free list is empty.** In a re-materialised store **the append does overwri
   §4.11, §4.12, §4.14 and §4.17 stands unchanged.
 - **It measures nothing**, and **claims no candidate's N6 status** — **the evidence task that would, if
   authorized, is a separate one.**
+
+---
+
+### 4.19 TASK-0046 topology/durability evidence — containment answers one exposure and not the other (MSG-0161b Q18)
+
+**Authority:** **MSG-0161b (Q18 = YES)**, ruling consequence 1; the evidence and its boundary are
+**MSG-0158**. **Additive: no other section is edited, no gate changes, no verdict moves, and this
+section clears nothing.**
+
+> **Promotion clears nothing.** MSG-0161b promotes this evidence *"through the established
+> COMMS/architecture mechanism"* and forbids generalizing the single-subject result to an engine class.
+> **No candidate becomes eligible, preferred or ranked because its evidence now has a section number.**
+
+#### What was measured
+
+**16 configurations** — four physical organizations × two journal modes × two request-induced write
+shapes — on **one subject: SQLite 3.51.3 via `node:sqlite`, Node v24.15.0, `secure_delete = 0`,
+`auto_vacuum = 0`.**
+
+| | Layout |
+|---|---|
+| **L1** | **shared** projection — one structure, both authorization classes |
+| **L2** | isolated **structures** in one store |
+| **L3** | isolated **stores**, one partition each |
+| **L4** | isolated stores **after re-partition** — this store previously held the other partition and was re-materialised |
+
+**Write shapes:** **W-A** access accounting (the TASK-0045 shape, an `UPDATE` of entitled rows) and
+**W-B** an appending cache writeback.
+
+#### The result, as captured
+
+| Configuration | store pages holding BOTH classes | durable page images | durable UNAUTH markers | verdict |
+|---|---|---|---|---|
+| **L1 / DELETE / W-A** | 7 | 6 | **200** | **FINDING → NOT CLEARED** (DA-5 row 1) |
+| L1 / DELETE / W-B | 7 | 2 | 0 | no marker observed — **DA-5 row 3 governs** |
+| **L1 / WAL / W-A** | 7 | 6 | **200** | **FINDING → NOT CLEARED** (DA-5 row 1) |
+| L1 / WAL / W-B | 7 | 5 | 0 | no marker observed |
+| L2 / both modes / both shapes | 0 | 2–5 | 0 | no marker observed |
+| L3 / both modes / both shapes | 0 | 2–5 | 0 | no marker observed |
+| L4 / DELETE / W-A | 0 | 3 | 0 | no marker observed |
+| **L4 / DELETE / W-B** | 0 | 3 | **15** | **FINDING → NOT CLEARED** (DA-5 row 1) |
+| L4 / WAL / W-A | 0 | 3 | 0 | no marker observed |
+| **L4 / WAL / W-B** | 0 | 6 | **15** | **FINDING → NOT CLEARED** (DA-5 row 1) |
+
+*"durable" means page images the request wrote into the rollback journal or the WAL. "no marker
+observed" is **not** a pass — **DA-5 row 3**: absence alone is not sufficient.*
+
+#### Part one — containment answered the exposure the question asked about
+
+**Under W-A the shared layout made unauthorized content durable and no isolated layout did.** That is
+the direct answer to the question §4.17's page-granularity finding raised: **if the reachable structure
+holds only the subject's own content, the neighbours whose bytes get journalled are the subject's own.**
+
+**The mechanism is exhibited, not asserted.** The artefacts were parsed, **every durable page was
+identified by number and classified individually**, and **every image was verified byte-identical to an
+independently read copy of the store.** **All 6 durable pages in the L1/W-A arms carried both
+authorization classes** — the co-residency is measured, not inferred from the count.
+
+#### Part two — the same isolated topology failed a different way
+
+**L4 made the marker durable 15 times under W-B, with no unauthorized row anywhere in reach.**
+
+**The mechanism is co-residency of BYTES, not of rows.** The dropped partition's pages sit on the free
+list **with their content** — **10 pages at `UNAUTH ×15`** in a store holding **no** unauthorized row —
+the appending write **consumes one**, and **journalling that page writes its original image** into the
+artefact.
+
+**That residue is not itself a finding.** Its provenance is the **re-partition**, not a request —
+**§4.16 DA-4 row 1**. **The finding is what the request then did with it.**
+
+> **This inverts §4.17.** There, **W-A** leaked and **W-B** journalled nothing, on the reasoning that *"a
+> rollback journal holds original images of overwritten pages and appends overwrite none."* **That
+> reasoning was correct — about a store whose free list is empty.** In a re-materialised store **the
+> append does overwrite something: a page the previous partition left behind.** **Same write shape,
+> opposite result, and the difference is the store's history rather than the query.**
+
+**§4.13 N3 makes this the normal case, which is the architectural point.** N3 restores the partition
+invariant on an enumerated transition, and **a W1–W3 topology re-materialises partitions as its ordinary
+operating mode** — so **L4 is not a state such a design rarely occupies; it is where it lives.**
+
+#### Relationship to N1, to N6 and to DA-1 — stated, not restated
+
+**L4 satisfies §4.13 N1 as written.** There is **no unauthorized *entry*** in the reachable structure;
+no query reaches those bytes; **`U` and `Ustruct` are blind to them**, `Ustruct` being an entry counter.
+
+**N1 and DA-1 therefore ask different questions of the same page**: **N1 asks what the structure
+contains; DA-1 (§4.16) asks what the engine writes down.** This section **proposes no amendment to N1**
+— MSG-0158 referred the question rather than answering it, and **the referral was answered by MSG-0160
+(Q19 = YES) and delivered as §4.18 N6.** **The rules live in those sections and are not restated here.**
+
+**Nothing in this section is an N6 measurement.** **N6 did not exist when this evidence was taken.**
+Its measurement is **TASK-0048** and belongs to **MSG-0163** and its own record.
+
+> **One fact recorded so a reader holding both records is not misled, and it changes nothing here:**
+> **MSG-0163's run did not reproduce the L4/W-B arm**, on a fixture that retained **one residue page
+> against the ten measured here**. **This section records what MSG-0158 measured and is not reconciled
+> against that later run** — and by **DA-5 row 3** a later absence is **not** evidence that this
+> presence was wrong.
+
+#### Run validity, and the controls kept structurally separate
+
+**RUN VALIDITY: VALID.** **Two negative controls, one per instrument, both placed on the ISOLATED
+layout** — deliberately, because **a null result under isolation is worthless unless the instrument is
+shown capable of a finding in that layout.**
+
+- **NC-1 / DELETE fired** — journal held 1 page image, `UNAUTH ×60`.
+- **NC-1 / WAL fired** — WAL held 1 frame, `UNAUTH ×61`.
+
+**These are controls, built to produce a finding, so their numbers are not findings about any layout.**
+They appear in **no result row, no verdict and no count of evidence about the subject**, and the probe
+enforces that structurally rather than by convention.
+
+**Distinct from the controls: the instrument checks.** Every parsed page image matched an independently
+read copy of the store. **A control shows the instrument can see a finding; an instrument check shows it
+reports what is actually in the file.**
+
+#### Two apparatus defects, fixed before any result was reported
+
+**Recorded because a promotion that hides its instrument's history is worth less than one that shows
+it.**
+
+1. **The parser required the journal's magic bytes and all four rollback-mode arms returned `MAGIC DID
+   NOT MATCH`, declaring the run INVALID.** **The cause was established rather than named:** read
+   *during* the transaction — the only time the artefact exists — **bytes 0..7 are zero, because the
+   engine writes the magic last** so a torn journal is not mistaken on recovery for a complete one.
+   **The first guess, "the parser is wrong about the format", would have sent the next session to fix
+   offsets that were correct.** **The fix strengthened the check rather than dropping it:**
+   byte-for-byte comparison against an independently read copy — **a header field the engine may
+   legitimately leave blank is a weaker validity test than the bytes themselves.**
+2. **A comparability assertion would have failed the run for being correct.** It asserted that no
+   configuration had unauthorized rows *in reach* — **but that figure is the independent variable**
+   (L1: 200; L2/L3/L4: 0). It confused **what the topology puts within reach** with **what the request
+   touched**. Replaced by the invariant that matters, **measured after every write: rows modified that
+   the subject was not entitled to — 0 in all 16 configurations.**
+
+#### The boundary — limits stated as limits
+
+- **One subject, one allocator, one build.** **§4.6 S10 forbids generalizing to SQLite as a product or
+  to an engine class**, and **§4.15 records that the two available subjects differ in the binding, not
+  the build.**
+- **`secure_delete = 0` and `auto_vacuum = 0`** were the settings measured. **No remedy was tested** —
+  neither pragma, nor `VACUUM`, nor a checkpoint variant — so **none is evaluated or recommended here.**
+- **"No marker observed" is not a pass** anywhere in the table (**DA-5 row 3**).
+- **Byte-scanning sees literal markers**; re-encoded, compressed or encrypted content would be missed.
+- **Filesystem- and device-level residue is outside §4.16 DA-3's scope** and was not measured.
+
+#### What this section does NOT establish
+
+- **Nothing is CLEARED.** **No candidate verdict moves**; every verdict in §4.11, §4.12, §4.14 and
+  §4.17 stands as recorded.
+- **No engine, runtime, provider, model or index technology is selected, adopted, deployed,
+  implemented or preferred.**
+- **No gate changes.** **N1–N6, DA-1…DA-7, E1–E4, G-Q4…G-Q7.8, S1–S11 and strict Shape-1 are untouched
+  by this section.**
+- **No topology is shown to satisfy N6**, and **isolation is not shown to be sufficient** — **part two
+  is the counter-example within the same evidence.**
 
 ---
 
