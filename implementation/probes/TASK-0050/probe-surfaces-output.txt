@@ -1,0 +1,130 @@
+
+==============================================================================================
+TASK-0050 part 2 · the surfaces exercised · disarmed before armed · §4.15 conditions applied
+==============================================================================================
+subject: SQLite via node:sqlite — the subject every Shape-1 measurement was taken on
+no install · no subprocess · no network · in-memory database only
+
+==============================================================================================
+A — setAuthorizer
+==============================================================================================
+
+--- A.0  CONTROL — is the instrument actually WIRED to the engine, or is it a no-op? --------
+   Without this, "the authorizer reported nothing" and "the authorizer was never running"
+   are the same observation — F15's rule, applied to a callback instead of a pragma.
+   The control: an authorizer that DENIES must make a statement FAIL to prepare. A no-op
+   cannot do that. Kept structurally separate (MSG-0156).
+      prepare under a DENY-ing authorizer threw: true — Error: not authorized
+      -> instrument is WIRED TO THE ENGINE
+
+--- A.1  DISARMED — no authorizer installed; the sink must stay empty -----------------------
+      events captured while DISARMED : 0
+      silent?                        : YES — the instrument is valid for this run
+
+--- A.2  ARMED path 1 — unauthorized text bound as a PARAMETER (§4.15's exact probe) --------
+      rows in fixture        : 200   (100 authorized + 100 unauthorized)
+      rows returned          : 1
+      events at PREPARE      : 3
+      events at EXECUTE      : 0
+      total events           : 3
+      unauthorized-marker occurrences in the captured events: *** 0 ***
+      the events themselves, in full:
+         [21,null,null,null,null]
+         [20,"chunk","id","main",null]
+         [20,"chunk","body","main",null]
+
+--- A.3  ARMED path 2 — the same text INLINED. A surface that survives A.2 is not thereby clean. 
+      rows returned          : 0
+      total events           : 3
+      inline-marker occurrences in the captured events: *** 0 ***
+      the events themselves, in full:
+         [21,null,null,null,null]
+         [20,"chunk","id","main",null]
+         [20,"chunk","body","main",null]
+
+--- A.4  Does the surface record what the engine EXAMINED?  (C4) ----------------------------
+   §4.6 S5: a count proves only that something crossed the point the instrument sits at.
+   If the event count does not move with the collection size, the surface is not counting
+   units examined — it is describing the instruction.
+      rows=  200   events at prepare=  3   events total=  3
+      rows= 1000   events at prepare=  3   events total=  3
+      rows= 5000   events at prepare=  3   events total=  3
+   -> if those three event counts are identical while the row count grows 25x, the surface
+      is INVARIANT WITH N and therefore cannot measure `U`.
+
+--- A.5  Second identical execution — §4.15 observed 0 events on re-execution; checked here too 
+      events on an identical SECOND execution of the SAME prepared statement: 0
+      -> a prepare-time surface says nothing at all about a statement that is re-run.
+
+==============================================================================================
+B — sourceSQL vs expandedSQL: is adversity a property of the SURFACE or of the ENGINE?
+==============================================================================================
+§4.15: the second subject's trace was adverse because "the trace emits the EXPANDED
+statement, so binding a parameter does not keep the text out of it." Whether that is a
+property of that binding or of statement observability generally was NOT established.
+
+This subject exposes BOTH forms as separate accessors, so the question is measurable here.
+
+--- B.1  DISARMED — the accessors read on a statement no unauthorized text has passed through 
+      sourceSQL   : "SELECT id FROM chunk WHERE scope = ?"
+      expandedSQL : "SELECT id FROM chunk WHERE scope = NULL"
+      marker hits : param 0, inline 0
+      silent?     : YES — valid for this run
+
+--- B.2  ARMED path 1 — unauthorized text bound as a PARAMETER ------------------------------
+      rows returned : 1
+      sourceSQL     : "SELECT id FROM chunk WHERE body = ?"
+         marker hits: 0
+      expandedSQL   : "SELECT id FROM chunk WHERE body = 'ZZ-UNAUTHORIZED-PASSAGE-TEXT-ZZ body 7'"
+         marker hits: 1
+
+--- B.3  ARMED path 2 — the same text INLINED -----------------------------------------------
+      rows returned : 0
+      sourceSQL     : "SELECT id FROM chunk WHERE body = 'ZZ-UNAUTH-INLINE-TEXT-ZZ body 7'"
+         marker hits: 1
+      expandedSQL   : "SELECT id FROM chunk WHERE body = 'ZZ-UNAUTH-INLINE-TEXT-ZZ body 7'"
+         marker hits: 1
+
+--- B.4  Is either accessor a LOG?  (C1 — E4 asks about the engine's own LOGS) --------------
+   A log accumulates entries about operations that have happened. These accessors return the
+   text of ONE statement object the caller is already holding. Measured, not asserted:
+      after running two different statements, s1.sourceSQL is: "SELECT id FROM chunk WHERE id = 1"
+      -> it carries s1 only. There is no accumulated record, and nothing to inspect for a
+         statement the caller did not keep a handle on.
+
+==============================================================================================
+C — createTagStore: the one member of this binding that ACCUMULATES
+==============================================================================================
+
+--- C.1  DISARMED — the store before anything has passed through it -------------------------
+      size     : 0
+      capacity : 1000
+      silent?  : YES — valid for this run
+
+--- C.2  ARMED — unauthorized text through the store's own API ------------------------------
+      rows returned : 1
+      size after    : 1   -> the store ACCUMULATES; it is not a per-statement accessor
+      second query rows : 0
+      size after        : 2
+
+--- C.3  CAN THE ACCUMULATED CONTENT BE INSPECTED FOR PASSAGE TEXT?  (C3) -------------------
+   Every read path this binding offers, tried rather than assumed:
+      Object.getOwnPropertyNames(store)   : returned — capacity, db, size
+                                            marker hits: param 0, inline 0
+      prototype members                   : returned — get, all, iterate, run, clear
+                                            marker hits: param 0, inline 0
+      JSON.stringify(store)               : returned — {"capacity":1000,"db":{"isOpen":true,"isTransaction":false,"limits":{"length":1000000000,"sqlLength":1000000000,"column":2000,"exprDepth":1000,"compou
+                                            marker hits: param 0, inline 0
+      store.iterate() as an enumerator    : THREW — TypeError: First argument must be an array of strings (template literal).
+      store[Symbol.iterator]              : THREW — TypeError: ts is not iterable
+      store.entries()                     : THREW — TypeError: ts.entries is not a function or its return value is not iterable
+      store.get() as an accessor          : THREW — TypeError: First argument must be an array of strings (template literal).
+
+   NOTE — the store's API is tagged-template only. An interpolation ALWAYS becomes a bound
+   parameter, so unauthorized text cannot be INLINED through it even deliberately. That is a
+   property of the caller-side API, not evidence about what the engine retains.
+
+==============================================================================================
+D — SUMMARY OF WHAT WAS OBSERVED (findings only; no verdict is invented here)
+==============================================================================================
+Recorded in the execution record with §4.15's C1–C4 applied to each surface.
