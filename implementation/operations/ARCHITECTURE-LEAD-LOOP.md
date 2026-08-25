@@ -142,3 +142,38 @@ active is **UNKNOWN** to this loop and must be reported as unknown, never assume
 
 **The operator is needed for decisions that are genuinely theirs — rulings, authorizations, privileged
 actions, and credentials. They are not needed to relay technical facts between two Claude sessions.**
+
+---
+
+## 9. The Routine itself — identity, and how to stop it
+
+**Recorded here because a future session must be able to find and disable this loop from the
+repository alone.** A running automation whose control surface exists only in someone's chat history
+is not operable.
+
+| | |
+|---|---|
+| **Name** | `PCI Architecture Lead Loop` |
+| **Trigger ID** | `trig_01PpjCrtoEUZnF3vPACBPfCW` |
+| **Schedule** | `23 * * * *` — hourly at :23, offset from the Supervisor's ten-minute cadence |
+| **Mode** | fresh Claude session per firing (`create_new_session_on_fire`) |
+| **Environment** | `env_01MwRiYLdHr7efifdENLpoUg` |
+| **Created** | 2026-08-25T21:29:57Z, **enabled**; first run 2026-08-25T22:23:00Z |
+| **Notifications** | push to the operator on a noteworthy completion |
+| **Authority** | **MSG-0166** |
+
+**To pause it:** `update_trigger` with `enabled: false`. **To remove it:** `delete_trigger`. **To run
+one cycle out of schedule:** `fire_trigger`. **Pausing is reversible and is the right first move if
+the loop misbehaves** — deletion discards the run history.
+
+**Known limitation, verified at creation:** the Routine **stores no MCP connectors**, so its sessions
+run **without `mcp__github__*` tools**. **This loop is designed for that** — every repository
+operation in §3 uses the `git` CLI over HTTPS, not the GitHub MCP server. **If a future cycle needs
+GitHub API access** (issues, PRs, checks), it does **not** have it and must **record that as a
+limitation rather than route around it.**
+
+**Status: INSTALLED, NOT PROVEN.** No cycle has run as of `ca13125`. **The first firing must establish
+what MSG-0166 §7 lists** — that the session reaches the repository, reads its rules, no-ops correctly
+when nothing changed, and aborts rather than merges when `main` moves. **Until a record says
+otherwise, treat the start path as unverified**, exactly as MSG-0011 → MSG-0029 → MSG-0032 treated the
+Supervisor's.
