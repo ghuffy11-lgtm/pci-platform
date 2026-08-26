@@ -211,13 +211,38 @@ the denied client-side check would only have observed.
 ## 9. Verification from `origin/main`
 
 ```text
-(pushed and read back — see §9 of the checkpoint for the full transcript)
+git push origin main
+  4ef6533..6083b0d  main -> main            (FAST-FORWARD)
+
+git rev-parse HEAD origin/main
+  6083b0dc78a2f002f3138c71bc56a15d7d0c68a5
+  6083b0dc78a2f002f3138c71bc56a15d7d0c68a5
+
+git diff --numstat 0eaa975 origin/main -- implementation/architecture/
+  178  0  implementation/architecture/EPA-0006-assistant-technology-evaluation.md
+
+git diff --name-only 0eaa975 origin/main -- docs/
+  (empty)
 ```
 
-**The full quoted transcript — push refs, `git rev-parse HEAD origin/main`, the `origin/main` read-back
-of the new headings, and the `--numstat` taken against `origin/main` — is in
-`implementation/operations/checkpoints/TASK-0052.md`, checkpoint 2**, and is not duplicated here so that
-one transcript has one home.
+**Additivity was checked LINE BY LINE against the published file, not inferred from the numstat.** The
+pre-change file was extracted at `0eaa975`, the post-change file read back from `origin/main`, and the
+two compared directly:
+
+```text
+deleted lines (present at 0eaa975, absent on origin/main)   -> NONE
+added line numbers on origin/main
+  -> 1924, 1932–1961, 2679–2695, 2727–2816, 2981–3002, 3239–3256      (178 lines)
+```
+
+**This is the mechanical proof of §1's first bullet, and it is stronger than a restatement.** **§4.6
+spans lines 364–655 and is unmoved, because no line before 1924 was added or removed** — so **no hunk
+touches §4.6 S6's table**, and the claim is re-checkable by anyone holding the two revisions rather than
+taken on trust. **The two derived comparison files were removed afterwards and `git status --short` is
+empty.**
+
+**The `origin/main` read-back of the four insertion points, and the full queue-parser output, are in
+`implementation/operations/checkpoints/TASK-0052.md`, checkpoint 2** — one transcript, one home.
 
 ---
 
