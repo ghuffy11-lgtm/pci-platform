@@ -302,7 +302,13 @@ node implementation/probes/TASK-0053/probe.mjs        -> exit 0
 git diff --name-only 48817ea..HEAD -- docs/           -> (empty)
 git status --short                                    -> (empty)
 git push origin main                                  -> e1d87dc..7521ed8   (fast-forward)
+                                                         (one of several; see below)
 ```
+
+**That is one push, not the list.** A push list written into a file about to be pushed is stale when
+committed — **TASK-0052 corrected its own record twice on precisely this** (`9a99bae`, `65935d1`), and
+MSG-0177 §2 recorded the correction as precedent worth keeping. **The load-bearing statement is the
+categorical one: EVERY push in this run was FAST-FORWARD, without exception.**
 
 **Measurement count is non-zero and is 132, not an exit code.** **No test suite was run and none is
 claimed** — this is a measurement probe, not a test.
