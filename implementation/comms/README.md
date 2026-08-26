@@ -8,9 +8,9 @@ Every message in this directory, newest first. Each row links to the file. Claud
 register whenever a message is created or its status changes — a message that is not listed here is
 a defect in the record, not a missing message.
 
-**Two disambiguation forms are in use for shared numbers, and both are valid.** ****TEN** numbers have
+**Two disambiguation forms are in use for shared numbers, and both are valid.** ****ELEVEN** numbers have
 been claimed by two files each** — MSG-0020, MSG-0033, MSG-0039, MSG-0046, MSG-0056, MSG-0107,
-MSG-0116, **MSG-0148**, **MSG-0161** and **MSG-0165**. The earliest four are indexed as **`MSG-0020 (a)`**, with a space and
+MSG-0116, **MSG-0148**, **MSG-0161**, **MSG-0165** and **MSG-0173**. The earliest four are indexed as **`MSG-0020 (a)`**, with a space and
 parentheses; the later four as **`MSG-0056a`**, with a bare suffix. **Neither form is wrong and no file
 was renamed** (MSG-0058 F4), but any check matching only one form will report the other set as missing
 from the index when it is not. Verified 2026-08-25: **every message file has a row in this register and
