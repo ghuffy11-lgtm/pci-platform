@@ -32,6 +32,16 @@ channel between you.** Do not ask the operator to relay technical facts (`CLAUDE
 - **"check comms"** is the operator's cue for you to go read GitHub and act. It is **not** the
   executor's `COMMS` command.
 - **Volume is a failure.** A long report of things they already know is worse than silence.
+- **Plain English in chat — ALWAYS, and especially in questions.** The operator asked for this
+  explicitly. **Do not put `E4`, `GAP-B`, `N6`, `Ustruct`, `MSG-0167`, SHAs or section numbers into a
+  question and expect them to carry meaning.** Say what the thing *is*: not *"is E4 satisfiable by an
+  unexpanded statement surface"* but *"is it good enough if the engine can show the query without the
+  secret text filled in?"*
+
+  **This applies to CHAT ONLY. Repository records stay precise and fully referenced** — they are the
+  project's memory and a future session reads them for exact authority. **Two registers, on purpose:
+  plain for the human, exact for the record.** Never simplify a COMMS message, a task definition, or a
+  status line to match the chat voice.
 
 ## 3. Active automation — both are durable and survive this session
 
