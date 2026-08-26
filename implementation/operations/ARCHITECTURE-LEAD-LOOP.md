@@ -213,8 +213,56 @@ operation in §3 uses the `git` CLI over HTTPS, not the GitHub MCP server. **If 
 GitHub API access** (issues, PRs, checks), it does **not** have it and must **record that as a
 limitation rather than route around it.**
 
-**Status: INSTALLED, NOT PROVEN.** No cycle has run as of `ca13125`. **The first firing must establish
-what MSG-0166 §7 lists** — that the session reaches the repository, reads its rules, no-ops correctly
-when nothing changed, and aborts rather than merges when `main` moves. **Until a record says
-otherwise, treat the start path as unverified**, exactly as MSG-0011 → MSG-0029 → MSG-0032 treated the
-Supervisor's.
+## 9.1 Status: PROVEN — and the earlier hangs had a cause worth recording
+
+**Status: PROVEN** as of 2026-08-26. **Superseded text, retained:** *"INSTALLED, NOT PROVEN. No cycle
+has run as of `ca13125`."* That was true when written, and the paragraph below is what replaced it.
+
+**The evidence, VERIFIED in the session that recorded this** by reading the session record directly,
+not carried from a summary:
+
+| | |
+|---|---|
+| **Session** | `session_01Ln4FPnFFC3pE81HCFbEh3F` |
+| **Ran** | `2026-08-26T09:07:27.066253Z` → `2026-08-26T09:10:14.443582Z` |
+| **Ended** | `SESSION_STATUS_IDLE`, bucket `REVIEW_READY` — **completed, blocked on nothing** |
+| **Pushed** | **nothing — which is the correct outcome**, the repository having not moved |
+| **Origin** | `force_run_trigger` (a deliberate out-of-schedule test fire) |
+
+**That discharges MSG-0166 §7's start-path requirement**: the session reached the repository, read its
+rules, and **no-op'd correctly when nothing had changed.** **What it does NOT yet establish is the
+abort path** — no cycle has yet been observed aborting because `main` moved underneath it. **That
+remains UNPROVEN and must not be reported otherwise.**
+
+### Why every earlier firing hung, and the rule that came out of it
+
+**Every scheduled firing before this one died silently at a permission prompt.** **VERIFIED by reading
+the blocked session's record**, not inferred from its silence: `session_01KdygB2vwtYchnsDGEtpN2X`,
+created `07:25:05Z`, stuck from `07:28:33Z` at `SESSION_STATUS_REQUIRES_ACTION` / bucket `BLOCKED`,
+with a **pending Bash approval** for a command whose first clause was:
+
+```text
+cd <scratchpad> && rm -rf pci-platform && git clone …
+```
+
+**The loop was clearing a scratch directory before re-cloning.** In an unattended session **there is
+nobody to approve a destructive command**, so the cycle did not fail — **it waited, indefinitely, and
+reported nothing.** **A hang is indistinguishable from "nothing to do" from the outside**, which is
+the same failure signature as DISC-0013 and DISC-0015 one layer up.
+
+**RULE 0, now in the Routine's own prompt: an unattended cycle NEVER runs a command that needs
+approval.** It clones into `WORKDIR=$(mktemp -d)` — a fresh directory that needs no clearing — and
+**if any command is refused, it stops and records that, rather than waiting.**
+
+**The general lesson, worth more than the fix:** **a scheduled automation must be written so that
+every step it takes is already permitted.** A step that *might* prompt is a step that *will* hang, and
+**silence is the one failure mode no monitor catches.**
+
+### One property observed while verifying, recorded because it bears on §5
+
+**Both sessions report `last_served_model: claude-sonnet-5`.** **The automated Lead cycle is therefore
+NOT served by the same model as the interactive Lead session.** Nothing here depends on that, and it
+is **not** offered as a reason to distrust a cycle's output — **but it is a further reason the §5
+authority boundary is right as written:** the loop verifies, reconciles and records, and **may not
+rule, select, clear or authorize.** **A mechanical-only boundary is sound whatever model executes it,
+which is precisely the property that makes it the correct boundary.**

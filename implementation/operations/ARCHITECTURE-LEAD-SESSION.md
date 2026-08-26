@@ -50,12 +50,24 @@ channel between you.** Do not ask the operator to relay technical facts (`CLAUDE
 | **Lead Loop** | `trig_01PpjCrtoEUZnF3vPACBPfCW` | hourly at `:23`, **fresh session**, runs `ARCHITECTURE-LEAD-LOOP.md` |
 | **Execution Supervisor** | *(not a Routine)* | every 10 min on the operator's Windows machine |
 
-**The Lead Loop is INSTALLED, NOT PROVEN** until a cycle is recorded. Controls: `update_trigger`
-(`enabled: false`) to pause, `delete_trigger` to remove, `fire_trigger` to run one cycle now.
+**The Lead Loop is PROVEN** as of 2026-08-26 — session `session_01Ln4FPnFFC3pE81HCFbEh3F` ran
+`09:07:27Z → 09:10:14Z`, ended **IDLE / REVIEW_READY**, **blocked on nothing**, and **pushed nothing,
+which was correct.** **The abort path is still UNPROVEN** — no cycle has yet been seen aborting
+because `main` moved. **`ARCHITECTURE-LEAD-LOOP.md` §9.1 carries the evidence and the cause of the
+earlier hangs.** *(This line previously read "INSTALLED, NOT PROVEN until a cycle is recorded.")*
+
+**Every scheduled firing before that one HUNG SILENTLY at a permission prompt** — a `rm -rf` in the
+scratch-clearing step, which **nobody is present to approve.** **RULE 0 is now in the Routine's
+prompt: an unattended cycle never runs a command that needs approval**; it clones into
+`WORKDIR=$(mktemp -d)`. **If you ever schedule anything else here, apply the same rule** — a step that
+might prompt is a step that will hang, and **a hang looks exactly like "nothing to do."**
+
+Controls: `update_trigger` (`enabled: false`) to pause, `delete_trigger` to remove, `fire_trigger` to
+run one cycle now.
 
 **Do not create a second Lead Routine.** Check `list_triggers` before scheduling anything.
 
-## 4. Three mistakes the Lead has actually made — do not repeat them
+## 4. Four mistakes the Lead has actually made — do not repeat them
 
 **1. Inventing a commit SHA.** Twice, a full 40-character SHA was typed from nothing into a `Verified
 at HEAD:` line. **Never hand-write a SHA. Always `git rev-parse` it** and substitute programmatically.
@@ -70,7 +82,25 @@ dependency cell is regex-scanned for `TASK-\d{4}` and every ID found must be `CO
 uncommitted** when the executor began. **The executor read the repository and was right.** **Ten
 numbers are now doubly claimed** — check `implementation/comms/README.md` before allocating.
 
-**The pattern behind all three: the repository is the state. An intention held in a session is not.**
+**4. Writing a NEGATED status word into the status cell.** A row was written `AUTHORIZED — NOT READY`
+— which any human reads as *not ready* — and **the Supervisor parses the cell WORD BY WORD with no
+negation handling**, so `\bREADY\b` matched and it parsed as **READY**. It would have **started a
+runner against a prerequisite known to be unmet.** **DISC-0015**, and it is **the mirror image of
+mistake 2**: that one made the Supervisor do nothing when it should have acted; this one would have
+made it act when it must not. **Use `WAITING_FOR_OPERATOR` or `WAITING_FOR_ARCHITECTURE_LEAD`, keep
+ALL prose out of the status cell, and run the pre-push check before pushing ANY board change — not
+only a READY row.** **That is what caught this.**
+
+**The pattern behind all four: the repository is the state. An intention held in a session is not.**
+**And mistakes 2 and 4 share a sharper one — a board cell written in prose and read by a regex will
+keep producing failures that look correct to a human reader.** **Q17 is the open question about that
+mechanism; every one of these is input to it.**
+
+**One more thing worth knowing before you trust the pre-push check: it is NOT a faithful replica of
+the Supervisor.** **Three verified divergences** are recorded in DISC-0015 §5 — mismatched status
+lists, no unrecognised-status check, no `IN_PROGRESS` validation. **None is live today, and it is
+still the best instrument available** — but **a pass is weaker evidence than MSG-0172 §3 assumed when
+it made a pass count as evidence.**
 
 ## 5. Standing boundaries — the ones most easily eroded
 
@@ -95,7 +125,22 @@ numbers are now doubly claimed** — check `implementation/comms/README.md` befo
 3. Read `implementation/operations/CLAUDE-TASKS.md` — the single READY task, if any.
 4. Read every OPEN item in `comms/`, `blockers/`, `discoveries/`.
 
-**State at the time of writing (`9d71790`), to be re-verified, never trusted:** **TASK-0050 is READY**
-— discharge **GAP-B**, the binding constraint on the programme. **Open and unruled: Q21, Q17, Q14, the
-L4/W-B non-reproduction (MSG-0164 §5), MSG-0060.** **Nothing selected, adopted, deployed, implemented
-or cleared.**
+**State at the time of writing (`0e1da66`), to be re-verified, never trusted:** **NO TASK IS READY and
+the queue is correctly empty — do NOT mistake that for a stall and do NOT manufacture work to fill
+it.** **TASK-0055 is authorized and sits at `WAITING_FOR_OPERATOR`**, waiting on two allow-lines the
+operator holds (BLK-0014). **Open blockers: BLK-0012, BLK-0014.** **Open and unruled: Q21, Q17, Q14,
+MSG-0060.** **Q22, Q23, Q24's parent and Q25 are RULED** (MSG-0170, 0171, 0172, 0182). **Thirteen
+probes have cleared nothing; GAP-B UNDISCHARGED; E4 UNMET; nothing selected, adopted, deployed,
+implemented or cleared.**
+
+**The two things genuinely waiting on the operator, and neither is a technical question:** BLK-0014's
+permission line, and — the larger one — **whether to obtain an engine from a different family purely
+as a test subject.** **Every subject in thirteen probes has been SQLite, because it is the only engine
+reachable without an install, and an accumulating readable statement log is not a SQLite feature.**
+**MSG-0182 §7 states it; MSG-0179 §3 item 2 is the alternative if no install is made.**
+
+> **Superseded, retained:** *"State at the time of writing (`9d71790`) … **TASK-0050 is READY** —
+> discharge **GAP-B**, the binding constraint on the programme. **Open and unruled: Q21, Q17, Q14, the
+> L4/W-B non-reproduction (MSG-0164 §5), MSG-0060.**"* **TASK-0050 ran and answered its question: no
+> reachable subject supplies E4 both obtainable and non-adverse.** The L4/W-B non-reproduction was
+> settled by TASK-0053 — **the variable is residue KIND, not density.**
