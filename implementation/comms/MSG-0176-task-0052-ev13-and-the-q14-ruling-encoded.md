@@ -203,8 +203,9 @@ live-read at `0eaa975` immediately before this run began, and local `HEAD` was t
 **That is an observation of a fetch this session did not perform, and it is stated that way
 deliberately.** **It does not cover movement DURING the run.** For that the detector is unchanged and is
 an **interlock rather than a claim**: **a non-fast-forward push rejection**, which is exactly what fired
-in **BLK-0013**. **Both pushes in this task were FAST-FORWARD** (§9), which is the server enforcing what
-the denied client-side check would only have observed.
+in **BLK-0013**. **All three pushes in this task were FAST-FORWARD** — `0eaa975..4ef6533`,
+`4ef6533..6083b0d`, `6083b0d..19875be` — which is the server enforcing what the denied client-side check
+would only have observed.
 
 ---
 
