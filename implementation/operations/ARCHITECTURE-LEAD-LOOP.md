@@ -53,7 +53,12 @@ Run in order. **Stop at the first step whose precondition fails, and record why.
 7. **Write one Lead record** in `implementation/comms/`, carrying the `**Verified at HEAD:**` line.
 8. **Re-fetch `origin/main` and confirm it still equals the starting HEAD.** If it moved — **abort,
    commit nothing, and record the movement** (`CLAUDE.md` § Mid-run repository movement).
-9. **Commit and push.**
+9. **Commit and push to `claude/architecture-lead-loop` — NEVER to `main`.** See §7.
+
+**Working on the branch, mechanically:** fetch both `origin/main` and `origin/claude/architecture-lead-loop`;
+check the Lead branch out (create it from `main` if it does not exist); **merge `main` into it** before
+doing any work, so the cycle sees the executor's latest; then commit and push the branch. **Never
+force-push, never rebase a published branch, and never push `main`.**
 
 ## 4. Verification is adversarial, not clerical
 
@@ -125,7 +130,37 @@ and no-op cycles must leave no trace.
 
 **Bootstrap value:** `83fa7f565421b1ba0be1bd61451c1eca461ce8c7` (`83fa7f5` — TASK-0049 COMPLETE, verified by the Lead in MSG-0166 §1a).
 
-## 7. Concurrency — two loops now write to `main`
+## 7. Concurrency — the Lead NEVER writes to `main` (Q23, MSG-0170)
+
+**RULED 2026-08-26 by the operator: the Lead Loop writes only to `claude/architecture-lead-loop`.
+The operator merges it. The Lead Loop must never push to `main`.**
+
+**Why, from the incident rather than from theory.** On 2026-08-25 the Lead pushed to `main` while the
+executor's runner was mid-task. The runner had committed locally and its push became
+non-fast-forward and was **rejected** (BLK-0013). The Supervisor requires local `HEAD` to equal
+`origin/main`, so it then refused **every cycle for about four and a half hours** —
+`NOOP :: not reconciled: local is ahead by 5 (and behind by 1)` — and **the runner is permitted
+`git push origin main` and no merge or fetch, so it could not free itself.** **Only a human could.**
+
+**MSG-0166 §5 called this a race and treated detect-and-abort as sufficient. It was not.** A race
+resolves itself; **this was a standing deadlock**, and it re-created exactly the human dependency the
+loop existed to remove.
+
+**The consequence of this ruling, stated plainly because it is a real cost:** a queue row the Lead
+Loop writes **does not reach the executor until the operator merges the branch.** The Supervisor reads
+`main`. **So the loop can verify, record and prepare autonomously, but making a task READY still ends
+in a human merge.** That is the price of never colliding, and the operator chose it knowingly.
+
+### The rules that remain
+
+1. **Fetch before writing, re-check before pushing** (§3 steps 2 and 8). **`main` moving mid-cycle is
+   an abort, not a merge.**
+2. **Never force-push, never rewrite published history**, and never resolve a race by overwriting the
+   other side's work.
+3. **The executor's `runner.lock` is not observable from the Lead's environment.** Whether a runner is
+   active is **UNKNOWN** to this loop and must be reported as unknown, never assumed either way.
+
+### Superseded — retained so the reasoning is not lost
 
 The Execution Supervisor may start a runner on its own cadence, and that runner pushes to `main`.
 **`BLK-0009` records a concurrent-session incident already.** Three mitigations, all mandatory:
