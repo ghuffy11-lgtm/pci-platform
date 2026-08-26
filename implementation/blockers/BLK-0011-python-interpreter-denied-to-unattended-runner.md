@@ -8,6 +8,17 @@ permission set was NOT broadened** — the grant was scoped to one task, so a st
 rule would have been wider than the authorization. **The condition this blocker describes therefore
 remains true for future UNATTENDED tasks**, and needs a fresh decision if one requires `py`.
 
+> **CORRECTION 2026-08-26 (MSG-0182 §6) — one finding below is now STALE, and the original text is
+> deliberately NOT rewritten because it was true when recorded.** This record states that **`py -V`**
+> returned *"This command requires approval."* **That is no longer true.** The TASK-0054 runner
+> attempted it once in-session and it **succeeded** (MSG-0181 §6) — VERIFIED by that session, not
+> inferred. **What this does NOT unlock, stated with it:** the only other allowlisted `py` entry is
+> **TASK-0043's own probe path**, so **arbitrary Python remains DENIED** and the second E4 subject
+> still cannot be measured against a new question. **Writing a fresh script into TASK-0043's path to
+> slip under its glob is a workaround and was correctly refused** — that refusal is now a standing
+> rule (MSG-0182 §5). **The three-behaviour diagnosis below remains sound as a method**; only the
+> `py -V` observation has moved.
+
 > **The line this replaces, retained:** "**OPEN** 2026-08-24 — requires an operator decision on this
 > machine's runner permission set. **Nothing was executed, nothing was installed, and no E4 observation
 > of any kind exists**." **True as written.** The stop was correct: the runner recorded the boundary
