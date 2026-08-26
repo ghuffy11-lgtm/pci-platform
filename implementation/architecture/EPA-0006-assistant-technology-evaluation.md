@@ -483,6 +483,18 @@ writer's care: **an unmeasurable stage yields NOT CLEARED by rule.**
 > re-materialisation interval **and** a working ADR-0020 §3 point-2 kernel re-check. **All three are
 > necessary and none is sufficient** — E1–E4 above remain the clearance bar.
 
+> **Declared pointer note, added 2026-08-26 by TASK-0051 (MSG-0171, MSG-0172 §5). This note points; it
+> does not change any cell of the table above, and it adds no row, no evidence class and no gate.**
+> **§4.20 defines `AB-1`, the application-binding requirement** — a condition that applies **where an E4
+> surface is built on the UNEXPANDED statement text**, because that form's non-adversity was **measured
+> to hold only for parameter-bound content and to be defeated by inlining** (MSG-0168 §5.3). **`AB-1`
+> constrains the APPLICATION, not the engine**, which is why it is stated outside this section and
+> outside this bar. **It is a condition a surface must satisfy IN ADDITION to being a log, never a
+> substitute for being one** (MSG-0171 §4). **E4 as stated in the table above is unchanged, unweakened,
+> unnarrowed and unreinterpreted** (MSG-0119), and **`AB-1` clears nothing** — **GAP-B remains
+> UNDISCHARGED and E4 remains UNMET for every candidate**, because a second and independent objection
+> stands: **none of the surfaces measured is a log**.
+
 #### S7 — Instrument placement, and reporting the maximum
 
 Because counts are position-dependent (S5), a probe **must**:
@@ -2983,6 +2995,235 @@ it.**
   by this section.**
 - **No topology is shown to satisfy N6**, and **isolation is not shown to be sufficient** — **part two
   is the counter-example within the same evidence.**
+
+---
+
+### 4.20 The application-binding requirement — AB-1 (TASK-0051, MSG-0171 / MSG-0172 §5)
+
+**Added 2026-08-26 by TASK-0051.** Authority: **MSG-0171** (Q22 = **conditional YES** — *"the condition
+is the ruling"*) and **MSG-0172 §5**, which allocates the label and the section. **This section is
+documentary. Nothing was measured to produce it, nothing was built, nothing was executed, and it
+clears, selects, adopts, compares, deploys and implements nothing.**
+
+> **Read this before anything else in the section.** **`AB-1` DISCHARGES NOTHING.** **GAP-B remains
+> UNDISCHARGED, E4 remains UNMET, all six §4.14 candidates remain NOT CLEARED, and eleven probes have
+> cleared nothing.** §4.20 states an obligation the project has just acquired; **it reports no progress
+> against any gate.**
+
+#### Why this section exists, and why definition comes before anything is built
+
+**MSG-0171 ruled that a statement surface built on the UNEXPANDED statement text may satisfy E4 *only*
+where the project enforces, by an automated check that fails the build, that unauthorized passage
+content is never inlined and is always bound as a parameter.** That obligation **now exists and had no
+definition anywhere in the architecture.**
+
+**The evidence that forces the condition** (MSG-0168 §5.3, reproduced — the measurement is not
+paraphrased away):
+
+| Path | `sourceSQL` (unexpanded) | `expandedSQL` (expanded) |
+|---|---|---|
+| **Parameter-bound** unauthorized text | **0 hits** | **1 hit, VERBATIM** |
+| **Inlined** unauthorized text | **1 hit** | **1 hit** |
+
+**On the inlined path the two forms are IDENTICAL and both adverse.** So the unexpanded form's
+cleanliness *"is contingent on the caller binding rather than inlining — a property of the application,
+not a guarantee the engine provides"* (MSG-0168 §7 consequence 2).
+
+**Which is the whole reason this is a requirement and not a note:**
+
+> **"A property that lives in developer discipline is not a security property at all unless something
+> mechanical enforces it … an enforced check is an interlock; a documented intention is a claim."**
+> — MSG-0171 §2
+
+**And the ordering is TASK-0044's precedent applied again.** A bar written by whoever also builds the
+check is a bar shaped by what that check turned out to catch, and **afterwards the shaping is
+invisible** — the record shows only a requirement and a check that agree. This is **§4.6 S5's asymmetry
+rule applied to the criterion itself** rather than to a counter, exactly as §4.16 applied it.
+
+#### AB-0 — Two structural choices, declared rather than assumed, and the collision check recorded
+
+**Both were ruled by MSG-0172 §5 rather than chosen here. They are restated with their reasoning
+because a reader of this section must be able to see why the label and the placement are what they
+are.**
+
+**Choice 1 — the label is `AB`, and deliberately NOT an `E` number.** `E1–E4` is **§4.6 S6's clearance
+bar**, and **MSG-0148b forbids adding to it** — the same reasoning that made the durability criterion
+`DA` rather than `E5` (§4.16 DA-0, choice 1). **An `E`-number would read as a fifth evidence class no
+matter what its text said**, and a fifth evidence class is precisely what this is not.
+
+**The collision check was performed, not asserted** (task file, required outcome 5). Searched across
+**`docs/`** and **`implementation/architecture/`** for any `AB` token: **zero occurrences in zero
+files** in each tree. Every identifier actually present in this document was then enumerated rather
+than recalled, and checked against `AB`:
+
+| Namespace | Allocated in this record | Collides with `AB`? |
+|---|---|---|
+| `E1–E4` (plus `E5`, appearing only as §4.16's **rejected** label) | E1, E2, E3, E4 | **No** |
+| `S1–S11` | S1…S11, with S7.1–S7.4 | **No** |
+| `U1–U5` | U1…U5 | **No** |
+| `G-Q4…G-Q7.8` | G-Q4, G-Q4.1–G-Q4.4, G-Q5, G-Q5.1–G-Q5.2, G-Q6, G-Q6.1–G-Q6.4, G-Q7, G-Q7.1–G-Q7.6, G-Q7.8 | **No** |
+| `I1–I8` | I0…I8 | **No** |
+| `N1–N6` | N1…N6, with N6.0–N6.3 | **No** |
+| `W1–W4` | W1…W4, and the write shapes W-A / W-B | **No** |
+| `EV1–EV13` | **EV1…EV12 only — see the note below** | **No** |
+| `F1–F16` | F1…F16 | **No** |
+| `DA-1…DA-7` | DA-0…DA-7, with DA-1.1–DA-1.3 | **No** |
+| `GAP-A…GAP-E` | GAP-A…GAP-E | **No** |
+
+> **One thing the enumeration turned up, recorded rather than acted on.** The highest `EV` identifier in
+> this document is **`EV12`**. **`EV13` is ruled by MSG-0172 §2** — N6 joins the EV-list, *"measured,
+> never assumed"* — **and has not yet been written into this record.** **TASK-0051 does not write it**:
+> the task file names the EV13/Q14 update as a separate obligation that this task does **not** perform,
+> **"recorded so they are not silently absorbed."** The gap is therefore **declared, not accidental**,
+> and it remains outstanding.
+
+**Choice 2 — a new section, `§4.20`, and not a home inside any existing criterion.** MSG-0172 §5(b) is
+the reason, and it is a reason about subject matter rather than about tidiness:
+
+> **"Every existing criterion asks what an engine does. `AB-1` asks what the code around the engine is
+> prevented from doing. Housing it inside an engine criterion would misfile it and invite exactly the
+> conflation MSG-0171 §4 warns against — that ruling Q22 discharged something."**
+
+**§4.20 is the next free number.** §4.19 is TASK-0046's promoted evidence and is the last allocated;
+**nothing is renumbered and no number is skipped.**
+
+#### AB-1 — The prohibition
+
+**Stated as a prohibition on the application, in the form §4.16 uses for DA-1: what the application must
+never do, not what it should try to do.**
+
+> **AB-1 — Application binding.** **The application must never place content drawn from the governed
+> corpus into the text of a statement submitted to the retrieval engine.** Such content must be passed
+> **only** as a bound parameter, and **the prohibition must be enforced mechanically rather than
+> observed by convention**, on every path by which the application can reach the projection store.
+
+**Four limbs, kept separate because a deployment can fail any one of them alone** — which is the point
+of stating them separately, and is MSG-0171 §3's *"all of"* made failable:
+
+| | Limb | What it requires |
+|---|---|---|
+| **AB-1.1** | **Automated** | The prohibition is checked by **tooling that runs without a person choosing to run it**. **Review, checklist, code-review convention, style guide and documented practice do not satisfy this limb**, whatever their diligence |
+| **AB-1.2** | **Build-failing** | A violation **stops the build or the pipeline**. **A warning is not enforcement**, a report that must be read is not enforcement, and a check whose failure can be merged past is not enforcement |
+| **AB-1.3** | **Complete over the reachable paths** | The check covers **every path by which the application can reach the projection store** — *"not merely the retrieval component's happy path"* (MSG-0171 §3.3). Migrations, maintenance scripts, admin and diagnostic tooling, background jobs, re-index and rebuild paths, and any second binding or client are inside this limb wherever they can reach the store |
+| **AB-1.4** | **Evidenced by a demonstrated failure** | The check's **operation is demonstrated by a test that is shown to FAIL when an inlined statement is introduced**. **A check nobody has watched reject anything is untested** (MSG-0171 §3.4) |
+
+**AB-1.4 is the limb most likely to be treated as ceremony, and it is not.** **§4.6 S5's asymmetry rule
+applies to the control itself**: a green pipeline is a **zero count**, and a zero count *"proves only
+that nothing unauthorized crossed the point where the instrument sits."* **A check that has never been
+observed rejecting anything is indistinguishable from a check that is misconfigured, scoped to the
+wrong paths, or silently disabled.** This is the same distinction the record has drawn repeatedly
+elsewhere and paid for each time — §4.12's calibration before use, TASK-0048's `fail()` interlock, and
+MSG-0169 §2's finding that *"Run validity: VALID"* was **an assessment rather than an interlock**.
+
+**"Content drawn from the governed corpus" carries §4.6 S4's meaning of the material at issue and
+introduces no new definition of authorization**, and none may be inferred from this section. **The limb
+does not depend on whether the particular content was authorized for the requesting subject**: at the
+point a statement is constructed, **whether the text is unauthorized for someone is not a property the
+constructing code can be relied on to know**, which is why the prohibition is stated over corpus content
+rather than over unauthorized content.
+
+#### AB-2 — The relationship to E4, stated exactly
+
+> **`AB-1` is a condition a surface must satisfy IN ADDITION to being a log. It is never a substitute
+> for being one.** — MSG-0171 §4
+
+**Stated as an ordering, so it cannot be read as a shortcut:**
+
+1. **A candidate E4 surface must first be a log** — an accumulating, inspectable record of the engine's
+   operations. **This is unchanged and is not what AB-1 addresses.**
+2. **Where such a log is built on the UNEXPANDED statement text**, MSG-0171's condition then applies,
+   and **AB-1 is that condition.**
+3. **Where AB-1 is unsatisfied, the unexpanded surface does not satisfy E4** — because its
+   non-adversity is defeated by inlining, and nothing prevents inlining.
+4. **Where AB-1 is satisfied and the surface is still not a log, E4 is still unmet.** **Satisfying
+   AB-1 moves nothing on its own.**
+
+**E4 is not weakened, narrowed or reinterpreted by this section** (MSG-0119). **§4.6 S6's table is
+unchanged, and this section adds no row and no cell to it.** What E4 requires is exactly what it
+required before; **AB-1 states an additional obligation the project carries, and states it outside the
+clearance bar.**
+
+#### AB-3 — What AB-1 does NOT do, and this is the part most likely to be over-read
+
+**MSG-0171 §4's reasoning is reproduced rather than paraphrased away, because the paraphrase is where
+the over-reading would enter.**
+
+**IT DOES NOT DISCHARGE GAP-B, AND IT CLEARS NOTHING.**
+
+Q22 removed **one** objection to the unexpanded surface. **A second, independent objection stands
+untouched and was measured in the same run: none of the surfaces found is a LOG.** MSG-0168 §5 records
+**C1 = NO on every member measured** —
+
+- **`sourceSQL` / `expandedSQL`:** *"per-statement accessors with NO accumulation. After two statements,
+  the first statement's accessor returns only its own text. There is nothing to inspect for any
+  statement the caller did not keep a handle on."*
+- **`createTagStore`:** *"accumulates, and has no read path — every read method tried threw."*
+- **`dbstat`:** *"page statistics, not a record of operations."*
+- **`setAuthorizer`:** *"prepare-time, per column reference, invariant with collection size."*
+- **`sqlite_stmt`, which would have been exactly such a log:** *"absent from the build."*
+
+> **"E4 asks for log inspection. A surface that shows you one statement you are already holding is not a
+> log, and this ruling does not make it one."** — MSG-0171 §4
+
+**Stated item by item, because each is a claim someone could otherwise read this section as supporting:**
+
+| `AB-1` does **not** | Why |
+|---|---|
+| **Discharge GAP-B** | GAP-B asks whether any reachable subject supplies E4 **obtainable and non-adverse**. TASK-0050 answered **no**, and **the log objection is untouched by Q22**. §4.13 still calls GAP-B *"the one to read first"* |
+| **Satisfy E4** | E4 is an evidence class in §4.6 S6. **AB-1 is not in that table and contributes to no Shape-1 verdict** |
+| **Make a non-log surface into a log** | **Accumulation and a read path are properties of the surface.** No requirement on the application creates either |
+| **Clear anything** | **Eleven probes have cleared nothing.** All six §4.14 candidates remain **NOT CLEARED**, and none of those verdicts is touched here |
+| **Show the gate satisfiable** | MSG-0168's referral established the gate is **not shown UNSATISFIABLE**. **That is not the same claim**, and this section makes neither |
+
+#### AB-4 — Evidence semantics, in §4.6 S9's existing vocabulary
+
+**No new verdict vocabulary is created**, on §4.16 DA-5's precedent, so a later check cannot invent its
+own:
+
+| Observation | Verdict on AB-1 |
+|---|---|
+| **An inlined statement carrying corpus content found on any path that can reach the projection store** | **NOT CLEARED**, conclusively. **A single occurrence is sufficient.** No convention, review record or intention rehabilitates it |
+| **A check that exists but only warns, or whose failure can be merged past** | **NOT CLEARED** — AB-1.2 is unsatisfied. **The check's existence is not the requirement; its power to stop the build is** |
+| **A check whose scope does not cover a path that can reach the store** | **NOT CLEARED** for the uncovered path, **whatever the covered paths show** — AB-1.3 |
+| **A passing check that has never been demonstrated to fail on an inlined statement** | **Not sufficient on its own** — AB-1.4, and **§4.6 S5 transfers intact**: a passing run proves nothing about a control that may never fire |
+| **All four limbs demonstrated, including a test observed to FAIL on an introduced inlined statement** | **AB-1 satisfied — and satisfying it clears nothing** (AB-3) |
+
+#### AB-5 — Fail-closed, stated in AB-1's own terms
+
+**Where the enforcement cannot be demonstrated at all — no check exists, its coverage cannot be
+established, or its failure mode has never been observed — the verdict is `NOT CLEARED`, never an
+inferred pass.** This is §4.6 S9's rule (*"`NOT CLEARED` is the required answer wherever evidence is
+absent"*) and §4.16 DA-6's fail-closed interpretation applied to an application control. **Unenforced
+is not clean, and "no inlined statement has been found" is not "none can be written."**
+
+**The current state under that rule, stated plainly:** **none of this is built.** MSG-0171 §3 is
+explicit — *"It is a requirement created by this ruling, not a description of anything that exists."*
+**So AB-1's status today is `NOT CLEARED`, for the project, by AB-5** — and **that costs nothing in
+either direction**, because **no E4 evidence rests on an unexpanded surface, no such surface has been
+found to be a log, and selection is blocked on independent grounds.**
+
+#### What this section does NOT establish
+
+- **Nothing is CLEARED, and nothing could have been.** No measurement was performed under this
+  authorization; **eleven probes have still cleared nothing**, and **all six §4.14 candidates remain
+  NOT CLEARED**.
+- **No check, linter, rule, CI configuration, test or tooling of any kind was written.** **Building the
+  check is a separate authorization that does not exist** (task file, *Constraints*). **AB-1 has been
+  defined and never applied.**
+- **Nothing was measured.** No probe, fixture or harness was written or run, **no test was executed, and
+  no test count is claimed — none could be.**
+- **E1–E4, S1–S11, U1–U5, G-Q4…G-Q7.8, I1–I8, N1–N6, W1–W4, EV1–EV12, F1–F16, DA-1…DA-7 and strict
+  Shape-1 are unchanged by this section**, and **no clearance gate is changed**. **E4 is not weakened**
+  (MSG-0119).
+- **No candidate verdict moves**, and **no verdict recorded anywhere in this document is re-scored.**
+- **No engine, runtime, binding, framework or index technology is named as the bearer of any property**,
+  compared, ranked, preferred, selected, adopted, deployed or implemented.
+- **No ADR is amended or proposed**; `git diff --name-only docs/` is **empty** for this change.
+- **No numeric threshold, benchmark, size, count, interval or figure is introduced.** The only figures
+  in this section are MSG-0168 §5.3's, quoted as the evidence that forces the condition.
+- **The EV13 / Q14 EPA-0006 update (MSG-0172 §1–§2) is NOT performed here**, and **the L4/W-B
+  re-measurement (MSG-0172 §4) is authorized and NOT READY**. Both are recorded as outstanding rather
+  than absorbed.
 
 ---
 
