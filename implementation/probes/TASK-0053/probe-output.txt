@@ -1,0 +1,2139 @@
+TASK-0053 -- re-measure the L4 append arm against a deliberately strong history
+Authority: MSG-0172 §4; the Lead task file TASK-0053-l4-wb-re-measurement.md.
+It settles a contradiction in the evidence base.  It selects, adopts, deploys,
+implements and clears NOTHING, and it changes no gate, invariant or verdict.
+One subject, one build.  §4.6 S10 forbids generalizing any result here.
+
+==============================================================================
+A. SUBJECT, RUNTIME AND THE SETTINGS THAT ARE LOAD-BEARING
+==============================================================================
+  subject / runtime:                                     SQLite 3.51.3 via node:sqlite, node v24.15.0
+  platform:                                              win32
+  default page_size:                                     4096
+  default secure_delete:                                 0
+  default auto_vacuum:                                   0
+  default cache_size:                                    -2000
+
+  secure_delete AND auto_vacuum ARE LOAD-BEARING (§4.18; MSG-0158).  A
+  deployment that zeroes freed pages, or that vacuums after re-partition,
+  would not hold residue at all and the variable under test would not exist.
+  They are READ here rather than assumed, and the run aborts if either is on.
+
+  THE SAME SUBJECT AND BUILD AS BOTH PRIORS.  MSG-0158 and MSG-0163 both
+  record "SQLite 3.51.3 via node:sqlite, node v24.15.0".  That is what makes
+  this run comparable to each of them rather than a third unrelated result.
+
+==============================================================================
+B. THE CONTRADICTION THIS RUN EXISTS TO SETTLE (quoted, not re-measured)
+==============================================================================
+                             TASK-0046 / MSG-0158     TASK-0048 / MSG-0163
+  L4 residue pages           10, each at UNAUTH x15   1
+  L4 append (W-B) finding    LEAKED, 15 occurrences   no finding, any topology
+
+  Both figures are QUOTATIONS from the prior records.  Nothing in section B
+  was measured here, and neither prior record is re-opened or weakened.
+
+  RESIDUE DENSITY IS NOT THE ONLY VARIABLE THAT DIFFERED, and this run says
+  so before it starts.  Read from the two committed harnesses:
+    transition kind     TASK-0046 DROP TABLE      TASK-0048 DELETE FROM
+    page cache          TASK-0046 default         TASK-0048 cache_size = -8
+    verdict basis       TASK-0046 parsed images   TASK-0048 max(parsed, raw)
+  All three are carried here as declared factors or as reported bases, so the
+  reconciliation does not have to assume any of them was immaterial.
+
+==============================================================================
+C. THE PRE-REGISTERED VERDICT RULE -- stated BEFORE any result is seen
+==============================================================================
+  Group every L4 / W-B cell by its MEASURED residue, not by its target:
+  
+      SCARCE     1 <= residue <= 2     (TASK-0048 measured 1)
+      PLENTIFUL  residue >= 10     (TASK-0046 measured 10)
+      ZERO       residue = 0        (the specificity control; excluded from the rule)
+      MIDDLE     otherwise          (reported, and not used by the rule)
+  
+  Let rSCARCE and rPLENTIFUL be the proportion of cells in each band carrying a
+  history-sourced finding.  Then:
+  
+      CONFIRMED   iff rPLENTIFUL > 0 AND rSCARCE = 0
+                      -- the leak appears when residue is plentiful and is absent
+                         when it is scarce, which is exactly the pair of prior
+                         results, and density explains the divergence.
+  
+      REFUTED     iff rPLENTIFUL = 0
+                      -- a deliberately large residue population does NOT
+                         reproduce the leak, so density does not explain
+                         TASK-0046's finding;
+                  OR  iff rSCARCE > 0 AND rSCARCE = rPLENTIFUL
+                      -- the leak occurs at every density including the scarce
+                         one, so density does not explain TASK-0048's silence.
+  
+      UNRESOLVED  in every other case, INCLUDING a partial gradient
+                  (rPLENTIFUL > rSCARCE > 0) and any case where the two journal
+                  modes disagree.  UNRESOLVED IS REPORTED AS UNRESOLVED.
+  
+  A band with no cells makes the result UNRESOLVED: a rule cannot be evaluated
+  on an empty set, and NC-4 gates that case before this rule is reached.
+
+==============================================================================
+D. CALIBRATION -- making residue density a controlled variable, by measurement
+==============================================================================
+  Predecessor size is swept; the residue each one leaves is MEASURED.  The
+  whole curve is printed because the curve is the evidence that the variable
+  is under control, and because a reader can check the chosen points against
+  it rather than take them on trust.
+  Successor partition held constant at 200 rows; predecessor rows padded to 200.
+
+  --- transition = DROP   (TASK-0046's) -------------------------------------
+    predecessor rows   store pages   RESIDUE   of which FREE   of which CO-RESIDENT   live unauth rows
+                 0             7         0               0                      0                 0
+                16             7         0               0                      0                 0
+                32             7         0               0                      0                 0
+                40             7         0               0                      0                 0
+                48             7         1               0                      1                 0
+                56             7         1               0                      1                 0
+                64             7         1               1                      0                 0
+                72             7         1               1                      0                 0
+                80             8         1               1                      0                 0
+                88             8         1               1                      0                 0
+                96             9         2               2                      0                 0
+               112            10         3               3                      0                 0
+               128            11         4               4                      0                 0
+               144            12         5               5                      0                 0
+               160            13         6               6                      0                 0
+               176            14         7               7                      0                 0
+               200            16         9               9                      0                 0
+               300            22        15              15                      0                 0
+               450            32        25              25                      0                 0
+               700            49        42              42                      0                 0
+              1000            69        62              62                      0                 0
+    D0   target  0 residue -> predRows     0
+    D1   target  1 residue -> predRows    48
+    D2   target 10 residue -> predRows   200
+    D3   target 40 residue -> predRows   700
+    F1   target  1 FREE    -> predRows    64   [ADDED after the first pass]
+    F2   target  3 FREE    -> predRows   112   [ADDED after the first pass]
+    F3   target  5 FREE    -> predRows   144   [ADDED after the first pass]
+    F4   target  7 FREE    -> predRows   176   [ADDED after the first pass]
+
+  --- transition = DELETE   (TASK-0048's) -----------------------------------
+    predecessor rows   store pages   RESIDUE   of which FREE   of which CO-RESIDENT   live unauth rows
+                 0             7         0               0                      0                 0
+                16             7         0               0                      0                 0
+                32             7         0               0                      0                 0
+                40             7         0               0                      0                 0
+                48             7         1               0                      1                 0
+                56             7         1               0                      1                 0
+                64             7         1               1                      0                 0
+                72             7         1               1                      0                 0
+                80             8         1               1                      0                 0
+                88             8         1               1                      0                 0
+                96             9         2               2                      0                 0
+               112            10         3               3                      0                 0
+               128            11         4               4                      0                 0
+               144            12         5               5                      0                 0
+               160            13         6               6                      0                 0
+               176            14         7               7                      0                 0
+               200            16         9               9                      0                 0
+               300            22        15              15                      0                 0
+               450            32        25              25                      0                 0
+               700            49        42              42                      0                 0
+              1000            69        62              62                      0                 0
+    D0   target  0 residue -> predRows     0
+    D1   target  1 residue -> predRows    48
+    D2   target 10 residue -> predRows   200
+    D3   target 40 residue -> predRows   700
+    F1   target  1 FREE    -> predRows    64   [ADDED after the first pass]
+    F2   target  3 FREE    -> predRows   112   [ADDED after the first pass]
+    F3   target  5 FREE    -> predRows   144   [ADDED after the first pass]
+    F4   target  7 FREE    -> predRows   176   [ADDED after the first pass]
+
+==============================================================================
+E. THE GRID
+==============================================================================
+  L4 measurement cells:                                  128   (8 densities x 2 transitions x 2 journal modes x 2 write shapes x 2 cache settings)
+  NC-1 mechanism control cells:                          4   (shared projection, W-A; kept structurally separate)
+  total measurements:                                    132
+
+==============================================================================
+F. PER-CELL RESULTS -- residue is reported for EVERY cell (required outcome 1)
+==============================================================================
+  dens transition mode    shape cache    RESIDUE free co-res storePg live  images/carry  markers(parse/raw)  finding
+  D0   DROP       delete  W-A   default        0    0      0       7     0  4/0           0/0               -
+  D0   DROP       delete  W-A   tiny           0    0      0       7     0  4/0           0/0               -
+  D0   DROP       delete  W-B   default        0    0      0       7     0  2/0           0/0               -
+  D0   DROP       delete  W-B   tiny           0    0      0       7     0  2/0           0/0               -
+  D0   DROP       wal     W-A   default        0    0      0       7     0  4/0           0/0               -
+  D0   DROP       wal     W-A   tiny           0    0      0       7     0  4/0           0/0               -
+  D0   DROP       wal     W-B   default        0    0      0       7     0  6/0           0/0               -
+  D0   DROP       wal     W-B   tiny           0    0      0       7     0  7/0           0/0               -
+  D0   DELETE     delete  W-A   default        0    0      0       7     0  4/0           0/0               -
+  D0   DELETE     delete  W-A   tiny           0    0      0       7     0  4/0           0/0               -
+  D0   DELETE     delete  W-B   default        0    0      0       7     0  2/0           0/0               -
+  D0   DELETE     delete  W-B   tiny           0    0      0       7     0  2/0           0/0               -
+  D0   DELETE     wal     W-A   default        0    0      0       7     0  4/0           0/0               -
+  D0   DELETE     wal     W-A   tiny           0    0      0       7     0  4/0           0/0               -
+  D0   DELETE     wal     W-B   default        0    0      0       7     0  6/0           0/0               -
+  D0   DELETE     wal     W-B   tiny           0    0      0       7     0  7/0           0/0               -
+  D1   DROP       delete  W-A   default        1    0      1       7     0  4/1           14/14             HISTORY-SOURCED
+  D1   DROP       delete  W-A   tiny           1    0      1       7     0  4/1           14/14             HISTORY-SOURCED
+  D1   DROP       delete  W-B   default        1    0      1       7     0  2/0           0/0               -
+  D1   DROP       delete  W-B   tiny           1    0      1       7     0  2/0           0/0               -
+  D1   DROP       wal     W-A   default        1    0      1       7     0  4/1           14/14             HISTORY-SOURCED
+  D1   DROP       wal     W-A   tiny           1    0      1       7     0  4/1           14/14             HISTORY-SOURCED
+  D1   DROP       wal     W-B   default        1    0      1       7     0  6/0           0/0               -
+  D1   DROP       wal     W-B   tiny           1    0      1       7     0  7/0           0/0               -
+  D1   DELETE     delete  W-A   default        1    0      1       7     0  4/1           14/14             HISTORY-SOURCED
+  D1   DELETE     delete  W-A   tiny           1    0      1       7     0  4/1           14/14             HISTORY-SOURCED
+  D1   DELETE     delete  W-B   default        1    0      1       7     0  2/0           0/0               -
+  D1   DELETE     delete  W-B   tiny           1    0      1       7     0  2/0           0/0               -
+  D1   DELETE     wal     W-A   default        1    0      1       7     0  4/1           14/14             HISTORY-SOURCED
+  D1   DELETE     wal     W-A   tiny           1    0      1       7     0  4/1           14/14             HISTORY-SOURCED
+  D1   DELETE     wal     W-B   default        1    0      1       7     0  6/0           0/0               -
+  D1   DELETE     wal     W-B   tiny           1    0      1       7     0  7/0           0/0               -
+  D2   DROP       delete  W-A   default        9    9      0      16     0  4/0           0/0               -
+  D2   DROP       delete  W-A   tiny           9    9      0      16     0  4/0           0/0               -
+  D2   DROP       delete  W-B   default        9    9      0      16     0  3/1           15/15             HISTORY-SOURCED
+  D2   DROP       delete  W-B   tiny           9    9      0      16     0  3/1           15/15             HISTORY-SOURCED
+  D2   DROP       wal     W-A   default        9    9      0      16     0  4/0           0/0               -
+  D2   DROP       wal     W-A   tiny           9    9      0      16     0  4/0           0/0               -
+  D2   DROP       wal     W-B   default        9    9      0      16     0  7/1           15/15             HISTORY-SOURCED
+  D2   DROP       wal     W-B   tiny           9    9      0      16     0  7/1           15/15             HISTORY-SOURCED
+  D2   DELETE     delete  W-A   default        9    9      0      16     0  4/0           0/0               -
+  D2   DELETE     delete  W-A   tiny           9    9      0      16     0  4/0           0/0               -
+  D2   DELETE     delete  W-B   default        9    9      0      16     0  3/1           15/15             HISTORY-SOURCED
+  D2   DELETE     delete  W-B   tiny           9    9      0      16     0  3/1           15/15             HISTORY-SOURCED
+  D2   DELETE     wal     W-A   default        9    9      0      16     0  4/0           0/0               -
+  D2   DELETE     wal     W-A   tiny           9    9      0      16     0  4/0           0/0               -
+  D2   DELETE     wal     W-B   default        9    9      0      16     0  7/1           15/15             HISTORY-SOURCED
+  D2   DELETE     wal     W-B   tiny           9    9      0      16     0  7/1           15/15             HISTORY-SOURCED
+  D3   DROP       delete  W-A   default       42   42      0      49     0  4/0           0/0               -
+  D3   DROP       delete  W-A   tiny          42   42      0      49     0  4/0           0/0               -
+  D3   DROP       delete  W-B   default       42   42      0      49     0  3/1           15/15             HISTORY-SOURCED
+  D3   DROP       delete  W-B   tiny          42   42      0      49     0  3/1           15/15             HISTORY-SOURCED
+  D3   DROP       wal     W-A   default       42   42      0      49     0  4/0           0/0               -
+  D3   DROP       wal     W-A   tiny          42   42      0      49     0  4/0           0/0               -
+  D3   DROP       wal     W-B   default       42   42      0      49     0  7/1           15/15             HISTORY-SOURCED
+  D3   DROP       wal     W-B   tiny          42   42      0      49     0  7/1           15/15             HISTORY-SOURCED
+  D3   DELETE     delete  W-A   default       42   42      0      49     0  4/0           0/0               -
+  D3   DELETE     delete  W-A   tiny          42   42      0      49     0  4/0           0/0               -
+  D3   DELETE     delete  W-B   default       42   42      0      49     0  3/1           15/15             HISTORY-SOURCED
+  D3   DELETE     delete  W-B   tiny          42   42      0      49     0  3/1           15/15             HISTORY-SOURCED
+  D3   DELETE     wal     W-A   default       42   42      0      49     0  4/0           0/0               -
+  D3   DELETE     wal     W-A   tiny          42   42      0      49     0  4/0           0/0               -
+  D3   DELETE     wal     W-B   default       42   42      0      49     0  7/1           15/15             HISTORY-SOURCED
+  D3   DELETE     wal     W-B   tiny          42   42      0      49     0  7/1           15/15             HISTORY-SOURCED
+  F1   DROP       delete  W-A   default        1    1      0       7     0  4/0           0/0               -
+  F1   DROP       delete  W-A   tiny           1    1      0       7     0  4/0           0/0               -
+  F1   DROP       delete  W-B   default        1    1      0       7     0  2/1           15/15             HISTORY-SOURCED
+  F1   DROP       delete  W-B   tiny           1    1      0       7     0  2/1           15/15             HISTORY-SOURCED
+  F1   DROP       wal     W-A   default        1    1      0       7     0  4/0           0/0               -
+  F1   DROP       wal     W-A   tiny           1    1      0       7     0  4/0           0/0               -
+  F1   DROP       wal     W-B   default        1    1      0       7     0  6/0           0/0               -
+  F1   DROP       wal     W-B   tiny           1    1      0       7     0  7/0           0/0               -
+  F1   DELETE     delete  W-A   default        1    1      0       7     0  4/0           0/0               -
+  F1   DELETE     delete  W-A   tiny           1    1      0       7     0  4/0           0/0               -
+  F1   DELETE     delete  W-B   default        1    1      0       7     0  2/1           15/15             HISTORY-SOURCED
+  F1   DELETE     delete  W-B   tiny           1    1      0       7     0  2/1           15/15             HISTORY-SOURCED
+  F1   DELETE     wal     W-A   default        1    1      0       7     0  4/0           0/0               -
+  F1   DELETE     wal     W-A   tiny           1    1      0       7     0  4/0           0/0               -
+  F1   DELETE     wal     W-B   default        1    1      0       7     0  6/0           0/0               -
+  F1   DELETE     wal     W-B   tiny           1    1      0       7     0  7/0           0/0               -
+  F2   DROP       delete  W-A   default        3    3      0      10     0  4/0           0/0               -
+  F2   DROP       delete  W-A   tiny           3    3      0      10     0  4/0           0/0               -
+  F2   DROP       delete  W-B   default        3    3      0      10     0  3/1           15/15             HISTORY-SOURCED
+  F2   DROP       delete  W-B   tiny           3    3      0      10     0  3/1           15/15             HISTORY-SOURCED
+  F2   DROP       wal     W-A   default        3    3      0      10     0  4/0           0/0               -
+  F2   DROP       wal     W-A   tiny           3    3      0      10     0  4/0           0/0               -
+  F2   DROP       wal     W-B   default        3    3      0      10     0  6/0           0/0               -
+  F2   DROP       wal     W-B   tiny           3    3      0      10     0  7/0           0/0               -
+  F2   DELETE     delete  W-A   default        3    3      0      10     0  4/0           0/0               -
+  F2   DELETE     delete  W-A   tiny           3    3      0      10     0  4/0           0/0               -
+  F2   DELETE     delete  W-B   default        3    3      0      10     0  3/1           15/15             HISTORY-SOURCED
+  F2   DELETE     delete  W-B   tiny           3    3      0      10     0  3/1           15/15             HISTORY-SOURCED
+  F2   DELETE     wal     W-A   default        3    3      0      10     0  4/0           0/0               -
+  F2   DELETE     wal     W-A   tiny           3    3      0      10     0  4/0           0/0               -
+  F2   DELETE     wal     W-B   default        3    3      0      10     0  6/0           0/0               -
+  F2   DELETE     wal     W-B   tiny           3    3      0      10     0  7/0           0/0               -
+  F3   DROP       delete  W-A   default        5    5      0      12     0  4/0           0/0               -
+  F3   DROP       delete  W-A   tiny           5    5      0      12     0  4/0           0/0               -
+  F3   DROP       delete  W-B   default        5    5      0      12     0  3/1           15/15             HISTORY-SOURCED
+  F3   DROP       delete  W-B   tiny           5    5      0      12     0  3/1           15/15             HISTORY-SOURCED
+  F3   DROP       wal     W-A   default        5    5      0      12     0  4/0           0/0               -
+  F3   DROP       wal     W-A   tiny           5    5      0      12     0  4/0           0/0               -
+  F3   DROP       wal     W-B   default        5    5      0      12     0  7/1           15/15             HISTORY-SOURCED
+  F3   DROP       wal     W-B   tiny           5    5      0      12     0  7/1           15/15             HISTORY-SOURCED
+  F3   DELETE     delete  W-A   default        5    5      0      12     0  4/0           0/0               -
+  F3   DELETE     delete  W-A   tiny           5    5      0      12     0  4/0           0/0               -
+  F3   DELETE     delete  W-B   default        5    5      0      12     0  3/1           15/15             HISTORY-SOURCED
+  F3   DELETE     delete  W-B   tiny           5    5      0      12     0  3/1           15/15             HISTORY-SOURCED
+  F3   DELETE     wal     W-A   default        5    5      0      12     0  4/0           0/0               -
+  F3   DELETE     wal     W-A   tiny           5    5      0      12     0  4/0           0/0               -
+  F3   DELETE     wal     W-B   default        5    5      0      12     0  7/1           15/15             HISTORY-SOURCED
+  F3   DELETE     wal     W-B   tiny           5    5      0      12     0  7/1           15/15             HISTORY-SOURCED
+  F4   DROP       delete  W-A   default        7    7      0      14     0  4/0           0/0               -
+  F4   DROP       delete  W-A   tiny           7    7      0      14     0  4/0           0/0               -
+  F4   DROP       delete  W-B   default        7    7      0      14     0  3/1           15/15             HISTORY-SOURCED
+  F4   DROP       delete  W-B   tiny           7    7      0      14     0  3/1           15/15             HISTORY-SOURCED
+  F4   DROP       wal     W-A   default        7    7      0      14     0  4/0           0/0               -
+  F4   DROP       wal     W-A   tiny           7    7      0      14     0  4/0           0/0               -
+  F4   DROP       wal     W-B   default        7    7      0      14     0  7/1           15/15             HISTORY-SOURCED
+  F4   DROP       wal     W-B   tiny           7    7      0      14     0  7/1           15/15             HISTORY-SOURCED
+  F4   DELETE     delete  W-A   default        7    7      0      14     0  4/0           0/0               -
+  F4   DELETE     delete  W-A   tiny           7    7      0      14     0  4/0           0/0               -
+  F4   DELETE     delete  W-B   default        7    7      0      14     0  3/1           15/15             HISTORY-SOURCED
+  F4   DELETE     delete  W-B   tiny           7    7      0      14     0  3/1           15/15             HISTORY-SOURCED
+  F4   DELETE     wal     W-A   default        7    7      0      14     0  4/0           0/0               -
+  F4   DELETE     wal     W-A   tiny           7    7      0      14     0  4/0           0/0               -
+  F4   DELETE     wal     W-B   default        7    7      0      14     0  7/1           15/15             HISTORY-SOURCED
+  F4   DELETE     wal     W-B   tiny           7    7      0      14     0  7/1           15/15             HISTORY-SOURCED
+
+==============================================================================
+G. THE ARM UNDER TEST -- L4 / W-B, the appending write, by residue band
+==============================================================================
+
+  --- W-B  (append -- the arm under test) -----------------------------------
+    band        cells   history-sourced findings   residue range
+    ZERO            8                         0   0
+    SCARCE         16                         4   1
+    MIDDLE         32                        28   3-9
+    PLENTIFUL       8                         8   42
+
+  --- W-B  (append -- the arm under test) -- by journal mode ----------------
+    delete  SCARCE      4 of 8
+    delete  PLENTIFUL   4 of 4
+    wal     SCARCE      0 of 8
+    wal     PLENTIFUL   4 of 4
+
+  --- W-A  (access accounting -- carried for comparability) -----------------
+    band        cells   history-sourced findings   residue range
+    ZERO            8                         0   0
+    SCARCE         16                         8   1
+    MIDDLE         32                         0   3-9
+    PLENTIFUL       8                         0   42
+
+  --- W-A  (access accounting -- carried for comparability) -- by journal mode 
+    delete  SCARCE      4 of 8
+    delete  PLENTIFUL   0 of 4
+    wal     SCARCE      4 of 8
+    wal     PLENTIFUL   0 of 4
+
+==============================================================================
+H. N6 LIMBS, PER CELL (DA-5 vocabulary, unchanged)
+==============================================================================
+
+  D0-DROP-delete-W-A-default   residue 0 page(s), live unauthorized rows 0
+    artefact:                                            PRESENT, 16928 bytes
+    baseline attributable (DA-4):                        YES -- NEVER CREATED before the request
+    N6.1 + N6.2:                                         no finding (not sufficient alone, DA-5 row 3)
+    N6.3 history within the invariant:                   satisfied on this measurement (no residue found)
+    scoring bases agree (parse vs raw):                  yes
+    basis:                                               the artefact was inspected and carried no unauthorized bytes
+    residue pages in the store (pgno:markers):           none
+    page images the request made durable:                3:AUTH-only  4:AUTH-only  5:AUTH-only  6:AUTH-only
+    NC-6 parser check:                                   4 of 4 images byte-identical to an independent copy
+    other in-scope artefacts:                            -shm: NEVER CREATED  |  -wal: NEVER CREATED  |  -journal: NEVER CREATED
+
+  D0-DROP-delete-W-A-tiny   residue 0 page(s), live unauthorized rows 0
+    artefact:                                            PRESENT, 19976 bytes
+    baseline attributable (DA-4):                        YES -- NEVER CREATED before the request
+    N6.1 + N6.2:                                         no finding (not sufficient alone, DA-5 row 3)
+    N6.3 history within the invariant:                   satisfied on this measurement (no residue found)
+    scoring bases agree (parse vs raw):                  yes
+    basis:                                               the artefact was inspected and carried no unauthorized bytes
+    residue pages in the store (pgno:markers):           none
+    page images the request made durable:                3:AUTH-only  4:AUTH-only  5:AUTH-only  6:AUTH-only
+    NC-6 parser check:                                   4 of 4 images byte-identical to an independent copy
+    other in-scope artefacts:                            -shm: NEVER CREATED  |  -wal: NEVER CREATED  |  -journal: NEVER CREATED
+
+  D0-DROP-delete-W-B-default   residue 0 page(s), live unauthorized rows 0
+    artefact:                                            PRESENT, 8720 bytes
+    baseline attributable (DA-4):                        YES -- NEVER CREATED before the request
+    N6.1 + N6.2:                                         no finding (not sufficient alone, DA-5 row 3)
+    N6.3 history within the invariant:                   satisfied on this measurement (no residue found)
+    scoring bases agree (parse vs raw):                  yes
+    basis:                                               the artefact was inspected and carried no unauthorized bytes
+    residue pages in the store (pgno:markers):           none
+    page images the request made durable:                7:neither  1:neither
+    NC-6 parser check:                                   2 of 2 images byte-identical to an independent copy
+    other in-scope artefacts:                            -shm: NEVER CREATED  |  -wal: NEVER CREATED  |  -journal: NEVER CREATED
+
+  D0-DROP-delete-W-B-tiny   residue 0 page(s), live unauthorized rows 0
+    artefact:                                            PRESENT, 9728 bytes
+    baseline attributable (DA-4):                        YES -- NEVER CREATED before the request
+    N6.1 + N6.2:                                         no finding (not sufficient alone, DA-5 row 3)
+    N6.3 history within the invariant:                   satisfied on this measurement (no residue found)
+    scoring bases agree (parse vs raw):                  yes
+    basis:                                               the artefact was inspected and carried no unauthorized bytes
+    residue pages in the store (pgno:markers):           none
+    page images the request made durable:                7:neither  1:neither
+    NC-6 parser check:                                   2 of 2 images byte-identical to an independent copy
+    other in-scope artefacts:                            -shm: NEVER CREATED  |  -wal: NEVER CREATED  |  -journal: NEVER CREATED
+
+  D0-DROP-wal-W-A-default   residue 0 page(s), live unauthorized rows 0
+    artefact:                                            PRESENT, 16512 bytes
+    baseline attributable (DA-4):                        YES -- PRESENT BUT EMPTY (0 bytes) before the request
+    N6.1 + N6.2:                                         no finding (not sufficient alone, DA-5 row 3)
+    N6.3 history within the invariant:                   satisfied on this measurement (no residue found)
+    scoring bases agree (parse vs raw):                  yes
+    basis:                                               the artefact was inspected and carried no unauthorized bytes
+    residue pages in the store (pgno:markers):           none
+    page images the request made durable:                3:AUTH-only  4:AUTH-only  5:AUTH-only  6:AUTH-only
+    NC-6 parser check:                                   4 of 4 images byte-identical to an independent copy
+    other in-scope artefacts:                            -shm: 32768 bytes  |  -wal: 0 bytes  |  -journal: NEVER CREATED
+
+  D0-DROP-wal-W-A-tiny   residue 0 page(s), live unauthorized rows 0
+    artefact:                                            PRESENT, 16512 bytes
+    baseline attributable (DA-4):                        YES -- PRESENT BUT EMPTY (0 bytes) before the request
+    N6.1 + N6.2:                                         no finding (not sufficient alone, DA-5 row 3)
+    N6.3 history within the invariant:                   satisfied on this measurement (no residue found)
+    scoring bases agree (parse vs raw):                  yes
+    basis:                                               the artefact was inspected and carried no unauthorized bytes
+    residue pages in the store (pgno:markers):           none
+    page images the request made durable:                3:AUTH-only  4:AUTH-only  5:AUTH-only  6:AUTH-only
+    NC-6 parser check:                                   4 of 4 images byte-identical to an independent copy
+    other in-scope artefacts:                            -shm: 32768 bytes  |  -wal: 0 bytes  |  -journal: NEVER CREATED
+
+  D0-DROP-wal-W-B-default   residue 0 page(s), live unauthorized rows 0
+    artefact:                                            PRESENT, 24752 bytes
+    baseline attributable (DA-4):                        YES -- PRESENT BUT EMPTY (0 bytes) before the request
+    N6.1 + N6.2:                                         no finding (not sufficient alone, DA-5 row 3)
+    N6.3 history within the invariant:                   satisfied on this measurement (no residue found)
+    scoring bases agree (parse vs raw):                  yes
+    basis:                                               the artefact was inspected and carried no unauthorized bytes
+    residue pages in the store (pgno:markers):           none
+    page images the request made durable:                1:neither  7:AUTH-only  8:AUTH-only  9:AUTH-only  10:AUTH-only  11:AUTH-only
+    NC-6 parser check:                                   6 of 6 images byte-identical to an independent copy
+    other in-scope artefacts:                            -shm: 32768 bytes  |  -wal: 0 bytes  |  -journal: NEVER CREATED
+
+  D0-DROP-wal-W-B-tiny   residue 0 page(s), live unauthorized rows 0
+    artefact:                                            PRESENT, 28872 bytes
+    baseline attributable (DA-4):                        YES -- PRESENT BUT EMPTY (0 bytes) before the request
+    N6.1 + N6.2:                                         no finding (not sufficient alone, DA-5 row 3)
+    N6.3 history within the invariant:                   satisfied on this measurement (no residue found)
+    scoring bases agree (parse vs raw):                  yes
+    basis:                                               the artefact was inspected and carried no unauthorized bytes
+    residue pages in the store (pgno:markers):           none
+    page images the request made durable:                8:AUTH-only  9:AUTH-only  11:AUTH-only  10:AUTH-only  1:neither  7:AUTH-only  11:AUTH-only
+    NC-6 parser check:                                   6 of 6 images byte-identical to an independent copy
+    other in-scope artefacts:                            -shm: 32768 bytes  |  -wal: 0 bytes  |  -journal: NEVER CREATED
+
+  D0-DELETE-delete-W-A-default   residue 0 page(s), live unauthorized rows 0
+    artefact:                                            PRESENT, 16928 bytes
+    baseline attributable (DA-4):                        YES -- NEVER CREATED before the request
+    N6.1 + N6.2:                                         no finding (not sufficient alone, DA-5 row 3)
+    N6.3 history within the invariant:                   satisfied on this measurement (no residue found)
+    scoring bases agree (parse vs raw):                  yes
+    basis:                                               the artefact was inspected and carried no unauthorized bytes
+    residue pages in the store (pgno:markers):           none
+    page images the request made durable:                3:AUTH-only  4:AUTH-only  5:AUTH-only  6:AUTH-only
+    NC-6 parser check:                                   4 of 4 images byte-identical to an independent copy
+    other in-scope artefacts:                            -shm: NEVER CREATED  |  -wal: NEVER CREATED  |  -journal: NEVER CREATED
+
+  D0-DELETE-delete-W-A-tiny   residue 0 page(s), live unauthorized rows 0
+    artefact:                                            PRESENT, 19976 bytes
+    baseline attributable (DA-4):                        YES -- NEVER CREATED before the request
+    N6.1 + N6.2:                                         no finding (not sufficient alone, DA-5 row 3)
+    N6.3 history within the invariant:                   satisfied on this measurement (no residue found)
+    scoring bases agree (parse vs raw):                  yes
+    basis:                                               the artefact was inspected and carried no unauthorized bytes
+    residue pages in the store (pgno:markers):           none
+    page images the request made durable:                3:AUTH-only  4:AUTH-only  5:AUTH-only  6:AUTH-only
+    NC-6 parser check:                                   4 of 4 images byte-identical to an independent copy
+    other in-scope artefacts:                            -shm: NEVER CREATED  |  -wal: NEVER CREATED  |  -journal: NEVER CREATED
+
+  D0-DELETE-delete-W-B-default   residue 0 page(s), live unauthorized rows 0
+    artefact:                                            PRESENT, 8720 bytes
+    baseline attributable (DA-4):                        YES -- NEVER CREATED before the request
+    N6.1 + N6.2:                                         no finding (not sufficient alone, DA-5 row 3)
+    N6.3 history within the invariant:                   satisfied on this measurement (no residue found)
+    scoring bases agree (parse vs raw):                  yes
+    basis:                                               the artefact was inspected and carried no unauthorized bytes
+    residue pages in the store (pgno:markers):           none
+    page images the request made durable:                7:neither  1:neither
+    NC-6 parser check:                                   2 of 2 images byte-identical to an independent copy
+    other in-scope artefacts:                            -shm: NEVER CREATED  |  -wal: NEVER CREATED  |  -journal: NEVER CREATED
+
+  D0-DELETE-delete-W-B-tiny   residue 0 page(s), live unauthorized rows 0
+    artefact:                                            PRESENT, 9728 bytes
+    baseline attributable (DA-4):                        YES -- NEVER CREATED before the request
+    N6.1 + N6.2:                                         no finding (not sufficient alone, DA-5 row 3)
+    N6.3 history within the invariant:                   satisfied on this measurement (no residue found)
+    scoring bases agree (parse vs raw):                  yes
+    basis:                                               the artefact was inspected and carried no unauthorized bytes
+    residue pages in the store (pgno:markers):           none
+    page images the request made durable:                7:neither  1:neither
+    NC-6 parser check:                                   2 of 2 images byte-identical to an independent copy
+    other in-scope artefacts:                            -shm: NEVER CREATED  |  -wal: NEVER CREATED  |  -journal: NEVER CREATED
+
+  D0-DELETE-wal-W-A-default   residue 0 page(s), live unauthorized rows 0
+    artefact:                                            PRESENT, 16512 bytes
+    baseline attributable (DA-4):                        YES -- PRESENT BUT EMPTY (0 bytes) before the request
+    N6.1 + N6.2:                                         no finding (not sufficient alone, DA-5 row 3)
+    N6.3 history within the invariant:                   satisfied on this measurement (no residue found)
+    scoring bases agree (parse vs raw):                  yes
+    basis:                                               the artefact was inspected and carried no unauthorized bytes
+    residue pages in the store (pgno:markers):           none
+    page images the request made durable:                3:AUTH-only  4:AUTH-only  5:AUTH-only  6:AUTH-only
+    NC-6 parser check:                                   4 of 4 images byte-identical to an independent copy
+    other in-scope artefacts:                            -shm: 32768 bytes  |  -wal: 0 bytes  |  -journal: NEVER CREATED
+
+  D0-DELETE-wal-W-A-tiny   residue 0 page(s), live unauthorized rows 0
+    artefact:                                            PRESENT, 16512 bytes
+    baseline attributable (DA-4):                        YES -- PRESENT BUT EMPTY (0 bytes) before the request
+    N6.1 + N6.2:                                         no finding (not sufficient alone, DA-5 row 3)
+    N6.3 history within the invariant:                   satisfied on this measurement (no residue found)
+    scoring bases agree (parse vs raw):                  yes
+    basis:                                               the artefact was inspected and carried no unauthorized bytes
+    residue pages in the store (pgno:markers):           none
+    page images the request made durable:                3:AUTH-only  4:AUTH-only  5:AUTH-only  6:AUTH-only
+    NC-6 parser check:                                   4 of 4 images byte-identical to an independent copy
+    other in-scope artefacts:                            -shm: 32768 bytes  |  -wal: 0 bytes  |  -journal: NEVER CREATED
+
+  D0-DELETE-wal-W-B-default   residue 0 page(s), live unauthorized rows 0
+    artefact:                                            PRESENT, 24752 bytes
+    baseline attributable (DA-4):                        YES -- PRESENT BUT EMPTY (0 bytes) before the request
+    N6.1 + N6.2:                                         no finding (not sufficient alone, DA-5 row 3)
+    N6.3 history within the invariant:                   satisfied on this measurement (no residue found)
+    scoring bases agree (parse vs raw):                  yes
+    basis:                                               the artefact was inspected and carried no unauthorized bytes
+    residue pages in the store (pgno:markers):           none
+    page images the request made durable:                1:neither  7:AUTH-only  8:AUTH-only  9:AUTH-only  10:AUTH-only  11:AUTH-only
+    NC-6 parser check:                                   6 of 6 images byte-identical to an independent copy
+    other in-scope artefacts:                            -shm: 32768 bytes  |  -wal: 0 bytes  |  -journal: NEVER CREATED
+
+  D0-DELETE-wal-W-B-tiny   residue 0 page(s), live unauthorized rows 0
+    artefact:                                            PRESENT, 28872 bytes
+    baseline attributable (DA-4):                        YES -- PRESENT BUT EMPTY (0 bytes) before the request
+    N6.1 + N6.2:                                         no finding (not sufficient alone, DA-5 row 3)
+    N6.3 history within the invariant:                   satisfied on this measurement (no residue found)
+    scoring bases agree (parse vs raw):                  yes
+    basis:                                               the artefact was inspected and carried no unauthorized bytes
+    residue pages in the store (pgno:markers):           none
+    page images the request made durable:                8:AUTH-only  9:AUTH-only  11:AUTH-only  10:AUTH-only  1:neither  7:AUTH-only  11:AUTH-only
+    NC-6 parser check:                                   6 of 6 images byte-identical to an independent copy
+    other in-scope artefacts:                            -shm: 32768 bytes  |  -wal: 0 bytes  |  -journal: NEVER CREATED
+
+  D1-DROP-delete-W-A-default   residue 1 page(s), live unauthorized rows 0
+    artefact:                                            PRESENT, 16928 bytes
+    baseline attributable (DA-4):                        YES -- NEVER CREATED before the request
+    N6.1 + N6.2:                                         FINDING (history-sourced) -- N6.1 + N6.2
+    N6.3 history within the invariant:                   VIOLATED -- 1 store page(s) carry unauthorized bytes with 0 unauthorized rows
+    scoring bases agree (parse vs raw):                  yes
+    basis:                                               the artefact carries unauthorized bytes and the store holds ZERO unauthorized rows, so the bytes came from its history
+    residue pages in the store (pgno:markers):           3:x14
+    page images the request made durable:                4:AUTH-only  6:AUTH-only  5:AUTH-only  3:BOTH:x14
+    NC-6 parser check:                                   4 of 4 images byte-identical to an independent copy
+    other in-scope artefacts:                            -shm: NEVER CREATED  |  -wal: NEVER CREATED  |  -journal: NEVER CREATED
+
+  D1-DROP-delete-W-A-tiny   residue 1 page(s), live unauthorized rows 0
+    artefact:                                            PRESENT, 19976 bytes
+    baseline attributable (DA-4):                        YES -- NEVER CREATED before the request
+    N6.1 + N6.2:                                         FINDING (history-sourced) -- N6.1 + N6.2
+    N6.3 history within the invariant:                   VIOLATED -- 1 store page(s) carry unauthorized bytes with 0 unauthorized rows
+    scoring bases agree (parse vs raw):                  yes
+    basis:                                               the artefact carries unauthorized bytes and the store holds ZERO unauthorized rows, so the bytes came from its history
+    residue pages in the store (pgno:markers):           3:x14
+    page images the request made durable:                4:AUTH-only  6:AUTH-only  5:AUTH-only  3:BOTH:x14
+    NC-6 parser check:                                   4 of 4 images byte-identical to an independent copy
+    other in-scope artefacts:                            -shm: NEVER CREATED  |  -wal: NEVER CREATED  |  -journal: NEVER CREATED
+
+  D1-DROP-delete-W-B-default   residue 1 page(s), live unauthorized rows 0
+    artefact:                                            PRESENT, 8720 bytes
+    baseline attributable (DA-4):                        YES -- NEVER CREATED before the request
+    N6.1 + N6.2:                                         no finding (not sufficient alone, DA-5 row 3)
+    N6.3 history within the invariant:                   VIOLATED -- 1 store page(s) carry unauthorized bytes with 0 unauthorized rows
+    scoring bases agree (parse vs raw):                  yes
+    basis:                                               the artefact was inspected and carried no unauthorized bytes
+    residue pages in the store (pgno:markers):           3:x14
+    page images the request made durable:                7:neither  1:neither
+    NC-6 parser check:                                   2 of 2 images byte-identical to an independent copy
+    other in-scope artefacts:                            -shm: NEVER CREATED  |  -wal: NEVER CREATED  |  -journal: NEVER CREATED
+
+  D1-DROP-delete-W-B-tiny   residue 1 page(s), live unauthorized rows 0
+    artefact:                                            PRESENT, 9728 bytes
+    baseline attributable (DA-4):                        YES -- NEVER CREATED before the request
+    N6.1 + N6.2:                                         no finding (not sufficient alone, DA-5 row 3)
+    N6.3 history within the invariant:                   VIOLATED -- 1 store page(s) carry unauthorized bytes with 0 unauthorized rows
+    scoring bases agree (parse vs raw):                  yes
+    basis:                                               the artefact was inspected and carried no unauthorized bytes
+    residue pages in the store (pgno:markers):           3:x14
+    page images the request made durable:                7:neither  1:neither
+    NC-6 parser check:                                   2 of 2 images byte-identical to an independent copy
+    other in-scope artefacts:                            -shm: NEVER CREATED  |  -wal: NEVER CREATED  |  -journal: NEVER CREATED
+
+  D1-DROP-wal-W-A-default   residue 1 page(s), live unauthorized rows 0
+    artefact:                                            PRESENT, 16512 bytes
+    baseline attributable (DA-4):                        YES -- PRESENT BUT EMPTY (0 bytes) before the request
+    N6.1 + N6.2:                                         FINDING (history-sourced) -- N6.1 + N6.2
+    N6.3 history within the invariant:                   VIOLATED -- 1 store page(s) carry unauthorized bytes with 0 unauthorized rows
+    scoring bases agree (parse vs raw):                  yes
+    basis:                                               the artefact carries unauthorized bytes and the store holds ZERO unauthorized rows, so the bytes came from its history
+    residue pages in the store (pgno:markers):           3:x14
+    page images the request made durable:                3:BOTH:x14  4:AUTH-only  5:AUTH-only  6:AUTH-only
+    NC-6 parser check:                                   4 of 4 images byte-identical to an independent copy
+    other in-scope artefacts:                            -shm: 32768 bytes  |  -wal: 0 bytes  |  -journal: NEVER CREATED
+
+  D1-DROP-wal-W-A-tiny   residue 1 page(s), live unauthorized rows 0
+    artefact:                                            PRESENT, 16512 bytes
+    baseline attributable (DA-4):                        YES -- PRESENT BUT EMPTY (0 bytes) before the request
+    N6.1 + N6.2:                                         FINDING (history-sourced) -- N6.1 + N6.2
+    N6.3 history within the invariant:                   VIOLATED -- 1 store page(s) carry unauthorized bytes with 0 unauthorized rows
+    scoring bases agree (parse vs raw):                  yes
+    basis:                                               the artefact carries unauthorized bytes and the store holds ZERO unauthorized rows, so the bytes came from its history
+    residue pages in the store (pgno:markers):           3:x14
+    page images the request made durable:                4:AUTH-only  6:AUTH-only  5:AUTH-only  3:BOTH:x14
+    NC-6 parser check:                                   4 of 4 images byte-identical to an independent copy
+    other in-scope artefacts:                            -shm: 32768 bytes  |  -wal: 0 bytes  |  -journal: NEVER CREATED
+
+  D1-DROP-wal-W-B-default   residue 1 page(s), live unauthorized rows 0
+    artefact:                                            PRESENT, 24752 bytes
+    baseline attributable (DA-4):                        YES -- PRESENT BUT EMPTY (0 bytes) before the request
+    N6.1 + N6.2:                                         no finding (not sufficient alone, DA-5 row 3)
+    N6.3 history within the invariant:                   VIOLATED -- 1 store page(s) carry unauthorized bytes with 0 unauthorized rows
+    scoring bases agree (parse vs raw):                  yes
+    basis:                                               the artefact was inspected and carried no unauthorized bytes
+    residue pages in the store (pgno:markers):           3:x14
+    page images the request made durable:                1:neither  7:AUTH-only  8:AUTH-only  9:AUTH-only  10:AUTH-only  11:AUTH-only
+    NC-6 parser check:                                   6 of 6 images byte-identical to an independent copy
+    other in-scope artefacts:                            -shm: 32768 bytes  |  -wal: 0 bytes  |  -journal: NEVER CREATED
+
+  D1-DROP-wal-W-B-tiny   residue 1 page(s), live unauthorized rows 0
+    artefact:                                            PRESENT, 28872 bytes
+    baseline attributable (DA-4):                        YES -- PRESENT BUT EMPTY (0 bytes) before the request
+    N6.1 + N6.2:                                         no finding (not sufficient alone, DA-5 row 3)
+    N6.3 history within the invariant:                   VIOLATED -- 1 store page(s) carry unauthorized bytes with 0 unauthorized rows
+    scoring bases agree (parse vs raw):                  yes
+    basis:                                               the artefact was inspected and carried no unauthorized bytes
+    residue pages in the store (pgno:markers):           3:x14
+    page images the request made durable:                8:AUTH-only  9:AUTH-only  11:AUTH-only  10:AUTH-only  1:neither  7:AUTH-only  11:AUTH-only
+    NC-6 parser check:                                   6 of 6 images byte-identical to an independent copy
+    other in-scope artefacts:                            -shm: 32768 bytes  |  -wal: 0 bytes  |  -journal: NEVER CREATED
+
+  D1-DELETE-delete-W-A-default   residue 1 page(s), live unauthorized rows 0
+    artefact:                                            PRESENT, 16928 bytes
+    baseline attributable (DA-4):                        YES -- NEVER CREATED before the request
+    N6.1 + N6.2:                                         FINDING (history-sourced) -- N6.1 + N6.2
+    N6.3 history within the invariant:                   VIOLATED -- 1 store page(s) carry unauthorized bytes with 0 unauthorized rows
+    scoring bases agree (parse vs raw):                  yes
+    basis:                                               the artefact carries unauthorized bytes and the store holds ZERO unauthorized rows, so the bytes came from its history
+    residue pages in the store (pgno:markers):           3:x14
+    page images the request made durable:                4:AUTH-only  6:AUTH-only  5:AUTH-only  3:BOTH:x14
+    NC-6 parser check:                                   4 of 4 images byte-identical to an independent copy
+    other in-scope artefacts:                            -shm: NEVER CREATED  |  -wal: NEVER CREATED  |  -journal: NEVER CREATED
+
+  D1-DELETE-delete-W-A-tiny   residue 1 page(s), live unauthorized rows 0
+    artefact:                                            PRESENT, 19976 bytes
+    baseline attributable (DA-4):                        YES -- NEVER CREATED before the request
+    N6.1 + N6.2:                                         FINDING (history-sourced) -- N6.1 + N6.2
+    N6.3 history within the invariant:                   VIOLATED -- 1 store page(s) carry unauthorized bytes with 0 unauthorized rows
+    scoring bases agree (parse vs raw):                  yes
+    basis:                                               the artefact carries unauthorized bytes and the store holds ZERO unauthorized rows, so the bytes came from its history
+    residue pages in the store (pgno:markers):           3:x14
+    page images the request made durable:                4:AUTH-only  6:AUTH-only  5:AUTH-only  3:BOTH:x14
+    NC-6 parser check:                                   4 of 4 images byte-identical to an independent copy
+    other in-scope artefacts:                            -shm: NEVER CREATED  |  -wal: NEVER CREATED  |  -journal: NEVER CREATED
+
+  D1-DELETE-delete-W-B-default   residue 1 page(s), live unauthorized rows 0
+    artefact:                                            PRESENT, 8720 bytes
+    baseline attributable (DA-4):                        YES -- NEVER CREATED before the request
+    N6.1 + N6.2:                                         no finding (not sufficient alone, DA-5 row 3)
+    N6.3 history within the invariant:                   VIOLATED -- 1 store page(s) carry unauthorized bytes with 0 unauthorized rows
+    scoring bases agree (parse vs raw):                  yes
+    basis:                                               the artefact was inspected and carried no unauthorized bytes
+    residue pages in the store (pgno:markers):           3:x14
+    page images the request made durable:                7:neither  1:neither
+    NC-6 parser check:                                   2 of 2 images byte-identical to an independent copy
+    other in-scope artefacts:                            -shm: NEVER CREATED  |  -wal: NEVER CREATED  |  -journal: NEVER CREATED
+
+  D1-DELETE-delete-W-B-tiny   residue 1 page(s), live unauthorized rows 0
+    artefact:                                            PRESENT, 9728 bytes
+    baseline attributable (DA-4):                        YES -- NEVER CREATED before the request
+    N6.1 + N6.2:                                         no finding (not sufficient alone, DA-5 row 3)
+    N6.3 history within the invariant:                   VIOLATED -- 1 store page(s) carry unauthorized bytes with 0 unauthorized rows
+    scoring bases agree (parse vs raw):                  yes
+    basis:                                               the artefact was inspected and carried no unauthorized bytes
+    residue pages in the store (pgno:markers):           3:x14
+    page images the request made durable:                7:neither  1:neither
+    NC-6 parser check:                                   2 of 2 images byte-identical to an independent copy
+    other in-scope artefacts:                            -shm: NEVER CREATED  |  -wal: NEVER CREATED  |  -journal: NEVER CREATED
+
+  D1-DELETE-wal-W-A-default   residue 1 page(s), live unauthorized rows 0
+    artefact:                                            PRESENT, 16512 bytes
+    baseline attributable (DA-4):                        YES -- PRESENT BUT EMPTY (0 bytes) before the request
+    N6.1 + N6.2:                                         FINDING (history-sourced) -- N6.1 + N6.2
+    N6.3 history within the invariant:                   VIOLATED -- 1 store page(s) carry unauthorized bytes with 0 unauthorized rows
+    scoring bases agree (parse vs raw):                  yes
+    basis:                                               the artefact carries unauthorized bytes and the store holds ZERO unauthorized rows, so the bytes came from its history
+    residue pages in the store (pgno:markers):           3:x14
+    page images the request made durable:                3:BOTH:x14  4:AUTH-only  5:AUTH-only  6:AUTH-only
+    NC-6 parser check:                                   4 of 4 images byte-identical to an independent copy
+    other in-scope artefacts:                            -shm: 32768 bytes  |  -wal: 0 bytes  |  -journal: NEVER CREATED
+
+  D1-DELETE-wal-W-A-tiny   residue 1 page(s), live unauthorized rows 0
+    artefact:                                            PRESENT, 16512 bytes
+    baseline attributable (DA-4):                        YES -- PRESENT BUT EMPTY (0 bytes) before the request
+    N6.1 + N6.2:                                         FINDING (history-sourced) -- N6.1 + N6.2
+    N6.3 history within the invariant:                   VIOLATED -- 1 store page(s) carry unauthorized bytes with 0 unauthorized rows
+    scoring bases agree (parse vs raw):                  yes
+    basis:                                               the artefact carries unauthorized bytes and the store holds ZERO unauthorized rows, so the bytes came from its history
+    residue pages in the store (pgno:markers):           3:x14
+    page images the request made durable:                4:AUTH-only  6:AUTH-only  5:AUTH-only  3:BOTH:x14
+    NC-6 parser check:                                   4 of 4 images byte-identical to an independent copy
+    other in-scope artefacts:                            -shm: 32768 bytes  |  -wal: 0 bytes  |  -journal: NEVER CREATED
+
+  D1-DELETE-wal-W-B-default   residue 1 page(s), live unauthorized rows 0
+    artefact:                                            PRESENT, 24752 bytes
+    baseline attributable (DA-4):                        YES -- PRESENT BUT EMPTY (0 bytes) before the request
+    N6.1 + N6.2:                                         no finding (not sufficient alone, DA-5 row 3)
+    N6.3 history within the invariant:                   VIOLATED -- 1 store page(s) carry unauthorized bytes with 0 unauthorized rows
+    scoring bases agree (parse vs raw):                  yes
+    basis:                                               the artefact was inspected and carried no unauthorized bytes
+    residue pages in the store (pgno:markers):           3:x14
+    page images the request made durable:                1:neither  7:AUTH-only  8:AUTH-only  9:AUTH-only  10:AUTH-only  11:AUTH-only
+    NC-6 parser check:                                   6 of 6 images byte-identical to an independent copy
+    other in-scope artefacts:                            -shm: 32768 bytes  |  -wal: 0 bytes  |  -journal: NEVER CREATED
+
+  D1-DELETE-wal-W-B-tiny   residue 1 page(s), live unauthorized rows 0
+    artefact:                                            PRESENT, 28872 bytes
+    baseline attributable (DA-4):                        YES -- PRESENT BUT EMPTY (0 bytes) before the request
+    N6.1 + N6.2:                                         no finding (not sufficient alone, DA-5 row 3)
+    N6.3 history within the invariant:                   VIOLATED -- 1 store page(s) carry unauthorized bytes with 0 unauthorized rows
+    scoring bases agree (parse vs raw):                  yes
+    basis:                                               the artefact was inspected and carried no unauthorized bytes
+    residue pages in the store (pgno:markers):           3:x14
+    page images the request made durable:                8:AUTH-only  9:AUTH-only  11:AUTH-only  10:AUTH-only  1:neither  7:AUTH-only  11:AUTH-only
+    NC-6 parser check:                                   6 of 6 images byte-identical to an independent copy
+    other in-scope artefacts:                            -shm: 32768 bytes  |  -wal: 0 bytes  |  -journal: NEVER CREATED
+
+  D2-DROP-delete-W-A-default   residue 9 page(s), live unauthorized rows 0
+    artefact:                                            PRESENT, 16928 bytes
+    baseline attributable (DA-4):                        YES -- NEVER CREATED before the request
+    N6.1 + N6.2:                                         no finding (not sufficient alone, DA-5 row 3)
+    N6.3 history within the invariant:                   VIOLATED -- 9 store page(s) carry unauthorized bytes with 0 unauthorized rows
+    scoring bases agree (parse vs raw):                  yes
+    basis:                                               the artefact was inspected and carried no unauthorized bytes
+    residue pages in the store (pgno:markers):           3:x15  6:x15  7:x15  8:x15  9:x15  10:x15  11:x15  12:x15  13:x15
+    page images the request made durable:                4:AUTH-only  16:AUTH-only  15:AUTH-only  14:AUTH-only
+    NC-6 parser check:                                   4 of 4 images byte-identical to an independent copy
+    other in-scope artefacts:                            -shm: NEVER CREATED  |  -wal: NEVER CREATED  |  -journal: NEVER CREATED
+
+  D2-DROP-delete-W-A-tiny   residue 9 page(s), live unauthorized rows 0
+    artefact:                                            PRESENT, 19976 bytes
+    baseline attributable (DA-4):                        YES -- NEVER CREATED before the request
+    N6.1 + N6.2:                                         no finding (not sufficient alone, DA-5 row 3)
+    N6.3 history within the invariant:                   VIOLATED -- 9 store page(s) carry unauthorized bytes with 0 unauthorized rows
+    scoring bases agree (parse vs raw):                  yes
+    basis:                                               the artefact was inspected and carried no unauthorized bytes
+    residue pages in the store (pgno:markers):           3:x15  6:x15  7:x15  8:x15  9:x15  10:x15  11:x15  12:x15  13:x15
+    page images the request made durable:                4:AUTH-only  16:AUTH-only  15:AUTH-only  14:AUTH-only
+    NC-6 parser check:                                   4 of 4 images byte-identical to an independent copy
+    other in-scope artefacts:                            -shm: NEVER CREATED  |  -wal: NEVER CREATED  |  -journal: NEVER CREATED
+
+  D2-DROP-delete-W-B-default   residue 9 page(s), live unauthorized rows 0
+    artefact:                                            PRESENT, 12824 bytes
+    baseline attributable (DA-4):                        YES -- NEVER CREATED before the request
+    N6.1 + N6.2:                                         FINDING (history-sourced) -- N6.1 + N6.2
+    N6.3 history within the invariant:                   VIOLATED -- 9 store page(s) carry unauthorized bytes with 0 unauthorized rows
+    scoring bases agree (parse vs raw):                  yes
+    basis:                                               the artefact carries unauthorized bytes and the store holds ZERO unauthorized rows, so the bytes came from its history
+    residue pages in the store (pgno:markers):           3:x15  6:x15  7:x15  8:x15  9:x15  10:x15  11:x15  12:x15  13:x15
+    page images the request made durable:                5:neither  1:neither  3:UNAUTH-only:x15
+    NC-6 parser check:                                   3 of 3 images byte-identical to an independent copy
+    other in-scope artefacts:                            -shm: NEVER CREATED  |  -wal: NEVER CREATED  |  -journal: NEVER CREATED
+
+  D2-DROP-delete-W-B-tiny   residue 9 page(s), live unauthorized rows 0
+    artefact:                                            PRESENT, 13824 bytes
+    baseline attributable (DA-4):                        YES -- NEVER CREATED before the request
+    N6.1 + N6.2:                                         FINDING (history-sourced) -- N6.1 + N6.2
+    N6.3 history within the invariant:                   VIOLATED -- 9 store page(s) carry unauthorized bytes with 0 unauthorized rows
+    scoring bases agree (parse vs raw):                  yes
+    basis:                                               the artefact carries unauthorized bytes and the store holds ZERO unauthorized rows, so the bytes came from its history
+    residue pages in the store (pgno:markers):           3:x15  6:x15  7:x15  8:x15  9:x15  10:x15  11:x15  12:x15  13:x15
+    page images the request made durable:                5:neither  1:neither  3:UNAUTH-only:x15
+    NC-6 parser check:                                   3 of 3 images byte-identical to an independent copy
+    other in-scope artefacts:                            -shm: NEVER CREATED  |  -wal: NEVER CREATED  |  -journal: NEVER CREATED
+
+  D2-DROP-wal-W-A-default   residue 9 page(s), live unauthorized rows 0
+    artefact:                                            PRESENT, 16512 bytes
+    baseline attributable (DA-4):                        YES -- PRESENT BUT EMPTY (0 bytes) before the request
+    N6.1 + N6.2:                                         no finding (not sufficient alone, DA-5 row 3)
+    N6.3 history within the invariant:                   VIOLATED -- 9 store page(s) carry unauthorized bytes with 0 unauthorized rows
+    scoring bases agree (parse vs raw):                  yes
+    basis:                                               the artefact was inspected and carried no unauthorized bytes
+    residue pages in the store (pgno:markers):           3:x15  6:x15  7:x15  8:x15  9:x15  10:x15  11:x15  12:x15  13:x15
+    page images the request made durable:                4:AUTH-only  14:AUTH-only  15:AUTH-only  16:AUTH-only
+    NC-6 parser check:                                   4 of 4 images byte-identical to an independent copy
+    other in-scope artefacts:                            -shm: 32768 bytes  |  -wal: 0 bytes  |  -journal: NEVER CREATED
+
+  D2-DROP-wal-W-A-tiny   residue 9 page(s), live unauthorized rows 0
+    artefact:                                            PRESENT, 16512 bytes
+    baseline attributable (DA-4):                        YES -- PRESENT BUT EMPTY (0 bytes) before the request
+    N6.1 + N6.2:                                         no finding (not sufficient alone, DA-5 row 3)
+    N6.3 history within the invariant:                   VIOLATED -- 9 store page(s) carry unauthorized bytes with 0 unauthorized rows
+    scoring bases agree (parse vs raw):                  yes
+    basis:                                               the artefact was inspected and carried no unauthorized bytes
+    residue pages in the store (pgno:markers):           3:x15  6:x15  7:x15  8:x15  9:x15  10:x15  11:x15  12:x15  13:x15
+    page images the request made durable:                4:AUTH-only  16:AUTH-only  15:AUTH-only  14:AUTH-only
+    NC-6 parser check:                                   4 of 4 images byte-identical to an independent copy
+    other in-scope artefacts:                            -shm: 32768 bytes  |  -wal: 0 bytes  |  -journal: NEVER CREATED
+
+  D2-DROP-wal-W-B-default   residue 9 page(s), live unauthorized rows 0
+    artefact:                                            PRESENT, 28872 bytes
+    baseline attributable (DA-4):                        YES -- PRESENT BUT EMPTY (0 bytes) before the request
+    N6.1 + N6.2:                                         FINDING (history-sourced) -- N6.1 + N6.2
+    N6.3 history within the invariant:                   VIOLATED -- 9 store page(s) carry unauthorized bytes with 0 unauthorized rows
+    scoring bases agree (parse vs raw):                  yes
+    basis:                                               the artefact carries unauthorized bytes and the store holds ZERO unauthorized rows, so the bytes came from its history
+    residue pages in the store (pgno:markers):           3:x15  6:x15  7:x15  8:x15  9:x15  10:x15  11:x15  12:x15  13:x15
+    page images the request made durable:                1:neither  3:UNAUTH-only:x15  5:AUTH-only  6:AUTH-only  9:AUTH-only  10:AUTH-only  13:AUTH-only
+    NC-6 parser check:                                   7 of 7 images byte-identical to an independent copy
+    other in-scope artefacts:                            -shm: 32768 bytes  |  -wal: 0 bytes  |  -journal: NEVER CREATED
+
+  D2-DROP-wal-W-B-tiny   residue 9 page(s), live unauthorized rows 0
+    artefact:                                            PRESENT, 28872 bytes
+    baseline attributable (DA-4):                        YES -- PRESENT BUT EMPTY (0 bytes) before the request
+    N6.1 + N6.2:                                         FINDING (history-sourced) -- N6.1 + N6.2
+    N6.3 history within the invariant:                   VIOLATED -- 9 store page(s) carry unauthorized bytes with 0 unauthorized rows
+    scoring bases agree (parse vs raw):                  yes
+    basis:                                               the artefact carries unauthorized bytes and the store holds ZERO unauthorized rows, so the bytes came from its history
+    residue pages in the store (pgno:markers):           3:x15  6:x15  7:x15  8:x15  9:x15  10:x15  11:x15  12:x15  13:x15
+    page images the request made durable:                3:UNAUTH-only:x15  6:AUTH-only  13:AUTH-only  1:neither  5:AUTH-only  9:AUTH-only  10:AUTH-only
+    NC-6 parser check:                                   7 of 7 images byte-identical to an independent copy
+    other in-scope artefacts:                            -shm: 32768 bytes  |  -wal: 0 bytes  |  -journal: NEVER CREATED
+
+  D2-DELETE-delete-W-A-default   residue 9 page(s), live unauthorized rows 0
+    artefact:                                            PRESENT, 16928 bytes
+    baseline attributable (DA-4):                        YES -- NEVER CREATED before the request
+    N6.1 + N6.2:                                         no finding (not sufficient alone, DA-5 row 3)
+    N6.3 history within the invariant:                   VIOLATED -- 9 store page(s) carry unauthorized bytes with 0 unauthorized rows
+    scoring bases agree (parse vs raw):                  yes
+    basis:                                               the artefact was inspected and carried no unauthorized bytes
+    residue pages in the store (pgno:markers):           3:x15  6:x15  7:x15  8:x15  9:x15  10:x15  11:x15  12:x15  13:x15
+    page images the request made durable:                4:AUTH-only  16:AUTH-only  15:AUTH-only  14:AUTH-only
+    NC-6 parser check:                                   4 of 4 images byte-identical to an independent copy
+    other in-scope artefacts:                            -shm: NEVER CREATED  |  -wal: NEVER CREATED  |  -journal: NEVER CREATED
+
+  D2-DELETE-delete-W-A-tiny   residue 9 page(s), live unauthorized rows 0
+    artefact:                                            PRESENT, 19976 bytes
+    baseline attributable (DA-4):                        YES -- NEVER CREATED before the request
+    N6.1 + N6.2:                                         no finding (not sufficient alone, DA-5 row 3)
+    N6.3 history within the invariant:                   VIOLATED -- 9 store page(s) carry unauthorized bytes with 0 unauthorized rows
+    scoring bases agree (parse vs raw):                  yes
+    basis:                                               the artefact was inspected and carried no unauthorized bytes
+    residue pages in the store (pgno:markers):           3:x15  6:x15  7:x15  8:x15  9:x15  10:x15  11:x15  12:x15  13:x15
+    page images the request made durable:                4:AUTH-only  16:AUTH-only  15:AUTH-only  14:AUTH-only
+    NC-6 parser check:                                   4 of 4 images byte-identical to an independent copy
+    other in-scope artefacts:                            -shm: NEVER CREATED  |  -wal: NEVER CREATED  |  -journal: NEVER CREATED
+
+  D2-DELETE-delete-W-B-default   residue 9 page(s), live unauthorized rows 0
+    artefact:                                            PRESENT, 12824 bytes
+    baseline attributable (DA-4):                        YES -- NEVER CREATED before the request
+    N6.1 + N6.2:                                         FINDING (history-sourced) -- N6.1 + N6.2
+    N6.3 history within the invariant:                   VIOLATED -- 9 store page(s) carry unauthorized bytes with 0 unauthorized rows
+    scoring bases agree (parse vs raw):                  yes
+    basis:                                               the artefact carries unauthorized bytes and the store holds ZERO unauthorized rows, so the bytes came from its history
+    residue pages in the store (pgno:markers):           3:x15  6:x15  7:x15  8:x15  9:x15  10:x15  11:x15  12:x15  13:x15
+    page images the request made durable:                5:neither  1:neither  3:UNAUTH-only:x15
+    NC-6 parser check:                                   3 of 3 images byte-identical to an independent copy
+    other in-scope artefacts:                            -shm: NEVER CREATED  |  -wal: NEVER CREATED  |  -journal: NEVER CREATED
+
+  D2-DELETE-delete-W-B-tiny   residue 9 page(s), live unauthorized rows 0
+    artefact:                                            PRESENT, 13824 bytes
+    baseline attributable (DA-4):                        YES -- NEVER CREATED before the request
+    N6.1 + N6.2:                                         FINDING (history-sourced) -- N6.1 + N6.2
+    N6.3 history within the invariant:                   VIOLATED -- 9 store page(s) carry unauthorized bytes with 0 unauthorized rows
+    scoring bases agree (parse vs raw):                  yes
+    basis:                                               the artefact carries unauthorized bytes and the store holds ZERO unauthorized rows, so the bytes came from its history
+    residue pages in the store (pgno:markers):           3:x15  6:x15  7:x15  8:x15  9:x15  10:x15  11:x15  12:x15  13:x15
+    page images the request made durable:                5:neither  1:neither  3:UNAUTH-only:x15
+    NC-6 parser check:                                   3 of 3 images byte-identical to an independent copy
+    other in-scope artefacts:                            -shm: NEVER CREATED  |  -wal: NEVER CREATED  |  -journal: NEVER CREATED
+
+  D2-DELETE-wal-W-A-default   residue 9 page(s), live unauthorized rows 0
+    artefact:                                            PRESENT, 16512 bytes
+    baseline attributable (DA-4):                        YES -- PRESENT BUT EMPTY (0 bytes) before the request
+    N6.1 + N6.2:                                         no finding (not sufficient alone, DA-5 row 3)
+    N6.3 history within the invariant:                   VIOLATED -- 9 store page(s) carry unauthorized bytes with 0 unauthorized rows
+    scoring bases agree (parse vs raw):                  yes
+    basis:                                               the artefact was inspected and carried no unauthorized bytes
+    residue pages in the store (pgno:markers):           3:x15  6:x15  7:x15  8:x15  9:x15  10:x15  11:x15  12:x15  13:x15
+    page images the request made durable:                4:AUTH-only  14:AUTH-only  15:AUTH-only  16:AUTH-only
+    NC-6 parser check:                                   4 of 4 images byte-identical to an independent copy
+    other in-scope artefacts:                            -shm: 32768 bytes  |  -wal: 0 bytes  |  -journal: NEVER CREATED
+
+  D2-DELETE-wal-W-A-tiny   residue 9 page(s), live unauthorized rows 0
+    artefact:                                            PRESENT, 16512 bytes
+    baseline attributable (DA-4):                        YES -- PRESENT BUT EMPTY (0 bytes) before the request
+    N6.1 + N6.2:                                         no finding (not sufficient alone, DA-5 row 3)
+    N6.3 history within the invariant:                   VIOLATED -- 9 store page(s) carry unauthorized bytes with 0 unauthorized rows
+    scoring bases agree (parse vs raw):                  yes
+    basis:                                               the artefact was inspected and carried no unauthorized bytes
+    residue pages in the store (pgno:markers):           3:x15  6:x15  7:x15  8:x15  9:x15  10:x15  11:x15  12:x15  13:x15
+    page images the request made durable:                4:AUTH-only  16:AUTH-only  15:AUTH-only  14:AUTH-only
+    NC-6 parser check:                                   4 of 4 images byte-identical to an independent copy
+    other in-scope artefacts:                            -shm: 32768 bytes  |  -wal: 0 bytes  |  -journal: NEVER CREATED
+
+  D2-DELETE-wal-W-B-default   residue 9 page(s), live unauthorized rows 0
+    artefact:                                            PRESENT, 28872 bytes
+    baseline attributable (DA-4):                        YES -- PRESENT BUT EMPTY (0 bytes) before the request
+    N6.1 + N6.2:                                         FINDING (history-sourced) -- N6.1 + N6.2
+    N6.3 history within the invariant:                   VIOLATED -- 9 store page(s) carry unauthorized bytes with 0 unauthorized rows
+    scoring bases agree (parse vs raw):                  yes
+    basis:                                               the artefact carries unauthorized bytes and the store holds ZERO unauthorized rows, so the bytes came from its history
+    residue pages in the store (pgno:markers):           3:x15  6:x15  7:x15  8:x15  9:x15  10:x15  11:x15  12:x15  13:x15
+    page images the request made durable:                1:neither  3:UNAUTH-only:x15  5:AUTH-only  6:AUTH-only  9:AUTH-only  10:AUTH-only  13:AUTH-only
+    NC-6 parser check:                                   7 of 7 images byte-identical to an independent copy
+    other in-scope artefacts:                            -shm: 32768 bytes  |  -wal: 0 bytes  |  -journal: NEVER CREATED
+
+  D2-DELETE-wal-W-B-tiny   residue 9 page(s), live unauthorized rows 0
+    artefact:                                            PRESENT, 28872 bytes
+    baseline attributable (DA-4):                        YES -- PRESENT BUT EMPTY (0 bytes) before the request
+    N6.1 + N6.2:                                         FINDING (history-sourced) -- N6.1 + N6.2
+    N6.3 history within the invariant:                   VIOLATED -- 9 store page(s) carry unauthorized bytes with 0 unauthorized rows
+    scoring bases agree (parse vs raw):                  yes
+    basis:                                               the artefact carries unauthorized bytes and the store holds ZERO unauthorized rows, so the bytes came from its history
+    residue pages in the store (pgno:markers):           3:x15  6:x15  7:x15  8:x15  9:x15  10:x15  11:x15  12:x15  13:x15
+    page images the request made durable:                3:UNAUTH-only:x15  6:AUTH-only  13:AUTH-only  1:neither  5:AUTH-only  9:AUTH-only  10:AUTH-only
+    NC-6 parser check:                                   7 of 7 images byte-identical to an independent copy
+    other in-scope artefacts:                            -shm: 32768 bytes  |  -wal: 0 bytes  |  -journal: NEVER CREATED
+
+  D3-DROP-delete-W-A-default   residue 42 page(s), live unauthorized rows 0
+    artefact:                                            PRESENT, 16928 bytes
+    baseline attributable (DA-4):                        YES -- NEVER CREATED before the request
+    N6.1 + N6.2:                                         no finding (not sufficient alone, DA-5 row 3)
+    N6.3 history within the invariant:                   VIOLATED -- 42 store page(s) carry unauthorized bytes with 0 unauthorized rows
+    scoring bases agree (parse vs raw):                  yes
+    basis:                                               the artefact was inspected and carried no unauthorized bytes
+    residue pages in the store (pgno:markers):           3:x15  6:x15  7:x15  8:x15  9:x15  10:x15  11:x15  12:x15  13:x15  14:x15  15:x15  16:x15  17:x15  18:x15  19:x15  20:x15  21:x15  22:x15  23:x15  24:x15  25:x15  26:x15  27:x15  28:x15  29:x15  30:x15  31:x15  32:x15  33:x15  34:x15  35:x15  36:x15  37:x15  38:x15  39:x15  40:x15  41:x15  42:x15  43:x15  44:x15  45:x15  46:x15
+    page images the request made durable:                4:AUTH-only  49:AUTH-only  48:AUTH-only  47:AUTH-only
+    NC-6 parser check:                                   4 of 4 images byte-identical to an independent copy
+    other in-scope artefacts:                            -shm: NEVER CREATED  |  -wal: NEVER CREATED  |  -journal: NEVER CREATED
+
+  D3-DROP-delete-W-A-tiny   residue 42 page(s), live unauthorized rows 0
+    artefact:                                            PRESENT, 19976 bytes
+    baseline attributable (DA-4):                        YES -- NEVER CREATED before the request
+    N6.1 + N6.2:                                         no finding (not sufficient alone, DA-5 row 3)
+    N6.3 history within the invariant:                   VIOLATED -- 42 store page(s) carry unauthorized bytes with 0 unauthorized rows
+    scoring bases agree (parse vs raw):                  yes
+    basis:                                               the artefact was inspected and carried no unauthorized bytes
+    residue pages in the store (pgno:markers):           3:x15  6:x15  7:x15  8:x15  9:x15  10:x15  11:x15  12:x15  13:x15  14:x15  15:x15  16:x15  17:x15  18:x15  19:x15  20:x15  21:x15  22:x15  23:x15  24:x15  25:x15  26:x15  27:x15  28:x15  29:x15  30:x15  31:x15  32:x15  33:x15  34:x15  35:x15  36:x15  37:x15  38:x15  39:x15  40:x15  41:x15  42:x15  43:x15  44:x15  45:x15  46:x15
+    page images the request made durable:                4:AUTH-only  49:AUTH-only  48:AUTH-only  47:AUTH-only
+    NC-6 parser check:                                   4 of 4 images byte-identical to an independent copy
+    other in-scope artefacts:                            -shm: NEVER CREATED  |  -wal: NEVER CREATED  |  -journal: NEVER CREATED
+
+  D3-DROP-delete-W-B-default   residue 42 page(s), live unauthorized rows 0
+    artefact:                                            PRESENT, 12824 bytes
+    baseline attributable (DA-4):                        YES -- NEVER CREATED before the request
+    N6.1 + N6.2:                                         FINDING (history-sourced) -- N6.1 + N6.2
+    N6.3 history within the invariant:                   VIOLATED -- 42 store page(s) carry unauthorized bytes with 0 unauthorized rows
+    scoring bases agree (parse vs raw):                  yes
+    basis:                                               the artefact carries unauthorized bytes and the store holds ZERO unauthorized rows, so the bytes came from its history
+    residue pages in the store (pgno:markers):           3:x15  6:x15  7:x15  8:x15  9:x15  10:x15  11:x15  12:x15  13:x15  14:x15  15:x15  16:x15  17:x15  18:x15  19:x15  20:x15  21:x15  22:x15  23:x15  24:x15  25:x15  26:x15  27:x15  28:x15  29:x15  30:x15  31:x15  32:x15  33:x15  34:x15  35:x15  36:x15  37:x15  38:x15  39:x15  40:x15  41:x15  42:x15  43:x15  44:x15  45:x15  46:x15
+    page images the request made durable:                5:neither  1:neither  3:UNAUTH-only:x15
+    NC-6 parser check:                                   3 of 3 images byte-identical to an independent copy
+    other in-scope artefacts:                            -shm: NEVER CREATED  |  -wal: NEVER CREATED  |  -journal: NEVER CREATED
+
+  D3-DROP-delete-W-B-tiny   residue 42 page(s), live unauthorized rows 0
+    artefact:                                            PRESENT, 13824 bytes
+    baseline attributable (DA-4):                        YES -- NEVER CREATED before the request
+    N6.1 + N6.2:                                         FINDING (history-sourced) -- N6.1 + N6.2
+    N6.3 history within the invariant:                   VIOLATED -- 42 store page(s) carry unauthorized bytes with 0 unauthorized rows
+    scoring bases agree (parse vs raw):                  yes
+    basis:                                               the artefact carries unauthorized bytes and the store holds ZERO unauthorized rows, so the bytes came from its history
+    residue pages in the store (pgno:markers):           3:x15  6:x15  7:x15  8:x15  9:x15  10:x15  11:x15  12:x15  13:x15  14:x15  15:x15  16:x15  17:x15  18:x15  19:x15  20:x15  21:x15  22:x15  23:x15  24:x15  25:x15  26:x15  27:x15  28:x15  29:x15  30:x15  31:x15  32:x15  33:x15  34:x15  35:x15  36:x15  37:x15  38:x15  39:x15  40:x15  41:x15  42:x15  43:x15  44:x15  45:x15  46:x15
+    page images the request made durable:                5:neither  1:neither  3:UNAUTH-only:x15
+    NC-6 parser check:                                   3 of 3 images byte-identical to an independent copy
+    other in-scope artefacts:                            -shm: NEVER CREATED  |  -wal: NEVER CREATED  |  -journal: NEVER CREATED
+
+  D3-DROP-wal-W-A-default   residue 42 page(s), live unauthorized rows 0
+    artefact:                                            PRESENT, 16512 bytes
+    baseline attributable (DA-4):                        YES -- PRESENT BUT EMPTY (0 bytes) before the request
+    N6.1 + N6.2:                                         no finding (not sufficient alone, DA-5 row 3)
+    N6.3 history within the invariant:                   VIOLATED -- 42 store page(s) carry unauthorized bytes with 0 unauthorized rows
+    scoring bases agree (parse vs raw):                  yes
+    basis:                                               the artefact was inspected and carried no unauthorized bytes
+    residue pages in the store (pgno:markers):           3:x15  6:x15  7:x15  8:x15  9:x15  10:x15  11:x15  12:x15  13:x15  14:x15  15:x15  16:x15  17:x15  18:x15  19:x15  20:x15  21:x15  22:x15  23:x15  24:x15  25:x15  26:x15  27:x15  28:x15  29:x15  30:x15  31:x15  32:x15  33:x15  34:x15  35:x15  36:x15  37:x15  38:x15  39:x15  40:x15  41:x15  42:x15  43:x15  44:x15  45:x15  46:x15
+    page images the request made durable:                4:AUTH-only  47:AUTH-only  48:AUTH-only  49:AUTH-only
+    NC-6 parser check:                                   4 of 4 images byte-identical to an independent copy
+    other in-scope artefacts:                            -shm: 32768 bytes  |  -wal: 0 bytes  |  -journal: NEVER CREATED
+
+  D3-DROP-wal-W-A-tiny   residue 42 page(s), live unauthorized rows 0
+    artefact:                                            PRESENT, 16512 bytes
+    baseline attributable (DA-4):                        YES -- PRESENT BUT EMPTY (0 bytes) before the request
+    N6.1 + N6.2:                                         no finding (not sufficient alone, DA-5 row 3)
+    N6.3 history within the invariant:                   VIOLATED -- 42 store page(s) carry unauthorized bytes with 0 unauthorized rows
+    scoring bases agree (parse vs raw):                  yes
+    basis:                                               the artefact was inspected and carried no unauthorized bytes
+    residue pages in the store (pgno:markers):           3:x15  6:x15  7:x15  8:x15  9:x15  10:x15  11:x15  12:x15  13:x15  14:x15  15:x15  16:x15  17:x15  18:x15  19:x15  20:x15  21:x15  22:x15  23:x15  24:x15  25:x15  26:x15  27:x15  28:x15  29:x15  30:x15  31:x15  32:x15  33:x15  34:x15  35:x15  36:x15  37:x15  38:x15  39:x15  40:x15  41:x15  42:x15  43:x15  44:x15  45:x15  46:x15
+    page images the request made durable:                4:AUTH-only  49:AUTH-only  48:AUTH-only  47:AUTH-only
+    NC-6 parser check:                                   4 of 4 images byte-identical to an independent copy
+    other in-scope artefacts:                            -shm: 32768 bytes  |  -wal: 0 bytes  |  -journal: NEVER CREATED
+
+  D3-DROP-wal-W-B-default   residue 42 page(s), live unauthorized rows 0
+    artefact:                                            PRESENT, 28872 bytes
+    baseline attributable (DA-4):                        YES -- PRESENT BUT EMPTY (0 bytes) before the request
+    N6.1 + N6.2:                                         FINDING (history-sourced) -- N6.1 + N6.2
+    N6.3 history within the invariant:                   VIOLATED -- 42 store page(s) carry unauthorized bytes with 0 unauthorized rows
+    scoring bases agree (parse vs raw):                  yes
+    basis:                                               the artefact carries unauthorized bytes and the store holds ZERO unauthorized rows, so the bytes came from its history
+    residue pages in the store (pgno:markers):           3:x15  6:x15  7:x15  8:x15  9:x15  10:x15  11:x15  12:x15  13:x15  14:x15  15:x15  16:x15  17:x15  18:x15  19:x15  20:x15  21:x15  22:x15  23:x15  24:x15  25:x15  26:x15  27:x15  28:x15  29:x15  30:x15  31:x15  32:x15  33:x15  34:x15  35:x15  36:x15  37:x15  38:x15  39:x15  40:x15  41:x15  42:x15  43:x15  44:x15  45:x15  46:x15
+    page images the request made durable:                1:neither  3:UNAUTH-only:x15  5:AUTH-only  6:AUTH-only  42:AUTH-only  43:AUTH-only  46:AUTH-only
+    NC-6 parser check:                                   7 of 7 images byte-identical to an independent copy
+    other in-scope artefacts:                            -shm: 32768 bytes  |  -wal: 0 bytes  |  -journal: NEVER CREATED
+
+  D3-DROP-wal-W-B-tiny   residue 42 page(s), live unauthorized rows 0
+    artefact:                                            PRESENT, 28872 bytes
+    baseline attributable (DA-4):                        YES -- PRESENT BUT EMPTY (0 bytes) before the request
+    N6.1 + N6.2:                                         FINDING (history-sourced) -- N6.1 + N6.2
+    N6.3 history within the invariant:                   VIOLATED -- 42 store page(s) carry unauthorized bytes with 0 unauthorized rows
+    scoring bases agree (parse vs raw):                  yes
+    basis:                                               the artefact carries unauthorized bytes and the store holds ZERO unauthorized rows, so the bytes came from its history
+    residue pages in the store (pgno:markers):           3:x15  6:x15  7:x15  8:x15  9:x15  10:x15  11:x15  12:x15  13:x15  14:x15  15:x15  16:x15  17:x15  18:x15  19:x15  20:x15  21:x15  22:x15  23:x15  24:x15  25:x15  26:x15  27:x15  28:x15  29:x15  30:x15  31:x15  32:x15  33:x15  34:x15  35:x15  36:x15  37:x15  38:x15  39:x15  40:x15  41:x15  42:x15  43:x15  44:x15  45:x15  46:x15
+    page images the request made durable:                3:UNAUTH-only:x15  6:AUTH-only  46:AUTH-only  1:neither  5:AUTH-only  42:AUTH-only  43:AUTH-only
+    NC-6 parser check:                                   7 of 7 images byte-identical to an independent copy
+    other in-scope artefacts:                            -shm: 32768 bytes  |  -wal: 0 bytes  |  -journal: NEVER CREATED
+
+  D3-DELETE-delete-W-A-default   residue 42 page(s), live unauthorized rows 0
+    artefact:                                            PRESENT, 16928 bytes
+    baseline attributable (DA-4):                        YES -- NEVER CREATED before the request
+    N6.1 + N6.2:                                         no finding (not sufficient alone, DA-5 row 3)
+    N6.3 history within the invariant:                   VIOLATED -- 42 store page(s) carry unauthorized bytes with 0 unauthorized rows
+    scoring bases agree (parse vs raw):                  yes
+    basis:                                               the artefact was inspected and carried no unauthorized bytes
+    residue pages in the store (pgno:markers):           3:x15  6:x15  7:x15  8:x15  9:x15  10:x15  11:x15  12:x15  13:x15  14:x15  15:x15  16:x15  17:x15  18:x15  19:x15  20:x15  21:x15  22:x15  23:x15  24:x15  25:x15  26:x15  27:x15  28:x15  29:x15  30:x15  31:x15  32:x15  33:x15  34:x15  35:x15  36:x15  37:x15  38:x15  39:x15  40:x15  41:x15  42:x15  43:x15  44:x15  45:x15  46:x15
+    page images the request made durable:                4:AUTH-only  49:AUTH-only  48:AUTH-only  47:AUTH-only
+    NC-6 parser check:                                   4 of 4 images byte-identical to an independent copy
+    other in-scope artefacts:                            -shm: NEVER CREATED  |  -wal: NEVER CREATED  |  -journal: NEVER CREATED
+
+  D3-DELETE-delete-W-A-tiny   residue 42 page(s), live unauthorized rows 0
+    artefact:                                            PRESENT, 19976 bytes
+    baseline attributable (DA-4):                        YES -- NEVER CREATED before the request
+    N6.1 + N6.2:                                         no finding (not sufficient alone, DA-5 row 3)
+    N6.3 history within the invariant:                   VIOLATED -- 42 store page(s) carry unauthorized bytes with 0 unauthorized rows
+    scoring bases agree (parse vs raw):                  yes
+    basis:                                               the artefact was inspected and carried no unauthorized bytes
+    residue pages in the store (pgno:markers):           3:x15  6:x15  7:x15  8:x15  9:x15  10:x15  11:x15  12:x15  13:x15  14:x15  15:x15  16:x15  17:x15  18:x15  19:x15  20:x15  21:x15  22:x15  23:x15  24:x15  25:x15  26:x15  27:x15  28:x15  29:x15  30:x15  31:x15  32:x15  33:x15  34:x15  35:x15  36:x15  37:x15  38:x15  39:x15  40:x15  41:x15  42:x15  43:x15  44:x15  45:x15  46:x15
+    page images the request made durable:                4:AUTH-only  49:AUTH-only  48:AUTH-only  47:AUTH-only
+    NC-6 parser check:                                   4 of 4 images byte-identical to an independent copy
+    other in-scope artefacts:                            -shm: NEVER CREATED  |  -wal: NEVER CREATED  |  -journal: NEVER CREATED
+
+  D3-DELETE-delete-W-B-default   residue 42 page(s), live unauthorized rows 0
+    artefact:                                            PRESENT, 12824 bytes
+    baseline attributable (DA-4):                        YES -- NEVER CREATED before the request
+    N6.1 + N6.2:                                         FINDING (history-sourced) -- N6.1 + N6.2
+    N6.3 history within the invariant:                   VIOLATED -- 42 store page(s) carry unauthorized bytes with 0 unauthorized rows
+    scoring bases agree (parse vs raw):                  yes
+    basis:                                               the artefact carries unauthorized bytes and the store holds ZERO unauthorized rows, so the bytes came from its history
+    residue pages in the store (pgno:markers):           3:x15  6:x15  7:x15  8:x15  9:x15  10:x15  11:x15  12:x15  13:x15  14:x15  15:x15  16:x15  17:x15  18:x15  19:x15  20:x15  21:x15  22:x15  23:x15  24:x15  25:x15  26:x15  27:x15  28:x15  29:x15  30:x15  31:x15  32:x15  33:x15  34:x15  35:x15  36:x15  37:x15  38:x15  39:x15  40:x15  41:x15  42:x15  43:x15  44:x15  45:x15  46:x15
+    page images the request made durable:                5:neither  1:neither  3:UNAUTH-only:x15
+    NC-6 parser check:                                   3 of 3 images byte-identical to an independent copy
+    other in-scope artefacts:                            -shm: NEVER CREATED  |  -wal: NEVER CREATED  |  -journal: NEVER CREATED
+
+  D3-DELETE-delete-W-B-tiny   residue 42 page(s), live unauthorized rows 0
+    artefact:                                            PRESENT, 13824 bytes
+    baseline attributable (DA-4):                        YES -- NEVER CREATED before the request
+    N6.1 + N6.2:                                         FINDING (history-sourced) -- N6.1 + N6.2
+    N6.3 history within the invariant:                   VIOLATED -- 42 store page(s) carry unauthorized bytes with 0 unauthorized rows
+    scoring bases agree (parse vs raw):                  yes
+    basis:                                               the artefact carries unauthorized bytes and the store holds ZERO unauthorized rows, so the bytes came from its history
+    residue pages in the store (pgno:markers):           3:x15  6:x15  7:x15  8:x15  9:x15  10:x15  11:x15  12:x15  13:x15  14:x15  15:x15  16:x15  17:x15  18:x15  19:x15  20:x15  21:x15  22:x15  23:x15  24:x15  25:x15  26:x15  27:x15  28:x15  29:x15  30:x15  31:x15  32:x15  33:x15  34:x15  35:x15  36:x15  37:x15  38:x15  39:x15  40:x15  41:x15  42:x15  43:x15  44:x15  45:x15  46:x15
+    page images the request made durable:                5:neither  1:neither  3:UNAUTH-only:x15
+    NC-6 parser check:                                   3 of 3 images byte-identical to an independent copy
+    other in-scope artefacts:                            -shm: NEVER CREATED  |  -wal: NEVER CREATED  |  -journal: NEVER CREATED
+
+  D3-DELETE-wal-W-A-default   residue 42 page(s), live unauthorized rows 0
+    artefact:                                            PRESENT, 16512 bytes
+    baseline attributable (DA-4):                        YES -- PRESENT BUT EMPTY (0 bytes) before the request
+    N6.1 + N6.2:                                         no finding (not sufficient alone, DA-5 row 3)
+    N6.3 history within the invariant:                   VIOLATED -- 42 store page(s) carry unauthorized bytes with 0 unauthorized rows
+    scoring bases agree (parse vs raw):                  yes
+    basis:                                               the artefact was inspected and carried no unauthorized bytes
+    residue pages in the store (pgno:markers):           3:x15  6:x15  7:x15  8:x15  9:x15  10:x15  11:x15  12:x15  13:x15  14:x15  15:x15  16:x15  17:x15  18:x15  19:x15  20:x15  21:x15  22:x15  23:x15  24:x15  25:x15  26:x15  27:x15  28:x15  29:x15  30:x15  31:x15  32:x15  33:x15  34:x15  35:x15  36:x15  37:x15  38:x15  39:x15  40:x15  41:x15  42:x15  43:x15  44:x15  45:x15  46:x15
+    page images the request made durable:                4:AUTH-only  47:AUTH-only  48:AUTH-only  49:AUTH-only
+    NC-6 parser check:                                   4 of 4 images byte-identical to an independent copy
+    other in-scope artefacts:                            -shm: 32768 bytes  |  -wal: 0 bytes  |  -journal: NEVER CREATED
+
+  D3-DELETE-wal-W-A-tiny   residue 42 page(s), live unauthorized rows 0
+    artefact:                                            PRESENT, 16512 bytes
+    baseline attributable (DA-4):                        YES -- PRESENT BUT EMPTY (0 bytes) before the request
+    N6.1 + N6.2:                                         no finding (not sufficient alone, DA-5 row 3)
+    N6.3 history within the invariant:                   VIOLATED -- 42 store page(s) carry unauthorized bytes with 0 unauthorized rows
+    scoring bases agree (parse vs raw):                  yes
+    basis:                                               the artefact was inspected and carried no unauthorized bytes
+    residue pages in the store (pgno:markers):           3:x15  6:x15  7:x15  8:x15  9:x15  10:x15  11:x15  12:x15  13:x15  14:x15  15:x15  16:x15  17:x15  18:x15  19:x15  20:x15  21:x15  22:x15  23:x15  24:x15  25:x15  26:x15  27:x15  28:x15  29:x15  30:x15  31:x15  32:x15  33:x15  34:x15  35:x15  36:x15  37:x15  38:x15  39:x15  40:x15  41:x15  42:x15  43:x15  44:x15  45:x15  46:x15
+    page images the request made durable:                4:AUTH-only  49:AUTH-only  48:AUTH-only  47:AUTH-only
+    NC-6 parser check:                                   4 of 4 images byte-identical to an independent copy
+    other in-scope artefacts:                            -shm: 32768 bytes  |  -wal: 0 bytes  |  -journal: NEVER CREATED
+
+  D3-DELETE-wal-W-B-default   residue 42 page(s), live unauthorized rows 0
+    artefact:                                            PRESENT, 28872 bytes
+    baseline attributable (DA-4):                        YES -- PRESENT BUT EMPTY (0 bytes) before the request
+    N6.1 + N6.2:                                         FINDING (history-sourced) -- N6.1 + N6.2
+    N6.3 history within the invariant:                   VIOLATED -- 42 store page(s) carry unauthorized bytes with 0 unauthorized rows
+    scoring bases agree (parse vs raw):                  yes
+    basis:                                               the artefact carries unauthorized bytes and the store holds ZERO unauthorized rows, so the bytes came from its history
+    residue pages in the store (pgno:markers):           3:x15  6:x15  7:x15  8:x15  9:x15  10:x15  11:x15  12:x15  13:x15  14:x15  15:x15  16:x15  17:x15  18:x15  19:x15  20:x15  21:x15  22:x15  23:x15  24:x15  25:x15  26:x15  27:x15  28:x15  29:x15  30:x15  31:x15  32:x15  33:x15  34:x15  35:x15  36:x15  37:x15  38:x15  39:x15  40:x15  41:x15  42:x15  43:x15  44:x15  45:x15  46:x15
+    page images the request made durable:                1:neither  3:UNAUTH-only:x15  5:AUTH-only  6:AUTH-only  42:AUTH-only  43:AUTH-only  46:AUTH-only
+    NC-6 parser check:                                   7 of 7 images byte-identical to an independent copy
+    other in-scope artefacts:                            -shm: 32768 bytes  |  -wal: 0 bytes  |  -journal: NEVER CREATED
+
+  D3-DELETE-wal-W-B-tiny   residue 42 page(s), live unauthorized rows 0
+    artefact:                                            PRESENT, 28872 bytes
+    baseline attributable (DA-4):                        YES -- PRESENT BUT EMPTY (0 bytes) before the request
+    N6.1 + N6.2:                                         FINDING (history-sourced) -- N6.1 + N6.2
+    N6.3 history within the invariant:                   VIOLATED -- 42 store page(s) carry unauthorized bytes with 0 unauthorized rows
+    scoring bases agree (parse vs raw):                  yes
+    basis:                                               the artefact carries unauthorized bytes and the store holds ZERO unauthorized rows, so the bytes came from its history
+    residue pages in the store (pgno:markers):           3:x15  6:x15  7:x15  8:x15  9:x15  10:x15  11:x15  12:x15  13:x15  14:x15  15:x15  16:x15  17:x15  18:x15  19:x15  20:x15  21:x15  22:x15  23:x15  24:x15  25:x15  26:x15  27:x15  28:x15  29:x15  30:x15  31:x15  32:x15  33:x15  34:x15  35:x15  36:x15  37:x15  38:x15  39:x15  40:x15  41:x15  42:x15  43:x15  44:x15  45:x15  46:x15
+    page images the request made durable:                3:UNAUTH-only:x15  6:AUTH-only  46:AUTH-only  1:neither  5:AUTH-only  42:AUTH-only  43:AUTH-only
+    NC-6 parser check:                                   7 of 7 images byte-identical to an independent copy
+    other in-scope artefacts:                            -shm: 32768 bytes  |  -wal: 0 bytes  |  -journal: NEVER CREATED
+
+  F1-DROP-delete-W-A-default   residue 1 page(s), live unauthorized rows 0
+    artefact:                                            PRESENT, 16928 bytes
+    baseline attributable (DA-4):                        YES -- NEVER CREATED before the request
+    N6.1 + N6.2:                                         no finding (not sufficient alone, DA-5 row 3)
+    N6.3 history within the invariant:                   VIOLATED -- 1 store page(s) carry unauthorized bytes with 0 unauthorized rows
+    scoring bases agree (parse vs raw):                  yes
+    basis:                                               the artefact was inspected and carried no unauthorized bytes
+    residue pages in the store (pgno:markers):           3:x15
+    page images the request made durable:                4:AUTH-only  7:AUTH-only  6:AUTH-only  5:AUTH-only
+    NC-6 parser check:                                   4 of 4 images byte-identical to an independent copy
+    other in-scope artefacts:                            -shm: NEVER CREATED  |  -wal: NEVER CREATED  |  -journal: NEVER CREATED
+
+  F1-DROP-delete-W-A-tiny   residue 1 page(s), live unauthorized rows 0
+    artefact:                                            PRESENT, 19976 bytes
+    baseline attributable (DA-4):                        YES -- NEVER CREATED before the request
+    N6.1 + N6.2:                                         no finding (not sufficient alone, DA-5 row 3)
+    N6.3 history within the invariant:                   VIOLATED -- 1 store page(s) carry unauthorized bytes with 0 unauthorized rows
+    scoring bases agree (parse vs raw):                  yes
+    basis:                                               the artefact was inspected and carried no unauthorized bytes
+    residue pages in the store (pgno:markers):           3:x15
+    page images the request made durable:                4:AUTH-only  7:AUTH-only  6:AUTH-only  5:AUTH-only
+    NC-6 parser check:                                   4 of 4 images byte-identical to an independent copy
+    other in-scope artefacts:                            -shm: NEVER CREATED  |  -wal: NEVER CREATED  |  -journal: NEVER CREATED
+
+  F1-DROP-delete-W-B-default   residue 1 page(s), live unauthorized rows 0
+    artefact:                                            PRESENT, 8720 bytes
+    baseline attributable (DA-4):                        YES -- NEVER CREATED before the request
+    N6.1 + N6.2:                                         FINDING (history-sourced) -- N6.1 + N6.2
+    N6.3 history within the invariant:                   VIOLATED -- 1 store page(s) carry unauthorized bytes with 0 unauthorized rows
+    scoring bases agree (parse vs raw):                  yes
+    basis:                                               the artefact carries unauthorized bytes and the store holds ZERO unauthorized rows, so the bytes came from its history
+    residue pages in the store (pgno:markers):           3:x15
+    page images the request made durable:                3:UNAUTH-only:x15  1:neither
+    NC-6 parser check:                                   2 of 2 images byte-identical to an independent copy
+    other in-scope artefacts:                            -shm: NEVER CREATED  |  -wal: NEVER CREATED  |  -journal: NEVER CREATED
+
+  F1-DROP-delete-W-B-tiny   residue 1 page(s), live unauthorized rows 0
+    artefact:                                            PRESENT, 9728 bytes
+    baseline attributable (DA-4):                        YES -- NEVER CREATED before the request
+    N6.1 + N6.2:                                         FINDING (history-sourced) -- N6.1 + N6.2
+    N6.3 history within the invariant:                   VIOLATED -- 1 store page(s) carry unauthorized bytes with 0 unauthorized rows
+    scoring bases agree (parse vs raw):                  yes
+    basis:                                               the artefact carries unauthorized bytes and the store holds ZERO unauthorized rows, so the bytes came from its history
+    residue pages in the store (pgno:markers):           3:x15
+    page images the request made durable:                3:UNAUTH-only:x15  1:neither
+    NC-6 parser check:                                   2 of 2 images byte-identical to an independent copy
+    other in-scope artefacts:                            -shm: NEVER CREATED  |  -wal: NEVER CREATED  |  -journal: NEVER CREATED
+
+  F1-DROP-wal-W-A-default   residue 1 page(s), live unauthorized rows 0
+    artefact:                                            PRESENT, 16512 bytes
+    baseline attributable (DA-4):                        YES -- PRESENT BUT EMPTY (0 bytes) before the request
+    N6.1 + N6.2:                                         no finding (not sufficient alone, DA-5 row 3)
+    N6.3 history within the invariant:                   VIOLATED -- 1 store page(s) carry unauthorized bytes with 0 unauthorized rows
+    scoring bases agree (parse vs raw):                  yes
+    basis:                                               the artefact was inspected and carried no unauthorized bytes
+    residue pages in the store (pgno:markers):           3:x15
+    page images the request made durable:                4:AUTH-only  5:AUTH-only  6:AUTH-only  7:AUTH-only
+    NC-6 parser check:                                   4 of 4 images byte-identical to an independent copy
+    other in-scope artefacts:                            -shm: 32768 bytes  |  -wal: 0 bytes  |  -journal: NEVER CREATED
+
+  F1-DROP-wal-W-A-tiny   residue 1 page(s), live unauthorized rows 0
+    artefact:                                            PRESENT, 16512 bytes
+    baseline attributable (DA-4):                        YES -- PRESENT BUT EMPTY (0 bytes) before the request
+    N6.1 + N6.2:                                         no finding (not sufficient alone, DA-5 row 3)
+    N6.3 history within the invariant:                   VIOLATED -- 1 store page(s) carry unauthorized bytes with 0 unauthorized rows
+    scoring bases agree (parse vs raw):                  yes
+    basis:                                               the artefact was inspected and carried no unauthorized bytes
+    residue pages in the store (pgno:markers):           3:x15
+    page images the request made durable:                4:AUTH-only  7:AUTH-only  6:AUTH-only  5:AUTH-only
+    NC-6 parser check:                                   4 of 4 images byte-identical to an independent copy
+    other in-scope artefacts:                            -shm: 32768 bytes  |  -wal: 0 bytes  |  -journal: NEVER CREATED
+
+  F1-DROP-wal-W-B-default   residue 1 page(s), live unauthorized rows 0
+    artefact:                                            PRESENT, 24752 bytes
+    baseline attributable (DA-4):                        YES -- PRESENT BUT EMPTY (0 bytes) before the request
+    N6.1 + N6.2:                                         no finding (not sufficient alone, DA-5 row 3)
+    N6.3 history within the invariant:                   VIOLATED -- 1 store page(s) carry unauthorized bytes with 0 unauthorized rows
+    scoring bases agree (parse vs raw):                  yes
+    basis:                                               the artefact was inspected and carried no unauthorized bytes
+    residue pages in the store (pgno:markers):           3:x15
+    page images the request made durable:                1:neither  3:AUTH-only  8:AUTH-only  9:AUTH-only  10:AUTH-only  11:AUTH-only
+    NC-6 parser check:                                   6 of 6 images byte-identical to an independent copy
+    other in-scope artefacts:                            -shm: 32768 bytes  |  -wal: 0 bytes  |  -journal: NEVER CREATED
+
+  F1-DROP-wal-W-B-tiny   residue 1 page(s), live unauthorized rows 0
+    artefact:                                            PRESENT, 28872 bytes
+    baseline attributable (DA-4):                        YES -- PRESENT BUT EMPTY (0 bytes) before the request
+    N6.1 + N6.2:                                         no finding (not sufficient alone, DA-5 row 3)
+    N6.3 history within the invariant:                   VIOLATED -- 1 store page(s) carry unauthorized bytes with 0 unauthorized rows
+    scoring bases agree (parse vs raw):                  yes
+    basis:                                               the artefact was inspected and carried no unauthorized bytes
+    residue pages in the store (pgno:markers):           3:x15
+    page images the request made durable:                8:AUTH-only  9:AUTH-only  11:AUTH-only  10:AUTH-only  1:neither  3:AUTH-only  11:AUTH-only
+    NC-6 parser check:                                   6 of 6 images byte-identical to an independent copy
+    other in-scope artefacts:                            -shm: 32768 bytes  |  -wal: 0 bytes  |  -journal: NEVER CREATED
+
+  F1-DELETE-delete-W-A-default   residue 1 page(s), live unauthorized rows 0
+    artefact:                                            PRESENT, 16928 bytes
+    baseline attributable (DA-4):                        YES -- NEVER CREATED before the request
+    N6.1 + N6.2:                                         no finding (not sufficient alone, DA-5 row 3)
+    N6.3 history within the invariant:                   VIOLATED -- 1 store page(s) carry unauthorized bytes with 0 unauthorized rows
+    scoring bases agree (parse vs raw):                  yes
+    basis:                                               the artefact was inspected and carried no unauthorized bytes
+    residue pages in the store (pgno:markers):           3:x15
+    page images the request made durable:                4:AUTH-only  7:AUTH-only  6:AUTH-only  5:AUTH-only
+    NC-6 parser check:                                   4 of 4 images byte-identical to an independent copy
+    other in-scope artefacts:                            -shm: NEVER CREATED  |  -wal: NEVER CREATED  |  -journal: NEVER CREATED
+
+  F1-DELETE-delete-W-A-tiny   residue 1 page(s), live unauthorized rows 0
+    artefact:                                            PRESENT, 19976 bytes
+    baseline attributable (DA-4):                        YES -- NEVER CREATED before the request
+    N6.1 + N6.2:                                         no finding (not sufficient alone, DA-5 row 3)
+    N6.3 history within the invariant:                   VIOLATED -- 1 store page(s) carry unauthorized bytes with 0 unauthorized rows
+    scoring bases agree (parse vs raw):                  yes
+    basis:                                               the artefact was inspected and carried no unauthorized bytes
+    residue pages in the store (pgno:markers):           3:x15
+    page images the request made durable:                4:AUTH-only  7:AUTH-only  6:AUTH-only  5:AUTH-only
+    NC-6 parser check:                                   4 of 4 images byte-identical to an independent copy
+    other in-scope artefacts:                            -shm: NEVER CREATED  |  -wal: NEVER CREATED  |  -journal: NEVER CREATED
+
+  F1-DELETE-delete-W-B-default   residue 1 page(s), live unauthorized rows 0
+    artefact:                                            PRESENT, 8720 bytes
+    baseline attributable (DA-4):                        YES -- NEVER CREATED before the request
+    N6.1 + N6.2:                                         FINDING (history-sourced) -- N6.1 + N6.2
+    N6.3 history within the invariant:                   VIOLATED -- 1 store page(s) carry unauthorized bytes with 0 unauthorized rows
+    scoring bases agree (parse vs raw):                  yes
+    basis:                                               the artefact carries unauthorized bytes and the store holds ZERO unauthorized rows, so the bytes came from its history
+    residue pages in the store (pgno:markers):           3:x15
+    page images the request made durable:                3:UNAUTH-only:x15  1:neither
+    NC-6 parser check:                                   2 of 2 images byte-identical to an independent copy
+    other in-scope artefacts:                            -shm: NEVER CREATED  |  -wal: NEVER CREATED  |  -journal: NEVER CREATED
+
+  F1-DELETE-delete-W-B-tiny   residue 1 page(s), live unauthorized rows 0
+    artefact:                                            PRESENT, 9728 bytes
+    baseline attributable (DA-4):                        YES -- NEVER CREATED before the request
+    N6.1 + N6.2:                                         FINDING (history-sourced) -- N6.1 + N6.2
+    N6.3 history within the invariant:                   VIOLATED -- 1 store page(s) carry unauthorized bytes with 0 unauthorized rows
+    scoring bases agree (parse vs raw):                  yes
+    basis:                                               the artefact carries unauthorized bytes and the store holds ZERO unauthorized rows, so the bytes came from its history
+    residue pages in the store (pgno:markers):           3:x15
+    page images the request made durable:                3:UNAUTH-only:x15  1:neither
+    NC-6 parser check:                                   2 of 2 images byte-identical to an independent copy
+    other in-scope artefacts:                            -shm: NEVER CREATED  |  -wal: NEVER CREATED  |  -journal: NEVER CREATED
+
+  F1-DELETE-wal-W-A-default   residue 1 page(s), live unauthorized rows 0
+    artefact:                                            PRESENT, 16512 bytes
+    baseline attributable (DA-4):                        YES -- PRESENT BUT EMPTY (0 bytes) before the request
+    N6.1 + N6.2:                                         no finding (not sufficient alone, DA-5 row 3)
+    N6.3 history within the invariant:                   VIOLATED -- 1 store page(s) carry unauthorized bytes with 0 unauthorized rows
+    scoring bases agree (parse vs raw):                  yes
+    basis:                                               the artefact was inspected and carried no unauthorized bytes
+    residue pages in the store (pgno:markers):           3:x15
+    page images the request made durable:                4:AUTH-only  5:AUTH-only  6:AUTH-only  7:AUTH-only
+    NC-6 parser check:                                   4 of 4 images byte-identical to an independent copy
+    other in-scope artefacts:                            -shm: 32768 bytes  |  -wal: 0 bytes  |  -journal: NEVER CREATED
+
+  F1-DELETE-wal-W-A-tiny   residue 1 page(s), live unauthorized rows 0
+    artefact:                                            PRESENT, 16512 bytes
+    baseline attributable (DA-4):                        YES -- PRESENT BUT EMPTY (0 bytes) before the request
+    N6.1 + N6.2:                                         no finding (not sufficient alone, DA-5 row 3)
+    N6.3 history within the invariant:                   VIOLATED -- 1 store page(s) carry unauthorized bytes with 0 unauthorized rows
+    scoring bases agree (parse vs raw):                  yes
+    basis:                                               the artefact was inspected and carried no unauthorized bytes
+    residue pages in the store (pgno:markers):           3:x15
+    page images the request made durable:                4:AUTH-only  7:AUTH-only  6:AUTH-only  5:AUTH-only
+    NC-6 parser check:                                   4 of 4 images byte-identical to an independent copy
+    other in-scope artefacts:                            -shm: 32768 bytes  |  -wal: 0 bytes  |  -journal: NEVER CREATED
+
+  F1-DELETE-wal-W-B-default   residue 1 page(s), live unauthorized rows 0
+    artefact:                                            PRESENT, 24752 bytes
+    baseline attributable (DA-4):                        YES -- PRESENT BUT EMPTY (0 bytes) before the request
+    N6.1 + N6.2:                                         no finding (not sufficient alone, DA-5 row 3)
+    N6.3 history within the invariant:                   VIOLATED -- 1 store page(s) carry unauthorized bytes with 0 unauthorized rows
+    scoring bases agree (parse vs raw):                  yes
+    basis:                                               the artefact was inspected and carried no unauthorized bytes
+    residue pages in the store (pgno:markers):           3:x15
+    page images the request made durable:                1:neither  3:AUTH-only  8:AUTH-only  9:AUTH-only  10:AUTH-only  11:AUTH-only
+    NC-6 parser check:                                   6 of 6 images byte-identical to an independent copy
+    other in-scope artefacts:                            -shm: 32768 bytes  |  -wal: 0 bytes  |  -journal: NEVER CREATED
+
+  F1-DELETE-wal-W-B-tiny   residue 1 page(s), live unauthorized rows 0
+    artefact:                                            PRESENT, 28872 bytes
+    baseline attributable (DA-4):                        YES -- PRESENT BUT EMPTY (0 bytes) before the request
+    N6.1 + N6.2:                                         no finding (not sufficient alone, DA-5 row 3)
+    N6.3 history within the invariant:                   VIOLATED -- 1 store page(s) carry unauthorized bytes with 0 unauthorized rows
+    scoring bases agree (parse vs raw):                  yes
+    basis:                                               the artefact was inspected and carried no unauthorized bytes
+    residue pages in the store (pgno:markers):           3:x15
+    page images the request made durable:                8:AUTH-only  9:AUTH-only  11:AUTH-only  10:AUTH-only  1:neither  3:AUTH-only  11:AUTH-only
+    NC-6 parser check:                                   6 of 6 images byte-identical to an independent copy
+    other in-scope artefacts:                            -shm: 32768 bytes  |  -wal: 0 bytes  |  -journal: NEVER CREATED
+
+  F2-DROP-delete-W-A-default   residue 3 page(s), live unauthorized rows 0
+    artefact:                                            PRESENT, 16928 bytes
+    baseline attributable (DA-4):                        YES -- NEVER CREATED before the request
+    N6.1 + N6.2:                                         no finding (not sufficient alone, DA-5 row 3)
+    N6.3 history within the invariant:                   VIOLATED -- 3 store page(s) carry unauthorized bytes with 0 unauthorized rows
+    scoring bases agree (parse vs raw):                  yes
+    basis:                                               the artefact was inspected and carried no unauthorized bytes
+    residue pages in the store (pgno:markers):           3:x15  6:x15  7:x15
+    page images the request made durable:                4:AUTH-only  10:AUTH-only  9:AUTH-only  8:AUTH-only
+    NC-6 parser check:                                   4 of 4 images byte-identical to an independent copy
+    other in-scope artefacts:                            -shm: NEVER CREATED  |  -wal: NEVER CREATED  |  -journal: NEVER CREATED
+
+  F2-DROP-delete-W-A-tiny   residue 3 page(s), live unauthorized rows 0
+    artefact:                                            PRESENT, 19976 bytes
+    baseline attributable (DA-4):                        YES -- NEVER CREATED before the request
+    N6.1 + N6.2:                                         no finding (not sufficient alone, DA-5 row 3)
+    N6.3 history within the invariant:                   VIOLATED -- 3 store page(s) carry unauthorized bytes with 0 unauthorized rows
+    scoring bases agree (parse vs raw):                  yes
+    basis:                                               the artefact was inspected and carried no unauthorized bytes
+    residue pages in the store (pgno:markers):           3:x15  6:x15  7:x15
+    page images the request made durable:                4:AUTH-only  10:AUTH-only  9:AUTH-only  8:AUTH-only
+    NC-6 parser check:                                   4 of 4 images byte-identical to an independent copy
+    other in-scope artefacts:                            -shm: NEVER CREATED  |  -wal: NEVER CREATED  |  -journal: NEVER CREATED
+
+  F2-DROP-delete-W-B-default   residue 3 page(s), live unauthorized rows 0
+    artefact:                                            PRESENT, 12824 bytes
+    baseline attributable (DA-4):                        YES -- NEVER CREATED before the request
+    N6.1 + N6.2:                                         FINDING (history-sourced) -- N6.1 + N6.2
+    N6.3 history within the invariant:                   VIOLATED -- 3 store page(s) carry unauthorized bytes with 0 unauthorized rows
+    scoring bases agree (parse vs raw):                  yes
+    basis:                                               the artefact carries unauthorized bytes and the store holds ZERO unauthorized rows, so the bytes came from its history
+    residue pages in the store (pgno:markers):           3:x15  6:x15  7:x15
+    page images the request made durable:                5:neither  1:neither  3:UNAUTH-only:x15
+    NC-6 parser check:                                   3 of 3 images byte-identical to an independent copy
+    other in-scope artefacts:                            -shm: NEVER CREATED  |  -wal: NEVER CREATED  |  -journal: NEVER CREATED
+
+  F2-DROP-delete-W-B-tiny   residue 3 page(s), live unauthorized rows 0
+    artefact:                                            PRESENT, 13824 bytes
+    baseline attributable (DA-4):                        YES -- NEVER CREATED before the request
+    N6.1 + N6.2:                                         FINDING (history-sourced) -- N6.1 + N6.2
+    N6.3 history within the invariant:                   VIOLATED -- 3 store page(s) carry unauthorized bytes with 0 unauthorized rows
+    scoring bases agree (parse vs raw):                  yes
+    basis:                                               the artefact carries unauthorized bytes and the store holds ZERO unauthorized rows, so the bytes came from its history
+    residue pages in the store (pgno:markers):           3:x15  6:x15  7:x15
+    page images the request made durable:                5:neither  1:neither  3:UNAUTH-only:x15
+    NC-6 parser check:                                   3 of 3 images byte-identical to an independent copy
+    other in-scope artefacts:                            -shm: NEVER CREATED  |  -wal: NEVER CREATED  |  -journal: NEVER CREATED
+
+  F2-DROP-wal-W-A-default   residue 3 page(s), live unauthorized rows 0
+    artefact:                                            PRESENT, 16512 bytes
+    baseline attributable (DA-4):                        YES -- PRESENT BUT EMPTY (0 bytes) before the request
+    N6.1 + N6.2:                                         no finding (not sufficient alone, DA-5 row 3)
+    N6.3 history within the invariant:                   VIOLATED -- 3 store page(s) carry unauthorized bytes with 0 unauthorized rows
+    scoring bases agree (parse vs raw):                  yes
+    basis:                                               the artefact was inspected and carried no unauthorized bytes
+    residue pages in the store (pgno:markers):           3:x15  6:x15  7:x15
+    page images the request made durable:                4:AUTH-only  8:AUTH-only  9:AUTH-only  10:AUTH-only
+    NC-6 parser check:                                   4 of 4 images byte-identical to an independent copy
+    other in-scope artefacts:                            -shm: 32768 bytes  |  -wal: 0 bytes  |  -journal: NEVER CREATED
+
+  F2-DROP-wal-W-A-tiny   residue 3 page(s), live unauthorized rows 0
+    artefact:                                            PRESENT, 16512 bytes
+    baseline attributable (DA-4):                        YES -- PRESENT BUT EMPTY (0 bytes) before the request
+    N6.1 + N6.2:                                         no finding (not sufficient alone, DA-5 row 3)
+    N6.3 history within the invariant:                   VIOLATED -- 3 store page(s) carry unauthorized bytes with 0 unauthorized rows
+    scoring bases agree (parse vs raw):                  yes
+    basis:                                               the artefact was inspected and carried no unauthorized bytes
+    residue pages in the store (pgno:markers):           3:x15  6:x15  7:x15
+    page images the request made durable:                4:AUTH-only  10:AUTH-only  9:AUTH-only  8:AUTH-only
+    NC-6 parser check:                                   4 of 4 images byte-identical to an independent copy
+    other in-scope artefacts:                            -shm: 32768 bytes  |  -wal: 0 bytes  |  -journal: NEVER CREATED
+
+  F2-DROP-wal-W-B-default   residue 3 page(s), live unauthorized rows 0
+    artefact:                                            PRESENT, 24752 bytes
+    baseline attributable (DA-4):                        YES -- PRESENT BUT EMPTY (0 bytes) before the request
+    N6.1 + N6.2:                                         no finding (not sufficient alone, DA-5 row 3)
+    N6.3 history within the invariant:                   VIOLATED -- 3 store page(s) carry unauthorized bytes with 0 unauthorized rows
+    scoring bases agree (parse vs raw):                  yes
+    basis:                                               the artefact was inspected and carried no unauthorized bytes
+    residue pages in the store (pgno:markers):           3:x15  6:x15  7:x15
+    page images the request made durable:                1:neither  3:AUTH-only  5:AUTH-only  6:AUTH-only  7:AUTH-only  11:AUTH-only
+    NC-6 parser check:                                   6 of 6 images byte-identical to an independent copy
+    other in-scope artefacts:                            -shm: 32768 bytes  |  -wal: 0 bytes  |  -journal: NEVER CREATED
+
+  F2-DROP-wal-W-B-tiny   residue 3 page(s), live unauthorized rows 0
+    artefact:                                            PRESENT, 28872 bytes
+    baseline attributable (DA-4):                        YES -- PRESENT BUT EMPTY (0 bytes) before the request
+    N6.1 + N6.2:                                         no finding (not sufficient alone, DA-5 row 3)
+    N6.3 history within the invariant:                   VIOLATED -- 3 store page(s) carry unauthorized bytes with 0 unauthorized rows
+    scoring bases agree (parse vs raw):                  yes
+    basis:                                               the artefact was inspected and carried no unauthorized bytes
+    residue pages in the store (pgno:markers):           3:x15  6:x15  7:x15
+    page images the request made durable:                3:AUTH-only  6:AUTH-only  7:AUTH-only  11:AUTH-only  1:neither  5:AUTH-only  11:AUTH-only
+    NC-6 parser check:                                   6 of 6 images byte-identical to an independent copy
+    other in-scope artefacts:                            -shm: 32768 bytes  |  -wal: 0 bytes  |  -journal: NEVER CREATED
+
+  F2-DELETE-delete-W-A-default   residue 3 page(s), live unauthorized rows 0
+    artefact:                                            PRESENT, 16928 bytes
+    baseline attributable (DA-4):                        YES -- NEVER CREATED before the request
+    N6.1 + N6.2:                                         no finding (not sufficient alone, DA-5 row 3)
+    N6.3 history within the invariant:                   VIOLATED -- 3 store page(s) carry unauthorized bytes with 0 unauthorized rows
+    scoring bases agree (parse vs raw):                  yes
+    basis:                                               the artefact was inspected and carried no unauthorized bytes
+    residue pages in the store (pgno:markers):           3:x15  6:x15  7:x15
+    page images the request made durable:                4:AUTH-only  10:AUTH-only  9:AUTH-only  8:AUTH-only
+    NC-6 parser check:                                   4 of 4 images byte-identical to an independent copy
+    other in-scope artefacts:                            -shm: NEVER CREATED  |  -wal: NEVER CREATED  |  -journal: NEVER CREATED
+
+  F2-DELETE-delete-W-A-tiny   residue 3 page(s), live unauthorized rows 0
+    artefact:                                            PRESENT, 19976 bytes
+    baseline attributable (DA-4):                        YES -- NEVER CREATED before the request
+    N6.1 + N6.2:                                         no finding (not sufficient alone, DA-5 row 3)
+    N6.3 history within the invariant:                   VIOLATED -- 3 store page(s) carry unauthorized bytes with 0 unauthorized rows
+    scoring bases agree (parse vs raw):                  yes
+    basis:                                               the artefact was inspected and carried no unauthorized bytes
+    residue pages in the store (pgno:markers):           3:x15  6:x15  7:x15
+    page images the request made durable:                4:AUTH-only  10:AUTH-only  9:AUTH-only  8:AUTH-only
+    NC-6 parser check:                                   4 of 4 images byte-identical to an independent copy
+    other in-scope artefacts:                            -shm: NEVER CREATED  |  -wal: NEVER CREATED  |  -journal: NEVER CREATED
+
+  F2-DELETE-delete-W-B-default   residue 3 page(s), live unauthorized rows 0
+    artefact:                                            PRESENT, 12824 bytes
+    baseline attributable (DA-4):                        YES -- NEVER CREATED before the request
+    N6.1 + N6.2:                                         FINDING (history-sourced) -- N6.1 + N6.2
+    N6.3 history within the invariant:                   VIOLATED -- 3 store page(s) carry unauthorized bytes with 0 unauthorized rows
+    scoring bases agree (parse vs raw):                  yes
+    basis:                                               the artefact carries unauthorized bytes and the store holds ZERO unauthorized rows, so the bytes came from its history
+    residue pages in the store (pgno:markers):           3:x15  6:x15  7:x15
+    page images the request made durable:                5:neither  1:neither  3:UNAUTH-only:x15
+    NC-6 parser check:                                   3 of 3 images byte-identical to an independent copy
+    other in-scope artefacts:                            -shm: NEVER CREATED  |  -wal: NEVER CREATED  |  -journal: NEVER CREATED
+
+  F2-DELETE-delete-W-B-tiny   residue 3 page(s), live unauthorized rows 0
+    artefact:                                            PRESENT, 13824 bytes
+    baseline attributable (DA-4):                        YES -- NEVER CREATED before the request
+    N6.1 + N6.2:                                         FINDING (history-sourced) -- N6.1 + N6.2
+    N6.3 history within the invariant:                   VIOLATED -- 3 store page(s) carry unauthorized bytes with 0 unauthorized rows
+    scoring bases agree (parse vs raw):                  yes
+    basis:                                               the artefact carries unauthorized bytes and the store holds ZERO unauthorized rows, so the bytes came from its history
+    residue pages in the store (pgno:markers):           3:x15  6:x15  7:x15
+    page images the request made durable:                5:neither  1:neither  3:UNAUTH-only:x15
+    NC-6 parser check:                                   3 of 3 images byte-identical to an independent copy
+    other in-scope artefacts:                            -shm: NEVER CREATED  |  -wal: NEVER CREATED  |  -journal: NEVER CREATED
+
+  F2-DELETE-wal-W-A-default   residue 3 page(s), live unauthorized rows 0
+    artefact:                                            PRESENT, 16512 bytes
+    baseline attributable (DA-4):                        YES -- PRESENT BUT EMPTY (0 bytes) before the request
+    N6.1 + N6.2:                                         no finding (not sufficient alone, DA-5 row 3)
+    N6.3 history within the invariant:                   VIOLATED -- 3 store page(s) carry unauthorized bytes with 0 unauthorized rows
+    scoring bases agree (parse vs raw):                  yes
+    basis:                                               the artefact was inspected and carried no unauthorized bytes
+    residue pages in the store (pgno:markers):           3:x15  6:x15  7:x15
+    page images the request made durable:                4:AUTH-only  8:AUTH-only  9:AUTH-only  10:AUTH-only
+    NC-6 parser check:                                   4 of 4 images byte-identical to an independent copy
+    other in-scope artefacts:                            -shm: 32768 bytes  |  -wal: 0 bytes  |  -journal: NEVER CREATED
+
+  F2-DELETE-wal-W-A-tiny   residue 3 page(s), live unauthorized rows 0
+    artefact:                                            PRESENT, 16512 bytes
+    baseline attributable (DA-4):                        YES -- PRESENT BUT EMPTY (0 bytes) before the request
+    N6.1 + N6.2:                                         no finding (not sufficient alone, DA-5 row 3)
+    N6.3 history within the invariant:                   VIOLATED -- 3 store page(s) carry unauthorized bytes with 0 unauthorized rows
+    scoring bases agree (parse vs raw):                  yes
+    basis:                                               the artefact was inspected and carried no unauthorized bytes
+    residue pages in the store (pgno:markers):           3:x15  6:x15  7:x15
+    page images the request made durable:                4:AUTH-only  10:AUTH-only  9:AUTH-only  8:AUTH-only
+    NC-6 parser check:                                   4 of 4 images byte-identical to an independent copy
+    other in-scope artefacts:                            -shm: 32768 bytes  |  -wal: 0 bytes  |  -journal: NEVER CREATED
+
+  F2-DELETE-wal-W-B-default   residue 3 page(s), live unauthorized rows 0
+    artefact:                                            PRESENT, 24752 bytes
+    baseline attributable (DA-4):                        YES -- PRESENT BUT EMPTY (0 bytes) before the request
+    N6.1 + N6.2:                                         no finding (not sufficient alone, DA-5 row 3)
+    N6.3 history within the invariant:                   VIOLATED -- 3 store page(s) carry unauthorized bytes with 0 unauthorized rows
+    scoring bases agree (parse vs raw):                  yes
+    basis:                                               the artefact was inspected and carried no unauthorized bytes
+    residue pages in the store (pgno:markers):           3:x15  6:x15  7:x15
+    page images the request made durable:                1:neither  3:AUTH-only  5:AUTH-only  6:AUTH-only  7:AUTH-only  11:AUTH-only
+    NC-6 parser check:                                   6 of 6 images byte-identical to an independent copy
+    other in-scope artefacts:                            -shm: 32768 bytes  |  -wal: 0 bytes  |  -journal: NEVER CREATED
+
+  F2-DELETE-wal-W-B-tiny   residue 3 page(s), live unauthorized rows 0
+    artefact:                                            PRESENT, 28872 bytes
+    baseline attributable (DA-4):                        YES -- PRESENT BUT EMPTY (0 bytes) before the request
+    N6.1 + N6.2:                                         no finding (not sufficient alone, DA-5 row 3)
+    N6.3 history within the invariant:                   VIOLATED -- 3 store page(s) carry unauthorized bytes with 0 unauthorized rows
+    scoring bases agree (parse vs raw):                  yes
+    basis:                                               the artefact was inspected and carried no unauthorized bytes
+    residue pages in the store (pgno:markers):           3:x15  6:x15  7:x15
+    page images the request made durable:                3:AUTH-only  6:AUTH-only  7:AUTH-only  11:AUTH-only  1:neither  5:AUTH-only  11:AUTH-only
+    NC-6 parser check:                                   6 of 6 images byte-identical to an independent copy
+    other in-scope artefacts:                            -shm: 32768 bytes  |  -wal: 0 bytes  |  -journal: NEVER CREATED
+
+  F3-DROP-delete-W-A-default   residue 5 page(s), live unauthorized rows 0
+    artefact:                                            PRESENT, 16928 bytes
+    baseline attributable (DA-4):                        YES -- NEVER CREATED before the request
+    N6.1 + N6.2:                                         no finding (not sufficient alone, DA-5 row 3)
+    N6.3 history within the invariant:                   VIOLATED -- 5 store page(s) carry unauthorized bytes with 0 unauthorized rows
+    scoring bases agree (parse vs raw):                  yes
+    basis:                                               the artefact was inspected and carried no unauthorized bytes
+    residue pages in the store (pgno:markers):           3:x15  6:x15  7:x15  8:x15  9:x15
+    page images the request made durable:                4:AUTH-only  12:AUTH-only  11:AUTH-only  10:AUTH-only
+    NC-6 parser check:                                   4 of 4 images byte-identical to an independent copy
+    other in-scope artefacts:                            -shm: NEVER CREATED  |  -wal: NEVER CREATED  |  -journal: NEVER CREATED
+
+  F3-DROP-delete-W-A-tiny   residue 5 page(s), live unauthorized rows 0
+    artefact:                                            PRESENT, 19976 bytes
+    baseline attributable (DA-4):                        YES -- NEVER CREATED before the request
+    N6.1 + N6.2:                                         no finding (not sufficient alone, DA-5 row 3)
+    N6.3 history within the invariant:                   VIOLATED -- 5 store page(s) carry unauthorized bytes with 0 unauthorized rows
+    scoring bases agree (parse vs raw):                  yes
+    basis:                                               the artefact was inspected and carried no unauthorized bytes
+    residue pages in the store (pgno:markers):           3:x15  6:x15  7:x15  8:x15  9:x15
+    page images the request made durable:                4:AUTH-only  12:AUTH-only  11:AUTH-only  10:AUTH-only
+    NC-6 parser check:                                   4 of 4 images byte-identical to an independent copy
+    other in-scope artefacts:                            -shm: NEVER CREATED  |  -wal: NEVER CREATED  |  -journal: NEVER CREATED
+
+  F3-DROP-delete-W-B-default   residue 5 page(s), live unauthorized rows 0
+    artefact:                                            PRESENT, 12824 bytes
+    baseline attributable (DA-4):                        YES -- NEVER CREATED before the request
+    N6.1 + N6.2:                                         FINDING (history-sourced) -- N6.1 + N6.2
+    N6.3 history within the invariant:                   VIOLATED -- 5 store page(s) carry unauthorized bytes with 0 unauthorized rows
+    scoring bases agree (parse vs raw):                  yes
+    basis:                                               the artefact carries unauthorized bytes and the store holds ZERO unauthorized rows, so the bytes came from its history
+    residue pages in the store (pgno:markers):           3:x15  6:x15  7:x15  8:x15  9:x15
+    page images the request made durable:                5:neither  1:neither  3:UNAUTH-only:x15
+    NC-6 parser check:                                   3 of 3 images byte-identical to an independent copy
+    other in-scope artefacts:                            -shm: NEVER CREATED  |  -wal: NEVER CREATED  |  -journal: NEVER CREATED
+
+  F3-DROP-delete-W-B-tiny   residue 5 page(s), live unauthorized rows 0
+    artefact:                                            PRESENT, 13824 bytes
+    baseline attributable (DA-4):                        YES -- NEVER CREATED before the request
+    N6.1 + N6.2:                                         FINDING (history-sourced) -- N6.1 + N6.2
+    N6.3 history within the invariant:                   VIOLATED -- 5 store page(s) carry unauthorized bytes with 0 unauthorized rows
+    scoring bases agree (parse vs raw):                  yes
+    basis:                                               the artefact carries unauthorized bytes and the store holds ZERO unauthorized rows, so the bytes came from its history
+    residue pages in the store (pgno:markers):           3:x15  6:x15  7:x15  8:x15  9:x15
+    page images the request made durable:                5:neither  1:neither  3:UNAUTH-only:x15
+    NC-6 parser check:                                   3 of 3 images byte-identical to an independent copy
+    other in-scope artefacts:                            -shm: NEVER CREATED  |  -wal: NEVER CREATED  |  -journal: NEVER CREATED
+
+  F3-DROP-wal-W-A-default   residue 5 page(s), live unauthorized rows 0
+    artefact:                                            PRESENT, 16512 bytes
+    baseline attributable (DA-4):                        YES -- PRESENT BUT EMPTY (0 bytes) before the request
+    N6.1 + N6.2:                                         no finding (not sufficient alone, DA-5 row 3)
+    N6.3 history within the invariant:                   VIOLATED -- 5 store page(s) carry unauthorized bytes with 0 unauthorized rows
+    scoring bases agree (parse vs raw):                  yes
+    basis:                                               the artefact was inspected and carried no unauthorized bytes
+    residue pages in the store (pgno:markers):           3:x15  6:x15  7:x15  8:x15  9:x15
+    page images the request made durable:                4:AUTH-only  10:AUTH-only  11:AUTH-only  12:AUTH-only
+    NC-6 parser check:                                   4 of 4 images byte-identical to an independent copy
+    other in-scope artefacts:                            -shm: 32768 bytes  |  -wal: 0 bytes  |  -journal: NEVER CREATED
+
+  F3-DROP-wal-W-A-tiny   residue 5 page(s), live unauthorized rows 0
+    artefact:                                            PRESENT, 16512 bytes
+    baseline attributable (DA-4):                        YES -- PRESENT BUT EMPTY (0 bytes) before the request
+    N6.1 + N6.2:                                         no finding (not sufficient alone, DA-5 row 3)
+    N6.3 history within the invariant:                   VIOLATED -- 5 store page(s) carry unauthorized bytes with 0 unauthorized rows
+    scoring bases agree (parse vs raw):                  yes
+    basis:                                               the artefact was inspected and carried no unauthorized bytes
+    residue pages in the store (pgno:markers):           3:x15  6:x15  7:x15  8:x15  9:x15
+    page images the request made durable:                4:AUTH-only  12:AUTH-only  11:AUTH-only  10:AUTH-only
+    NC-6 parser check:                                   4 of 4 images byte-identical to an independent copy
+    other in-scope artefacts:                            -shm: 32768 bytes  |  -wal: 0 bytes  |  -journal: NEVER CREATED
+
+  F3-DROP-wal-W-B-default   residue 5 page(s), live unauthorized rows 0
+    artefact:                                            PRESENT, 28872 bytes
+    baseline attributable (DA-4):                        YES -- PRESENT BUT EMPTY (0 bytes) before the request
+    N6.1 + N6.2:                                         FINDING (history-sourced) -- N6.1 + N6.2
+    N6.3 history within the invariant:                   VIOLATED -- 5 store page(s) carry unauthorized bytes with 0 unauthorized rows
+    scoring bases agree (parse vs raw):                  yes
+    basis:                                               the artefact carries unauthorized bytes and the store holds ZERO unauthorized rows, so the bytes came from its history
+    residue pages in the store (pgno:markers):           3:x15  6:x15  7:x15  8:x15  9:x15
+    page images the request made durable:                1:neither  3:UNAUTH-only:x15  5:AUTH-only  6:AUTH-only  7:AUTH-only  8:AUTH-only  9:AUTH-only
+    NC-6 parser check:                                   7 of 7 images byte-identical to an independent copy
+    other in-scope artefacts:                            -shm: 32768 bytes  |  -wal: 0 bytes  |  -journal: NEVER CREATED
+
+  F3-DROP-wal-W-B-tiny   residue 5 page(s), live unauthorized rows 0
+    artefact:                                            PRESENT, 28872 bytes
+    baseline attributable (DA-4):                        YES -- PRESENT BUT EMPTY (0 bytes) before the request
+    N6.1 + N6.2:                                         FINDING (history-sourced) -- N6.1 + N6.2
+    N6.3 history within the invariant:                   VIOLATED -- 5 store page(s) carry unauthorized bytes with 0 unauthorized rows
+    scoring bases agree (parse vs raw):                  yes
+    basis:                                               the artefact carries unauthorized bytes and the store holds ZERO unauthorized rows, so the bytes came from its history
+    residue pages in the store (pgno:markers):           3:x15  6:x15  7:x15  8:x15  9:x15
+    page images the request made durable:                3:UNAUTH-only:x15  6:AUTH-only  9:AUTH-only  1:neither  5:AUTH-only  7:AUTH-only  8:AUTH-only
+    NC-6 parser check:                                   7 of 7 images byte-identical to an independent copy
+    other in-scope artefacts:                            -shm: 32768 bytes  |  -wal: 0 bytes  |  -journal: NEVER CREATED
+
+  F3-DELETE-delete-W-A-default   residue 5 page(s), live unauthorized rows 0
+    artefact:                                            PRESENT, 16928 bytes
+    baseline attributable (DA-4):                        YES -- NEVER CREATED before the request
+    N6.1 + N6.2:                                         no finding (not sufficient alone, DA-5 row 3)
+    N6.3 history within the invariant:                   VIOLATED -- 5 store page(s) carry unauthorized bytes with 0 unauthorized rows
+    scoring bases agree (parse vs raw):                  yes
+    basis:                                               the artefact was inspected and carried no unauthorized bytes
+    residue pages in the store (pgno:markers):           3:x15  6:x15  7:x15  8:x15  9:x15
+    page images the request made durable:                4:AUTH-only  12:AUTH-only  11:AUTH-only  10:AUTH-only
+    NC-6 parser check:                                   4 of 4 images byte-identical to an independent copy
+    other in-scope artefacts:                            -shm: NEVER CREATED  |  -wal: NEVER CREATED  |  -journal: NEVER CREATED
+
+  F3-DELETE-delete-W-A-tiny   residue 5 page(s), live unauthorized rows 0
+    artefact:                                            PRESENT, 19976 bytes
+    baseline attributable (DA-4):                        YES -- NEVER CREATED before the request
+    N6.1 + N6.2:                                         no finding (not sufficient alone, DA-5 row 3)
+    N6.3 history within the invariant:                   VIOLATED -- 5 store page(s) carry unauthorized bytes with 0 unauthorized rows
+    scoring bases agree (parse vs raw):                  yes
+    basis:                                               the artefact was inspected and carried no unauthorized bytes
+    residue pages in the store (pgno:markers):           3:x15  6:x15  7:x15  8:x15  9:x15
+    page images the request made durable:                4:AUTH-only  12:AUTH-only  11:AUTH-only  10:AUTH-only
+    NC-6 parser check:                                   4 of 4 images byte-identical to an independent copy
+    other in-scope artefacts:                            -shm: NEVER CREATED  |  -wal: NEVER CREATED  |  -journal: NEVER CREATED
+
+  F3-DELETE-delete-W-B-default   residue 5 page(s), live unauthorized rows 0
+    artefact:                                            PRESENT, 12824 bytes
+    baseline attributable (DA-4):                        YES -- NEVER CREATED before the request
+    N6.1 + N6.2:                                         FINDING (history-sourced) -- N6.1 + N6.2
+    N6.3 history within the invariant:                   VIOLATED -- 5 store page(s) carry unauthorized bytes with 0 unauthorized rows
+    scoring bases agree (parse vs raw):                  yes
+    basis:                                               the artefact carries unauthorized bytes and the store holds ZERO unauthorized rows, so the bytes came from its history
+    residue pages in the store (pgno:markers):           3:x15  6:x15  7:x15  8:x15  9:x15
+    page images the request made durable:                5:neither  1:neither  3:UNAUTH-only:x15
+    NC-6 parser check:                                   3 of 3 images byte-identical to an independent copy
+    other in-scope artefacts:                            -shm: NEVER CREATED  |  -wal: NEVER CREATED  |  -journal: NEVER CREATED
+
+  F3-DELETE-delete-W-B-tiny   residue 5 page(s), live unauthorized rows 0
+    artefact:                                            PRESENT, 13824 bytes
+    baseline attributable (DA-4):                        YES -- NEVER CREATED before the request
+    N6.1 + N6.2:                                         FINDING (history-sourced) -- N6.1 + N6.2
+    N6.3 history within the invariant:                   VIOLATED -- 5 store page(s) carry unauthorized bytes with 0 unauthorized rows
+    scoring bases agree (parse vs raw):                  yes
+    basis:                                               the artefact carries unauthorized bytes and the store holds ZERO unauthorized rows, so the bytes came from its history
+    residue pages in the store (pgno:markers):           3:x15  6:x15  7:x15  8:x15  9:x15
+    page images the request made durable:                5:neither  1:neither  3:UNAUTH-only:x15
+    NC-6 parser check:                                   3 of 3 images byte-identical to an independent copy
+    other in-scope artefacts:                            -shm: NEVER CREATED  |  -wal: NEVER CREATED  |  -journal: NEVER CREATED
+
+  F3-DELETE-wal-W-A-default   residue 5 page(s), live unauthorized rows 0
+    artefact:                                            PRESENT, 16512 bytes
+    baseline attributable (DA-4):                        YES -- PRESENT BUT EMPTY (0 bytes) before the request
+    N6.1 + N6.2:                                         no finding (not sufficient alone, DA-5 row 3)
+    N6.3 history within the invariant:                   VIOLATED -- 5 store page(s) carry unauthorized bytes with 0 unauthorized rows
+    scoring bases agree (parse vs raw):                  yes
+    basis:                                               the artefact was inspected and carried no unauthorized bytes
+    residue pages in the store (pgno:markers):           3:x15  6:x15  7:x15  8:x15  9:x15
+    page images the request made durable:                4:AUTH-only  10:AUTH-only  11:AUTH-only  12:AUTH-only
+    NC-6 parser check:                                   4 of 4 images byte-identical to an independent copy
+    other in-scope artefacts:                            -shm: 32768 bytes  |  -wal: 0 bytes  |  -journal: NEVER CREATED
+
+  F3-DELETE-wal-W-A-tiny   residue 5 page(s), live unauthorized rows 0
+    artefact:                                            PRESENT, 16512 bytes
+    baseline attributable (DA-4):                        YES -- PRESENT BUT EMPTY (0 bytes) before the request
+    N6.1 + N6.2:                                         no finding (not sufficient alone, DA-5 row 3)
+    N6.3 history within the invariant:                   VIOLATED -- 5 store page(s) carry unauthorized bytes with 0 unauthorized rows
+    scoring bases agree (parse vs raw):                  yes
+    basis:                                               the artefact was inspected and carried no unauthorized bytes
+    residue pages in the store (pgno:markers):           3:x15  6:x15  7:x15  8:x15  9:x15
+    page images the request made durable:                4:AUTH-only  12:AUTH-only  11:AUTH-only  10:AUTH-only
+    NC-6 parser check:                                   4 of 4 images byte-identical to an independent copy
+    other in-scope artefacts:                            -shm: 32768 bytes  |  -wal: 0 bytes  |  -journal: NEVER CREATED
+
+  F3-DELETE-wal-W-B-default   residue 5 page(s), live unauthorized rows 0
+    artefact:                                            PRESENT, 28872 bytes
+    baseline attributable (DA-4):                        YES -- PRESENT BUT EMPTY (0 bytes) before the request
+    N6.1 + N6.2:                                         FINDING (history-sourced) -- N6.1 + N6.2
+    N6.3 history within the invariant:                   VIOLATED -- 5 store page(s) carry unauthorized bytes with 0 unauthorized rows
+    scoring bases agree (parse vs raw):                  yes
+    basis:                                               the artefact carries unauthorized bytes and the store holds ZERO unauthorized rows, so the bytes came from its history
+    residue pages in the store (pgno:markers):           3:x15  6:x15  7:x15  8:x15  9:x15
+    page images the request made durable:                1:neither  3:UNAUTH-only:x15  5:AUTH-only  6:AUTH-only  7:AUTH-only  8:AUTH-only  9:AUTH-only
+    NC-6 parser check:                                   7 of 7 images byte-identical to an independent copy
+    other in-scope artefacts:                            -shm: 32768 bytes  |  -wal: 0 bytes  |  -journal: NEVER CREATED
+
+  F3-DELETE-wal-W-B-tiny   residue 5 page(s), live unauthorized rows 0
+    artefact:                                            PRESENT, 28872 bytes
+    baseline attributable (DA-4):                        YES -- PRESENT BUT EMPTY (0 bytes) before the request
+    N6.1 + N6.2:                                         FINDING (history-sourced) -- N6.1 + N6.2
+    N6.3 history within the invariant:                   VIOLATED -- 5 store page(s) carry unauthorized bytes with 0 unauthorized rows
+    scoring bases agree (parse vs raw):                  yes
+    basis:                                               the artefact carries unauthorized bytes and the store holds ZERO unauthorized rows, so the bytes came from its history
+    residue pages in the store (pgno:markers):           3:x15  6:x15  7:x15  8:x15  9:x15
+    page images the request made durable:                3:UNAUTH-only:x15  6:AUTH-only  9:AUTH-only  1:neither  5:AUTH-only  7:AUTH-only  8:AUTH-only
+    NC-6 parser check:                                   7 of 7 images byte-identical to an independent copy
+    other in-scope artefacts:                            -shm: 32768 bytes  |  -wal: 0 bytes  |  -journal: NEVER CREATED
+
+  F4-DROP-delete-W-A-default   residue 7 page(s), live unauthorized rows 0
+    artefact:                                            PRESENT, 16928 bytes
+    baseline attributable (DA-4):                        YES -- NEVER CREATED before the request
+    N6.1 + N6.2:                                         no finding (not sufficient alone, DA-5 row 3)
+    N6.3 history within the invariant:                   VIOLATED -- 7 store page(s) carry unauthorized bytes with 0 unauthorized rows
+    scoring bases agree (parse vs raw):                  yes
+    basis:                                               the artefact was inspected and carried no unauthorized bytes
+    residue pages in the store (pgno:markers):           3:x15  6:x15  7:x15  8:x15  9:x15  10:x15  11:x15
+    page images the request made durable:                4:AUTH-only  14:AUTH-only  13:AUTH-only  12:AUTH-only
+    NC-6 parser check:                                   4 of 4 images byte-identical to an independent copy
+    other in-scope artefacts:                            -shm: NEVER CREATED  |  -wal: NEVER CREATED  |  -journal: NEVER CREATED
+
+  F4-DROP-delete-W-A-tiny   residue 7 page(s), live unauthorized rows 0
+    artefact:                                            PRESENT, 19976 bytes
+    baseline attributable (DA-4):                        YES -- NEVER CREATED before the request
+    N6.1 + N6.2:                                         no finding (not sufficient alone, DA-5 row 3)
+    N6.3 history within the invariant:                   VIOLATED -- 7 store page(s) carry unauthorized bytes with 0 unauthorized rows
+    scoring bases agree (parse vs raw):                  yes
+    basis:                                               the artefact was inspected and carried no unauthorized bytes
+    residue pages in the store (pgno:markers):           3:x15  6:x15  7:x15  8:x15  9:x15  10:x15  11:x15
+    page images the request made durable:                4:AUTH-only  14:AUTH-only  13:AUTH-only  12:AUTH-only
+    NC-6 parser check:                                   4 of 4 images byte-identical to an independent copy
+    other in-scope artefacts:                            -shm: NEVER CREATED  |  -wal: NEVER CREATED  |  -journal: NEVER CREATED
+
+  F4-DROP-delete-W-B-default   residue 7 page(s), live unauthorized rows 0
+    artefact:                                            PRESENT, 12824 bytes
+    baseline attributable (DA-4):                        YES -- NEVER CREATED before the request
+    N6.1 + N6.2:                                         FINDING (history-sourced) -- N6.1 + N6.2
+    N6.3 history within the invariant:                   VIOLATED -- 7 store page(s) carry unauthorized bytes with 0 unauthorized rows
+    scoring bases agree (parse vs raw):                  yes
+    basis:                                               the artefact carries unauthorized bytes and the store holds ZERO unauthorized rows, so the bytes came from its history
+    residue pages in the store (pgno:markers):           3:x15  6:x15  7:x15  8:x15  9:x15  10:x15  11:x15
+    page images the request made durable:                5:neither  1:neither  3:UNAUTH-only:x15
+    NC-6 parser check:                                   3 of 3 images byte-identical to an independent copy
+    other in-scope artefacts:                            -shm: NEVER CREATED  |  -wal: NEVER CREATED  |  -journal: NEVER CREATED
+
+  F4-DROP-delete-W-B-tiny   residue 7 page(s), live unauthorized rows 0
+    artefact:                                            PRESENT, 13824 bytes
+    baseline attributable (DA-4):                        YES -- NEVER CREATED before the request
+    N6.1 + N6.2:                                         FINDING (history-sourced) -- N6.1 + N6.2
+    N6.3 history within the invariant:                   VIOLATED -- 7 store page(s) carry unauthorized bytes with 0 unauthorized rows
+    scoring bases agree (parse vs raw):                  yes
+    basis:                                               the artefact carries unauthorized bytes and the store holds ZERO unauthorized rows, so the bytes came from its history
+    residue pages in the store (pgno:markers):           3:x15  6:x15  7:x15  8:x15  9:x15  10:x15  11:x15
+    page images the request made durable:                5:neither  1:neither  3:UNAUTH-only:x15
+    NC-6 parser check:                                   3 of 3 images byte-identical to an independent copy
+    other in-scope artefacts:                            -shm: NEVER CREATED  |  -wal: NEVER CREATED  |  -journal: NEVER CREATED
+
+  F4-DROP-wal-W-A-default   residue 7 page(s), live unauthorized rows 0
+    artefact:                                            PRESENT, 16512 bytes
+    baseline attributable (DA-4):                        YES -- PRESENT BUT EMPTY (0 bytes) before the request
+    N6.1 + N6.2:                                         no finding (not sufficient alone, DA-5 row 3)
+    N6.3 history within the invariant:                   VIOLATED -- 7 store page(s) carry unauthorized bytes with 0 unauthorized rows
+    scoring bases agree (parse vs raw):                  yes
+    basis:                                               the artefact was inspected and carried no unauthorized bytes
+    residue pages in the store (pgno:markers):           3:x15  6:x15  7:x15  8:x15  9:x15  10:x15  11:x15
+    page images the request made durable:                4:AUTH-only  12:AUTH-only  13:AUTH-only  14:AUTH-only
+    NC-6 parser check:                                   4 of 4 images byte-identical to an independent copy
+    other in-scope artefacts:                            -shm: 32768 bytes  |  -wal: 0 bytes  |  -journal: NEVER CREATED
+
+  F4-DROP-wal-W-A-tiny   residue 7 page(s), live unauthorized rows 0
+    artefact:                                            PRESENT, 16512 bytes
+    baseline attributable (DA-4):                        YES -- PRESENT BUT EMPTY (0 bytes) before the request
+    N6.1 + N6.2:                                         no finding (not sufficient alone, DA-5 row 3)
+    N6.3 history within the invariant:                   VIOLATED -- 7 store page(s) carry unauthorized bytes with 0 unauthorized rows
+    scoring bases agree (parse vs raw):                  yes
+    basis:                                               the artefact was inspected and carried no unauthorized bytes
+    residue pages in the store (pgno:markers):           3:x15  6:x15  7:x15  8:x15  9:x15  10:x15  11:x15
+    page images the request made durable:                4:AUTH-only  14:AUTH-only  13:AUTH-only  12:AUTH-only
+    NC-6 parser check:                                   4 of 4 images byte-identical to an independent copy
+    other in-scope artefacts:                            -shm: 32768 bytes  |  -wal: 0 bytes  |  -journal: NEVER CREATED
+
+  F4-DROP-wal-W-B-default   residue 7 page(s), live unauthorized rows 0
+    artefact:                                            PRESENT, 28872 bytes
+    baseline attributable (DA-4):                        YES -- PRESENT BUT EMPTY (0 bytes) before the request
+    N6.1 + N6.2:                                         FINDING (history-sourced) -- N6.1 + N6.2
+    N6.3 history within the invariant:                   VIOLATED -- 7 store page(s) carry unauthorized bytes with 0 unauthorized rows
+    scoring bases agree (parse vs raw):                  yes
+    basis:                                               the artefact carries unauthorized bytes and the store holds ZERO unauthorized rows, so the bytes came from its history
+    residue pages in the store (pgno:markers):           3:x15  6:x15  7:x15  8:x15  9:x15  10:x15  11:x15
+    page images the request made durable:                1:neither  3:UNAUTH-only:x15  5:AUTH-only  6:AUTH-only  7:AUTH-only  8:AUTH-only  11:AUTH-only
+    NC-6 parser check:                                   7 of 7 images byte-identical to an independent copy
+    other in-scope artefacts:                            -shm: 32768 bytes  |  -wal: 0 bytes  |  -journal: NEVER CREATED
+
+  F4-DROP-wal-W-B-tiny   residue 7 page(s), live unauthorized rows 0
+    artefact:                                            PRESENT, 28872 bytes
+    baseline attributable (DA-4):                        YES -- PRESENT BUT EMPTY (0 bytes) before the request
+    N6.1 + N6.2:                                         FINDING (history-sourced) -- N6.1 + N6.2
+    N6.3 history within the invariant:                   VIOLATED -- 7 store page(s) carry unauthorized bytes with 0 unauthorized rows
+    scoring bases agree (parse vs raw):                  yes
+    basis:                                               the artefact carries unauthorized bytes and the store holds ZERO unauthorized rows, so the bytes came from its history
+    residue pages in the store (pgno:markers):           3:x15  6:x15  7:x15  8:x15  9:x15  10:x15  11:x15
+    page images the request made durable:                3:UNAUTH-only:x15  6:AUTH-only  11:AUTH-only  1:neither  5:AUTH-only  7:AUTH-only  8:AUTH-only
+    NC-6 parser check:                                   7 of 7 images byte-identical to an independent copy
+    other in-scope artefacts:                            -shm: 32768 bytes  |  -wal: 0 bytes  |  -journal: NEVER CREATED
+
+  F4-DELETE-delete-W-A-default   residue 7 page(s), live unauthorized rows 0
+    artefact:                                            PRESENT, 16928 bytes
+    baseline attributable (DA-4):                        YES -- NEVER CREATED before the request
+    N6.1 + N6.2:                                         no finding (not sufficient alone, DA-5 row 3)
+    N6.3 history within the invariant:                   VIOLATED -- 7 store page(s) carry unauthorized bytes with 0 unauthorized rows
+    scoring bases agree (parse vs raw):                  yes
+    basis:                                               the artefact was inspected and carried no unauthorized bytes
+    residue pages in the store (pgno:markers):           3:x15  6:x15  7:x15  8:x15  9:x15  10:x15  11:x15
+    page images the request made durable:                4:AUTH-only  14:AUTH-only  13:AUTH-only  12:AUTH-only
+    NC-6 parser check:                                   4 of 4 images byte-identical to an independent copy
+    other in-scope artefacts:                            -shm: NEVER CREATED  |  -wal: NEVER CREATED  |  -journal: NEVER CREATED
+
+  F4-DELETE-delete-W-A-tiny   residue 7 page(s), live unauthorized rows 0
+    artefact:                                            PRESENT, 19976 bytes
+    baseline attributable (DA-4):                        YES -- NEVER CREATED before the request
+    N6.1 + N6.2:                                         no finding (not sufficient alone, DA-5 row 3)
+    N6.3 history within the invariant:                   VIOLATED -- 7 store page(s) carry unauthorized bytes with 0 unauthorized rows
+    scoring bases agree (parse vs raw):                  yes
+    basis:                                               the artefact was inspected and carried no unauthorized bytes
+    residue pages in the store (pgno:markers):           3:x15  6:x15  7:x15  8:x15  9:x15  10:x15  11:x15
+    page images the request made durable:                4:AUTH-only  14:AUTH-only  13:AUTH-only  12:AUTH-only
+    NC-6 parser check:                                   4 of 4 images byte-identical to an independent copy
+    other in-scope artefacts:                            -shm: NEVER CREATED  |  -wal: NEVER CREATED  |  -journal: NEVER CREATED
+
+  F4-DELETE-delete-W-B-default   residue 7 page(s), live unauthorized rows 0
+    artefact:                                            PRESENT, 12824 bytes
+    baseline attributable (DA-4):                        YES -- NEVER CREATED before the request
+    N6.1 + N6.2:                                         FINDING (history-sourced) -- N6.1 + N6.2
+    N6.3 history within the invariant:                   VIOLATED -- 7 store page(s) carry unauthorized bytes with 0 unauthorized rows
+    scoring bases agree (parse vs raw):                  yes
+    basis:                                               the artefact carries unauthorized bytes and the store holds ZERO unauthorized rows, so the bytes came from its history
+    residue pages in the store (pgno:markers):           3:x15  6:x15  7:x15  8:x15  9:x15  10:x15  11:x15
+    page images the request made durable:                5:neither  1:neither  3:UNAUTH-only:x15
+    NC-6 parser check:                                   3 of 3 images byte-identical to an independent copy
+    other in-scope artefacts:                            -shm: NEVER CREATED  |  -wal: NEVER CREATED  |  -journal: NEVER CREATED
+
+  F4-DELETE-delete-W-B-tiny   residue 7 page(s), live unauthorized rows 0
+    artefact:                                            PRESENT, 13824 bytes
+    baseline attributable (DA-4):                        YES -- NEVER CREATED before the request
+    N6.1 + N6.2:                                         FINDING (history-sourced) -- N6.1 + N6.2
+    N6.3 history within the invariant:                   VIOLATED -- 7 store page(s) carry unauthorized bytes with 0 unauthorized rows
+    scoring bases agree (parse vs raw):                  yes
+    basis:                                               the artefact carries unauthorized bytes and the store holds ZERO unauthorized rows, so the bytes came from its history
+    residue pages in the store (pgno:markers):           3:x15  6:x15  7:x15  8:x15  9:x15  10:x15  11:x15
+    page images the request made durable:                5:neither  1:neither  3:UNAUTH-only:x15
+    NC-6 parser check:                                   3 of 3 images byte-identical to an independent copy
+    other in-scope artefacts:                            -shm: NEVER CREATED  |  -wal: NEVER CREATED  |  -journal: NEVER CREATED
+
+  F4-DELETE-wal-W-A-default   residue 7 page(s), live unauthorized rows 0
+    artefact:                                            PRESENT, 16512 bytes
+    baseline attributable (DA-4):                        YES -- PRESENT BUT EMPTY (0 bytes) before the request
+    N6.1 + N6.2:                                         no finding (not sufficient alone, DA-5 row 3)
+    N6.3 history within the invariant:                   VIOLATED -- 7 store page(s) carry unauthorized bytes with 0 unauthorized rows
+    scoring bases agree (parse vs raw):                  yes
+    basis:                                               the artefact was inspected and carried no unauthorized bytes
+    residue pages in the store (pgno:markers):           3:x15  6:x15  7:x15  8:x15  9:x15  10:x15  11:x15
+    page images the request made durable:                4:AUTH-only  12:AUTH-only  13:AUTH-only  14:AUTH-only
+    NC-6 parser check:                                   4 of 4 images byte-identical to an independent copy
+    other in-scope artefacts:                            -shm: 32768 bytes  |  -wal: 0 bytes  |  -journal: NEVER CREATED
+
+  F4-DELETE-wal-W-A-tiny   residue 7 page(s), live unauthorized rows 0
+    artefact:                                            PRESENT, 16512 bytes
+    baseline attributable (DA-4):                        YES -- PRESENT BUT EMPTY (0 bytes) before the request
+    N6.1 + N6.2:                                         no finding (not sufficient alone, DA-5 row 3)
+    N6.3 history within the invariant:                   VIOLATED -- 7 store page(s) carry unauthorized bytes with 0 unauthorized rows
+    scoring bases agree (parse vs raw):                  yes
+    basis:                                               the artefact was inspected and carried no unauthorized bytes
+    residue pages in the store (pgno:markers):           3:x15  6:x15  7:x15  8:x15  9:x15  10:x15  11:x15
+    page images the request made durable:                4:AUTH-only  14:AUTH-only  13:AUTH-only  12:AUTH-only
+    NC-6 parser check:                                   4 of 4 images byte-identical to an independent copy
+    other in-scope artefacts:                            -shm: 32768 bytes  |  -wal: 0 bytes  |  -journal: NEVER CREATED
+
+  F4-DELETE-wal-W-B-default   residue 7 page(s), live unauthorized rows 0
+    artefact:                                            PRESENT, 28872 bytes
+    baseline attributable (DA-4):                        YES -- PRESENT BUT EMPTY (0 bytes) before the request
+    N6.1 + N6.2:                                         FINDING (history-sourced) -- N6.1 + N6.2
+    N6.3 history within the invariant:                   VIOLATED -- 7 store page(s) carry unauthorized bytes with 0 unauthorized rows
+    scoring bases agree (parse vs raw):                  yes
+    basis:                                               the artefact carries unauthorized bytes and the store holds ZERO unauthorized rows, so the bytes came from its history
+    residue pages in the store (pgno:markers):           3:x15  6:x15  7:x15  8:x15  9:x15  10:x15  11:x15
+    page images the request made durable:                1:neither  3:UNAUTH-only:x15  5:AUTH-only  6:AUTH-only  7:AUTH-only  8:AUTH-only  11:AUTH-only
+    NC-6 parser check:                                   7 of 7 images byte-identical to an independent copy
+    other in-scope artefacts:                            -shm: 32768 bytes  |  -wal: 0 bytes  |  -journal: NEVER CREATED
+
+  F4-DELETE-wal-W-B-tiny   residue 7 page(s), live unauthorized rows 0
+    artefact:                                            PRESENT, 28872 bytes
+    baseline attributable (DA-4):                        YES -- PRESENT BUT EMPTY (0 bytes) before the request
+    N6.1 + N6.2:                                         FINDING (history-sourced) -- N6.1 + N6.2
+    N6.3 history within the invariant:                   VIOLATED -- 7 store page(s) carry unauthorized bytes with 0 unauthorized rows
+    scoring bases agree (parse vs raw):                  yes
+    basis:                                               the artefact carries unauthorized bytes and the store holds ZERO unauthorized rows, so the bytes came from its history
+    residue pages in the store (pgno:markers):           3:x15  6:x15  7:x15  8:x15  9:x15  10:x15  11:x15
+    page images the request made durable:                3:UNAUTH-only:x15  6:AUTH-only  11:AUTH-only  1:neither  5:AUTH-only  7:AUTH-only  8:AUTH-only
+    NC-6 parser check:                                   7 of 7 images byte-identical to an independent copy
+    other in-scope artefacts:                            -shm: 32768 bytes  |  -wal: 0 bytes  |  -journal: NEVER CREATED
+
+==============================================================================
+G2. THE SAME CELLS, GROUPED BY *FREE* RESIDUE INSTEAD OF TOTAL RESIDUE
+==============================================================================
+  Total residue counts two mechanically different things together:
+    FREE        a whole page on the free list.  Only an ALLOCATING write
+                reaches it.
+    CO-RESIDENT a page the successor partially reused, so live authorized
+                rows and the predecessor's dead bytes share it.  A write
+                that touches an authorized row on it reaches it; an
+                allocating write never does, because it is not free.
+
+  Both priors, and the pre-registered rule, count TOTAL.  This grouping is
+  reported ALONGSIDE, not instead of, and it changes no verdict by itself.
+
+  --- W-B  (append) -- by FREE residue pages, split by journal mode ---------
+    free residue   co-resident   delete: findings/cells   wal: findings/cells
+               0           0/1                    0 of 8                0 of 8
+               1             0                    4 of 4                0 of 4
+               3             0                    4 of 4                0 of 4
+               5             0                    4 of 4                4 of 4
+               7             0                    4 of 4                4 of 4
+               9             0                    4 of 4                4 of 4
+              42             0                    4 of 4                4 of 4
+
+  --- W-A  (access accounting) -- by FREE residue pages, split by journal mode 
+    free residue   co-resident   delete: findings/cells   wal: findings/cells
+               0           0/1                    4 of 8                4 of 8
+               1             0                    0 of 4                0 of 4
+               3             0                    0 of 4                0 of 4
+               5             0                    0 of 4                0 of 4
+               7             0                    0 of 4                0 of 4
+               9             0                    0 of 4                0 of 4
+              42             0                    0 of 4                0 of 4
+
+  THE TWO MODES ARE NOT MEASURING THE SAME EXPOSURE, and the page-level
+  listing in section H shows why in the cells themselves rather than by
+  argument: a rollback journal records the page image BEFORE the write, so
+  ANY reuse of a residue page exposes the predecessor's content in full; a
+  WAL frame records the image AFTER, so a page that the write FULLY overwrote
+  exposes nothing.  Compare the "page images the request made durable" lines
+  for the F1 and D2 wal/W-B cells: the same page 3 is "AUTH-only" in one and
+  "UNAUTH-only:x15" in the other.
+
+==============================================================================
+H2. THE MECHANISM, EXHIBITED BY PAGE NUMBER RATHER THAN ASSERTED
+==============================================================================
+  §4.19 records what made TASK-0046's evidence worth promoting: the pages were
+  identified, classified individually and byte-verified, so the mechanism was
+  exhibited rather than re-asserted.  The same is done here, and it is what
+  turns "the append consumed a residue page" from a story into a measurement.
+
+  For each density, one representative cell of each write shape, delete mode,
+  default cache, DROP transition.  Read the two columns against each other:
+  a finding exists exactly where a page number appears in BOTH.
+
+  --- D0  (target residue 0)  --  no predecessor at all -- the specificity control 
+    W-A  residue pages : none
+        made durable  : 3:AUTH-only  4:AUTH-only  5:AUTH-only  6:AUTH-only
+        finding       : none
+    W-B  residue pages : none
+        made durable  : 7:neither  1:neither
+        finding       : none
+
+  --- D1  (target residue 1)  --  TASK-0048's regime, as both priors counted residue 
+    W-A  residue pages : 3:x14
+        made durable  : 4:AUTH-only  6:AUTH-only  5:AUTH-only  3:BOTH:x14
+        finding       : HISTORY-SOURCED
+    W-B  residue pages : 3:x14
+        made durable  : 7:neither  1:neither
+        finding       : none
+
+  --- D2  (target residue 10)  --  TASK-0046's regime -----------------------
+    W-A  residue pages : 3:x15  6:x15  7:x15  8:x15  9:x15  10:x15  11:x15  12:x15  13:x15
+        made durable  : 4:AUTH-only  16:AUTH-only  15:AUTH-only  14:AUTH-only
+        finding       : none
+    W-B  residue pages : 3:x15  6:x15  7:x15  8:x15  9:x15  10:x15  11:x15  12:x15  13:x15
+        made durable  : 5:neither  1:neither  3:UNAUTH-only:x15
+        finding       : HISTORY-SOURCED
+
+  --- D3  (target residue 40)  --  a deliberately strong history ------------
+    W-A  residue pages : 3:x15  6:x15  7:x15  8:x15  9:x15  10:x15  11:x15  12:x15  13:x15  14:x15  15:x15  16:x15  17:x15  18:x15  19:x15  20:x15  21:x15  22:x15  23:x15  24:x15  25:x15  26:x15  27:x15  28:x15  29:x15  30:x15  31:x15  32:x15  33:x15  34:x15  35:x15  36:x15  37:x15  38:x15  39:x15  40:x15  41:x15  42:x15  43:x15  44:x15  45:x15  46:x15
+        made durable  : 4:AUTH-only  49:AUTH-only  48:AUTH-only  47:AUTH-only
+        finding       : none
+    W-B  residue pages : 3:x15  6:x15  7:x15  8:x15  9:x15  10:x15  11:x15  12:x15  13:x15  14:x15  15:x15  16:x15  17:x15  18:x15  19:x15  20:x15  21:x15  22:x15  23:x15  24:x15  25:x15  26:x15  27:x15  28:x15  29:x15  30:x15  31:x15  32:x15  33:x15  34:x15  35:x15  36:x15  37:x15  38:x15  39:x15  40:x15  41:x15  42:x15  43:x15  44:x15  45:x15  46:x15
+        made durable  : 5:neither  1:neither  3:UNAUTH-only:x15
+        finding       : HISTORY-SOURCED
+
+  --- F1  (target residue 1)  --  ONE free-list residue page -- added after the first pass 
+    W-A  residue pages : 3:x15
+        made durable  : 4:AUTH-only  7:AUTH-only  6:AUTH-only  5:AUTH-only
+        finding       : none
+    W-B  residue pages : 3:x15
+        made durable  : 3:UNAUTH-only:x15  1:neither
+        finding       : HISTORY-SOURCED
+
+  --- F2  (target residue 3)  --  a few free-list residue pages -- added after the first pass 
+    W-A  residue pages : 3:x15  6:x15  7:x15
+        made durable  : 4:AUTH-only  10:AUTH-only  9:AUTH-only  8:AUTH-only
+        finding       : none
+    W-B  residue pages : 3:x15  6:x15  7:x15
+        made durable  : 5:neither  1:neither  3:UNAUTH-only:x15
+        finding       : HISTORY-SOURCED
+
+  --- F3  (target residue 5)  --  between F2 and D2 -- added to narrow the wal-mode threshold 
+    W-A  residue pages : 3:x15  6:x15  7:x15  8:x15  9:x15
+        made durable  : 4:AUTH-only  12:AUTH-only  11:AUTH-only  10:AUTH-only
+        finding       : none
+    W-B  residue pages : 3:x15  6:x15  7:x15  8:x15  9:x15
+        made durable  : 5:neither  1:neither  3:UNAUTH-only:x15
+        finding       : HISTORY-SOURCED
+
+  --- F4  (target residue 7)  --  between F2 and D2 -- added to narrow the wal-mode threshold 
+    W-A  residue pages : 3:x15  6:x15  7:x15  8:x15  9:x15  10:x15  11:x15
+        made durable  : 4:AUTH-only  14:AUTH-only  13:AUTH-only  12:AUTH-only
+        finding       : none
+    W-B  residue pages : 3:x15  6:x15  7:x15  8:x15  9:x15  10:x15  11:x15
+        made durable  : 5:neither  1:neither  3:UNAUTH-only:x15
+        finding       : HISTORY-SOURCED
+
+==============================================================================
+I. CONTROLS -- THESE GATE THE RUN
+==============================================================================
+  MSG-0169 §2: "a fail() on a silent control is an interlock; a printed line
+  is a claim."  Every control below aborts the run when it does not fire, and
+  NO VERDICT IS PRINTED IF ANY OF THEM FAILS.
+  A control's finding is NEVER reported as a finding about the subject -- MSG-0156.
+
+  --- NC-1  mechanism control -- a shared projection MUST produce a finding -
+    delete: control cells that produced a finding:       2 of 2   (markers seen: 200, 200)
+  ok  NC-1 (delete): the instrument demonstrably detects a durability leak
+    wal: control cells that produced a finding:          2 of 2   (markers seen: 200, 200)
+  ok  NC-1 (wal): the instrument demonstrably detects a durability leak
+
+  --- NC-2  instrument control -- a marker that is never written ------------
+    hits for WW-MARKER-THAT-IS-NEVER-WRITTEN-WW:         0
+  ok  NC-2: the scanner reports zero for content that was never written
+
+  --- NC-3  specificity control -- a store with NO history must produce no history-sourced finding 
+    cells with 0 residue pages:                          16
+    of those, history-sourced findings:                  0
+  ok  NC-3: with no history present, no history-sourced finding was produced
+
+  --- NC-4  independent-variable control -- the densities must actually differ 
+    D0 target 0 -> measured residue:                     0
+    D1 target 1 -> measured residue:                     1
+    D2 target 10 -> measured residue:                    9
+    D3 target 40 -> measured residue:                    42
+    F1 target 1 -> measured residue:                     1
+    F2 target 3 -> measured residue:                     3
+    F3 target 5 -> measured residue:                     5
+    F4 target 7 -> measured residue:                     7
+    highest residue measured anywhere:                   42
+    cells landing in SCARCE (1-2):                       32
+    cells landing in PLENTIFUL (>=10):                   16
+  ok  NC-4: the independent variable spans both prior regimes
+    cells with 0 free residue but residue > 0 (co-resident only): 16
+    cells with 1-3 free residue pages:                   32
+    cells with >= 10 free residue pages:                 16
+  ok  NC-4b: free residue is itself spanned -- co-resident-only, few, and many
+
+  --- NC-5  provenance control -- every L4 cell must hold ZERO live unauthorized rows 
+    L4 cells holding a live unauthorized row:            0
+  ok  NC-5: no L4 cell holds a live unauthorized row, so provenance is separable
+
+  --- NC-6  parser control -- page images must match an independently read copy 
+    cells whose parser output was checked:               132
+    mismatches:                                          0
+  ok  NC-6: every checked page image was byte-identical to an independently read copy
+
+  --- NC-6b  parser over-read control -- no image may lie outside the store -
+    cells with an image beyond the end of the store:     0
+  ok  NC-6b: every parsed image corresponds to a page that exists in the store
+
+  --- NC-6c  parser under-read control -- the parse must account for every marker 
+    delete-mode cells where parsed markers < raw markers: 0
+  ok  NC-6c: every marker in every rollback journal is accounted for by a parsed page image
+
+  --- NC-7  entitlement control -- the request must touch nothing it was not entitled to 
+    cells where the request touched an unentitled row:   0
+  ok  NC-7: no request touched a row it was not entitled to
+
+  --- errors ----------------------------------------------------------------
+    cells that threw:                                    0
+
+==============================================================================
+J. RUN VALIDITY -- the interlock
+==============================================================================
+  control failures recorded:                             0
+  RUN VALIDITY: VALID -- every control fired, enforced by abort rather than reported.
+
+==============================================================================
+K. THE HYPOTHESIS -- CONFIRMED, REFUTED or UNRESOLVED (required outcome 5)
+==============================================================================
+  Hypothesis (MSG-0163 §4, never previously tested): the L4/W-B divergence is
+  explained by residue density -- "an append can only expose residue if it
+  consumes a residue page, and with one such page the odds are small".
+
+  DECLARED BEFORE THE NUMBERS: four density levels were ADDED after the first
+  pass of this probe, and both reasons are recorded rather than buried.
+    F1, F2  because the first pass showed the LOW END OF THE LADDER was
+            holding CO-RESIDENT residue -- a page the successor had partly
+            reused -- rather than a FREE page, so the regime the rule calls
+            SCARCE was not in the grid at all.  See section D.
+    F3, F4  to narrow a threshold the second pass exposed between 3 and 9
+            free residue pages in wal mode.  It changes no verdict; it
+            replaces an interpolation with a measurement.
+  THE RULE BELOW IS APPLIED TO EVERY W-B CELL, INCLUDING THE ADDED ONES.
+  Excluding them to protect a verdict already seen would be exactly the
+  post-hoc move the pre-registration exists to prevent -- and it would have
+  mattered: on the first pass the rule returned CONFIRMED, and it is the
+  added cells that make it UNRESOLVED.
+
+  rSCARCE    (history-sourced findings / cells):         4 of 16
+  rPLENTIFUL (history-sourced findings / cells):         8 of 8
+  delete-mode verdict:                                   UNRESOLVED   (a partial gradient -- the leak is denser at higher residue but is not absent at the scarce end)
+  wal-mode verdict:                                      CONFIRMED   (the leak reproduces where residue is plentiful and is absent where it is scarce)
+  the two journal modes agree:                           NO -- the rule makes this UNRESOLVED
+
+  VERDICT: UNRESOLVED
+  BASIS:   the two journal modes produced different verdicts, and the pre-registered rule makes that UNRESOLVED rather than rounding it
+
+  This verdict was produced by the rule printed in section C BEFORE any
+  measurement was taken.  It is not an assessment of the numbers above.
+
+==============================================================================
+K2. THE SECOND FACE OF THE DIVERGENCE -- W-A, whose gradient runs the OTHER WAY
+==============================================================================
+  The record so far describes the contradiction in one direction only: TASK-0046
+  saw the append leak, TASK-0048 saw nothing.  BUT THE SAME TWO RUNS ALSO
+  DISAGREE ON W-A, THE OPPOSITE WAY ROUND -- TASK-0048 found an L4/W-A finding
+  (MSG-0163 §3: wal 1 of 11 frames carrying, delete journal marker x20) where
+  TASK-0046 found none.  That is visible only by reading the two outputs side
+  by side, and this run measured it rather than leaving it unexamined.
+
+  W-A  rSCARCE:                                          8 of 16
+  W-A  rPLENTIFUL:                                       0 of 8
+  W-A  delete-mode / wal-mode:                           REFUTED / REFUTED
+
+  THE PRE-REGISTERED RULE IS NOT APPLIED TO W-A AS A VERDICT, and saying so
+  matters: the rule was written for the append arm, which is the arm MSG-0172
+  §4 authorised re-measuring.  Applying a rule to a series it was not written
+  for, after seeing that series, is the post-hoc move the pre-registration
+  exists to prevent.  The NUMBERS are reported; the verdict is not claimed.
+
+  WHAT THE NUMBERS SHOW, STATED FLATLY:  the two write shapes have OPPOSITE
+  relationships to residue density on this subject.  W-B leaks only where
+  residue is plentiful; W-A leaks only where it is scarce.  Both are absent at
+  zero residue, which is the specificity control and is the one thing both
+  shapes agree on.
+
+  THIS IS AN OBSERVATION, NOT AN EXPLANATION.  The page numbers in section H2
+  show WHICH page carried it; they do not establish WHY the allocator reaches a
+  residue page under one shape at one density and not the other.  Establishing
+  that would require instrumenting the allocator, which this task is not
+  authorised to do and which no available instrument reaches.  IT IS REFERRED,
+  NOT EXPLAINED AWAY.
+
+  What it does NOT do: it does not weaken, re-open or supersede either prior
+  record.  Both stand as taken.  It does not move a verdict, and it does not
+  change the CONFIRMED result in section K, which concerns W-B alone.
+
+==============================================================================
+L. WHAT THIS RUN DOES NOT ESTABLISH
+==============================================================================
+  - No engine is selected, adopted, deployed, implemented or cleared.
+  - No candidate verdict moves.  N1-N6, DA-1..DA-7, E1-E4, EV1-EV13,
+    G-Q4..G-Q7.8 and strict Shape-1 are untouched.
+  - Neither prior record is re-opened, weakened or superseded.  Both stand as
+    taken; this run measures a variable neither controlled.
+  - One subject and one build.  §4.6 S10 forbids generalizing this to SQLite
+    as a product or to an engine class.
+  - Byte-scanning sees literal markers.  Re-encoded, compressed or partially
+    overwritten content would be missed, and absence remains "not sufficient
+    alone" (DA-5 row 3).
+  - Filesystem-, block-device- and encryption-at-rest residue is outside DA-3
+    scope and was not measured.
+  - The residue itself is NOT a violation of N6.1 (DA-4 row 1: its provenance
+    is the transition).  The finding is what the request then did with it.
+
+END OF PROBE -- VALID
