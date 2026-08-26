@@ -1,7 +1,10 @@
 # BLK-0013 — `origin/main` Moved Mid-Run; TASK-0050's Records Are Committed Locally and CANNOT Be Published
 
-**Status:** **OPEN** 2026-08-26 — requires an operator or Architecture Lead action. **This runner cannot
-clear it and must not try.**
+**Status:** **CLEARED** 2026-08-26 by **MSG-0169**. The operator reconciled the divergence (`git merge origin/main`) and pushed `f9f8f07..dd99f37`; **TASK-0050's records are now on `origin/main` and were verified there by the Lead**, discharging required outcome 7. **The runner was right to stop and right not to try** — it is permitted `git push origin main` and no merge.
+
+> **Cause, recorded on the blocker itself: the LEAD pushed to `main` during this run.** The rejection was not a transient race but the start of a **standing deadlock** — the Supervisor requires `HEAD == origin/main` and refused every cycle for ~4.5 hours. **MSG-0169 §4** carries the full finding; **the Lead Loop is PAUSED** pending **Q23**.
+
+> *The line this replaces, retained:* "**Status:** **OPEN** 2026-08-26 — requires an operator or Architecture Lead action. **This runner cannot clear it and must not try.**"
 **Raised:** 2026-08-26, by the supervisor-started TASK-0050 session (`runner.lock` pid **14068**,
 acquired **2026-08-25T21:51:58Z**, host `LENOVO-LA0X1754`)
 **Severity:** **Communication channel down for this session.** The evidence work is complete and
