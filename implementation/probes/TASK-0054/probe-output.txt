@@ -1,0 +1,287 @@
+TASK-0054 survey of instruments — accumulating, readable statement log?
+run at (wall clock, reported not measured): 2026-08-26T09:29:36.360Z
+node v24.15.0 win32 x64
+   [control 1] marker scanner discriminates -> FIRED :: positive=1 negative=0
+
+==============================================================================
+SECTION A — required outcome 1: what is REACHABLE, and how the list was established
+==============================================================================
+
+-- A1. Runtime built-ins, enumerated from node:module builtinModules (not from memory) 
+   builtinModules total   : 72
+   engine-shaped matches  : node:sqlite
+   [control 2] builtin enumeration is live, not hard-coded -> FIRED :: sqlite present in builtinModules
+   [control 3] builtin filter discriminates -> FIRED :: non-engine builtins excluded
+   VERDICT: the ONLY database engine this runtime supplies without an install is node:sqlite
+
+-- A2. Packages already present — repository, npm global, npm cache --------
+   repository node_modules   : D:\Work\pci-platform\node_modules
+                               NOT PRESENT — directory does not exist
+   npm global node_modules   : C:\Program Files\nodejs\node_modules
+                               2 entries -> corepack, npm
+                               engine-shaped: NONE
+   npm cache                 : C:\Users\Administrator\.npm\_cacache -> NOT PRESENT
+   npm cache                 : C:\Users\Administrator\AppData\Local\npm-cache\_cacache -> PRESENT
+   NOTE: a package present in a CACHE is not an installed package. Installing from cache
+         is still an install, and TASK-0054 forbids one. Recorded, not attempted.
+
+-- A3. Other language runtimes and database executables — FILESYSTEM PRESENCE on PATH 
+   METHOD LIMIT, stated before the result: this scan reads the filesystem. It does NOT
+   execute anything. PRESENT means a file exists at that path, NOT that this runner may
+   invoke it. BLK-0011 is the standing case: python is present and DENIED to this runner.
+   ABSENT   sqlite3           (SQLite CLI shell — has .trace, an accumulating statement log)
+   ABSENT   psql              (PostgreSQL client)
+   ABSENT   postgres          (PostgreSQL server)
+   ABSENT   mysql             (MySQL client)
+   ABSENT   mariadb           (MariaDB client)
+   ABSENT   mongod            (MongoDB server)
+   ABSENT   redis-server      (Redis server)
+   ABSENT   duckdb            (DuckDB CLI)
+   ABSENT   sqlcmd            (SQL Server client)
+   PRESENT  esentutl       -> C:\Windows\System32\esentutl.EXE   (Windows ESE / JET Blue storage engine utility)
+   PRESENT  odbcconf       -> C:\Windows\System32\odbcconf.EXE   (ODBC driver-manager configuration)
+   PRESENT  odbcad32       -> C:\Windows\System32\odbcad32.EXE   (ODBC Data Source Administrator)
+   ABSENT   python            (CPython — stdlib sqlite3 is EPA-0006 §4.15 subject 2)
+   ABSENT   python3           (CPython)
+   PRESENT  py             -> C:\Windows\py.EXE   (Windows Python launcher)
+   ABSENT   java              (JVM — no DB engine in the JDK standard library)
+   PRESENT  perl           -> C:\Program Files\Git\usr\bin\perl.EXE   (Perl)
+   ABSENT   ruby              (Ruby)
+   ABSENT   php               (PHP)
+   ABSENT   dotnet            (.NET SDK/runtime)
+   ABSENT   deno              (Deno)
+   PRESENT  bun            -> C:\Users\Administrator\.bun\bin\bun.EXE   (Bun)
+   ABSENT   docker            (container runtime — would be an install route)
+   [control 4] PATH scan discriminates -> FIRED :: 6 of 23 present
+   [control 5] PATH scan negative control -> FIRED :: fabricated executable name NOT found
+
+-- A3b. A WIDER net — every executable on PATH whose NAME is engine-shaped -
+   The fixed list above can only find what it was told to look for. This scan reads every
+   PATH directory and matches on the engine vocabulary, so the enumeration is an
+   enumeration and not a checklist. DISC-0014 is the reason this is done.
+   PATH directories scanned: 29
+   engine-shaped executables found: 5
+     -> C:\Program Files\Git\usr\bin\gpg.exe
+     -> C:\Program Files\Git\usr\bin\watchgnupg.exe
+     -> C:\Windows\System32\SearchFilterHost.exe
+     -> C:\Windows\System32\SearchIndexer.exe
+     -> C:\Windows\System32\SearchProtocolHost.exe
+
+-- A3c. JavaScript runtimes other than this one — the BINDING is the variable (§4.15) 
+   §4.15 established that E4 obtainability changed with the BINDING and not the build.
+   So a second JS runtime on this host is a DISTINCT binding to the same engine family,
+   and is a subject this programme has never enumerated. Checked by filesystem presence:
+   PRESENT  bun install dir C:\Users\Administrator\.bun
+            contents: bin, install, uninstall.ps1
+            bin/: bun.exe, bunx.exe
+            bun.exe: 98480216 bytes, mtime 2026-05-12T19:39:24.000Z
+            bunx.exe: 98480216 bytes, mtime 2026-05-12T19:39:24.000Z
+            note: ships bun:sqlite — a THIRD SQLite binding — and bun:sql
+   ABSENT   deno install dir C:\Users\Administrator\.deno
+            note: ships no SQLite binding in its standard library
+   VERSION AND CAPABILITY ARE UNKNOWN AND ARE NOT GUESSED. Establishing either requires
+   EXECUTING the runtime, which this runner may not do. That is a PERMISSION boundary,
+   not an install boundary, and it is recorded as a blocker rather than routed around.
+
+-- A4. Windows ODBC driver manager — present as a file, and what that does and does not mean 
+   PRESENT  C:\Windows\System32\odbc32.dll
+   PRESENT  C:\Windows\System32\odbctrac.dll
+   PRESENT  C:\Windows\System32\esent.dll
+
+==============================================================================
+SECTION B — the one binding this runner can EXECUTE: node:sqlite, enumerated fresh
+==============================================================================
+   module exports        : DatabaseSync, Session, StatementSync, backup, constants
+   DatabaseSync instance : aggregate, applyChangeset, close, createSession, createTagStore, enableDefensive, enableLoadExtension, exec, function, isOpen, isTransaction, limits, loadExtension, location, open, prepare, setAuthorizer
+   StatementSync instance: all, columns, expandedSQL, get, iterate, run, setAllowBareNamedParameters, setAllowUnknownNamedParameters, setReadBigInts, setReturnArrays, sourceSQL
+   DatabaseSync.prototype: __defineGetter__, __defineSetter__, __lookupGetter__, __lookupSetter__, __proto__, aggregate, applyChangeset, close, createSession, createTagStore, enableDefensive, enableLoadExtension, exec, function, hasOwnProperty, isPrototypeOf, loadExtension, location, open, prepare, propertyIsEnumerable, setAuthorizer, toLocaleString, toString, valueOf
+   Session.prototype     : __defineGetter__, __defineSetter__, __lookupGetter__, __lookupSetter__, __proto__, changeset, close, hasOwnProperty, isPrototypeOf, patchset, propertyIsEnumerable, toLocaleString, toString, valueOf
+   StatementSync.prototype: __defineGetter__, __defineSetter__, __lookupGetter__, __lookupSetter__, __proto__, all, columns, get, hasOwnProperty, isPrototypeOf, iterate, propertyIsEnumerable, run, setAllowBareNamedParameters, setAllowUnknownNamedParameters, setReadBigInts, setReturnArrays, toLocaleString, toString, valueOf
+   backup is a           : function · constants keys: 45
+
+-- B1. Trace / profile / log entry points — checked by name against a fabricated-name control 
+   checked : 24 names
+   PRESENT : (none)
+   ABSENT  : trace, setTrace, traceV2, trace_v2, setTracer, profile, setProfile, onStatement, setLogger, log, configLog, setProgressHandler, progressHandler, stmtScanStatus, scanStatus, setTraceCallback, sqlLog, unlockNotify, setUpdateHook, updateHook, commitHook, rollbackHook, wal_hook, setWalHook
+   [control 6] name check discriminates -> FIRED :: a real member is found and a fabricated one is not
+
+-- B2. Tracing pragmas against the §4.12 nonexistent-pragma control --------
+   CONTROL  PRAGMA zz_no_such_pragma_zz -> []
+   INERT     PRAGMA vdbe_trace       -> []
+   INERT     PRAGMA vdbe_listing     -> []
+   INERT     PRAGMA vdbe_addoptrace  -> []
+   INERT     PRAGMA parser_trace     -> []
+   INERT     PRAGMA sql_trace        -> []
+   INERT     PRAGMA stmt_scanstatus  -> []
+   INERT     PRAGMA bytecode         -> []
+   7 INERT (identical to the control) · 0 differ
+   [control 7] pragma control is meaningful -> FIRED :: the nonexistent pragma returns an empty result, so "empty" is not evidence of a live pragma
+
+-- B3. Statement-log virtual tables — checked against a fabricated-table control 
+   CONTROL  zz_no_such_table_zz -> THREW: no such table: zz_no_such_table_zz
+   [control 8] virtual-table control fires -> FIRED :: a fabricated table name throws "no such table"
+   ABSENT   sqlite_stmt      -> no such table: sqlite_stmt
+   PRESENT  dbstat           -> 2 rows
+   ABSENT   sqlite_dbpage    -> no such table: sqlite_dbpage
+   ABSENT   bytecode         -> no such table: bytecode
+   ABSENT   tables_used      -> no such table: tables_used
+   PRESENT  sqlite_schema    -> 1 rows
+
+-- B4. Build — compile options ---------------------------------------------
+   compile options: 49
+   ABSENT   ENABLE_STMTVTAB
+   ABSENT   ENABLE_SQLLOG
+   ABSENT   DEBUG
+   ABSENT   ENABLE_STMT_SCANSTATUS
+   ABSENT   ENABLE_NORMALIZE
+   PRESENT  ENABLE_DBSTAT_VTAB
+   PRESENT  ENABLE_SESSION
+   PRESENT  ENABLE_PREUPDATE_HOOK
+   engine version : 3.51.3
+
+==============================================================================
+SECTION C — required outcome 2: does any surface ACCUMULATE and can it be READ BACK?
+==============================================================================
+   [control 9] fixture actually contains the unauthorized marker -> FIRED :: 100 unauthorized rows
+
+-- C1-SURFACE. createSession / Session.changeset() — the only member whose SHAPE is a log 
+   MSG-0168 §4.1 enumerated Session and reported "none" as an observability surface.
+   It was enumerated and NOT measured for accumulation. TASK-0054 asks exactly that, so it
+   is MEASURED here rather than dismissed — the same reasoning MSG-0168 §5.4 applied to
+   createTagStore.
+   DISARMED (no session open): a write ran; there is no surface to read at all.
+              rows before/after: 200 -> 201
+   ARMED, before any statement : changeset bytes = 0
+   [control 10] session disarmed state is empty -> FIRED :: changeset is 0 bytes before any statement
+   after statement 1           : changeset bytes = 74 · marker hits = 1
+   after statement 2           : changeset bytes = 137 · marker hits = 2
+   patchset after statement 2  : bytes = 137 · marker hits = 2
+   [control 11] session ACCUMULATES across statements -> FIRED :: 0 -> 74 -> 137 bytes across two distinct statements
+   [control 12] session is READABLE BACK -> FIRED :: changeset() returns an inspectable Uint8Array of 137 bytes
+   statement text in changeset : hits for "INSERT INTO chunk" = 0
+   ROW CONTENT in changeset    : hits for the unauthorized marker = 2
+   [control 13] changeset carries CONTENT and not statement text -> FIRED :: marker hits=2 statement-text hits=0
+   a SELECT examining 103 unauthorized rows: changeset 137 -> 137 bytes
+   [control 14] session records WRITES only, never reads -> FIRED :: 103 unauthorized rows examined and the surface did not move
+
+-- C2-SURFACE. createTagStore — accumulation confirmed, read paths re-tried rather than carried 
+   DISARMED: size = 0 · capacity = 1000
+   [control 15] tag store disarmed state is empty -> FIRED :: size 0 before any statement
+   ARMED   : size 0 -> 1 -> 2 across two distinct statements
+   [control 16] tag store ACCUMULATES across statements -> FIRED :: 0 -> 1 -> 2
+   read path getOwnPropertyNames  -> RETURNED: capacity,db,size
+   read path prototype names      -> RETURNED: get,all,iterate,run,clear,constructor
+   read path JSON.stringify       -> RETURNED: {"capacity":1000,"db":{"isOpen":true,"isTransaction":false,"limits":{"length":1000000000,"sqlLength":1000000000,"column":2000,"exprDepth":1000,"compoundSelect":500,"vdbeOp":250000000,"functionArg":1000,"attach":10,"likePatternLength":50000,"variableNumber":32766,"triggerDepth":1000}},"size":2}
+   read path iterate()            -> THREW: First argument must be an array of strings (template literal).
+   read path Symbol.iterator      -> THREW: store is not iterable
+   read path entries()            -> THREW: store.entries is not a function
+   read path get()                -> THREW: First argument must be an array of strings (template literal).
+   read path all()                -> THREW: First argument must be an array of strings (template literal).
+   read path keys()               -> THREW: store.keys is not a function
+   read path values()             -> THREW: store.values is not a function
+   read path toArray()            -> THREW: store.toArray is not a function
+   read paths that returned STATEMENT TEXT: NONE
+   [control 17] tag store has NO read path to its accumulated statements -> FIRED :: every enumerator threw or returned metadata only
+   Its 0 marker hits are therefore ZERO EVIDENCE, not a clean result — there is nothing
+   readable for a scan to be a scan of. MSG-0168 §5.4, re-measured here and confirmed.
+
+-- C3-SURFACE. sourceSQL / expandedSQL — the (b) half, tested for the (a) half 
+   after two statements, s1.sourceSQL   : "SELECT id FROM chunk WHERE scope = ?"
+   after two statements, s1.expandedSQL : "SELECT id FROM chunk WHERE scope = 'authorized'"
+   after two statements, s2.sourceSQL   : "SELECT id FROM chunk WHERE body = ?"
+   after two statements, s2.expandedSQL : "SELECT id FROM chunk WHERE body = 'ZZ-UNAUTHORIZED-PASSAGE-TEXT-ZZ body 7'"
+   [control 18] sourceSQL does NOT accumulate -> FIRED :: each handle reports only its own text; neither carries the other statement
+   marker hits — sourceSQL  : 0 (parameter-bound)
+   marker hits — expandedSQL: 1 (parameter-bound)
+   INLINED — sourceSQL      : 1 hits
+   INLINED — expandedSQL    : 1 hits
+   [control 19] MSG-0168 §5.3 reproduced on this run -> FIRED :: parameter-bound: source 0 / expanded 1 · inlined: both 1
+   a statement run via exec() leaves NO handle, so it has no sourceSQL to read at all.
+
+-- C4-SURFACE. setAuthorizer — accumulation is CALLER-side, and it never sees content 
+   DISARMED: events = 0
+   [control 20] authorizer disarmed state is empty -> FIRED :: 0 events before arming
+   [control 21] authorizer is WIRED to the engine (deny control) -> FIRED :: prepare under a DENY-ing authorizer threw "not authorized"
+   ARMED   : events 0 -> 3 -> 6 across two distinct statements
+   events carry: [[21,null,null,null,null],[20,"chunk","id","main",null],[20,"chunk","scope","main",null]]
+   marker hits across ALL events: 0
+   [control 22] authorizer events carry object names, never content -> FIRED :: 6 events, 0 marker hits
+   The accumulation above is the ARRAY the caller built. The engine emits one callback
+   per column reference at PREPARE and retains nothing. Nothing is read BACK from the
+   engine; the caller is reading its own array. §4.15 and MSG-0168 §5.2 classified this
+   instrument the same way on both other subjects.
+
+-- C5-SURFACE. user-defined function / aggregate — the AB-1 shape, recorded and not offered 
+   a caller-registered function observed 100 values; 100 carry the unauthorized marker
+   [control 23] UDF observation is caller-side and adverse by construction -> FIRED :: 100 values observed
+   This ACCUMULATES and is READABLE — and it is NOT an engine-emitted log. It is the
+   application writing its own record of content the engine handed it. Offering it as
+   E4 would make E4 satisfiable by any application that chooses to log, which is the
+   reinterpretation MSG-0119 forbids. Recorded so the possibility is closed explicitly.
+
+==============================================================================
+SECTION F — required outcome 6: could a LIVE REGISTRY satisfy C1? Evidence, not a ruling
+==============================================================================
+MSG-0180 §2 fact 2: sqlite_stmt lists CURRENTLY PREPARED statements, so a finalized
+statement is gone — "a live registry, not a history". sqlite_stmt is ABSENT from this
+build (Section B3), so it CANNOT be measured here and is NOT measured here.
+
+What CAN be measured is the analogous property on the binding that IS reachable: how long
+a statement's text stays readable, and to whom. That is evidence bearing on the question
+and it is NOT an answer to it. §4.6 S10 forbids generalizing one subject to a class.
+   while the caller HOLDS the handle : sourceSQL marker hits = 1
+   [control 24] statement text is readable while the handle is held -> FIRED :: 1 hit
+   [control 25] the scan target is non-empty -> FIRED :: 100 unauthorized rows are in the database, so a 0 on a surface is a real 0
+   after the handle is DROPPED, dbstat (all rows)            -> 0
+   after the handle is DROPPED, sqlite_schema                -> 0
+   after the handle is DROPPED, tag store size (never armed with it) -> 0
+   after the handle is DROPPED, tag store readable content   -> NONE — no read path at any time (Section C2)
+   [control 26] no engine-side surface retains the statement text once the handle is gone -> FIRED :: every readable surface returns 0 hits while the database itself still carries 100
+
+   THE FINDING: on this binding the retention window for statement text is exactly the
+   CALLER'S HANDLE LIFETIME. The read path IS the handle, and the handle is the
+   application's, not the engine's. So "the engine retained it" and "the application
+   kept a reference" are the same event here, which is the C5 shape again.
+
+   WHAT THIS DOES AND DOES NOT SETTLE. It does NOT settle whether sqlite_stmt could
+   satisfy C1 — that is a different surface on a build nobody here has. It DOES show
+   that the live-registry SHAPE, where it exists in reach, collapses into the caller
+   keeping its own record. REFERRED AS A QUESTION, NOT RULED.
+
+==============================================================================
+SECTION D — required outcome 3: C1-C4 applied to every surface, in MSG-0168 §5 table form
+==============================================================================
+
+| Surface | C1 — engine-emitted LOG exists and was taken | C2 — control | C3 — inspectable for passage text | C4 — records what the engine EXAMINED |
+|---|---|---|---|---|
+| createSession / Session.changeset() | NO — a row-change set, not a log of statements. Records WRITES only; a SELECT examining 103 unauthorized rows moved it 0 bytes | YES — 0 bytes disarmed | YES — an inspectable Uint8Array, and it carries row CONTENT verbatim | NO — records what CHANGED, not what was EXAMINED |
+| createTagStore | NO — a caller-side statement cache in the binding, not an engine log | YES — size 0 disarmed | NO — no read path exists at all | NO |
+| sourceSQL (unexpanded) | NO — no accumulation; each handle reports only its own text | YES | YES | NO — statement text is the instruction |
+| expandedSQL | NO — no accumulation | YES | YES | NO — statement text is the instruction |
+| setAuthorizer | NO — a prepare-time authorization callback; the engine retains nothing | YES — deny control fired | YES | NO — per column reference, invariant with N |
+| dbstat | NO — page-level storage statistics | YES | YES | NO — describes pages |
+| user-defined function / aggregate | NO — the APPLICATION logging content the engine handed it, not an engine-emitted log | YES | YES | NO |
+
+C1 = NO on every surface. Seven surfaces, one engine, and no log.
+
+==============================================================================
+SECTION E — the two halves, answered together for the first time
+==============================================================================
+
+| Surface | (a) ACCUMULATES across statements AND readable back | (b) statement text WITHOUT inlined content | BOTH? |
+|---|---|---|---|
+| createSession / changeset() | **YES** — measured: 0 -> 74 -> 137 bytes across two statements, readable as a Uint8Array | **NO** — it carries no statement text at all (0 hits for "INSERT INTO chunk"), and carries row CONTENT verbatim (2 marker hits) | **NO** |
+| createTagStore | **NO** — accumulates but has NO read path | n/a — unreadable | **NO** |
+| sourceSQL | **NO** — per-handle, no accumulation | **YES** — parameter-bound text stays out of it | **NO** |
+| expandedSQL | **NO** — per-handle | **NO** — inlines bound values | **NO** |
+| setAuthorizer | **NO** — caller-side array; engine retains nothing | n/a — never carries statement text | **NO** |
+| Python sqlite3.set_trace_callback (§4.15, CARRIED not re-measured) | **YES** | **NO** — emits the EXPANDED statement, and the binding offers no unexpanded form | **NO** |
+
+NOTHING REACHABLE SATISFIES BOTH HALVES.
+The one surface that ACCUMULATES and can be READ BACK carries row content and no statement
+text. The one surface whose statement text is clean does not accumulate. They are different
+surfaces and no reachable engine puts them together.
+
+==============================================================================
+RUN VALID — 26 controls fired, none failed.
+==============================================================================
