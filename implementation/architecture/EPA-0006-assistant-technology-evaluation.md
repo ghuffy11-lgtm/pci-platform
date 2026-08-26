@@ -1921,12 +1921,43 @@ discharges it. **All twelve are necessary, none is sufficient, and satisfying al
 | **EV10** | **N5, measured** | The **served set** reported alongside `U` in every cell, with at least one scenario in which an answer exists. **A design returning an empty answer where an answer exists fails**, whatever its `U` |
 | **EV11** | **Plan- and maintenance-independence** | The same verdict in **every** configuration cell, across at minimum: baseline; **after statistics maintenance**; with and without any available plan pinning; fresh connections; a shifted query instant; and **≥ 2 data distributions**. **F12 is why this is not optional** — a single-configuration measurement is a measurement of one plan |
 | **EV12** | **Both validity gates, per run** | The **adversarial precondition** verified before **every** measurement (the unconstrained top-`k` contains **no** authorized chunk), and a **negative control that FAILS**. **§4.6 S8: if the harness does not fail the control, the run is void and its passes prove nothing** |
+| **EV13** | **N6, measured** — byte-level durability containment (**§4.18**) | The selected topology **measured against N6**, across **limbs N6.1, N6.2 and N6.3**, with **provenance established before any finding is assigned** (**DA-4** — presence is not provenance), and with the **residue after an N3 transition examined, not only the live entries** (**N6.3**). **Unmeasured is not satisfied.** Stated at **EV2's strength**: what it requires is a **measurement**, not a pass |
 
 **Two scoping rules on this list, both carried from the record rather than invented here.** **No
 result may be generalized from one build to an engine class** (§4.12; MSG-0130) — evidence obtained
 against a specific runtime, version and configuration is evidence about that, and must say so. And
 **EV1–EV12 are obtained against a test subject, which is not a selection**: naming a candidate names
 a **test subject** (§4.6 S11; MSG-0101 §3).
+
+> **Declared pointer note, added 2026-08-26 by TASK-0052 under MSG-0172 §2 (Q21 = YES). The prose above
+> and below this note is left exactly as TASK-0041 wrote it, and the `EV13` row is the only change to
+> this subsection.** It is a pointer, not a rewording — §4.12's Q12 note is the precedent, and it is the
+> same mechanism TASK-0047 used for N6 below §4.13's N-table.
+>
+> **The arithmetic, declared rather than corrected in place.** The sentence above reads *"All twelve are
+> necessary, none is sufficient"*, and the sentence beside it reads *"EV1–EV12 are obtained against a
+> test subject"*. **Both were true when written and neither is edited. With `EV13` the list is
+> THIRTEEN**, and **every word of both sentences applies to `EV13` unchanged** — it is necessary, it is
+> not sufficient, and it is obtained against a **test subject**, which is **not a selection**.
+>
+> **What `EV13` does and does not do, stated here because this is the list a future selection task will
+> read first.** **It adds no clearance gate.** MSG-0172 §2: EV13 *"does not make N6 a clearance gate,
+> does not add to §4.6 S6's table"*, and **satisfying N6 still clears nothing** (§4.18). **The sentence
+> above — that this list *"adds no gate and relaxes none"* — survives `EV13` intact**, because what
+> `EV13` closes is an **evidence gap**, not a bar: **the list predates N6**, and **`EV13` requires the
+> measurement to have been TAKEN, not to have passed.**
+>
+> **Why the omission would have mattered, from the evidence rather than from principle.** **L4 —
+> isolated stores after re-partition — satisfies N1 as written and made the previous partition's bytes
+> durable anyway** (§4.19; MSG-0158 §5), through a page the dropped partition left on the free list.
+> **`Ustruct`, N1's own instrument, counts entries and is structurally blind to it.** So **without
+> `EV13` a topology could reach a selection task carrying the one failure mode the TASK-0046 evidence
+> exists to record**, with every other item on this list discharged.
+>
+> **Nothing moves because of this row.** **No candidate holds an N6 status, because none has been
+> measured against N6** — and **unmeasured is not satisfied**, which is the row's own last clause read
+> back on the present state. **No verdict recorded anywhere in this document changes**, **GAP-B remains
+> UNDISCHARGED**, and **selection remains blocked on grounds independent of `EV13`.**
 
 #### The bounded recommendation, and what stays open
 
@@ -2645,6 +2676,23 @@ DA-1 and **this task was forbidden to measure one.**
 
 #### Q14 — does a DA-1 failure block selection? **Surfaced, deliberately NOT decided**
 
+> **Q14 has since been RULED, and this subsection is otherwise unchanged.** Declared pointer note added
+> 2026-08-26 by **TASK-0052** under **MSG-0172 §1**; **additive — nothing below is deleted or reworded,
+> and the heading is left exactly as TASK-0044 wrote it** so the referral reads as it did when made.
+> **The heading is deliberately NOT updated**: §4.13's Q13 note changed its heading only because
+> MSG-0133 *instructed that change in terms*, and **MSG-0172 instructs no such change here** — so the
+> §4.12 Q12 form is followed instead.
+>
+> **The ruling is recorded in full below, at the end of this section, under *"Q14 — RULED by MSG-0172
+> §1"*.** **It is stated there rather than here** because MSG-0172's reasoning is required to be
+> reproduced rather than paraphrased, and a summary in this position would be the second statement of
+> one rule — the drift §4.12's note exists to avoid.
+>
+> **The one line below that the ruling supersedes, named so it is not read as still operative:** the
+> *"fail-closed default until ruled"* paragraph. **It is left standing because it was correct while it
+> stood, and because it recorded why it cost nothing.** **No verdict below changes, and none could —
+> DA-1 has never been applied to a candidate.**
+
 **DA-1 yields its own verdict in §4.6 S9's vocabulary. What that verdict does to a candidate's
 eligibility is an architecture decision, and it is the Lead's.** MSG-0147 consequence 2 states the R2
 ruling *"does not by itself clear or fail any retrieval engine"*, and MSG-0148b forbids changing any
@@ -2675,6 +2723,96 @@ are NOT CLEARED and no candidate is eligible for selection on any reading of Q14
   none could be.
 - **The exposure evidence task is separate and is NOT authorized by this section.** It must be
   authorized on its own, and it measures **against this criterion as it now stands**.
+
+#### Q14 — RULED by MSG-0172 §1. A confirmed DA-1 violation DISQUALIFIES; NOT CLEARED blocks without disqualifying
+
+**Added 2026-08-26 by TASK-0052 under MSG-0172 §1. Additive: every subsection above is left exactly as
+TASK-0044 wrote it, `DA-0`…`DA-7` are unchanged, and no verdict moves.**
+
+**The question this answers is the one the subsection above referred:** *what does a DA-1 verdict do to
+a candidate's eligibility?* **DA-1 already yields its own verdict in §4.6 S9's vocabulary; what that
+verdict does to eligibility was the Lead's to decide, and it is now decided.**
+
+**The ruling has two limbs, and they are kept separate here for the reason MSG-0172 gives — they are
+not the same fact.**
+
+| DA-1 verdict | Effect on selection |
+|---|---|
+| **DISQUALIFIED** — a request was **measured** to make unauthorized content durable, **provenance established** | **The candidate is DISQUALIFIED for selection.** Not *"recorded alongside"* — **out** |
+| **NOT CLEARED** — unproven, unmeasured, or provenance **not separable** | **Cannot support selection**, and **does not itself disqualify.** It is an **absence of evidence**, and **absence is not sufficient** (§4.6 S5; DA-5 row 3) |
+
+##### Why DISQUALIFIED rather than merely recorded — MSG-0172's reasoning, reproduced
+
+**MSG-0172 §1 is quoted rather than summarised, because the reasoning is what makes the ruling
+checkable:**
+
+> **DA-1 is not a quality property. A confirmed violation means that resolving an ordinary request
+> wrote content the requester was not entitled to receive into durable storage** — the same
+> confidentiality failure strict Shape-1 exists to prevent, arriving by the write path instead of the
+> read path. **A architecture that disqualifies an engine for examining unauthorized entries and
+> tolerates one for making unauthorized bytes durable is not coherent.**
+
+**The load-bearing move is the one about paths.** Strict Shape-1 (§4.6 S1–S3) polices what an engine
+**examines** — the read path. **DA-1 polices what resolving the request leaves readable on disk
+afterwards, and by whom** (DA-7). **Those are two routes to the same failure**, and this record's own
+measured evidence already shows the write route does not need the read route to be open: **§4.17's rollback-journal
+finding arose on a request that examined no unauthorized row**, and **§4.19's L4 finding arose with no
+unauthorized row in reach at all.** **A bar that is decisive on one route and advisory on the other is
+not a bar; it is a preference about which mechanism gets to fail.**
+
+##### Why NOT CLEARED does not disqualify — the second limb, and it is not a softening
+
+> **§4.6 S5's asymmetry cuts both ways: a non-zero finding is conclusive, an absent one is not.
+> Treating unproven as violation would let a missing instrument convict an engine**, and DA-6 already
+> fixes the consequence — **unproven cannot support selection, which is sufficient.**
+
+**This is the same rule §4.6 S5 states about counters, applied to artefacts rather than relaxed for
+them.** **DA-6 is unchanged and still binding**: where an in-scope artefact cannot be inspected at all,
+the verdict is **`NOT CLEARED`** — **uninspectable is not clean.** **What this limb refuses is the
+opposite error to the one DA-6 refuses**, and both are refused: **DA-6 stops an unmeasurable engine
+being read as clean; this limb stops an unmeasurable engine being read as guilty.** **Neither reading
+lets it be selected.**
+
+##### The asymmetry, stated explicitly so it is not read as contradicting DA-5 consequence 1
+
+**The obvious objection, and MSG-0172 states it against itself before answering it:** **DA-5
+consequence 1 says that *satisfying* DA-1 clears nothing.** If satisfying it clears nothing, how can
+failing it disqualify?
+
+> **This ruling is not its mirror and does not make it one. Passing a necessary condition is not
+> evidence of the whole; failing one is decisive. That asymmetry is the design of every gate in this
+> record.**
+
+**It is the design, and the record can be checked against that claim rather than asked to accept it.**
+**§4.6 S5:** a non-zero count is conclusive, a zero count is not. **§4.6 S6 E3:** an unmeasurable opaque
+stage is **NOT CLEARED**, *"never a pass by default"*. **§4.6 S10 and DA-6:** an engine that cannot be
+observed fails the burden rather than inheriting a pass. **§4.18 consequence 1:** satisfying N6 clears
+nothing. **Every one of those is the same shape**, and **Q14's ruling adds a member to that family
+rather than an exception to it.**
+
+##### What this ruling does NOT do — and this is the part most likely to be over-read
+
+- **It creates NO new clearance gate.** **§4.6 S6's table is untouched** — no row added, no cell
+  altered, no evidence class created. **E1, E2, E3 and E4 remain the clearance bar**, and **DA-1 still
+  contributes to no Shape-1 verdict** (DA-5 consequence 1, DA-7's last row). **Q14 rules what a DA-1
+  verdict does to *eligibility*; it does not make DA-1 an evidence class.**
+- **It does not make `EV13`, or N6, a gate either.** **N6 still clears nothing** (§4.18 consequence 1),
+  and **`EV13` (§4.13) requires N6 to be MEASURED, not passed.**
+- **No candidate verdict changes, and none could.** **DA-1 has been defined and never applied** — the
+  statement §4.16 already makes above is unchanged and remains exactly true. **There is nothing to
+  re-score**: no candidate holds a DA-1 verdict of either kind, so **neither limb moves anything
+  today.** MSG-0172 §1: *"Nothing changes today: DA-1 has never been applied to a candidate, so no
+  verdict moves."*
+- **It relaxes nothing and weakens nothing.** **Strict Shape-1, S1–S11, E1–E4, N1–N6, `DA-1`…`DA-7`,
+  G-Q4…G-Q7.8 and every verdict recorded in §4.11, §4.12, §4.14, §4.17 and §4.19 are unchanged by this
+  subsection.** **E4 is not weakened** (MSG-0119).
+- **It brings GAP-B no closer to discharge.** **GAP-B remains UNDISCHARGED and E4 remains UNMET**, for
+  the reason MSG-0171 §4 gives and this ruling does not touch: **none of the surfaces measured is a
+  log.** **Q14 is about DA-1's consequence, and GAP-B is about E4's evidence** — **they do not meet, and
+  a reader who takes this subsection as progress on GAP-B has read it wrong.**
+- **It measures nothing, selects nothing and clears nothing.** **No probe was written or run under this
+  subsection, no test executed and no test count is claimed** — none could be. **All six §4.14
+  candidates remain NOT CLEARED, and eleven probes have cleared nothing.**
 
 ---
 
@@ -2839,6 +2977,28 @@ whose free list is empty.** In a re-materialised store **the append does overwri
   §4.11, §4.12, §4.14 and §4.17 stands unchanged.
 - **It measures nothing**, and **claims no candidate's N6 status** — **the evidence task that would, if
   authorized, is a separate one.**
+
+> **Declared pointer note, added 2026-08-26 by TASK-0052 under MSG-0172 §2 (Q21 = YES). This note
+> points; it changes no limb, no table cell and no sentence of §4.18, and it creates nothing.**
+> **N6 is now named in §4.13's pre-selection evidence list as `EV13`.** The row is **in §4.13, where the
+> evidence bill lives**, and is **deliberately not restated here** — two statements of one rule invite
+> drift (§4.12's Q12 note is the precedent, and it is the same reason §4.13's N-table points at this
+> section rather than carrying a sixth row).
+>
+> **This section's own consequence 1 is unaffected, and the distinction is the whole point of the
+> note.** **Satisfying N6 still clears nothing.** **`EV13` puts N6 on the list of evidence that must
+> EXIST before a selection task could be authorized; it does not put N6 in §4.6 S6's table**, which is
+> untouched. MSG-0172 §2: EV13 *"requires **measurement**, not a pass … It closes an evidence gap; it
+> does not create a new bar."* **A topology that has been measured against N6 and failed has not
+> satisfied `EV13` by having been measured** — **the finding stands, and under §4.16's Q14 ruling a
+> confirmed DA-1 violation disqualifies.**
+>
+> **And this section's last bullet still reads correctly, with one clarification that keeps it from
+> being over-read in either direction.** **This section measured nothing**, and that is what the bullet
+> says. **N6 has since been measured on a TEST SUBJECT** — TASK-0048, recorded in **MSG-0163**, with
+> **L4 violating it** — but **a test subject is not a candidate** (§4.6 S11; MSG-0101 §3), so **no
+> candidate holds an N6 status, and `EV13` is discharged for none of them.** **Unmeasured is not
+> satisfied.**
 
 ---
 
@@ -3076,6 +3236,24 @@ than recalled, and checked against `AB`:
 > the task file names the EV13/Q14 update as a separate obligation that this task does **not** perform,
 > **"recorded so they are not silently absorbed."** The gap is therefore **declared, not accidental**,
 > and it remains outstanding.
+
+> **Declared pointer note, added 2026-08-26 by TASK-0052 under MSG-0172 §1–§2. The table above and the
+> note above it are left exactly as TASK-0051 wrote them, and nothing in this section is reworded,
+> withdrawn or corrected.**
+>
+> **The gap the note above declares has since been closed, by the separate task it named.** **`EV13` is
+> now written into §4.13's EV-list**, and **the Q14 ruling is recorded at the end of §4.16.** So the
+> `EV1–EV13` row's cell — *"EV1…EV12 only"* — **described this document accurately when TASK-0051
+> measured it and no longer describes it now; the row is left standing because the enumeration it
+> records was a measurement, and editing a measurement after the fact would destroy the thing that made
+> it trustworthy.**
+>
+> **Nothing about §4.20 changes.** **The collision result is unaffected** — the question that table
+> answers is whether `AB` collides with anything, and **`EV13` is not an `AB` token**; the answer stays
+> **No** in every row. **`AB-1` is untouched, and it still discharges nothing** — **GAP-B remains
+> UNDISCHARGED and E4 remains UNMET.** **The closing statement at the end of this section that the
+> EV13/Q14 update *"is NOT performed here"* also stands: it was true of TASK-0051, which is what it
+> claims.**
 
 **Choice 2 — a new section, `§4.20`, and not a home inside any existing criterion.** MSG-0172 §5(b) is
 the reason, and it is a reason about subject matter rather than about tidiness:
